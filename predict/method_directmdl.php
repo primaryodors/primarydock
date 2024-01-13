@@ -111,3 +111,17 @@ $cenres = substr($cenres_active, 8);
 prepare_receptor($pdbfname, "$flxr $aflxr");
 
 $poses = process_dock("a");
+
+if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
+{
+    dynamic_clash_compensation();
+
+    $pdbfname = $tmpoutpdb;
+    $outfname = "output/$fam/$protid/$protid.$ligname.dynamic.dock";
+    prepare_receptor($pdbfname, "$flxr $aflxr");
+    $poses = process_dock("ad");
+
+    // Delete the tmp PDB.
+    unlink($tmpoutpdb);
+}
+

@@ -156,3 +156,105 @@ function do_templated_activation()
         }
     }
 }
+
+function dynamic_clash_compensation()
+{
+    global $protid, $has_fyg, $has_rock6, $cryoem, $template, $clashcomp, $num_std_devs, $tmpoutpdb;
+    if (!count($template)) build_template();
+
+    // Ensure template contains standard deviations. If not, average the ones from the templates that do.
+    foreach ($template as $hxno => $metrics)
+    {
+        foreach ($metrics as $metric => $xyz)
+        {
+            if (!isset($xyz["sigma"]))
+            {
+                $averages = [];
+                $counts = [];
+
+                foreach ($cryoem as $lrecep => $lhelixes)
+                {
+                    foreach ($lhelixes as $lhelix => $lmetrics)
+                    {
+                        foreach ($lmetrics as $lmetric => $lxyz)
+                        {
+                            if (isset($lxyz["sigma"]))
+                            {
+                                if (!isset($averages[$lhelix][$lmetric])) $averages[$lhelix][$lmetric] = floatval($lxyz["sigma"]);
+                                else $averages[$lhelix][$lmetric] += floatval($lxyz["sigma"]);
+
+                                if (!isset($counts[$lhelix][$lmetric])) $counts[$lhelix][$lmetric] = 1;
+                                else $counts[$lhelix][$lmetric]++;
+                            }
+                        }
+                    }
+                }
+
+                foreach ($averages as $lhelix => $lmetrics)
+                {
+                    foreach ($lmetrics as $lmetric => $total)
+                    {
+                        if (!isset($template[$lhelix][$lmetric]["sigma"]))
+                        {
+                            if ($counts[$lhelix][$lmetric]) $total /= $counts[$lhelix][$lmetric];
+                            $template[$lhelix][$lmetric]["sigma"] = $total;
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    foreach ($clashcomp as $tmrno => $cc)
+    {
+        foreach ($cc as $segment => $xyz)
+        {
+            // Check each clash compensation is within the SD limit. If not, reduce the magnitude to the deviation limit.
+            $sigma = floatval(@$template[$tmrno][$segment]["sigma"]);
+            $rlimit = $sigma*$num_std_devs;
+            if (!$sigma) continue;
+            $tmparr = []; foreach (['x','y','z'] as $idx => $var) $tmparr[$var] = floatval($xyz[$idx]); extract($tmparr);
+            $r = sqrt($x*$x+$y*$y+$z*$z);
+
+            if ($r > $rlimit)
+            {
+                $divisor = $rlimit / $r;
+                $x *= $divisor; $y *= $divisor; $z *= $divisor;
+            }
+
+            // Apply the corrected compensation.
+            foreach (['x','y','z'] as $var)
+            {
+                $$var = round($$var, 3);
+                $template[$tmrno][$segment][$var] = floatval($template[$tmrno][$segment][$var]) + $$var;
+                echo "Compensating TMR$tmrno.$segment.$var to {$template[$tmrno][$segment][$var]}...\n";
+            }
+        }
+    }
+
+    // Create a temporary custom output PDB and retry the active dock.
+    $args = "$protid";
+    foreach ($template as $hxno => $metrics)
+    {
+        foreach ($metrics as $metric => $dimensions)
+        {
+            if ($hxno == 6)
+            {
+                if ($metric == "cyt" && ($has_fyg || $has_rock6)) continue;
+                else if ($metric == "exr" && $has_rock6) continue;
+            }
+
+            $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
+            $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
+        }
+    }
+
+    $tmpoutpdb = "tmp/$protid.".getmypid().".pdb";
+    $args .= " -o $tmpoutpdb";
+
+    $cmd = "bin/fyg_activate_or $args";
+    echo "$cmd\n";
+    passthru($cmd);
+}

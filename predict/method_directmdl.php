@@ -116,7 +116,8 @@ prepare_receptor($pdbfname, "$flxr $aflxr");
 
 $poses = process_dock("a");
 
-if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
+// TODO: Separate dynamic_clash_compensation() into FYG-activation and direct-model editions.
+/* if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
 {
     dynamic_clash_compensation();
 
@@ -127,5 +128,4 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
 
     // Delete the tmp PDB.
     unlink($tmpoutpdb);
-}
-
+} */

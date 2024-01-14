@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <vector>
 #include <fstream>
 #include <math.h>
 
@@ -96,6 +97,15 @@ extern char asterisk[5];
 
 #if active_persistence_noflex
 extern bool allow_ligand_flex;
+#endif
+
+#if _dbg_too_slow
+extern std::vector<std::string> performance_function_names;
+extern std::vector<double> performance_function_times;
+extern std::vector<double> performance_function_began;
+
+void performance_begin_clock(std::string fnname);
+void performance_end_clock(std::string fnname);
 #endif
 
 #endif

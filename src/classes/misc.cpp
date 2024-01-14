@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include "point.h"
 
 using namespace std;
@@ -18,6 +19,52 @@ bool last_iter = false;
 bool differential_dock = false;
 float pre_ligand_multimol_radius = default_pre_ligand_multimol_radius;
 float pre_ligand_flex_radius = default_pre_ligand_flex_radius;
+
+#if _dbg_too_slow
+std::vector<std::string> performance_function_names;
+std::vector<double> performance_function_times;
+std::vector<double> performance_function_began;
+
+void performance_begin_clock(std::string fnname)
+{
+    int i, n;
+    n = performance_function_names.size();
+    struct timeval tv;
+    for (i=0; i<n; i++)
+    {
+        if (performance_function_names[i] == fnname)
+        {
+            gettimeofday(&tv, NULL);
+            performance_function_began[i] = tv.tv_sec + 1e-6*tv.tv_usec;
+            return;
+        }
+    }
+
+    performance_function_names.push_back(fnname);
+    performance_function_times.push_back(0);
+    gettimeofday(&tv, NULL);
+    performance_function_began[n] = tv.tv_sec + 1e-6*tv.tv_usec;
+}
+
+void performance_end_clock(std::string fnname)
+{
+    int i, n;
+    n = performance_function_names.size();
+    struct timeval tv;
+    for (i=0; i<n; i++)
+    {
+        if (performance_function_names[i] == fnname)
+        {
+            gettimeofday(&tv, NULL);
+            double elapsed = tv.tv_sec + 1e-6*tv.tv_usec - performance_function_began[i];
+            performance_function_times[i] += elapsed;
+            return;
+        }
+    }
+
+    throw -1;
+}
+#endif
 
 char asterisk[5] = "*";
 

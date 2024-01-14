@@ -392,6 +392,7 @@
 #define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0
+#define _dbg_too_slow 1
 #define _DBG_TUMBLE_SPHERES 0
 #define _debug_active_bond_rot 0
 #define debug_stop_after_tumble_sphere 0

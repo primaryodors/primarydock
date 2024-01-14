@@ -3358,6 +3358,10 @@ _exitposes:
 
     if (debug) debug->close();
 
+    #if _dbg_too_slow
+    performance_output_totals();
+    #endif
+
     return 0;
 }
 

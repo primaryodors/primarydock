@@ -106,6 +106,7 @@ extern std::vector<double> performance_function_began;
 
 void performance_begin_clock(std::string fnname);
 void performance_end_clock(std::string fnname);
+void performance_output_totals();
 #endif
 
 #endif

@@ -43,26 +43,40 @@ void performance_begin_clock(std::string fnname)
     performance_function_names.push_back(fnname);
     performance_function_times.push_back(0);
     gettimeofday(&tv, NULL);
-    performance_function_began[n] = tv.tv_sec + 1e-6*tv.tv_usec;
+    performance_function_began.push_back(tv.tv_sec + 1e-6*tv.tv_usec);
 }
 
 void performance_end_clock(std::string fnname)
 {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
     int i, n;
     n = performance_function_names.size();
-    struct timeval tv;
     for (i=0; i<n; i++)
     {
         if (performance_function_names[i] == fnname)
         {
-            gettimeofday(&tv, NULL);
             double elapsed = tv.tv_sec + 1e-6*tv.tv_usec - performance_function_began[i];
             performance_function_times[i] += elapsed;
+            performance_function_began[i] = 0;
             return;
         }
     }
 
     throw -1;
+}
+
+void performance_output_totals()
+{
+    int i, n;
+    n = performance_function_names.size();
+    for (i=0; i<n; i++)
+    {
+        cout << "function " << performance_function_names[i] << ":";
+        cout << " " << performance_function_times[i] << " seconds.";
+        if (performance_function_began[i]) cout << " ERROR: Unterminated clocks.";
+        cout << endl;
+    }
 }
 #endif
 

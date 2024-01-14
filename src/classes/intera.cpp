@@ -22,6 +22,10 @@ bool interauditing = false;
 
 void InteratomicForce::append_by_Z(int Za, int Zb, InteratomicForce* iff)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("append_by_Z");
+    #endif
+
     int i;
 
     if (!forces_by_Z[Za][Zb])
@@ -40,10 +44,18 @@ void InteratomicForce::append_by_Z(int Za, int Zb, InteratomicForce* iff)
             break;
         }
     }
+
+    #if _dbg_too_slow
+    performance_end_clock("append_by_Z");
+    #endif
 }
 
 void InteratomicForce::read_all_forces()
 {
+    #if _dbg_too_slow
+    performance_begin_clock("read_all_forces");
+    #endif
+
     int i, ifcount = 0;
     init_nulls(all_forces, _MAX_NUM_FORCES);
 
@@ -112,6 +124,10 @@ void InteratomicForce::read_all_forces()
         all_forces[ifcount] = 0;
         read_forces_dat = true;
     }
+
+    #if _dbg_too_slow
+    performance_end_clock("read_all_forces");
+    #endif
 }
 
 InteratomicForce::InteratomicForce()
@@ -121,6 +137,10 @@ InteratomicForce::InteratomicForce()
 
 void InteratomicForce::read_dat_line(char* line)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("read_dat_line");
+    #endif
+
     char** words = chop_spaced_words(line);
     if (!words) return;
     if (words[0]
@@ -249,10 +269,18 @@ void InteratomicForce::read_dat_line(char* line)
         }
     }
     delete[] words;
+
+    #if _dbg_too_slow
+    performance_end_clock("read_dat_line");
+    #endif
 }
 
 bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("atom_is_capable_of");
+    #endif
+
     InteratomicForce** look = all_forces;
     int i, Za = a->get_Z();
 
@@ -264,7 +292,14 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
                 switch (t)
                 {
                 case covalent:
-                    if (a->get_valence()) return true;
+                    if (a->get_valence())
+                    {
+                        #if _dbg_too_slow
+                        performance_end_clock("atom_is_capable_of");
+                        #endif
+
+                        return true;
+                    }
                     break;
 
                 case ionic:
@@ -272,29 +307,67 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
                             ||
                             a->get_acidbase()
                        )
+                    {
+                        #if _dbg_too_slow
+                        performance_end_clock("atom_is_capable_of");
+                        #endif
+
                         return true;
+                    }
                     break;
 
                 case hbond:
-                    if (a->is_polar()) return true;
+                    if (a->is_polar()) 
+                    {
+                        #if _dbg_too_slow
+                        performance_end_clock("atom_is_capable_of");
+                        #endif
+
+                        return true;
+                    }
                     break;
 
                 case pi:
-                    if (a->is_pi()) return true;
+                    if (a->is_pi())
+                    {
+                        #if _dbg_too_slow
+                        performance_end_clock("atom_is_capable_of");
+                        #endif
+
+                        return true;
+                    }
                     break;
 
                 case polarpi:
                     if (a->is_pi() || a->is_metal())
+                    {
+                        #if _dbg_too_slow
+                        performance_end_clock("atom_is_capable_of");
+                        #endif
+
                         return true;
+                    }
                     break;
 
                 case mcoord:
                     if (a->get_charge() <= 0)		// -NH3+ groups would be unable to coordinate metals because of the steric hindrance of the extra proton.
+                    {
+                        #if _dbg_too_slow
+                        performance_end_clock("atom_is_capable_of");
+                        #endif
+
                         return true;
+                    }
                     break;
 
                 case vdW:
-                    return true;
+                    {
+                        #if _dbg_too_slow
+                        performance_end_clock("atom_is_capable_of");
+                        #endif
+
+                        return true;
+                    }
                     break;
 
                 default:
@@ -303,15 +376,27 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
             }
     }
     return false;
+
+    #if _dbg_too_slow
+    performance_end_clock("atom_is_capable_of");
+    #endif
 }
 
 #define _dbg_applicable 0
 void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** retval)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("fetch_applicable");
+    #endif
+
     if (!read_forces_dat && !reading_forces) read_all_forces();
     if (!a || !b)
     {
         retval[0] = nullptr;
+
+        #if _dbg_too_slow
+        performance_end_clock("fetch_applicable");
+        #endif
         return;
     }
 
@@ -520,10 +605,18 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
         }
     }
     retval[j] = nullptr;
+
+    #if _dbg_too_slow
+    performance_end_clock("fetch_applicable");
+    #endif
 }
 
 SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("get_geometry_for_pi_stack");
+    #endif
+
     SCoord* retval = new SCoord[5];
     int i;
     Point pt[5];
@@ -542,20 +635,35 @@ SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
     retval[3] = pt[3];
     retval[4] = pt[4];
 
+    #if _dbg_too_slow
+    performance_end_clock("get_geometry_for_pi_stack");
+    #endif
+
     return retval;
 }
 
 float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("metal_compatibility");
+    #endif
+
     float f = (1.0 + 1.0 * cos(fmin(fabs(((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25)*6), M_PI)));
     #if _dbg_groupsel
     // cout << "Metal compatibility for " << *a << "..." << *b << " = " << f << endl;
+    #endif
+    #if _dbg_too_slow
+    performance_end_clock("metal_compatibility");
     #endif
     return f;
 }
 
 float InteratomicForce::potential_binding(Atom* a, Atom* b)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("potential_binding");
+    #endif
+
     InteratomicForce* forces[32];
     fetch_applicable(a, b, forces);
 
@@ -593,11 +701,18 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
         }
     }
 
+    #if _dbg_too_slow
+    performance_end_clock("potential_binding");
+    #endif
     return potential;
 }
 
 float InteratomicForce::total_binding(Atom* a, Atom* b)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("total_binding");
+    #endif
+
     InteratomicForce* forces[32];
     fetch_applicable(a, b, forces);
 
@@ -1110,6 +1225,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (fabs(partial) > fabs(forces[i]->kJ_mol*2) || partial >= 500)
             {                
                 #if ignore_invalid_partial
+                #if _dbg_too_slow
+                performance_end_clock("total_binding");
+                #endif
                 return 0;
                 #endif
                 cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
@@ -1163,6 +1281,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (fabs(partial) >= 500)
         {
             #if ignore_invalid_partial
+            #if _dbg_too_slow
+            performance_end_clock("total_binding");
+            #endif
             return 0;
             #else
             cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
@@ -1318,11 +1439,18 @@ _canstill_clash:
     }
 
     _finished_clashing:
+    #if _dbg_too_slow
+    performance_end_clock("total_binding");
+    #endif
     return kJmol;
 }
 
 float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("Lennard_Jones");
+    #endif
+
     float local_clash_allowance = global_clash_allowance;
     if (atom1->get_Z() == 1 && atom2->get_Z() == 1) local_clash_allowance *= double_hydrogen_clash_allowance_multiplier;
 
@@ -1330,12 +1458,20 @@ float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
     float r = atom1->distance_to(atom2);
     float sigma_r = sigma / r;
 
-    return Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
-}
+    float result = Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
+    #if _dbg_too_slow
+    performance_end_clock("Lennard_Jones");
+    #endif
 
+    return result;
+}
 
 float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("distance_anomaly");
+    #endif
+
     InteratomicForce* forces[32];
     fetch_applicable(a, b, forces);
 
@@ -1348,11 +1484,19 @@ float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
         anomaly += fabs(r - forces[i]->distance);
     }
 
+    #if _dbg_too_slow
+    performance_end_clock("distance_anomaly");
+    #endif
+
     return anomaly;
 }
 
 float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("covalent_bond_radius");
+    #endif
+
     if (!read_forces_dat && !reading_forces) read_all_forces();
     if (!a || !b || !a->get_Z() || !b->get_Z()) return 0;
 
@@ -1379,6 +1523,9 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
                     )
                )
             {
+                #if _dbg_too_slow
+                performance_end_clock("covalent_bond_radius");
+                #endif
                 return all_forces[i]->distance;
             }
     }
@@ -1390,6 +1537,10 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
 
 float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type btype)
 {
+    #if _dbg_too_slow
+    performance_begin_clock("coordinate_bond_radius");
+    #endif
+
     if (!read_forces_dat && !reading_forces) read_all_forces();
 
     int i, j=0;
@@ -1415,6 +1566,9 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
                     )
                )
             {
+                #if _dbg_too_slow
+                performance_end_clock("coordinate_bond_radius");
+                #endif
                 return all_forces[i]->distance;
             }
     }
@@ -1424,6 +1578,10 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
 
 std::string InteratomicForce::get_config_string() const
 {
+    #if _dbg_too_slow
+    performance_begin_clock("get_config_string");
+    #endif
+
     char buffer[128];
     const char* bondchrs[5] = {"", "-", "=", "#", "$"};
     sprintf(buffer, "%s%s%s %s%s%s %s %f %f %f",
@@ -1446,6 +1604,9 @@ std::string InteratomicForce::get_config_string() const
             kJ_mol
            );
     std::string returnValue = buffer;
+    #if _dbg_too_slow
+    performance_end_clock("get_config_string");
+    #endif
     return returnValue;
 }
 

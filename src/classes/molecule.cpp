@@ -3147,6 +3147,8 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic()) ((AminoAcid*)a)->set_conditional_basicity(nearby);
 
     float result = -a->total_eclipses();
+    if (a->is_residue()) result += reinterpret_cast<AminoAcid*>(a)->initial_eclipses;
+
     int j;
     for (j=0; nearby[j]; j++)
     {

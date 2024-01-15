@@ -3059,7 +3059,7 @@ _try_again:
 
             if (!nodeno)
             {
-                if (dr[drcount][nodeno].ligand_self < -individual_clash_limit)
+                if ((dr[drcount][nodeno].ligand_self + ligand->total_eclipses()) < -individual_clash_limit)
                 {
                     // cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " out of range." << endl << endl;
                     break;          // Exit nodeno loop.

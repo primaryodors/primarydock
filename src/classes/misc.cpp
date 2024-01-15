@@ -24,18 +24,28 @@ float pre_ligand_flex_radius = default_pre_ligand_flex_radius;
 std::vector<std::string> performance_function_names;
 std::vector<double> performance_function_times;
 std::vector<double> performance_function_began;
+std::vector<int> performance_function_stack;
 
 void performance_begin_clock(std::string fnname)
 {
     int i, n;
-    n = performance_function_names.size();
     struct timeval tv;
+
+    if (n = performance_function_stack.size())          // ANC
+    {
+        i = performance_function_stack[n-1];
+        gettimeofday(&tv, NULL);
+        float elapsed = tv.tv_sec + 1e-6*tv.tv_usec - performance_function_began[i];
+    }
+
+    n = performance_function_names.size();
     for (i=0; i<n; i++)
     {
         if (performance_function_names[i] == fnname)
         {
             gettimeofday(&tv, NULL);
             performance_function_began[i] = tv.tv_sec + 1e-6*tv.tv_usec;
+            performance_function_stack.push_back(i);
             return;
         }
     }
@@ -44,13 +54,21 @@ void performance_begin_clock(std::string fnname)
     performance_function_times.push_back(0);
     gettimeofday(&tv, NULL);
     performance_function_began.push_back(tv.tv_sec + 1e-6*tv.tv_usec);
+    performance_function_stack.push_back(0);
 }
 
 void performance_end_clock(std::string fnname)
 {
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    int i, n;
+    int i, j=-1, n;
+
+    performance_function_stack.pop_back();
+    if (n = performance_function_stack.size())          // ANC
+    {
+        j = performance_function_stack[n-1];
+    }
+
     n = performance_function_names.size();
     for (i=0; i<n; i++)
     {
@@ -59,6 +77,10 @@ void performance_end_clock(std::string fnname)
             double elapsed = tv.tv_sec + 1e-6*tv.tv_usec - performance_function_began[i];
             performance_function_times[i] += elapsed;
             performance_function_began[i] = 0;
+            if (j>=0)
+            {
+                if (performance_function_began[j]) performance_function_began[j] += elapsed;
+            }
             return;
         }
     }

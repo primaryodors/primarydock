@@ -149,6 +149,7 @@ public:
     void clear_atom_binding_energies();
     int has_hbond_donors();
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
+    void reset_spent_conjugations();
 
     // Bond functions.
     Bond** get_rotatable_bonds();

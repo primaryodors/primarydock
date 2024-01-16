@@ -345,6 +345,9 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
         }
         else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) do_ionic = false;
         else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) do_ionic = false;
+
+        if (a->conjugation && a->conjugation->spent) do_ionic = false;
+        if (b->conjugation && b->conjugation->spent) do_ionic = false;
     }
     if (do_ionic)
     {
@@ -740,6 +743,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
             else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) continue;
             else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
+
+            if (a->conjugation && a->conjugation->spent) continue;
+            if (b->conjugation && b->conjugation->spent) continue;
         }
 
         if (!forces[i]->distance) continue;
@@ -1128,6 +1134,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
             {
                 partial *= achg * -bchg;
+                a->conjugation->spent = true;
+                b->conjugation->spent = true;
             }
 
             if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);

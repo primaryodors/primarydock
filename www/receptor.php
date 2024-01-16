@@ -151,7 +151,7 @@ include("header.php");
     font-size: small;
 }
 
-#txtview
+#txtview, #htmview
 {
     position: absolute;
     z-index: 10000;
@@ -166,7 +166,7 @@ include("header.php");
     box-shadow: 0px 0px 50px #000, 0px 0px 100px #000, 0px 0px 200px #000;
 }
 
-#txttext
+#txttext, #htmhtml
 {
     width: 100%;
     height: 100%;
@@ -294,6 +294,25 @@ function view_file(url)
 		success: function(result)
 		{
             txt.value = result;
+            vw.show();
+        }
+    });
+    vw.show();
+}
+
+function view_html_file(url)
+{
+    var htm = $('#htmhtml')[0];
+    var vw = $('#htmview');
+    htm.innerHTML = "Loading...";
+
+	$.ajax(
+	{
+		url: url,
+		cache: false,
+		success: function(result)
+		{
+            htm.innerHTML = result;
             vw.show();
         }
     });
@@ -1013,12 +1032,12 @@ $('#skeletal').hide();
             <td><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Active dock:</td>
-            <td><a href="#" onclick="view_file($('#dl_acv_dc')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_html_file($('#dl_acv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">view</a></td>
             <td><a id="vw_acv_dc_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Inactive dock:</td>
-            <td><a href="#" onclick="view_file($('#dl_iacv_dc')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_html_file($('#dl_iacv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">view</a></td>
             <td><a id="vw_iacv_dc_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
@@ -1037,7 +1056,17 @@ $('#dlmenu').hide();
     <div align="right">
         <a href="#" class="closebtn" onclick="$('#txtview').hide();">&#xd7;</a>
     </div>
-    <textarea id="txttext" enabled=false>
+    <textarea id="txttext" enabled="false">
         Loading...
     </textarea>
 </div>
+
+<div id="htmview" style="display: none;">
+    <div align="right">
+        <a href="#" class="closebtn" onclick="$('#htmview').hide();">&#xd7;</a>
+    </div>
+    <div id="htmhtml">
+        Loading...
+    </div>
+</div>
+

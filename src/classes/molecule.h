@@ -124,6 +124,7 @@ public:
     bool shielded(Atom* a, Atom* b) const;
     float correct_structure(int iters = 500);
     float close_loop(Atom** path, float closing_bond_cardinality);
+    float total_eclipses();
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
     float distance_to(Molecule* other_mol);
     std::vector<Atom*> longest_dimension();

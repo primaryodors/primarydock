@@ -26,6 +26,7 @@
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 4.0
 #define contact_r_5x58_7x53 3.93
+#define eclipsing_kJmol_per_radian 1.86453
 #define memsanity 0x10000000
 
 #define pH 6.0
@@ -122,7 +123,7 @@
 #define global_clash_allowance 0.4
 #define double_hydrogen_clash_allowance_multiplier 1.5
 #define ignore_double_hydrogen_clashes 0
-#define ignore_nonpolar_hydrogen_clashes 1
+#define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 3.0
@@ -355,6 +356,7 @@
 #define _dbg_cond_basic_acd_lig 0
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
+#define _dbg_eclipses 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0

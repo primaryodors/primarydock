@@ -1395,6 +1395,8 @@ _return_added:
     if (!check_Greek_continuity()) throw 0xbadc0de;
     #endif
 
+    initial_eclipses = total_eclipses();
+
     return added;
 }
 

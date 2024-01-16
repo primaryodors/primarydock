@@ -50,7 +50,7 @@ LET &x1 = &xm - &xa
 LET &x2 = &xa - &xi
 LET &x = &x1
 IF &x2 > &x1 LET &x = &x2
-LET @size.x = &x * 2
+LET @size.x = &x
 
 LET &ym = @max.y
 LET &yi = @min.y
@@ -59,7 +59,7 @@ LET &y1 = &ym - &ya
 LET &y2 = &ya - &yi
 LET &y = &y1
 IF &y2 > &y1 LET &y = &y2
-LET @size.y = &y * 2
+LET @size.y = &y
 
 LET &zm = @max.z
 LET &zi = @min.z
@@ -68,7 +68,7 @@ LET &z1 = &zm - &za
 LET &z2 = &za - &zi
 LET &z = &z1
 IF &z2 > &z1 LET &z = &z2
-LET @size.z = &z * 2
+LET @size.z = &z
 
 
 # Output.

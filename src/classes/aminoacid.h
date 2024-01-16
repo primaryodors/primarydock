@@ -184,6 +184,7 @@ public:
     MetalCoord* m_mcoord=0;
     Atom* coordmtl = nullptr;
     bool added_heavies = false;
+    float initial_eclipses = 0;
 
 protected:
     void load_aa_defs();

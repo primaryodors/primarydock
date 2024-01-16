@@ -13,6 +13,8 @@ require_once("methods_common.php");
 chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir(__DIR__);
+require_once("template.php");
+chdir(__DIR__);
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1).
@@ -76,12 +78,14 @@ $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 if (!file_exists($pdbfname_inactive) && file_exists($pdbfname_active))
     $pdbfname_inactive = $pdbfname;
 
-if (!file_exists($pdbfname_active))
+if (!file_exists($pdbfname_active) && (substr($protid, 0, 4) == "OR51" || substr($protid, 0, 4) == "OR52"))
 {
     exec("php -f predict/cryoem_motions.php");
     exec("bin/pepteditor data/OR51.pepd");
     exec("bin/pepteditor data/OR52.pepd");
 }
+
+if (!file_exists($pdbfname_active)) die("No bound model.\n");
 
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
@@ -111,3 +115,17 @@ $cenres = substr($cenres_active, 8);
 prepare_receptor($pdbfname, "$flxr $aflxr");
 
 $poses = process_dock("a");
+
+// TODO: Separate dynamic_clash_compensation() into FYG-activation and direct-model editions.
+/* if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
+{
+    dynamic_clash_compensation();
+
+    $pdbfname = $tmpoutpdb;
+    $outfname = "output/$fam/$protid/$protid.$ligname.dynamic.dock";
+    prepare_receptor($pdbfname, "$flxr $aflxr");
+    $poses = process_dock("ad");
+
+    // Delete the tmp PDB.
+    unlink($tmpoutpdb);
+} */

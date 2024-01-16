@@ -222,6 +222,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             res_clash_dir[resno] = res_clash_dir[resno].add(clashdir);
         }
 
+        lb -= fmax(reaches_spheroid[i]->total_eclipses() - reaches_spheroid[i]->initial_eclipses, 0);
+
         #if _dbg_51e2_ionic
         if (resno == 262)
         {
@@ -319,7 +321,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     this->imvdWrepl    = new float[metcount];
     this->m_atom1_name  = new const char*[metcount];
     this->m_atom2_name  = new const char*[metcount];
-    ligand_self = ligand->get_intermol_binding(ligand);
+    ligand_self = ligand->get_intermol_binding(ligand) - ligand->total_eclipses();
     kJmol += ligand_self;
     #if _dbg_internal_energy
     cout << "Ligand internal = " << ligand_self << endl;

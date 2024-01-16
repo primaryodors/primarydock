@@ -1134,8 +1134,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
             {
                 partial *= achg * -bchg;
-                a->conjugation->spent = true;
-                b->conjugation->spent = true;
+                if (a->conjugation) a->conjugation->spent = true;
+                if (b->conjugation) b->conjugation->spent = true;
             }
 
             if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);

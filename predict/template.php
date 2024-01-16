@@ -234,7 +234,7 @@ function dynamic_clash_compensation()
         }
     }
 
-    // Create a temporary custom output PDB and retry the active dock.
+    // Create a temporary custom output PDB in order to retry the active dock.
     $args = "$protid";
     foreach ($template as $hxno => $metrics)
     {

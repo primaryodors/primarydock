@@ -7,7 +7,8 @@ function openTab(ctl, tabName)
     tabcontent = document.getElementsByClassName("tabcontent");
     for (i = 0; i < tabcontent.length; i++) 
     {
-        tabcontent[i].style.display = "none";
+        if (tabcontent[i].parentElement == ctl.parentElement.parentElement)
+            tabcontent[i].style.display = "none";
     }
 
     // Get all elements with class="tablinks" and remove the class "active"

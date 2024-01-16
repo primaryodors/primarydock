@@ -166,6 +166,12 @@ include("header.php");
     box-shadow: 0px 0px 50px #000, 0px 0px 100px #000, 0px 0px 200px #000;
 }
 
+#htmview
+{
+    padding: 13px;
+    padding-top: 4px;
+}
+
 #txttext, #htmhtml
 {
     width: 100%;

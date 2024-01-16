@@ -21,6 +21,8 @@ class Conjugation
     Atom* get_nearest_atom(Point pt);
     Atom* get_nearest_atom(Conjugation* conj);
 
+    bool spent = false;
+
     protected:
     Atom** atoms = nullptr;           // Not using a vector for performance reasons.
     float net_charge = 0;

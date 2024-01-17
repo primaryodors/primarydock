@@ -1513,6 +1513,125 @@ _cannot_reverse_bondrot:
     return true;
 }
 
+Point Bond::ring_rotate(float theta, Atom* sa)
+{
+    Point result(0,0,0);
+
+    last_fail = bf_unknown;
+    if (!btom)
+    {
+        last_fail = bf_empty_atom;
+        return result;
+    }
+
+    if (!btom->is_bonded_to(sa))
+    {
+        last_fail = bf_not_connected;
+        return result;
+    }
+
+    if (!moves_with_btom) fill_moves_with_cache();
+    enforce_moves_with_uniqueness();
+
+    if (cardinality > 1.25)
+    {
+        last_fail = bf_disallowed_rotation;
+        return result;
+    }
+
+    int i;
+    Point cen = btom->get_location();
+    Point bas = atom->get_location();
+    Point dir = cen.subtract(&bas);
+    SCoord v(&dir);
+
+    Rotation rot;
+    rot.v = v;
+    rot.a = theta;
+
+    btom->rotate_geometry(rot);
+
+    for (i=0; moves_with_btom[i]; i++)
+    {
+        if (moves_with_btom[i]->residue != btom->residue) continue;
+
+        Point loc = moves_with_btom[i]->get_location();
+        Point nl  = rotate3D(&loc, &cen, &v, theta);
+
+        if (moves_with_btom[i] == sa)
+        {
+            result = nl;
+            continue;
+        }
+
+        moves_with_btom[i]->move(&nl);
+        moves_with_btom[i]->rotate_geometry(rot);
+    }
+
+    total_rotations += theta;
+    last_fail = bf_none;
+
+    return result;
+}
+
+Atom* Ring::traverse_ring(Atom* f, Atom* af)
+{
+    if (!f || !f->is_in_ring(this)) return nullptr;
+    if (af)
+    {
+        if (!af->is_in_ring(this)) return nullptr;
+        if (!f->is_bonded_to(af)) return nullptr;
+    }
+
+    int i;
+    for (i=0; i<atcount; i++)
+    {
+        if (atoms[i] == af) continue;
+        if (atoms[i]->is_bonded_to(f)) return atoms[i];
+    }
+
+    return nullptr;
+}
+
+float Ring::flip_atom(Atom* wa)
+{
+    if (type == UNKNOWN) determine_type();
+    if (type == AROMATIC || type == ANTIAROMATIC || type == COPLANAR) return 0;
+    if (atcount < 4) return 0;
+    if (!wa || wa->num_rings() != 1) return 0;
+    if (!wa->is_in_ring(this)) return 0;
+
+    Atom* xa = traverse_ring(wa);
+    Atom* va = traverse_ring(wa, xa);
+    Atom* ya = traverse_ring(xa, wa);
+    Atom* ua = traverse_ring(va, wa);
+    Bond* buv = ua->get_bond_between(va);
+    Bond* byx = ya->get_bond_between(xa);
+
+    float theta = 0, step = 10.0*fiftyseventh;
+    Point ol = wa->get_location();
+    bool far_enough = false;
+    while (theta<M_PI*2)
+    {
+        Point pt1 = buv->ring_rotate( step, wa);
+        Point pt2 = byx->ring_rotate(-step, wa);
+        theta += step;
+
+        float r = pt1.get_3d_distance(ol);
+        if (r > 0.1) far_enough = true;
+        if (far_enough)
+        {
+            r = pt1.get_3d_distance(pt2);
+            if (r < 0.001) return theta;
+            step = r * fiftyseventh;
+        }
+    }
+
+    Point pt1 = buv->ring_rotate(-theta, wa);
+    Point pt2 = byx->ring_rotate( theta, wa);
+    return 0;
+}
+
 void Atom::rotate_geometry(Rotation rot)
 {
     if (!geov) return;				// If no cached geometry, it will be calculated the next time it's required.

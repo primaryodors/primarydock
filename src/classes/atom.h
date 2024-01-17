@@ -29,6 +29,7 @@ enum bond_rotation_fail_reason
     bf_limited_rotation,
     bf_disallowed_rotation,
     bf_sidechain_hierarchy,
+    bf_not_connected,
     bf_unknown
 };
 
@@ -59,6 +60,7 @@ public:
     ~Bond();
 
     bool rotate(float angle_radians, bool allow_backbone = false, bool skip_inverse_check = false);
+    Point ring_rotate(float angle_radians, Atom* stop_at);
     void clear_moves_with_cache()
     {
         moves_with_btom = 0;
@@ -107,6 +109,8 @@ public:
     bool is_coplanar();
     bool is_conjugated();
     bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
+    Atom* traverse_ring(Atom* from, Atom* away_from = nullptr);     // If away_from is null, traverse in either direction.
+    float flip_atom(Atom* which_atom);
 
 protected:
     Atom* atoms[256];

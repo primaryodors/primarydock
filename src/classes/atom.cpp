@@ -1250,7 +1250,7 @@ void Bond::fill_moves_with_cache()
     btom->used = true;
     Bond* b[16];
     btom->fetch_bonds(b);
-    if (!b) return;
+    if (!b[0]) return;
     for (i=0; b[i]; i++)
     {
         if (b[i]->btom && b[i]->btom != atom && b[i]->btom->residue == btom->residue)
@@ -1344,8 +1344,8 @@ void Bond::enforce_moves_with_uniqueness()
     if (!atom->doing_ring_closure && !btom->doing_ring_closure && atom && btom && atom->in_same_ring_as(btom))
     {
         can_rotate = false;
-        if (moves_with_btom) delete[] moves_with_btom;
-        moves_with_btom = nullptr;
+        // if (moves_with_btom) delete[] moves_with_btom;
+        // moves_with_btom = nullptr;
         // cout << atom->name << " is in the same ring as " << btom->name << "; no rotations allowed." << endl;
         return;
     }
@@ -1622,8 +1622,9 @@ float Ring::flip_atom(Atom* wa)
         if (far_enough)
         {
             r = pt1.get_3d_distance(pt2);
+            cout << (theta*fiftyseven) << "deg: r = " << r << " step = " << (step*fiftyseven) << endl;
             if (r < 0.001) return theta;
-            step = r * fiftyseventh;
+            step = r * 0.1 * fiftyseventh;
         }
     }
 

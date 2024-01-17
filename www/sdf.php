@@ -23,29 +23,58 @@ chdir(__DIR__);
 chdir("..");
 $fullname = $odor['full_name'];
 $sdfname = "sdf/$fullname.sdf";
+if (isset($odor["isomers"])) $sdfname = "sdf/".(array_keys($odor["isomers"])[0])."-$name.sdf";
 if (!file_exists($sdfname))
 {
-    $smilesu = urlencode($odor['smiles']);
-    $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/SDF";
-
-    $ch = curl_init( $url );
-    curl_setopt( $ch, CURLOPT_POST, 1);
-    curl_setopt( $ch, CURLOPT_POSTFIELDS, $arg = "record_type=3d&smiles=$smilesu");
-    curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt( $ch, CURLOPT_HEADER, 0);
-    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-
-    $sdfdat = curl_exec( $ch );
-    $sdfln = explode("\n", $sdfdat);
-    if (false!==strpos($sdfln[0], "Status: ")) die("$arg\n\n$sdfdat");
-
-    $fp = fopen($sdfname, "wb");
-    if ($fp)
+    if (isset($odor["isomers"]))
     {
-        fwrite($fp, $sdfdat);
-        fclose($fp);
+        foreach ($odor["isomers"] as $iso => $ismiles)
+        {
+            $parts = explode("|", $ismiles);
+            passthru("obabel -:\"$ismiles\" --gen3D -osdf -O\"sdf/$iso-$name.sdf\"");
+            if (@$parts[1])
+            {
+                $sub4 = substr($parts[1], 0, 4);
+                switch ($sub4)
+                {
+                    case "chxf":
+                    // TODO:
+                    break;
+
+                    default:
+                    die("Unknown modifier $sub4.\n");
+                }
+            }
+        }
     }
-    else error_log("Warning: Unable to write to $sdfname");
+    else
+    {
+        $smiles = $odor['smiles'];
+        passthru("obabel -:\"$smiles\" --gen3D -osdf -O\"sdf/$name.sdf\"");
+        /*
+        $smilesu = urlencode($odor['smiles']);
+        $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/SDF";
+
+        $ch = curl_init( $url );
+        curl_setopt( $ch, CURLOPT_POST, 1);
+        curl_setopt( $ch, CURLOPT_POSTFIELDS, $arg = "record_type=3d&smiles=$smilesu");
+        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt( $ch, CURLOPT_HEADER, 0);
+        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+
+        $sdfdat = curl_exec( $ch );
+        $sdfln = explode("\n", $sdfdat);
+        if (false!==strpos($sdfln[0], "Status: ")) die("$arg\n\n$sdfdat");
+
+        $fp = fopen($sdfname, "wb");
+        if ($fp)
+        {
+            fwrite($fp, $sdfdat);
+            fclose($fp);
+        }
+        else error_log("Warning: Unable to write to $sdfname");
+        */
+    }
 }
 else
 {

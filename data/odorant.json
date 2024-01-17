@@ -5081,16 +5081,21 @@
         "name1": "norlimbanol",
         "name2": "karmawood",
         "smiles": "OC(CCC)CCC1C(CCCC1(C)C)C",
+        "isomers":
+        {
+            "(1'R,3S,6'S)": "O[C@@H](CCC)CC[C@@H]1[C@H](CCCC1(C)C)C|chxf8,9,10,11,12,13",
+            "(1'S,3S,6'R)": "O[C@@H](CCC)CC[C@H]1[C@@H](CCCC1(C)C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "amber",
                 "dry",
-                "powdery",
-                "sandalwood",
                 "sawdust",
-                "woody"
+                "woody",
+                "powdery",
+                "amber",
+                "sandalwood"
             ]
         },
         "activity":
@@ -5125,7 +5130,12 @@
                 }
             }
         },
-        "oid": "205815e6ade49371b1ef06511691e855"
+        "oid": "205815e6ade49371b1ef06511691e855",
+        "refs":
+        [
+            "https:\/\/doi.org\/10.1002\/(SICI)1522-2675(19991006)82:10%3C1762::AID-HLCA1762%3E3.0.CO;2-1",
+            "https://doi.org/10.3390%2Fijms13055542"
+        ]
     },
     "2071c456bef0f0a366e3173b4bcb7c42":
     {
@@ -13223,6 +13233,14 @@
         "aroma": [],
         "activity":
         {
+            "https:\/\/dx.doi.org\/10.1371%2Fjournal.pone.0144704":
+            {
+                "TAAR5":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
+            },
             "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
             {
                 "OR2W3":

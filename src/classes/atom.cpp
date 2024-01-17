@@ -1274,6 +1274,11 @@ void Bond::fill_moves_with_cache()
                     if (_DBGMOVES) if (b[i]->btom) cout << "(" << attmp[j]->name << "-" << b[i]->btom->name << (b[i]->btom->used ? "*" : "") << "?) ";
                     if (b[i]->btom && !b[i]->btom->used && b[i]->btom != atom && b[i]->btom->residue == btom->residue)
                     {
+                        if (b[i]->btom->in_same_ring_as(atom))
+                        {
+                            b[i]->btom->used = true;
+                            continue;
+                        }
                         attmp[tmplen++] = b[i]->btom;
                         b[i]->btom->used = true;
                         if (_DBGMOVES) cout << b[i]->btom->name << " " << flush;
@@ -1566,6 +1571,7 @@ Point Bond::ring_rotate(float theta, Atom* sa)
 
         moves_with_btom[i]->move(&nl);
         moves_with_btom[i]->rotate_geometry(rot);
+        // cout << "Moved " << moves_with_btom[i]->name << endl;
     }
 
     total_rotations += theta;
@@ -1608,7 +1614,7 @@ float Ring::flip_atom(Atom* wa)
     Bond* buv = ua->get_bond_between(va);
     Bond* byx = ya->get_bond_between(xa);
 
-    float theta = 0, step = 10.0*fiftyseventh;
+    float theta = 0, step = 1.0*fiftyseventh;
     Point ol = wa->get_location();
     bool far_enough = false;
     while (theta<M_PI*2)
@@ -1618,13 +1624,13 @@ float Ring::flip_atom(Atom* wa)
         theta += step;
 
         float r = pt1.get_3d_distance(ol);
-        if (r > 0.1) far_enough = true;
+        if (!far_enough && r > 0.05) far_enough = true;
         if (far_enough)
         {
             r = pt1.get_3d_distance(pt2);
             cout << (theta*fiftyseven) << "deg: r = " << r << " step = " << (step*fiftyseven) << endl;
             if (r < 0.001) return theta;
-            step = r * 0.1 * fiftyseventh;
+            step = r * 0.5 * fiftyseventh;
         }
     }
 

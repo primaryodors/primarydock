@@ -135,6 +135,7 @@ else
 
 
 ensure_sdf_exists($ligname);
+$ligname = check_isomers($ligname);
 
 echo "Beginning prediction of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);

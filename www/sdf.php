@@ -22,74 +22,14 @@ else
 chdir(__DIR__);
 chdir("..");
 $fullname = $odor['full_name'];
+ensure_sdf_exists($fullname);
 $sdfname = "sdf/$fullname.sdf";
 if (isset($odor["isomers"])) $sdfname = "sdf/".(array_keys($odor["isomers"])[0])."-$fullname.sdf";
-if (!file_exists($sdfname))
-{
-    if (isset($odor["isomers"]))
-    {
-        $first = true;
-        foreach ($odor["isomers"] as $iso => $ismiles)
-        {
-            $parts = explode("|", $ismiles);
-            $ismiles = $parts[0];
-            passthru("obabel -:\"$ismiles\" --gen3D -osdf -O\"sdf/$iso-$fullname.sdf\"");
-            if (@$parts[1])
-            {
-                $sub4 = substr($parts[1], 0, 4);
-                $rest = substr($parts[1], 4);
-                switch ($sub4)
-                {
-                    case "rflp":
-                    $cmd = "bin/ringflip \"sdf/$iso-$fullname.sdf\" $rest";
-                    // echo "$cmd\n";
-                    exec($cmd);
-                    break;
-
-                    default:
-                    die("Unknown modifier $sub4.\n");
-                }
-            }
-            if ($first) $sdfdat = file_get_contents("sdf/$iso-$fullname.sdf");
-            $first = false;
-        }
-    }
-    else
-    {
-        $smiles = $odor['smiles'];
-        passthru("obabel -:\"$smiles\" --gen3D -osdf -O\"sdf/$name.sdf\"");
-        $sdfdat = file_get_contents("sdf/$name.sdf");
-        /*
-        $smilesu = urlencode($odor['smiles']);
-        $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/SDF";
-
-        $ch = curl_init( $url );
-        curl_setopt( $ch, CURLOPT_POST, 1);
-        curl_setopt( $ch, CURLOPT_POSTFIELDS, $arg = "record_type=3d&smiles=$smilesu");
-        curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt( $ch, CURLOPT_HEADER, 0);
-        curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-
-        $sdfdat = curl_exec( $ch );
-        $sdfln = explode("\n", $sdfdat);
-        if (false!==strpos($sdfln[0], "Status: ")) die("$arg\n\n$sdfdat");
-
-        $fp = fopen($sdfname, "wb");
-        if ($fp)
-        {
-            fwrite($fp, $sdfdat);
-            fclose($fp);
-        }
-        else error_log("Warning: Unable to write to $sdfname");
-        */
-    }
-}
-else
+if (file_exists($sdfname))
 {
     $sdfdat = file_get_contents($sdfname);
-    $sdfln = explode("\n", $sdfdat);
-    if (false!==strpos($sdfln[0], "Status: ")) unlink($sdfname);
 }
+else die("File not exist $sdfname\n");
 
 $sdfdat = explode("\n", $sdfdat);
 $sdfdat[0] = $fullname;

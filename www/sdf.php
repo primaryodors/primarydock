@@ -23,15 +23,17 @@ chdir(__DIR__);
 chdir("..");
 $fullname = $odor['full_name'];
 $sdfname = "sdf/$fullname.sdf";
-if (isset($odor["isomers"])) $sdfname = "sdf/".(array_keys($odor["isomers"])[0])."-$name.sdf";
+if (isset($odor["isomers"])) $sdfname = "sdf/".(array_keys($odor["isomers"])[0])."-$fullname.sdf";
 if (!file_exists($sdfname))
 {
     if (isset($odor["isomers"]))
     {
+        $first = true;
         foreach ($odor["isomers"] as $iso => $ismiles)
         {
             $parts = explode("|", $ismiles);
-            passthru("obabel -:\"$ismiles\" --gen3D -osdf -O\"sdf/$iso-$name.sdf\"");
+            $ismiles = $parts[0];
+            passthru("obabel -:\"$ismiles\" --gen3D -osdf -O\"sdf/$iso-$fullname.sdf\"");
             if (@$parts[1])
             {
                 $sub4 = substr($parts[1], 0, 4);
@@ -45,12 +47,15 @@ if (!file_exists($sdfname))
                     die("Unknown modifier $sub4.\n");
                 }
             }
+            if ($first) $sdfdat = file_get_contents("sdf/$iso-$fullname.sdf");
+            $first = false;
         }
     }
     else
     {
         $smiles = $odor['smiles'];
         passthru("obabel -:\"$smiles\" --gen3D -osdf -O\"sdf/$name.sdf\"");
+        $sdfdat = file_get_contents("sdf/$name.sdf");
         /*
         $smilesu = urlencode($odor['smiles']);
         $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/SDF";

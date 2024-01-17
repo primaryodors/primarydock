@@ -1614,7 +1614,7 @@ float Ring::flip_atom(Atom* wa)
     Bond* buv = ua->get_bond_between(va);
     Bond* byx = ya->get_bond_between(xa);
 
-    float theta = 0, step = 1.0*fiftyseventh;
+    float theta = 0, step = 0.1*fiftyseventh;
     Point ol = wa->get_location();
     bool far_enough = false;
     while (theta<M_PI*2)
@@ -1623,14 +1623,18 @@ float Ring::flip_atom(Atom* wa)
         Point pt2 = byx->ring_rotate(-step, wa);
         theta += step;
 
-        float r = pt1.get_3d_distance(ol);
-        if (!far_enough && r > 0.05) far_enough = true;
+        float r; // = pt1.get_3d_distance(ol);
+        if (!far_enough && theta > square / 2) far_enough = true;
         if (far_enough)
         {
             r = pt1.get_3d_distance(pt2);
             cout << (theta*fiftyseven) << "deg: r = " << r << " step = " << (step*fiftyseven) << endl;
-            if (r < 0.001) return theta;
-            step = r * 0.5 * fiftyseventh;
+            if (r < 0.001)
+            {
+                wa->move(pt1);
+                return theta;
+            }
+            step = r * 0.9 * fiftyseventh;
         }
     }
 

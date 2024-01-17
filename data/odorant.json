@@ -5083,7 +5083,7 @@
         "smiles": "OC(CCC)CCC1C(CCCC1(C)C)C",
         "isomers":
         {
-            "(1'R,3S,6'S)": "O[C@@H](CCC)CC[C@@H]1[C@H](CCCC1(C)C)C|chxf8,9,10,11,12,13",
+            "(1'R,3S,6'S)": "O[C@@H](CCC)CC[C@@H]1[C@H](CCCC1(C)C)C|rflp C8 C9 C11",
             "(1'S,3S,6'R)": "O[C@@H](CCC)CC[C@H]1[C@@H](CCCC1(C)C)C"
         },
         "aroma":

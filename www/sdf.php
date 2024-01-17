@@ -37,10 +37,13 @@ if (!file_exists($sdfname))
             if (@$parts[1])
             {
                 $sub4 = substr($parts[1], 0, 4);
+                $rest = substr($parts[1], 4);
                 switch ($sub4)
                 {
-                    case "chxf":
-                    // TODO:
+                    case "rflp":
+                    $cmd = "bin/ringflip \"sdf/$iso-$fullname.sdf\" $rest";
+                    // echo "$cmd\n";
+                    exec($cmd);
                     break;
 
                     default:

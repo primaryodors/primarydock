@@ -8,7 +8,7 @@
 #include <climits>
 #include "atom.h"
 
-#define _DBGMOVES 1
+#define _DBGMOVES 0
 #define _DBGGEO 0
 
 using namespace std;
@@ -1637,14 +1637,6 @@ float Ring::flip_atom(Atom* wa)
         Point pt1 = rotate3D(ol, va->get_location(), auv,  theta);
         Point pt2 = rotate3D(ol, xa->get_location(), ayx, -theta);
 
-        /*pt1 = pt1.subtract(va->get_location());
-        pt1.scale(rvw);
-        pt1 = pt1.add(va->get_location());
-
-        pt2 = pt2.subtract(xa->get_location());
-        pt2.scale(rxw);
-        pt2 = pt2.add(xa->get_location());*/
-
         theta += step;
         Point nl = pt2.subtract(pt1);
         nl.multiply(0.5);
@@ -1656,7 +1648,7 @@ float Ring::flip_atom(Atom* wa)
         if (far_enough)
         {
             r = pt1.get_3d_distance(pt2);
-            cout << (theta*fiftyseven) << "deg: r = " << r << " step = " << (step*fiftyseven) << endl;
+            // cout << (theta*fiftyseven) << "deg: r = " << r << " step = " << (step*fiftyseven) << endl;
             if (r < 0.1 && r > lr)
             {
                 Bond* wbonds[16];
@@ -1685,7 +1677,7 @@ float Ring::flip_atom(Atom* wa)
                 }
                 return theta;
             }
-            step = r * 0.1 * fiftyseventh;
+            step = fmax(0.01, r * 0.1 * fiftyseventh);
         }
 
         lr = r;

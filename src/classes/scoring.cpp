@@ -204,13 +204,11 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         res_clash_dir[i] = SCoord(0,0,0);
     }
 
-    ligand->reset_spent_conjugations();
     for (i=0; i<sphres; i++)
     {
         if (!reaches_spheroid[i]) continue;
         if (!protein->aa_ptr_in_range(reaches_spheroid[i])) continue;
         reaches_spheroid[i]->clear_atom_binding_energies();
-        reaches_spheroid[i]->reset_spent_conjugations();
         int resno = reaches_spheroid[i]->get_residue_no();
 
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
@@ -296,7 +294,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             if (!mtlcoords[i].mtl) continue;
             Molecule lm("MTL");
             lm.add_existing_atom(mtlcoords[i].mtl);
-            lm.reset_spent_conjugations();
             float f = ligand->get_intermol_binding(&lm);
             btot += f;
         }

@@ -817,17 +817,6 @@ int Molecule::has_hbond_acceptors()
     return result;
 }
 
-void Molecule::reset_spent_conjugations()
-{
-    if (!atoms) return;
-
-    int i;
-    for (i=0; atoms[i]; i++)
-    {
-        if (atoms[i]->conjugation) atoms[i]->conjugation->spent = false;
-    }
-}
-
 int Molecule::from_sdf(char const* sdf_dat)
 {
     if (!sdf_dat) return 0;
@@ -3160,12 +3149,9 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     float result = -a->total_eclipses();
     if (a->is_residue()) result += reinterpret_cast<AminoAcid*>(a)->initial_eclipses;
 
-    a->reset_spent_conjugations();
-
     int j;
     for (j=0; nearby[j]; j++)
     {
-        nearby[j]->reset_spent_conjugations();
         float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
         result += f;
     }
@@ -3173,7 +3159,6 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     {
         for (j=0; a->mclashables[j]; j++)
         {
-            a->mclashables[j]->reset_spent_conjugations();
             float f = a->intermol_bind_for_multimol_dock(a->mclashables[j], false);
             result += f;
         }

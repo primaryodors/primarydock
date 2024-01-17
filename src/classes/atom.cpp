@@ -8,7 +8,7 @@
 #include <climits>
 #include "atom.h"
 
-#define _DBGMOVES 0
+#define _DBGMOVES 1
 #define _DBGGEO 0
 
 using namespace std;
@@ -1266,6 +1266,12 @@ void Bond::fill_moves_with_cache()
         k=0;
         for (j=0; j<tmplen; j++)
         {
+            if (attmp[j]->in_same_ring_as(atom))
+            {
+                attmp[j]->used = true;
+                continue;
+            }
+
             attmp[j]->fetch_bonds(b);
             if (b)
             {
@@ -1612,34 +1618,81 @@ float Ring::flip_atom(Atom* wa)
     Atom* ya = traverse_ring(xa, wa);
     Atom* ua = traverse_ring(va, wa);
     Bond* buv = ua->get_bond_between(va);
+    Bond* bvw = va->get_bond_between(wa);
+    Bond* bxw = xa->get_bond_between(wa);
     Bond* byx = ya->get_bond_between(xa);
+    float rvw = bvw->optimal_radius;
+    float rxw = bxw->optimal_radius;
+    SCoord auv = va->get_location().subtract(ua->get_location());
+    SCoord ayx = xa->get_location().subtract(ya->get_location());
 
     float theta = 0, step = 0.1*fiftyseventh;
     Point ol = wa->get_location();
     bool far_enough = false;
+    float lr = 0;
     while (theta<M_PI*2)
     {
-        Point pt1 = buv->ring_rotate( step, wa);
-        Point pt2 = byx->ring_rotate(-step, wa);
+        buv->ring_rotate( step, wa);
+        byx->ring_rotate(-step, wa);
+        Point pt1 = rotate3D(ol, va->get_location(), auv,  theta);
+        Point pt2 = rotate3D(ol, xa->get_location(), ayx, -theta);
+
+        /*pt1 = pt1.subtract(va->get_location());
+        pt1.scale(rvw);
+        pt1 = pt1.add(va->get_location());
+
+        pt2 = pt2.subtract(xa->get_location());
+        pt2.scale(rxw);
+        pt2 = pt2.add(xa->get_location());*/
+
         theta += step;
+        Point nl = pt2.subtract(pt1);
+        nl.multiply(0.5);
+        nl = nl.add(pt1);
+        wa->move(nl);
 
         float r; // = pt1.get_3d_distance(ol);
-        if (!far_enough && theta > square / 2) far_enough = true;
+        if (!far_enough && theta > hexagonal / 3) far_enough = true;
         if (far_enough)
         {
             r = pt1.get_3d_distance(pt2);
             cout << (theta*fiftyseven) << "deg: r = " << r << " step = " << (step*fiftyseven) << endl;
-            if (r < 0.001)
+            if (r < 0.1 && r > lr)
             {
-                wa->move(pt1);
+                Bond* wbonds[16];
+                wa->fetch_bonds(wbonds);
+                int i, j;
+                Point origin = xa->get_location();
+                SCoord axis = origin.subtract(va->get_location());
+                float vxtheta = -find_angle_along_vector(wa->get_location(), ol, origin, axis);
+                for (i=0; wbonds[i]; i++)
+                {
+                    if (!wbonds[i]->btom) continue;
+                    if (wbonds[i]->btom->in_same_ring_as(wa)) continue;
+
+                    Point lpt = wbonds[i]->btom->get_location();
+                    lpt = rotate3D(lpt, origin, axis, vxtheta);
+                    wbonds[i]->btom->move(lpt);
+
+                    Atom* movesw[1024];
+                    wbonds[i]->fetch_moves_with_btom(movesw);
+                    for (j=0; movesw[j]; j++)
+                    {
+                        lpt = movesw[j]->get_location();
+                        lpt = rotate3D(lpt, origin, axis, vxtheta);
+                        movesw[j]->move(lpt);
+                    }
+                }
                 return theta;
             }
-            step = r * 0.9 * fiftyseventh;
+            step = r * 0.1 * fiftyseventh;
         }
+
+        lr = r;
     }
 
-    Point pt1 = buv->ring_rotate(-theta, wa);
-    Point pt2 = byx->ring_rotate( theta, wa);
+    buv->ring_rotate(-theta, wa);
+    byx->ring_rotate( theta, wa);
     return 0;
 }
 

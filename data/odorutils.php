@@ -263,13 +263,11 @@ function check_isomers($ligname, $randomize=true)
 {
     $odor = find_odorant($ligname);
 	if (!$odor) die("Odorant not found $ligname.\n");
-	if (!isset($odor["isomers"])) return $ligname;
-	else
-	{
-		if ($randomize) $k = rand(0, count($odor["isomers"])-1);		// TODO: Apply Zipf's law.
-		else $k = 0;
-		return array_keys($odor["isomers"])[$k]."-".$odor["full_name"];
-	}
+	if (!isset($odor["isomers"])) return false;
+
+	$result = [];
+	foreach (array_keys($odor["isomers"]) as $iso) $result[] = "$iso-{$odor["full_name"]}";
+	return $result;
 }
 
 function ensure_sdf_exists($ligname)
@@ -278,7 +276,8 @@ function ensure_sdf_exists($ligname)
 
 	$o = find_odorant($ligname);
 	if (!$o) die("Odorant not found $ligname.\n");
-	$lignamei = check_isomers($ligname, false);
+	$isomers = check_isomers($ligname);
+	$lignamei = $isomers ? $isomers[0] : $ligname;
 		
 	$pwd = getcwd();
 	chdir(__DIR__);

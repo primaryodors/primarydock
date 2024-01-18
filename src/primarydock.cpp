@@ -27,7 +27,31 @@ struct AcvBndRot
     float theta;
 };
 
+std::string get_fttl_no_path_or_ext(const char* filename)
+{
+    char buffer[256];
+    strcpy(buffer, filename);
+    int i, n = strlen(buffer);
+    for (i=n; i>0; i--)
+    {
+        if (buffer[i] == '.')
+        {
+            buffer[i] = 0;
+            break;
+        }
+    }
+    for (; i>0; i--)
+    {
+        if (buffer[i] == '/')
+        {
+            std::string result = &buffer[i+1];
+            return result;
+        }
+    }
 
+    std::string result = filename;
+    return result;
+}
 
 char* get_file_ext(char* filename)
 {
@@ -74,6 +98,7 @@ int addl_resno[256];
 const Region* regions;
 SCoord region_clashes[85][3];
 Molecule* ligand;
+std::vector<std::string> isomers;
 Molecule** waters = nullptr;
 Molecule** owaters = nullptr;
 Point ligcen_target;
@@ -967,9 +992,13 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "LIG"))
     {
         strcpy(ligfname, words[1]);
-        // optsecho = "Ligand file is " + (std::string)ligfname;
         ligset = true;
         if (ligcmd) smset = smcmd;
+        return 1;
+    }
+    else if (!strcmp(words[0], "ISO"))
+    {
+        isomers.push_back(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "SMILES"))
@@ -2003,7 +2032,8 @@ int main(int argc, char** argv)
     for (l=0; l<=poses; l++)
     {
         ligand = &pose_ligands[l];
-        ligand->set_name(ligfname);
+        std::string ligname = get_fttl_no_path_or_ext(ligfname);
+        ligand->set_name(ligname.c_str());
         char* ext = get_file_ext(ligfname);
         if (!ext)
         {
@@ -2020,7 +2050,14 @@ int main(int argc, char** argv)
         case 's':
         case 'S':
             // SDF
-            pf = fopen(ligfname, "r");
+            if (isomers.size())
+            {
+                i = rand() % isomers.size();
+                ligname = get_fttl_no_path_or_ext(isomers[i].c_str());
+                ligand->set_name(ligname.c_str());
+                pf = fopen(isomers[i].c_str(), "r");
+            }
+            else pf = fopen(ligfname, "r");
             if (!pf)
             {
                 cout << "Error trying to read " << ligfname << endl;
@@ -2033,7 +2070,14 @@ int main(int argc, char** argv)
 
         case 'p':
         case 'P':
-            pf = fopen(ligfname, "r");
+            if (isomers.size())
+            {
+                i = rand() % isomers.size();
+                ligname = get_fttl_no_path_or_ext(isomers[i].c_str());
+                ligand->set_name(ligname.c_str());
+                pf = fopen(isomers[i].c_str(), "r");
+            }
+            else pf = fopen(ligfname, "r");
             if (!pf)
             {
                 cout << "Error trying to read " << ligfname << endl;
@@ -2918,6 +2962,7 @@ _try_again:
             dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
+            if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
             n = protein->get_end_resno();
             for (i=1; i<=n; i++)
@@ -3140,6 +3185,7 @@ _try_again:
         {
             protein = &pose_proteins[j];
             ligand = &pose_ligands[j+1];
+
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)

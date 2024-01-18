@@ -29,6 +29,7 @@ class DockResult
     const char** m_atom1_name = nullptr;
     const char** m_atom2_name = nullptr;
     std::string pdbdat;
+    std::string isomer;
     std::string softrock;
     std::string miscdata;
     float bytype[_INTER_TYPES_LIMIT];

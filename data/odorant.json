@@ -4144,6 +4144,11 @@
     {
         "full_name": "helional",
         "smiles": "CC(CC1=CC2=C(C=C1)OCO2)C=O",
+        "isomers":
+        {
+            "(R)": "C[C@H](CC1=CC2=C(C=C1)OCO2)C=O",
+            "(S)": "C[C@@H](CC1=CC2=C(C=C1)OCO2)C=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -4539,17 +4544,24 @@
     "1bf8d63e1593909486c3f37956488442":
     {
         "full_name": "farnesol",
-        "smiles": "OCC=C(CCC=C(CC\\C=C(\/C)C)C)C",
+        "smiles": "OCC=C(CCC=C(CCC=C(C)C)C)C",
+        "isomers":
+        {
+            "(2E,6E)": "OC\\C=C\\(CC\\C=C\\(CCC=C(C)C)C)C",
+            "(2Z,6E)": "OC\\C=C\/(CC\\C=C\\(CCC=C(C)C)C)C",
+            "(2E,6Z)": "OC\\C=C\\(CC\\C=C\/(CCC=C(C)C)C)C",
+            "(2Z,6Z)": "OC\\C=C\/(CC\\C=C\/(CCC=C(C)C)C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "angelica",
-                "dry",
-                "floral",
                 "fresh",
+                "sweet",
                 "linden_flower",
-                "sweet"
+                "floral",
+                "angelica",
+                "dry"
             ]
         },
         "activity":
@@ -4989,10 +5001,10 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "cassia",
                 "cinnamon",
-                "cumin",
-                "spicy"
+                "cassia",
+                "spicy",
+                "cumin"
             ]
         },
         "activity":
@@ -5245,6 +5257,11 @@
     {
         "full_name": "1-(methylthio)-ethanethiol",
         "smiles": "CSC(S)C",
+        "isomers":
+        {
+            "(R)": "CS[C@@H](S)C",
+            "(S)": "CS[C@H](S)C"
+        },
         "oid": "20550e9cf25376fd4cc46f97a3987a13"
     },
     "205815e6ade49371b1ef06511691e855":
@@ -5371,6 +5388,11 @@
     {
         "full_name": "beta-ionone",
         "smiles": "CC1=C(C(CCC1)(C)C)C=CC(=O)C",
+        "isomers":
+        {
+            "(E)": "CC1=C(C(CCC1)(C)C)\\C=C\\C(=O)C",
+            "(Z)": "CC1=C(C(CCC1)(C)C)\\C=C\/C(=O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -5954,14 +5976,19 @@
     {
         "full_name": "5-hydroxy-4-octanone",
         "smiles": "CCCC(=O)C(O)CCC",
+        "isomers":
+        {
+            "(R)": "CCCC(=O)[C@H](O)CCC",
+            "(S)": "CCCC(=O)[C@@H](O)CCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "buttery",
-                "nutty",
+                "sweet",
                 "pungent",
-                "sweet"
+                "buttery",
+                "nutty"
             ]
         },
         "oid": "24ae2dcca9207ad38debe893a2d88184"
@@ -6343,6 +6370,13 @@
     {
         "full_name": "amber butanol",
         "smiles": "CCC(COC1CCCCC1C(C)(C)C)O",
+        "isomers":
+        {
+            "(2R,1'S,2'R)": "CC[C@H](CO[C@H]1CCCC[C@@H]1C(C)(C)C)O",
+            "(2S,1'S,2'R)": "CC[C@@H](CO[C@H]1CCCC[C@@H]1C(C)(C)C)O",
+            "(2R,1'R,2'S)": "CC[C@H](CO[C@@H]1CCCC[C@H]1C(C)(C)C)O|rflp C6 C9 C11",
+            "(2S,1'R,2'S)": "CC[C@@H](CO[C@@H]1CCCC[C@H]1C(C)(C)C)O|rflp C6 C9 C11"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -6415,6 +6449,11 @@
     {
         "full_name": "4-terpineol",
         "smiles": "CC1=CCC(CC1)(C(C)C)O",
+        "isomers":
+        {
+            "(R)": "CC1=CC[C@](CC1)(C(C)C)O",
+            "(S)": "CC1=CC[C@@](CC1)(C(C)C)O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -6756,6 +6795,25 @@
     {
         "full_name": "aquaflora",
         "smiles": "C1CC2C(C1)C3CC2CC3CC=O",
+        "isomers":
+        {
+            "(R,S,S,S,S)": "C1C[C@@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
+            "(S,S,S,S,S)": "C1C[C@@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@SH]3CC=O",
+            "(R,S,S,R,R)": "C1C[C@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
+            "(S,S,S,R,R)": "C1C[C@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O",
+            "(R,R,R,S,S)": "C1C[C@@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
+            "(S,R,R,S,S)": "C1C[C@@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@SH]3CC=O",
+            "(R,R,R,R,R)": "C1C[C@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
+            "(S,R,R,R,R)": "C1C[C@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
+            "(R,R,S,S,R)": "C1C[C@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
+            "(S,R,S,S,R)": "C1C[C@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
+            "(R,S,S,S,R)": "C1C[C@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
+            "(S,S,S,S,R)": "C1C[C@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O",
+            "(R,R,S,R,S)": "C1C[C@@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
+            "(S,R,S,R,S)": "C1C[C@@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
+            "(R,S,S,R,S)": "C1C[C@@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
+            "(S,S,S,R,S)": "C1C[C@@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -6791,6 +6849,11 @@
     {
         "full_name": "camphor",
         "smiles": "CC1(C)C2CCC1(C)C(=O)C2",
+        "isomers":
+        {
+            "(2S,3'R)": "CC1(C)[C@H]2CC[C@]1(C)C(=O)C2",
+            "(2R,3'S)": "CC1(C)[C@@H]2CC[C@@]1(C)C(=O)C2"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -6878,16 +6941,23 @@
     {
         "full_name": "1,5-octadien-3-ol",
         "smiles": "C=CC(O)CC=CCC",
+        "isomers":
+        {
+            "(R)-(E)": "C=C[C@H](O)C\\C=C\\CC",
+            "(S)-(E)": "C=C[C@@H](O)C\\C=C\\CC",
+            "(R)-(Z)": "C=C[C@H](O)C\\C=C\/CC",
+            "(S)-(Z)": "C=C[C@@H](O)C\\C=C\/CC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
+                "mushroom",
                 "geranium",
+                "leafy",
                 "green",
-                "leaf",
-                "marine",
-                "mushroom"
+                "marine"
             ]
         },
         "oid": "2beea7198fb42f004bbbe4b0dd220931"
@@ -6896,6 +6966,13 @@
     {
         "full_name": "triplal",
         "smiles": "CC1C=C(CCC1C=O)C",
+        "isomers":
+        {
+            "(2R,3R)": "C[C@@H]1C=C(CC[C@H]1C=O)C",
+            "(2S,3S)": "C[C@H]1C=C(CC[C@@H]1C=O)C",
+            "(2R,3S)": "C[C@H]1C=C(CC[C@H]1C=O)C",
+            "(2S,3R)": "C[C@@H]1C=C(CC[C@@H]1C=O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -7097,22 +7174,23 @@
         "full_name": "caramel furanone",
         "name2": "sotolone",
         "smiles": "CC1C(=C(C(=O)O1)O)C",
+        "isomers":
+        {
+            "(R)": "C[C@@H]1C(=C(C(=O)O1)O)C",
+            "(S)": "C[C@H]1C(=C(C(=O)O1)O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "burnt",
-                "caramellic",
-                "coffee",
-                "maple",
-                "sugar",
                 "sweet",
-                "burnt",
                 "caramellic",
-                "coffee",
                 "maple",
                 "sugar",
-                "sweet"
+                "burnt_sugar",
+                "coffee",
+                "brown_sugar",
+                "cotton_candy"
             ]
         },
         "activity":
@@ -7408,16 +7486,21 @@
     {
         "full_name": "lilial",
         "smiles": "CC(CC1=CC=C(C=C1)C(C)(C)C)C=O",
+        "isomers":
+        {
+            "(R)": "C[C@H](CC1=CC=C(C=C1)C(C)(C)C)C=O",
+            "(S)": "C[C@@H](CC1=CC=C(C=C1)C(C)(C)C)C=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "cumin",
                 "floral",
-                "green",
                 "muguet",
+                "watery",
+                "green",
                 "powdery",
-                "watery"
+                "cumin"
             ]
         },
         "activity":
@@ -7576,6 +7659,11 @@
     {
         "full_name": "beta-methylphenylethylamine",
         "smiles": "[NH3+]CC(c1ccccc1)C",
+        "isomers":
+        {
+            "(R)": "[NH3+]C[C@@H](c1ccccc1)C",
+            "(S)": "[NH3+]C[C@H](c1ccccc1)C"
+        },
         "aroma":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
@@ -7599,7 +7687,12 @@
     "2f5b2eae6bbd5fe5cb637a408876106b":
     {
         "full_name": "furaneol",
-        "smiles": "O=C1C(\\O)=C(\/OC1C)C",
+        "smiles": "O=C1C(O)=C(OC1C)C",
+        "isomers":
+        {
+            "(R)": "O=C1C(O)=C(O[C@@H]1C)C",
+            "(S)": "O=C1C(O)=C(O[C@H]1C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -7652,8 +7745,13 @@
     },
     "2f6799c1143d6c41263e18715640f328":
     {
-        "full_name": "citronellal natural",
+        "full_name": "citronellal",
         "smiles": "CC(CCC=C(C)C)CC=O",
+        "isomers":
+        {
+            "(S)-(-)": "C[C@@H](CCC=C(C)C)CC=O",
+            "(R)-(+)": "C[C@H](CCC=C(C)C)CC=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -7768,6 +7866,13 @@
     {
         "full_name": "brahmanol",
         "smiles": "CC1=CCC(C1(C)C)CCC(C)CO",
+        "isomers":
+        {
+            "(2R,5R)": "CC1=CC[C@H](C1(C)C)CC[C@@H](C)CO|rflp C5",
+            "(2S,5R)": "CC1=CC[C@H](C1(C)C)CC[C@H](C)CO|rflp C5",
+            "(2R,5S)": "CC1=CC[C@@H](C1(C)C)CC[C@@H](C)CO",
+            "(2S,5S)": "CC1=CC[C@@H](C1(C)C)CC[C@H](C)CO"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

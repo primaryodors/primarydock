@@ -72,8 +72,11 @@ int main(int argc, char** argv)
         }
 
         Ring** rr = a->get_rings();
-        rr[0]->flip_atom(a);
+        float theta = rr[0]->flip_atom(a);
+        cout << "Flipped " << a->name << " " << (theta*fiftyseven) << "deg." << endl;
     }
+
+    m.minimize_internal_clashes();
 
     fp = fopen(filename.c_str(), "w");
     m.save_sdf(fp);

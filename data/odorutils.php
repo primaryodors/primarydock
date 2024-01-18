@@ -278,12 +278,12 @@ function ensure_sdf_exists($ligname)
 	if (!$o) die("Odorant not found $ligname.\n");
 	$isomers = check_isomers($ligname);
 	$lignamei = $isomers ? $isomers[0] : $ligname;
-		
+
 	$pwd = getcwd();
 	chdir(__DIR__);
 	chdir("..");
 	$sdfname = str_replace(" ", "_", "sdf/$lignamei.sdf");
-	if (!file_exists($sdfname) || filesize($sdfname) < 10)
+	if (!file_exists($sdfname) || filesize($sdfname) < 20)
 	{
 		if (isset($o["isomers"]))
 		{
@@ -313,8 +313,11 @@ function ensure_sdf_exists($ligname)
 		}
 		else
 		{
-			$smiles = $odor['smiles'];
-			exec("obabel -:\"$smiles\" --gen3D -osdf -O\"sdf/$name.sdf\"");
+			$smiles = $o["smiles"];
+			$fullname = str_replace(" ", "_", $o["full_name"]);
+			$cmd = "obabel -:\"$smiles\" --gen3D -osdf -O\"sdf/$fullname.sdf\"";
+			// echo "$cmd\n";
+			exec($cmd);
 		}
 	}
 	chdir($pwd);

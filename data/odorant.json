@@ -353,6 +353,11 @@
         "name1": "nonisyl acetate",
         "iupac": "3,5,5-trimethylhexyl acetate",
         "smiles": "CC(CCOC(=O)C)CC(C)(C)C",
+        "isomers":
+        {
+            "(S)": "C[C@H](CCOC(=O)C)CC(C)(C)C",
+            "(R)": "C[C@@H](CCOC(=O)C)CC(C)(C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -671,6 +676,11 @@
     {
         "full_name": "3-hydroxy-3-methylhexanoic acid",
         "smiles": "[O-]C(=O)CC(C)(O)CCC",
+        "isomers":
+        {
+            "(S)-(+)": "[O-]C(=O)C[C@@](C)(O)CCC",
+            "(R)-(-)": "[O-]C(=O)C[C@](C)(O)CCC"
+        },
         "aroma":
         {
             "http:\/\/www.leffingwell.com\/chirality\/3-hydroxy-3-methylhexanoicacid.htm":
@@ -942,6 +952,13 @@
     {
         "full_name": "pi-23472",
         "smiles": "CC1=CCC(C1(C)C)C2=CCCC(C2)C(C)=O",
+        "isomers":
+        {
+            "(R,S)": "CC1=CC[C@H](C1(C)C)C2=CCC[C@H](C2)C(C)=O|rflp C5 C13",
+            "(S,S)": "CC1=CC[C@H](C1(C)C)C2=CCC[C@@H](C2)C(C)=O",
+            "(R,R)": "CC1=CC[C@@H](C1(C)C)C2=CCC[C@H](C2)C(C)=O|rflp C5 C13",
+            "(S,R)": "CC1=CC[C@@H](C1(C)C)C2=CCC[C@@H](C2)C(C)=O"
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1074\/jbc.m110.211524":
@@ -959,6 +976,11 @@
     {
         "full_name": "hydroxycitronellal",
         "smiles": "CC(CCCC(C)(C)O)CC=O",
+        "isomers":
+        {
+            "(S)": "C[C@@H](CCCC(C)(C)O)CC=O",
+            "(R)": "C[C@H](CCCC(C)(C)O)CC=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -1207,6 +1229,11 @@
     {
         "full_name": "butyl butyryl lactate",
         "smiles": "CCCCOC(=O)C(C)OC(=O)CCC",
+        "isomers":
+        {
+            "(S)": "CCCCOC(=O)[C@H](C)OC(=O)CCC",
+            "(R)": "CCCCOC(=O)[C@@H](C)OC(=O)CCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -1335,6 +1362,11 @@
     {
         "full_name": "isomenthone",
         "smiles": "CC1CCC(C(=O)C1)C(C)C",
+        "isomers":
+        {
+            "(1R,4R)": "C[C@@H]1CC[C@@H](C(=O)C1)C(C)C|rflp C5",
+            "(1S,4S)": "C[C@H]1CC[C@H](C(=O)C1)C(C)C|rflp C2"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -1369,22 +1401,28 @@
     {
         "full_name": "3-methyl-2-butanethiol",
         "smiles": "CC(C)C(S)C",
+        "isomers":
+        {
+            "(R)": "C[C@@H](C)C(S)C",
+            "(S)": "C[C@H](C)C(S)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "beefy",
-                "burnt",
-                "cheesy",
-                "chicken",
-                "coffee",
                 "meaty",
-                "pork",
-                "repulsive",
-                "roasted",
-                "rubbery",
+                "sulfurous",
                 "savory",
-                "sulfurous"
+                "burnt",
+                "rubbery",
+                "roasted",
+                "chicken",
+                "pork",
+                "meaty",
+                "coffee",
+                "roasted_coffee",
+                "cheesy"
             ]
         },
         "activity":
@@ -1405,6 +1443,11 @@
     {
         "full_name": "2-ethyl hexanal",
         "smiles": "CCCCC(CC)C=O",
+        "isomers":
+        {
+            "(R)": "CCCC[C@@H](CC)C=O",
+            "(S)": "CCCC[C@H](CC)C=O"
+        },
         "aroma": [],
         "activity":
         {
@@ -1491,6 +1534,13 @@
     {
         "full_name": "3-mercapto-2-methylhexan-1-ol",
         "smiles": "CCCC(C(C)CO)S",
+        "isomers":
+        {
+            "(2R,3R)": "OC[C@H]([C@@H](S)CCC)C",
+            "(2S,3R)": "OC[C@@H]([C@H](S)CCC)C",
+            "(2R,3S)": "OC[C@H]([C@H](S)CCC)C",
+            "(2S,3S)": "OC[C@@H]([C@@H](S)CCC)C"
+        },
         "aroma":
         {
             "https:\/\/doi.org\/10.1093\/chemse\/bjw118":
@@ -1828,6 +1878,11 @@
     {
         "full_name": "abhexone",
         "smiles": "CCC1C(=C(C(=O)O1)O)C",
+        "isomers":
+        {
+            "(S)": "CC[C@H]1C(=C(C(=O)O1)O)C",
+            "(R)": "CC[C@@H]1C(=C(C(=O)O1)O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -1863,16 +1918,25 @@
     {
         "full_name": "2-octanol",
         "smiles": "CCCCCCC(O)C",
+        "isomers":
+        {
+            "(S)": "CCCCCC[C@@H](O)C",
+            "(R)": "CCCCCC[C@H](O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "earthy",
                 "fresh",
-                "green",
-                "herbal",
                 "spicy",
-                "woody"
+                "green",
+                "woody",
+                "herbal",
+                "earthy",
+                "nasturtium",
+                "banana",
+                "unripe_banana",
+                "mushroom"
             ]
         },
         "activity":
@@ -2103,6 +2167,11 @@
     {
         "full_name": "3-mercapto-2-pentanone",
         "smiles": "CC(=O)C(S)CC",
+        "isomers":
+        {
+            "(R)": "CC(=O)[C@H](S)CC",
+            "(S)": "CC(=O)[C@@H](S)CC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -2129,16 +2198,23 @@
     },
     "0a423ef1550a6b22ebf9194b787d5132":
     {
-        "full_name": "methylcinnamaldehyde",
-        "smiles": "C\/C(=C\\C1=CC=CC=C1)\/C=O",
+        "full_name": "alpha-methyl cinnamaldehyde",
+        "smiles": "c1ccccc1C=C(C)C=O",
+        "isomers":
+        {
+            "E": "c1ccccc1\/C=C\\(C)C=O",
+            "Z": "c1ccccc1\/C=C\/(C)C=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "cassia",
+                "sweet",
                 "cinnamon",
                 "spicy",
-                "sweet"
+                "cassia",
+                "warm",
+                "balsamic"
             ]
         },
         "activity":
@@ -2178,14 +2254,18 @@
     {
         "full_name": "2-undecenal",
         "smiles": "CCCCCCCCC=CC=O",
+        "isomers":
+        {
+            "E": "CCCCCCCC\/C=C\/C=O",
+            "Z": "CCCCCCCC\/C=C\\C=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "fresh",
                 "fruity",
-                "orange",
-                "peel"
+                "orange_peel"
             ]
         },
         "oid": "0a8731d32b745b9f38b6b27ec663db19"
@@ -2194,6 +2274,11 @@
     {
         "full_name": "4-methyl nonanoic acid",
         "smiles": "[O-]C(=O)CCC(C)CCCCC",
+        "isomers":
+        {
+            "(R)": "[O-]C(=O)CC[C@H](C)CCCCC",
+            "(S)": "[O-]C(=O)CC[C@@H](C)CCCCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -2292,15 +2377,22 @@
     {
         "full_name": "nerolidol",
         "smiles": "CC(=CCC\\C(=C\\CCC(C)(C=C)O)\\C)C",
+        "isomers":
+        {
+            "(R)": "CC(=CCC\\C(=C\\CC[C@](C)(C=C)O)\\C)C",
+            "(S)": "CC(=CCC\\C(=C\\CC[C@@](C)(C=C)O)\\C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "citrus",
                 "floral",
                 "green",
                 "waxy",
-                "woody"
+                "citrus",
+                "woody",
+                "fruity",
+                "melon"
             ]
         },
         "activity":
@@ -2356,7 +2448,13 @@
     "0c222b92a49b0c3d2b63b3bf842d8dc8":
     {
         "full_name": "3-phenylbutyraldehyde",
+        "name1": "trifernal",
         "smiles": "C1=CC=CC=C1C(C)CC=O",
+        "isomers":
+        {
+            "(R)": "c1ccccc1[C@@H](C)CC=O",
+            "(S)": "c1ccccc1[C@H](C)CC=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -2378,6 +2476,22 @@
                 "OR2T4":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1111\/j.1471-4159.2006.03771.x":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.81"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acschemneuro.5b00335":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.81"
                 }
             }
         },
@@ -2630,15 +2744,23 @@
     {
         "full_name": "gamma-caprolactone",
         "smiles": "CCC1CCC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "CC[C@H]1CCC(=O)O1",
+            "(R)-(+)": "CC[C@@H]1CCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "coconut",
-                "coumarinic",
                 "herbal",
+                "coconut",
                 "sweet",
-                "tobacco"
+                "coumarinic",
+                "tobacco",
+                "creamy",
+                "lactonic",
+                "green"
             ]
         },
         "activity":
@@ -8914,6 +9036,11 @@
     {
         "full_name": "delta-tridecalactone",
         "smiles": "CCCCCCCCC1CCCC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "CCCCCCCC[C@H]1CCCC(=O)O1",
+            "(R)-(+)": "CCCCCCCC[C@@H]1CCCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -9332,6 +9459,11 @@
     {
         "full_name": "delta-2-decenolactone",
         "smiles": "CCCCCC1CC=CC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "CCCCC[C@H]1CC=CC(=O)O1",
+            "(R)-(+)": "CCCCC[C@@H]1CC=CC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -9674,13 +9806,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "bready",
-                "burnt",
+                "sweet",
                 "caramellic",
-                "coffee",
                 "maple",
                 "sugar",
-                "sweet",
+                "coffee",
                 "woody"
             ]
         },
@@ -10899,19 +11029,25 @@
     {
         "full_name": "delta-undecalactone",
         "smiles": "CCCCCCC1CCCC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "CCCCCC[C@H]1CCCC(=O)O1",
+            "(R)-(+)": "CCCCCC[C@@H]1CCCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "coconut",
                 "creamy",
                 "fatty",
+                "coconut",
                 "fruity",
-                "green",
-                "lactonic",
-                "milky",
                 "peach",
-                "waxy"
+                "waxy",
+                "peach",
+                "milky",
+                "lactonic",
+                "green"
             ]
         },
         "activity":
@@ -12548,6 +12684,11 @@
     {
         "full_name": "jasmolactone delta",
         "smiles": "O=C1CCCC(CCC=CC)O1",
+        "isomers":
+        {
+            "(R)-(-)": "CC=CCC[C@@H]1CCCC(=O)O1",
+            "(S)-(+)": "CC=CCC[C@H]1CCCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -12974,6 +13115,11 @@
     {
         "full_name": "delta-nonalactone",
         "smiles": "CCCCC1CCCC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "CCCC[C@H]1CCCC(=O)O1",
+            "(R)-(+)": "CCCC[C@@H]1CCCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -16241,6 +16387,11 @@
     {
         "full_name": "delta-dodecalactone",
         "smiles": "CCCCCCCC1CCCC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "CCCCCCC[C@H]1CCCC(=O)O1",
+            "(R)-(+)": "CCCCCCC[C@@H]1CCCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -17186,6 +17337,11 @@
     {
         "full_name": "gamma-octalactone",
         "smiles": "CCCCC1CCC(=O)O1",
+        "isomers":
+        {
+            "(R)-(+)": "CCCC[C@@H]1CCC(=O)O1",
+            "(S)-(-)": "CCCC[C@H]1CCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -17269,18 +17425,23 @@
     {
         "full_name": "delta-tetradecalactone",
         "smiles": "CCCCCCCCCC1CCCC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "CCCCCCCCC[C@H]1CCCC(=O)O1",
+            "(R)-(+)": "CCCCCCCCC[C@@H]1CCCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "buttery",
-                "cheesy",
+                "waxy",
                 "creamy",
-                "dairy",
-                "fatty",
-                "milky",
+                "buttery",
                 "oily",
-                "waxy"
+                "fatty",
+                "cheesy",
+                "milky",
+                "dairy"
             ]
         },
         "activity":
@@ -18550,6 +18711,11 @@
     {
         "full_name": "gamma-valerolactone",
         "smiles": "CC1CCC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "C[C@H]1CCC(=O)O1",
+            "(R)-(+)": "C[C@@H]1CCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -19189,7 +19355,17 @@
     {
         "full_name": "bicyclononalactone",
         "smiles": "C1CCC2C(C1)CCC(=O)O2",
-        "aroma": [],
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "herbal",
+                "coumarinic",
+                "tonka",
+                "woody"
+            ]
+        },
         "oid": "86208d18e5619cf3b167a5185465f418"
     },
     "865c6d4085b0d00a81cf4d98140da208":
@@ -21413,6 +21589,11 @@
     {
         "full_name": "gamma-dodecalactone",
         "smiles": "CCCCCCCCC1CCC(=O)O1",
+        "isomers":
+        {
+            "(R)-(+)": "CCCCCCCC[C@@H]1CCC(=O)O1",
+            "(S)-(-)": "CCCCCCCC[C@H]1CCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -23062,6 +23243,11 @@
     {
         "full_name": "gamma-nonalactone",
         "smiles": "CCCCCC1CCC(=O)O1",
+        "isomers":
+        {
+            "(R)-(+)": "CCCCC[C@@H]1CCC(=O)O1",
+            "(S)-(-)": "CCCCC[C@H]1CCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -24481,6 +24667,11 @@
     {
         "full_name": "delta-decalactone",
         "smiles": "CCCCCC1CCCC(=O)O1",
+        "isomers":
+        {
+            "(S)-(-)": "CCCCC[C@H]1CCCC(=O)O1",
+            "(R)-(+)": "CCCCC[C@@H]1CCCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -24803,17 +24994,22 @@
     {
         "full_name": "gamma-decalactone",
         "smiles": "CCCCCCC1CCC(=O)O1",
+        "isomers":
+        {
+            "(R)-(+)": "CCCCCC[C@@H]1CCC(=O)O1",
+            "(S)-(-)": "CCCCCC[C@H]1CCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "buttery",
-                "coconut",
                 "fresh",
                 "oily",
+                "waxy",
                 "peach",
-                "sweet",
-                "waxy"
+                "coconut",
+                "buttery",
+                "sweet"
             ]
         },
         "activity":
@@ -27939,18 +28135,23 @@
     {
         "full_name": "gamma-undecalactone",
         "smiles": "CCCCCCCC1CCC(=O)O1",
+        "isomers":
+        {
+            "(R)-(+)": "CCCCCCC[C@@H]1CCC(=O)O1",
+            "(S)-(-)": "CCCCCCC[C@H]1CCC(=O)O1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "apricot",
-                "coconut",
+                "fruity",
+                "peach",
                 "creamy",
                 "fatty",
-                "fruity",
-                "ketonic",
                 "lactonic",
-                "peach"
+                "apricot",
+                "ketonic",
+                "coconut"
             ]
         },
         "activity":
@@ -31399,41 +31600,6 @@
         },
         "oid": "e27df19eb19010d180969a650c4846f8"
     },
-    "e34317a434c2051c6117a038efea2051":
-    {
-        "full_name": "trifernal",
-        "smiles": "C[C@@H](CC=O)C1=CC=CC=C1",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "foliage",
-                "green",
-                "herbal",
-                "hyacinth"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1111\/j.1471-4159.2006.03771.x":
-            {
-                "OR3A1":
-                {
-                    "type": "ma",
-                    "ec50": "-4.81"
-                }
-            },
-            "https:\/\/doi.org\/10.1021\/acschemneuro.5b00335":
-            {
-                "OR3A1":
-                {
-                    "type": "ma",
-                    "ec50": "-4.81"
-                }
-            }
-        },
-        "oid": "e34317a434c2051c6117a038efea2051"
-    },
     "e37a7e8e11160e30d81b0e4461124c7c":
     {
         "full_name": "muguet carbinol",
@@ -31468,6 +31634,13 @@
     {
         "full_name": "3-mercapto-2-methylpentan-1-ol",
         "smiles": "CCC(C(C)CO)S",
+        "isomers":
+        {
+            "(2R,3R)": "OC[C@H]([C@@H](S)CC)C",
+            "(2S,3R)": "OC[C@@H]([C@H](S)CC)C",
+            "(2R,3S)": "OC[C@H]([C@H](S)CC)C",
+            "(2S,3S)": "OC[C@@H]([C@@H](S)CC)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -34145,6 +34318,13 @@
     {
         "full_name": "3-mercapto-2-methylbutan-1-ol",
         "smiles": "CC(C(C)CO)S",
+        "isomers":
+        {
+            "(2R,3R)": "OC[C@H]([C@@H](S)C)C",
+            "(2S,3R)": "OC[C@@H]([C@H](S)C)C",
+            "(2R,3S)": "OC[C@H]([C@H](S)C)C",
+            "(2S,3S)": "OC[C@@H]([C@@H](S)C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

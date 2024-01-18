@@ -23,13 +23,13 @@ chdir(__DIR__);
 chdir("..");
 $fullname = $odor['full_name'];
 ensure_sdf_exists($fullname);
-$sdfname = "sdf/$fullname.sdf";
-if (isset($odor["isomers"])) $sdfname = "sdf/".(array_keys($odor["isomers"])[0])."-$fullname.sdf";
+$sdfname = str_replace(' ','_',"sdf/$fullname.sdf");
+if (isset($odor["isomers"])) $sdfname = str_replace(' ','_',"sdf/".(array_keys($odor["isomers"])[0])."-$fullname.sdf");
 if (file_exists($sdfname))
 {
     $sdfdat = file_get_contents($sdfname);
 }
-else die("File not exist $sdfname\n");
+else die("File not found $sdfname\n");
 
 $sdfdat = explode("\n", $sdfdat);
 $sdfdat[0] = $fullname;

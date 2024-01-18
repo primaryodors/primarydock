@@ -661,6 +661,7 @@ heredoc;
             $iso = [];
             foreach ($isomers as $k => $v) $iso[] = "ISO sdf/".str_replace(' ','_',$v).".sdf";
             $iso = implode("\n", $iso);
+            if ($pose < 4*count($isomers)) $pose = 4*count($isomers);
         }
         else $iso = "";
 

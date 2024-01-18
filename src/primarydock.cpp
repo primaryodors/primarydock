@@ -2256,7 +2256,7 @@ _try_again:
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
-        ligand->crumple(M_PI);
+        ligand->crumple(square);
 
         for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 

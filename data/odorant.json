@@ -2931,6 +2931,11 @@
     {
         "full_name": "3-methylhexanoic acid",
         "smiles": "CCCC(C)CC(=O)[O-]",
+        "isomers":
+        {
+            "(R)": "CCC[C@@H](C)CC(=O)[O-]",
+            "(S)": "CCC[C@H](C)CC(=O)[O-]"
+        },
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
@@ -3028,6 +3033,13 @@
     {
         "full_name": "polysantol",
         "smiles": "CC1=CCC(C1(C)C)\/C=C\/C(C)(C)C(C)O",
+        "isomers":
+        {
+            "(2S,6R)": "CC1=CC[C@H](C1(C)C)\/C=C\/C(C)(C)[C@H](C)O",
+            "(2R,6R)": "CC1=CC[C@H](C1(C)C)\/C=C\/C(C)(C)[C@@H](C)O",
+            "(2R,6S)": "CC1=CC[C@@H](C1(C)C)\/C=C\/C(C)(C)[C@@H](C)O",
+            "(2S,6S)": "CC1=CC[C@@H](C1(C)C)\/C=C\/C(C)(C)[C@H](C)O"
+        },
         "aroma": [],
         "activity":
         {
@@ -3087,6 +3099,11 @@
     {
         "full_name": "melonal",
         "smiles": "CC(CCC=C(C)C)C=O",
+        "isomers":
+        {
+            "(R)": "C[C@H](CCC=C(C)C)C=O",
+            "(S)": "C[C@@H](CCC=C(C)C)C=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -3120,16 +3137,23 @@
     {
         "full_name": "helvetolide",
         "smiles": "CCC(=O)OCC(C)(C)OC(C)C1CCCC(C1)(C)C",
+        "isomers":
+        {
+            "(5R,7R)": "CCC(=O)OCC(C)(C)O[C@H](C)[C@@H]1CCCC(C1)(C)C",
+            "(5S,7R)": "CCC(=O)OCC(C)(C)O[C@@H](C)[C@H]1CCCC(C1)(C)C",
+            "(5R,7S)": "CCC(=O)OCC(C)(C)O[C@@H](C)[C@@H]1CCCC(C1)(C)C",
+            "(5S,7S)": "CCC(=O)OCC(C)(C)O[C@H](C)[C@H]1CCCC(C1)(C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "ambrette",
-                "floral",
-                "fruity",
                 "musk",
+                "ambrette",
+                "fruity",
                 "pear",
-                "woody"
+                "woody",
+                "floral"
             ]
         },
         "activity":
@@ -3306,11 +3330,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "corn",
                 "earthy",
-                "musty",
+                "potato_chip",
                 "nutty",
-                "potato"
+                "popcorn",
+                "corn"
             ]
         },
         "activity":
@@ -3330,6 +3354,11 @@
     {
         "full_name": "2-methylundecanol",
         "smiles": "OCC(C)CCCCCCCCC",
+        "isomers":
+        {
+            "(R)": "OC[C@H](C)CCCCCCCCC",
+            "(S)": "OC[C@@H](C)CCCCCCCCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -3343,6 +3372,11 @@
     {
         "full_name": "celery ketone",
         "smiles": "CCCC1CC(=CC(=O)C1)C",
+        "isomers":
+        {
+            "(R)": "CCC[C@@H]1CC(=CC(=O)C1)C",
+            "(S)": "CCC[C@H]1CC(=CC(=O)C1)C|rflp C4"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -3465,15 +3499,22 @@
     {
         "full_name": "methyl tuberate",
         "smiles": "CCCCCC1C(CC(=O)O1)C",
+        "isomers":
+        {
+            "(3R,4R)": "CCCCC[C@@H]1[C@@H](CC(=O)O1)C",
+            "(3S,4R)": "CCCCC[C@@H]1[C@H](CC(=O)O1)C",
+            "(3R,4S)": "CCCCC[C@H]1[C@@H](CC(=O)O1)C",
+            "(3S,4S)": "CCCCC[C@H]1[C@H](CC(=O)O1)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "waxy",
                 "lactonic",
                 "metallic",
-                "plum",
                 "tuberose",
-                "waxy"
+                "plum"
             ]
         },
         "activity":
@@ -3953,17 +3994,26 @@
     "17c6f28f393a41d39f403331225a72fc":
     {
         "full_name": "alpha-terpineol",
-        "smiles": "C\\C1=C\\CC(CC1)C(O)(C)C",
+        "smiles": "CC1=CCC(CC1)C(C)(C)O",
+        "isomers":
+        {
+            "(R)": "CC1=CC[C@@H](CC1)C(C)(C)O|rflp C5",
+            "(S)": "CC1=CC[C@H](CC1)C(C)(C)O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "citrus",
-                "floral",
-                "lilac",
                 "pine",
                 "terpenic",
-                "woody"
+                "lilac",
+                "citrus",
+                "woody",
+                "floral",
+                "resinous",
+                "cooling",
+                "lemon",
+                "lime"
             ]
         },
         "activity":
@@ -4343,14 +4393,14 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "boronia",
                 "dry",
-                "hay",
-                "leafy",
-                "nutty",
                 "sweet",
                 "tobacco",
+                "nutty",
                 "violet",
+                "boronia",
+                "leafy",
+                "hay",
                 "woody"
             ]
         },
@@ -23165,6 +23215,11 @@
         "name1": "aldehyde MNA",
         "iupac": "2-methylundecanal",
         "smiles": "O=CC(C)CCCCCCCCC",
+        "isomers":
+        {
+            "(R)": "O=C[C@H](C)CCCCCCCCC",
+            "(S)": "O=C[C@@H](C)CCCCCCCCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

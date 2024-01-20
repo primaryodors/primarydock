@@ -17103,10 +17103,10 @@
         "smiles": "O=C(OC)CC1C(C(=O)CC1)CCCCC",
         "isomers":
         {
-            "(2R,3R)": "O=C(OC)C[C@@H]1[C@H](C(=O)CC1)CCCCC",
-            "(2S,3S)": "O=C(OC)C[C@H]1[C@@H](C(=O)CC1)CCCCC",
-            "(2S,3R)": "O=C(OC)C[C@@H]1[C@@H](C(=O)CC1)CCCCC",
-            "(2R,3S)": "O=C(OC)C[C@H]1[C@H](C(=O)CC1)CCCCC"
+            "(1R,2S)": "O=C(OC)C[C@@H]1[C@@H](C(=O)CC1)CCCCC",
+            "(1R,2R)": "O=C(OC)C[C@@H]1[C@H](C(=O)CC1)CCCCC",
+            "(1S,2R)": "O=C(OC)C[C@H]1[C@H](C(=O)CC1)CCCCC",
+            "(1S,2S)": "O=C(OC)C[C@H]1[C@@H](C(=O)CC1)CCCCC"
         },
         "aroma":
         {
@@ -18964,9 +18964,9 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "cognac",
                 "fruity",
                 "pineapple",
+                "cognac",
                 "rummy",
                 "winey"
             ]
@@ -19089,9 +19089,10 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "green_pea",
+                "bell_pepper",
                 "green",
-                "pea",
-                "pepper"
+                "galbanum"
             ]
         },
         "activity":
@@ -19173,15 +19174,16 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "alliaceous",
                 "burnt",
                 "fatty",
-                "garlic",
+                "sulfurous",
                 "meaty",
-                "nutty",
+                "garlic",
                 "roasted",
+                "alliaceous",
+                "nutty",
                 "rubbery",
-                "sulfurous"
+                "vegetable"
             ]
         },
         "activity":
@@ -19214,9 +19216,9 @@
             [
                 "naphthyl",
                 "narcissus",
-                "nutty",
+                "ylang",
                 "powdery",
-                "ylang"
+                "nutty"
             ]
         },
         "activity":
@@ -19237,6 +19239,17 @@
     {
         "full_name": "sandalore",
         "smiles": "CC1=CCC(C1(C)C)CCC(C)C(C)O",
+        "isomers":
+        {
+            "(2R,3R,6R)": "CC1=CC[C@H](C1(C)C)CC[C@@H](C)[C@@H](C)O",
+            "(2S,3R,6R)": "CC1=CC[C@H](C1(C)C)CC[C@H](C)[C@H](C)O",
+            "(2R,3S,6R)": "CC1=CC[C@H](C1(C)C)CC[C@H](C)[C@@H](C)O",
+            "(2S,3S,6R)": "CC1=CC[C@H](C1(C)C)CC[C@@H](C)[C@H](C)O",
+            "(2R,3R,6S)": "CC1=CC[C@@H](C1(C)C)CC[C@@H](C)[C@@H](C)O",
+            "(2S,3R,6S)": "CC1=CC[C@@H](C1(C)C)CC[C@H](C)[C@H](C)O",
+            "(2R,3S,6S)": "CC1=CC[C@@H](C1(C)C)CC[C@H](C)[C@@H](C)O",
+            "(2S,3S,6S)": "CC1=CC[C@@H](C1(C)C)CC[C@@H](C)[C@H](C)O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -19318,11 +19331,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "cocoa",
                 "herbal",
                 "sweet",
-                "tobacco",
                 "warm",
+                "tobacco",
+                "cocoa",
                 "woody"
             ]
         },
@@ -19354,9 +19367,9 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "skunk",
                 "cooked",
-                "meaty",
-                "skunk"
+                "meaty"
             ]
         },
         "oid": "83e0df486070b35af8c902f6ec6edb0a"
@@ -19364,7 +19377,7 @@
     "8405df5160056c2a3a7c26dd38b616fe":
     {
         "full_name": "globanone",
-        "smiles": "C1CCCC=C\/CCCCCCC(=O)CCC1",
+        "smiles": "C1CCC\\C=C\\CCCCCCC(=O)CCC1",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -19449,8 +19462,22 @@
     },
     "8491ff7449c0079506fd40c1267e06d8":
     {
-        "full_name": "ethyl_salicylate",
+        "full_name": "ethyl salicylate",
         "smiles": "O=C(OCC)c1ccccc1O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "wintergreen",
+                "minty",
+                "floral",
+                "spicy",
+                "balsamic",
+                "tutti_frutti",
+                "cooling"
+            ]
+        },
         "oid": "8491ff7449c0079506fd40c1267e06d8"
     },
     "853853d1fa9f2eff2e3141817aff7748":
@@ -19461,12 +19488,12 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "apple",
-                "berry",
-                "estery",
                 "fruity",
                 "green",
-                "waxy"
+                "waxy",
+                "berry",
+                "apple",
+                "estery"
             ]
         },
         "activity":
@@ -19491,11 +19518,13 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "sharp",
                 "acetic",
-                "buttery",
                 "cheesy",
+                "buttery",
                 "fruity",
-                "sharp"
+                "dairy",
+                "creamy"
             ]
         },
         "activity":
@@ -19902,15 +19931,15 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "alcoholic",
-                "apple",
                 "fermented",
-                "fruity",
                 "fusel",
                 "musty",
-                "pear",
-                "sweet",
                 "tequila",
-                "yeasty"
+                "yeasty",
+                "sweet",
+                "fruity",
+                "apple",
+                "pear"
             ]
         },
         "activity":
@@ -19953,6 +19982,13 @@
     {
         "full_name": "bicyclononalactone",
         "smiles": "C1CCC2C(C1)CCC(=O)O2",
+        "isomers":
+        {
+            "(4aS,8aR)": "C1CC[C@@H]2[C@@H](C1)CCC(=O)O2",
+            "(4aR,8aS)": "C1CC[C@H]2[C@H](C1)CCC(=O)O2",
+            "(4aR,8aR)": "C1CC[C@@H]2[C@H](C1)CCC(=O)O2",
+            "(4aS,8aS)": "C1CC[C@H]2[C@@H](C1)CCC(=O)O2"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -19975,11 +20011,10 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "alliaceous",
-                "clam",
-                "coffee",
                 "eggy",
-                "nut",
-                "onion",
+                "nut_skin",
+                "coffee",
+                "clam",
                 "seafood"
             ]
         },
@@ -20147,14 +20182,16 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "sweet",
+                "sassafrass",
                 "anise",
-                "anisic",
-                "fennel",
+                "spicy",
                 "green",
                 "herbal",
-                "sassafrass",
-                "spicy",
-                "sweet"
+                "fennel",
+                "phenolic",
+                "anise",
+                "minty"
             ]
         },
         "activity":
@@ -20211,18 +20248,17 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "apple",
-                "apricot",
-                "blueberry",
                 "floral",
                 "fruity",
-                "frutti",
-                "peach",
-                "pineapple",
-                "ripe",
-                "rose",
                 "sweet",
-                "tutti"
+                "rose",
+                "peach",
+                "apricot",
+                "ripe",
+                "pineapple",
+                "tutti_frutti",
+                "apple",
+                "blueberry"
             ]
         },
         "activity":
@@ -20246,13 +20282,14 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "dairy",
-                "fruity",
-                "green",
-                "herbal",
                 "sharp",
                 "solvent",
-                "spicy"
+                "green",
+                "herbal",
+                "fruity",
+                "dairy",
+                "spicy",
+                "vegetable"
             ]
         },
         "oid": "889748872983de7214334b637f8ad5b3"
@@ -20273,15 +20310,24 @@
     },
     "896c431409a358d3e393831fc857785a":
     {
-        "full_name": "4-methyl-2-(1-phenylethyl)-1,3-dioxolane",
+        "full_name": "cyclotropal",
+        "name1": "melon acetal",
+        "iupac": "4-methyl-2-(1-phenylethyl)-1,3-dioxolane",
         "smiles": "CC1COC(O1)C(C)C2=CC=CC=C2",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "green",
-                "hay",
-                "mushroom"
+                "mushroom",
+                "chicken_coop",
+                "new_mown_hay",
+                "herbal",
+                "earthy",
+                "alfalfa",
+                "violet",
+                "melon_rind",
+                "brothy"
             ]
         },
         "oid": "896c431409a358d3e393831fc857785a"
@@ -20294,11 +20340,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "sweet",
                 "floral",
-                "fresh",
                 "fruity",
                 "jasmine",
-                "sweet"
+                "fresh"
             ]
         },
         "activity":
@@ -20597,7 +20643,12 @@
     "8b16e36657a9f5be9eeb045ac6e4d47d":
     {
         "full_name": "alpha-isomethyl ionone",
-        "smiles": "CC(=O)C(\\C)=CC1C(C)=CCCC1(C)C",
+        "smiles": "CC(=O)\\C(C)=C\\C1C(C)=CCCC1(C)C",
+        "isomers":
+        {
+            "(R)-(E)": "CC(=O)\/C(C)=C\\([H])[C@H]1C(C)=CCCC1(C)C",
+            "(S)-(E)": "CC(=O)\/C(C)=C\\([H])[C@@H]1C(C)=CCCC1(C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -20650,9 +20701,9 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "warm",
                 "herbal",
-                "tobacco",
-                "warm"
+                "tobacco"
             ]
         },
         "activity":
@@ -20846,6 +20897,11 @@
         "full_name": "myrac aldehyde",
         "name1": "empetal",
         "smiles": "CC(=CCCC1=CCC(CC1)C=O)C",
+        "isomers":
+        {
+            "(R)": "CC(=CCCC1=CC[C@@H](CC1)C=O)C|rflp C9",
+            "(S)": "CC(=CCCC1=CC[C@H](CC1)C=O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -20993,6 +21049,11 @@
     {
         "full_name": "2-methylheptanoic acid",
         "smiles": "CCCCCC(C)C(=O)[O-]",
+        "isomers":
+        {
+            "(R)": "CCCCC[C@@H](C)C(=O)[O-]",
+            "(S)": "CCCCC[C@H](C)C(=O)[O-]"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -21309,6 +21370,13 @@
     {
         "full_name": "2,5-dihydro-2,4,5-trimethylthiazoline",
         "smiles": "CC1SC(C)C(C)=N1",
+        "isomers":
+        {
+            "(2R,5R)": "C[C@H]1S[C@H](C)C(C)=N1",
+            "(2S,5R)": "C[C@@H]1S[C@H](C)C(C)=N1",
+            "(2R,5S)": "C[C@H]1S[C@@H](C)C(C)=N1",
+            "(2S,5S)": "C[C@@H]1S[C@@H](C)C(C)=N1"
+        },
         "activity":
         {
             "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
@@ -21326,17 +21394,22 @@
     {
         "full_name": "2-nonanol",
         "smiles": "CCCCCCCC(O)C",
+        "isomers":
+        {
+            "(R)": "CCCCCCC[C@H](O)C",
+            "(S)": "CCCCCCC[C@@H](O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "cheesy",
-                "citrus",
-                "creamy",
-                "fruity",
+                "waxy",
                 "green",
+                "creamy",
+                "citrus",
                 "orange",
-                "waxy"
+                "cheesy",
+                "fruity"
             ]
         },
         "activity":
@@ -21551,6 +21624,11 @@
     {
         "full_name": "styralyl acetate",
         "smiles": "CC(C1=CC=CC=C1)OC(=O)C",
+        "isomers":
+        {
+            "(R)": "C[C@H](C1=CC=CC=C1)OC(=O)C",
+            "(S)": "C[C@@H](C1=CC=CC=C1)OC(=O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -21586,6 +21664,13 @@
     {
         "full_name": "dihydroisojasmonate",
         "smiles": "COC(=O)C1CCC(=O)C1CCCCCC",
+        "isomers":
+        {
+            "(1R,2S)": "COC(=O)[C@H]1CCC(=O)[C@H]1CCCCCC",
+            "(1R,2R)": "COC(=O)[C@H]1CCC(=O)[C@@H]1CCCCCC",
+            "(1S,2R)": "COC(=O)[C@@H]1CCC(=O)[C@@H]1CCCCCC",
+            "(1S,2S)": "COC(=O)[C@@H]1CCC(=O)[C@H]1CCCCCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -21816,14 +21901,19 @@
     {
         "full_name": "cashmeran",
         "smiles": "CC1C(C2=C(C1(C)C)C(=O)CCC2)(C)C",
+        "isomers":
+        {
+            "(R)": "C[C@@H]1C(C2=C(C1(C)C)C(=O)CCC2)(C)C",
+            "(S)": "C[C@H]1C(C2=C(C1(C)C)C(=O)CCC2)(C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "clean",
-                "musk",
                 "spicy",
-                "woody"
+                "musk",
+                "woody",
+                "clean"
             ]
         },
         "activity":
@@ -25874,6 +25964,13 @@
     {
         "full_name": "methyl jasmonate",
         "smiles": "CCC=CCC1C(CCC1=O)CC(=O)OC",
+        "isomers":
+        {
+            "(1R,2S)": "CCC=CC[C@H]1[C@H](CCC1=O)CC(=O)OC",
+            "(1R,2R)": "CCC=CC[C@@H]1[C@H](CCC1=O)CC(=O)OC",
+            "(1S,2R)": "CCC=CC[C@@H]1[C@@H](CCC1=O)CC(=O)OC",
+            "(1S,2S)": "CCC=CC[C@H]1[C@@H](CCC1=O)CC(=O)OC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

@@ -1649,7 +1649,7 @@ float Ring::flip_atom(Atom* wa)
         {
             r = pt1.get_3d_distance(pt2);
             // cout << (theta*fiftyseven) << "deg: r = " << r << " step = " << (step*fiftyseven) << endl;
-            if (r < 0.1 && r > lr)
+            if (theta > hexagonal/2 && r < 0.33 && r > lr)
             {
                 Bond* wbonds[16];
                 wa->fetch_bonds(wbonds);

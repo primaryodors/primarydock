@@ -5,7 +5,7 @@ if (isset($_REQUEST['smiles']))
     chdir(__DIR__);
     $smilesu = escapeshellarg($_REQUEST['smiles']);
     $cmd = "obabel --gen3d -osdf -O\"test.sdf\" -:$smilesu 2>&1";
-    echo ($cmd);
+    echo ("$cmd\n");
     passthru($cmd);
     exit;
 }

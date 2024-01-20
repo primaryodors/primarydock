@@ -26956,6 +26956,11 @@
         "full_name": "huminol M",
         "iupac": "8-ethyl-1,5-dimethylbicyclo[3.2.1]octan-8-ol",
         "smiles": "CCC1(C2(CCCC1(CC2)C)C)O",
+        "isomers":
+        {
+            "(R)": "CC[C@@]1([C@@]2(CCCC1(CC2)C)C)O",
+            "(S)": "CC[C@]1([C@@]2(CCCC1(CC2)C)C)O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27014,6 +27019,11 @@
     {
         "full_name": "2-heptanol",
         "smiles": "CC(O)CCCCC",
+        "isomers":
+        {
+            "(R)": "C[C@@H](O)CCCCC",
+            "(S)": "C[C@H](O)CCCCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27241,7 +27251,12 @@
     "bfe68d98a3d08e9190ef434c8063aeec":
     {
         "full_name": "3-(3-propen-2-yl phenyl) butanal",
-        "smiles": "O=CCC(c1cc(ccc1)\\C(=C)C)C",
+        "smiles": "O=CCC(c1cc(ccc1)C(=C)C)C",
+        "isomers":
+        {
+            "(R)": "O=CC[C@@H](c1cc(ccc1)C(=C)C)C",
+            "(S)": "O=CC[C@H](c1cc(ccc1)C(=C)C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27318,6 +27333,11 @@
     {
         "full_name": "2-methylbutylamine",
         "smiles": "CCC(C)C[NH3+]",
+        "isomers":
+        {
+            "(R)": "CC[C@@H](C)C[NH3+]",
+            "(S)": "CC[C@H](C)C[NH3+]"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27340,6 +27360,7 @@
     "c0f638accf17c3f6de97baaab32b2546":
     {
         "full_name": "dihydrocivetone",
+        "iupac": "cycloheptadecanone",
         "smiles": "C1CCCCCCCCC(=O)CCCCCCC1",
         "aroma":
         {
@@ -27367,6 +27388,11 @@
         "full_name": "troenan",
         "name1": "privet dioxane",
         "smiles": "CCCC(C)C1OCC(CO1)(C)CCC",
+        "isomers":
+        {
+            "(R)": "CCC[C@@H](C)C1OCC(CO1)(C)CCC",
+            "(S)": "CCC[C@H](C)C1OCC(CO1)(C)CCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27398,6 +27424,11 @@
     {
         "full_name": "3-methylcyclotetradecanone",
         "smiles": "O=C1CC(C)CCCCCCCCCCC1",
+        "isomers":
+        {
+            "(R)": "O=C1C[C@H](C)CCCCCCCCCCC1",
+            "(S)": "O=C1C[C@@H](C)CCCCCCCCCCC1"
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1523\/JNEUROSCI.3259-15.2016":
@@ -27437,6 +27468,11 @@
     {
         "full_name": "methylhydrocinnamaldehyde",
         "smiles": "C1=CC=C(C=C1)CC(C)C=O",
+        "isomers":
+        {
+            "(R)": "C1=CC=C(C=C1)C[C@@H](C)C=O",
+            "(S)": "C1=CC=C(C=C1)C[C@H](C)C=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27611,6 +27647,11 @@
         "full_name": "cyclamal",
         "name1": "cyclamen aldehyde",
         "smiles": "CC(C)c1ccc(cc1)CC(C)C=O",
+        "isomers":
+        {
+            "(R)": "CC(C)c1ccc(cc1)C[C@@H](C)C=O",
+            "(S)": "CC(C)c1ccc(cc1)C[C@H](C)C=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27781,6 +27822,11 @@
     {
         "full_name": "tonalide",
         "smiles": "CC1CC(C2=C(C1(C)C)C=C(C(=C2)C(=O)C)C)(C)C",
+        "isomers":
+        {
+            "(R)": "C[C@@H]1CC(C2=C(C1(C)C)C=C(C(=C2)C(=O)C)C)(C)C",
+            "(S)": "C[C@H]1CC(C2=C(C1(C)C)C=C(C(=C2)C(=O)C)C)(C)C|rflp C2"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27990,6 +28036,13 @@
     {
         "full_name": "romandolide",
         "smiles": "CCC(=O)OCC(=O)OC(C)C1CCCC(C1)(C)C",
+        "isomers":
+        {
+            "(5R,6R)": "CCC(=O)OCC(=O)O[C@H](C)[C@@H]1CCCC(C1)(C)C",
+            "(5S,6R)": "CCC(=O)OCC(=O)O[C@@H](C)[C@H]1CCCC(C1)(C)C|rflp C12",
+            "(5R,6S)": "CCC(=O)OCC(=O)O[C@@H](C)[C@@H]1CCCC(C1)(C)C",
+            "(5S,6S)": "CCC(=O)OCC(=O)O[C@H](C)[C@H]1CCCC(C1)(C)C|rflp C12"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -28024,7 +28077,7 @@
     "c53392b5b56b1cc74af241880713ec2e":
     {
         "full_name": "(+)-2-phenylbutyric acid",
-        "smiles": "CCC(C1=CC=CC=C1)C(=O)[O-]",
+        "smiles": "CC[C@@H](C1=CC=CC=C1)C(=O)[O-]",
         "activity":
         {
             "https:\/\/doi.org\/10.1126\/scisignal.2000016":

@@ -1612,6 +1612,7 @@ float Ring::flip_atom(Atom* wa)
     if (atcount < 4) return 0;
     if (!wa || wa->num_rings() != 1) return 0;
     if (!wa->is_in_ring(this)) return 0;
+    if (wa->is_pi()) return 0;
 
     Atom* xa = traverse_ring(wa);
     Atom* va = traverse_ring(wa, xa);

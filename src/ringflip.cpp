@@ -71,6 +71,12 @@ int main(int argc, char** argv)
             return -1;
         }
 
+        if (a->is_pi())
+        {
+            cout << "Atom " << atom_names[i] << " is double bonded and cannot flip." << endl;
+            return -1;
+        }
+
         Ring** rr = a->get_rings();
         float theta = rr[0]->flip_atom(a);
         cout << "Flipped " << a->name << " " << (theta*fiftyseven) << "deg." << endl;

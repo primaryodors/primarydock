@@ -22159,23 +22159,28 @@
     {
         "full_name": "3-octyl acetate",
         "smiles": "CCC(CCCCC)OC(=O)C",
+        "isomers":
+        {
+            "(R)": "CC[C@H](CCCCC)OC(=O)C",
+            "(S)": "CC[C@@H](CCCCC)OC(=O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "aldehydic",
-                "anisic",
-                "apple",
-                "bergamot",
-                "citrus",
-                "fatty",
                 "fresh",
-                "grapefruit",
+                "bergamot",
+                "woody",
                 "green",
-                "minty",
+                "grapefruit",
                 "rose",
+                "apple",
+                "minty",
                 "waxy",
-                "woody"
+                "aldehydic",
+                "fatty",
+                "citrus",
+                "anisic"
             ]
         },
         "activity":

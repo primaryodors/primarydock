@@ -12,7 +12,7 @@ if (isset($_REQUEST['smiles']))
 
 ?><html>
 <head>
-<title>Molecule thingie</title>
+<title>SMILES viewer</title>
 <style>
 body
 {

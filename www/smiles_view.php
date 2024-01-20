@@ -3,10 +3,21 @@
 if (isset($_REQUEST['smiles']))
 {
     chdir(__DIR__);
+
     $smilesu = escapeshellarg($_REQUEST['smiles']);
     $cmd = "obabel --gen3d -osdf -O\"test.sdf\" -:$smilesu 2>&1";
     echo ("$cmd\n");
     passthru($cmd);
+
+    if (@$_REQUEST["rflp"])
+    {
+        chdir("..");
+        $rflp = escapeshellarg($_REQUEST['rflp']);
+        $cmd = "bin/ringflip \"www/test.sdf\" $rflp";
+        echo ("$cmd\n");
+        passthru($cmd);
+    }
+
     exit;
 }
 
@@ -130,6 +141,7 @@ var color_scheme = NGL.ColormakerRegistry.addScheme(function (params)
 function go(smiles_string)
 {
     stage.removeAllComponents();
+    stage.setSpin(false);
     url = "<?php echo $_SERVER["PHP_SELF"]; ?>";
 	$.ajax(
 	{
@@ -137,7 +149,8 @@ function go(smiles_string)
 		cache: false,
 		data:
 		{
-			smiles: smiles_string
+			smiles: smiles_string,
+            rflp: $('#rflp')[0].value,
 		},
 		success: function(result)
 		{
@@ -167,19 +180,23 @@ function go(smiles_string)
 }
 </script>
 </head>
-<body onload="set_stage();">
+<body onload="set_stage(); go($('#smiles')[0].value);">
 <div class="flex-outer">
 <div class="flex-inner" style="width:33%;">
 <label for="smiles">SMILES string:</label>
 <br>
-<input type="text" name="smiles" id="smiles" value="CCO">
+<input type="text" name="smiles" id="smiles" value="CCO" onchange="$('#rflp')[0].value = '';">
 <br>
-<input type="button" value="Go" onclick="go($('#smiles')[0].value);">
+<label for="rflp">Ring flips (optional):</label>
+<br>
+<input type="text" name="rflp" id="rflp" value="">
+<br>
+<input type="button" value="Go" onclick="go($('#smiles')[0].value);" onchange="go($('#smiles')[0].value);">
 <br><br>
 <textarea id="result">
 </textarea>
 </div>
-<div class="flex-inner" style="width:66%;">
+<div class="flex-inner" style="width:60%;">
 <div id="viewport" style="width:100%; height:100%; background-color: #020408;"></div>
 </div>
 </div>

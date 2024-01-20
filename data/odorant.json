@@ -23125,7 +23125,14 @@
     {
         "full_name": "tonka undecanone",
         "name1": "florex",
-        "smiles": "C\/C=C\/1\\CC2CC1C3C2OC(=O)CC3",
+        "smiles": "CC=C1CC2CC1C3C2OC(=O)CC3",
+        "isomers":
+        {
+            "(2R,3R)": "CC=C1C[C@H]2CC1[C@@H]3[C@@H]2OC(=O)CC3",
+            "(2S,3R)": "CC=C1C[C@@H]2CC1[C@@H]3[C@H]2OC(=O)CC3",
+            "(2R,3S)": "CC=C1C[C@@H]2CC1[C@H]3[C@@H]2OC(=O)CC3",
+            "(2S,3S)": "CC=C1C[C@@H]2CC1[C@H]3[C@H]2OC(=O)CC3"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -23208,6 +23215,11 @@
     {
         "full_name": "ysamber",
         "smiles": "CC1(CCC2(C3C14CCC(C4)C3(C)C)OCCO2)C",
+        "isomers":
+        {
+            "(R)": "CC1(CCC2([C@H]3[C@@]14CCC(C4)C3(C)C)OCCO2)C",
+            "(S)": "CC1(CCC2([C@H]3[C@]14CCC(C4)C3(C)C)OCCO2)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -23409,6 +23421,11 @@
     {
         "full_name": "homofuraneol",
         "smiles": "CCC1C(=O)C(=C(O1)C)O",
+        "isomers":
+        {
+            "(R)": "CC[C@@H]1C(=O)C(=C(O1)C)O",
+            "(S)": "CC[C@H]1C(=O)C(=C(O1)C)O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -23529,12 +23546,12 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "sweet",
+                "woody",
+                "spicy",
                 "clove",
                 "dry",
-                "spicy",
-                "sweet",
-                "terpenic",
-                "woody"
+                "terpenic"
             ]
         },
         "oid": "a3229d0c17fdce0c53dc5f6fa8207690"
@@ -23605,6 +23622,11 @@
     {
         "full_name": "acetoin",
         "smiles": "CC(=O)C(C)O",
+        "isomers":
+        {
+            "(R)": "CC(=O)[C@@H](C)O",
+            "(S)": "CC(=O)[C@H](C)O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -24202,7 +24224,8 @@
     },
     "a79baa2ec07741d850812f503e1bcb21":
     {
-        "full_name": "1,1-dimethoxyoctane",
+        "full_name": "octanal dimethyl acetal",
+        "iupac": "1,1-dimethoxyoctane",
         "smiles": "CCCCCCCC(OC)OC",
         "aroma":
         {
@@ -24327,6 +24350,11 @@
     {
         "full_name": "lime oxide",
         "smiles": "CC1(CCCC(O1)(C)C=C)C",
+        "isomers":
+        {
+            "(R)": "CC1(CCC[C@](O1)(C)C=C)C",
+            "(S)": "CC1(CCC[C@@](O1)(C)C=C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -24343,7 +24371,7 @@
     "a9b77ed2a0ebb57857e97c07cc06d8e2":
     {
         "full_name": "beta-damascenone",
-        "smiles": "O=C(\\C1=C(\\C=C\/CC1(C)C)C)\/C=C\/C",
+        "smiles": "O=C(C1=C(C=CCC1(C)C)C)C=CC",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -24399,7 +24427,12 @@
     "ab22168ee1200a51287524b52ff7c11e":
     {
         "full_name": "ethyl linalool",
-        "smiles": "CC\/C(=C\/CCC(C)(C=C)O)\/C",
+        "smiles": "CCC(=CCCC(C)(C=C)O)C",
+        "isomers":
+        {
+            "(R)": "CCC(=CCC[C@](C)(C=C)O)C",
+            "(S)": "CCC(=CCC[C@@](C)(C=C)O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -24559,6 +24592,11 @@
     {
         "full_name": "fenchone",
         "smiles": "O=C1C(C)(C)C2CC1(C)CC2",
+        "isomers":
+        {
+            "(1R,4S)-(+)": "O=C1C(C)(C)[C@@H]2CC1(C)CC2",
+            "(1S,4R)-(-)": "O=C1C(C)(C)[C@H]2CC1(C)CC2"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -24759,6 +24797,11 @@
     {
         "full_name": "3-methyl-2,4-nonanedione",
         "smiles": "CC(=O)C(C)C(=O)CCCCC",
+        "isomers":
+        {
+            "(R)": "CC(=O)[C@@H](C)C(=O)CCCCC",
+            "(S)": "CC(=O)[C@H](C)C(=O)CCCCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -24975,6 +25018,11 @@
     {
         "full_name": "methyl camomille",
         "smiles": "CCCCOC(=O)C(C)CCC",
+        "isomers":
+        {
+            "(R)": "CCCCOC(=O)[C@H](C)CCC",
+            "(S)": "CCCCOC(=O)[C@@H](C)CCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -25209,6 +25257,11 @@
     {
         "full_name": "styralyl alcohol",
         "smiles": "CC(C1=CC=CC=C1)O",
+        "isomers":
+        {
+            "(R)": "C[C@H](C1=CC=CC=C1)O",
+            "(S)": "C[C@@H](C1=CC=CC=C1)O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -25331,6 +25384,11 @@
     {
         "full_name": "citronellyl nitrile",
         "smiles": "CC(CCC=C(C)C)CC#N",
+        "isomers":
+        {
+            "(R)": "C[C@H](CCC=C(C)C)CC#N",
+            "(S)": "C[C@@H](CCC=C(C)C)CC#N"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -25359,6 +25417,11 @@
     {
         "full_name": "4-ethyloctanoic acid",
         "smiles": "CCCCC(CC)CCC(=O)[O-]",
+        "isomers":
+        {
+            "(R)": "CCCC[C@@H](CC)CCC(=O)[O-]",
+            "(S)": "CCCC[C@H](CC)CCC(=O)[O-]"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -25938,6 +26001,11 @@
     {
         "full_name": "quintone",
         "smiles": "CCCCCC1CCCC1=O",
+        "isomers":
+        {
+            "(R)": "CCCCC[C@@H]1CCCC1=O",
+            "(S)": "CCCCC[C@H]1CCCC1=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -26261,6 +26329,11 @@
     {
         "full_name": "lyral",
         "smiles": "CC(C)(CCCC1=CCC(CC1)C=O)O",
+        "isomers":
+        {
+            "(R)": "CC(C)(CCCC1=CC[C@@H](CC1)C=O)O|rflp C10",
+            "(S)": "CC(C)(CCCC1=CC[C@H](CC1)C=O)O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -26537,6 +26610,13 @@
     {
         "full_name": "norbornane-2-carboxylic acid",
         "smiles": "C1CC2CC1CC2C(=O)[O-]",
+        "isomers":
+        {
+            "(R)-exo": "C1C[C@H]2CC1C[C@@H]2C(=O)[O-]",
+            "(S)-exo": "C1C[C@@H]2CC1C[C@H]2C(=O)[O-]",
+            "(R)-endo": "C1C[C@H]2CC1C[C@H]2C(=O)[O-]",
+            "(S)-endo": "C1C[C@@H]2CC1C[C@@H]2C(=O)[O-]"
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1002\/cbdv.201400083":
@@ -26613,6 +26693,11 @@
     {
         "full_name": "tetrahydro citral",
         "smiles": "CC(C)CCCC(C)CC=O",
+        "isomers":
+        {
+            "(R)": "CC(C)CCC[C@@H](C)CC=O",
+            "(S)": "CC(C)CCC[C@H](C)CC=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -26701,6 +26786,11 @@
     {
         "full_name": "1-octen-3-yl acetate",
         "smiles": "CCCCCC(C=C)OC(=O)C",
+        "isomers":
+        {
+            "(R)": "CCCCC[C@H](C=C)OC(=O)C",
+            "(S)": "CCCCC[C@@H](C=C)OC(=O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -26812,12 +26902,22 @@
     {
         "full_name": "nonisyl alcohol",
         "smiles": "CC(CCO)CC(C)(C)C",
+        "isomers":
+        {
+            "(R)": "C[C@@H](CCO)CC(C)(C)C",
+            "(S)": "C[C@H](CCO)CC(C)(C)C"
+        },
         "oid": "b99f54f72cc373ce0d067031c265142f"
     },
     "ba119fa996e35d7222b5582a8060a940":
     {
         "full_name": "3-methylthio-1-hexanol",
         "smiles": "OCCC(SC)CCC",
+        "isomers":
+        {
+            "(R)": "OCC[C@H](SC)CCC",
+            "(S)": "OCC[C@@H](SC)CCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

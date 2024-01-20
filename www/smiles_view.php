@@ -45,7 +45,7 @@ textarea
     height: 80%;
     width: 100%;
     color: #0f0;
-    font-family: Pet Me 2Y, Courier New, Monospace;
+    font-family: Monospace;
     overflow-x: auto;
     overflow-y: auto;
 }

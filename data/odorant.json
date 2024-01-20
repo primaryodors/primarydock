@@ -4928,7 +4928,9 @@
     },
     "1f633b7a97d558a2a2aa887c6a17fc9c":
     {
-        "full_name": "pentadecalactone",
+        "full_name": "exaltolide",
+        "name1": "pentadecalactone",
+        "iupac": "omega-pentadecalactone",
         "smiles": "C1CCCCCCCOC(=O)CCCCCC1",
         "aroma":
         {
@@ -4988,6 +4990,46 @@
                 "OR5I1":
                 {
                     "type": "na"
+                }
+            },
+
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.4000000953674"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.40650404989719"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.40650404989719"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.40650404989719"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         },
@@ -28736,65 +28778,6 @@
             }
         },
         "oid": "c8782b34f75f1ea211af35f43b9cd398"
-    },
-    "c8d369fea9574abfdf23c19b13f6065d":
-    {
-        "full_name": "exaltolide",
-        "smiles": "O=C1CCCCCCCCCCCCCCO1",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "musk",
-                "animal",
-                "powdery",
-                "natural",
-                "fruity"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
-            {
-                "OR5A1":
-                {
-                    "type": "na"
-                },
-                "OR5A2":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.4000000953674"
-                },
-                "OR5AN1":
-                {
-                    "type": "na"
-                }
-            },
-            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
-            {
-                "OR2W1":
-                {
-                    "type": "ia",
-                    "adjusted_curve_top": "-0.40650404989719"
-                },
-                "OR5K1":
-                {
-                    "type": "ia",
-                    "adjusted_curve_top": "-0.40650404989719"
-                },
-                "OR5P3":
-                {
-                    "type": "ia",
-                    "adjusted_curve_top": "-0.40650404989719"
-                },
-                "OR8H1":
-                {
-                    "type": "ia",
-                    "adjusted_curve_top": "-0.65040647983551"
-                }
-            }
-        },
-        "oid": "c8d369fea9574abfdf23c19b13f6065d"
     },
     "c91c8e2a573c47e5734fac4d612385cc":
     {

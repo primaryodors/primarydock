@@ -29135,6 +29135,11 @@
     {
         "full_name": "isoborneol",
         "smiles": "CC1(C2CCC1(C(C2)O)C)C",
+        "isomers":
+        {
+            "(+)": "CC1([C@H]2CCC1([C@H](C2)O)C)C",
+            "(-)": "CC1([C@@H]2CCC1([C@@H](C2)O)C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -29492,6 +29497,11 @@
     {
         "full_name": "2,5-dimethyl-3(2h)-furanone",
         "smiles": "CC1C(=O)C=C(O1)C",
+        "isomers":
+        {
+            "(R)": "C[C@@H]1C(=O)C=C(O1)C",
+            "(S)": "C[C@H]1C(=O)C=C(O1)C"
+        },
         "aroma":
         {
             "https:\/\/pubs.acs.org\/doi\/abs\/10.1021\/acs.jafc.1c03314":
@@ -29666,6 +29676,11 @@
     {
         "full_name": "firascone",
         "smiles": "CC1C=CCC(C1C(=O)OC)(C)C",
+        "isomers":
+        {
+            "(R)": "CC1C=CCC([C@@H]1C(=O)OC)(C)C",
+            "(S)": "CC1C=CCC([C@H]1C(=O)OC)(C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -29890,7 +29905,12 @@
         "full_name": "2-ethyl fenchol",
         "name1": "terrasol",
         "iupac": "6-ethyl-1,5,5-trimethylbicyclo[2.2.1]heptan-6-ol",
-        "smiles": "CC1(C2CCC(C2)(C1OCC)C)C",
+        "smiles": "CC1(C2CCC(C2)(C1(O)CC)C)C",
+        "isomers":
+        {
+            "(1R,2R,4S)": "CC1([C@H]2CCC(C2)([C@]1(O)CC)C)C",
+            "(1S,2S,4R)": "CC1([C@@H]2CCC(C2)([C@@]1(O)CC)C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -30110,6 +30130,11 @@
     {
         "full_name": "1-octen-3-ol",
         "smiles": "OC(C=C)CCCCC",
+        "isomers":
+        {
+            "(R)": "O[C@@H](C=C)CCCCC",
+            "(S)": "O[C@H](C=C)CCCCC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -30168,6 +30193,11 @@
         "name3": "sandafleur",
         "name4": "sandal butenol",
         "smiles": "CC1=CCC(C1(C)C)C\/C=C(\\C)\/CO",
+        "isomers":
+        {
+            "(R)": "CC1=CC[C@H](C1(C)C)CC=C(C)CO",
+            "(S)": "CC1=CC[C@@H](C1(C)C)CC=C(C)CO"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -30258,6 +30288,11 @@
     {
         "full_name": "2-mercapto-3-pentanone",
         "smiles": "CC(S)C(=O)CC",
+        "isomers":
+        {
+            "(R)": "C[C@@H](S)C(=O)CC",
+            "(S)": "C[C@H](S)C(=O)CC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -30281,7 +30316,7 @@
     "d5ca075c633a3f8067608fae49d2d7e8":
     {
         "full_name": "2-acetyl-1-pyrroline",
-        "smiles": "CC(=O)C1=[NH+]CCC1",
+        "smiles": "CC(=O)C1=NCCC1",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -30763,13 +30798,6 @@
         },
         "oid": "d719fac5dce4f2b13e317f21dc7975e7"
     },
-    "d7287db45b6c6491b3a9c9a1cbf3a47b":
-    {
-        "full_name": "cedrene",
-        "smiles": "CC1CCC2C13CC=C(C(C3)C2(C)C)C",
-        "aroma": [],
-        "oid": "d7287db45b6c6491b3a9c9a1cbf3a47b"
-    },
     "d7315752c49d5c0473c6c0b5e24613f3":
     {
         "full_name": "aniline",
@@ -30780,12 +30808,22 @@
     {
         "full_name": "cyclosal",
         "smiles": "CC1=CC(=O)CC(C1)C(C)C",
+        "isomers":
+        {
+            "(R)": "CC1=CC(=O)C[C@@H](C1)C(C)C",
+            "(S)": "CC1=CC(=O)C[C@H](C1)C(C)C|rflp C7"
+        },
         "oid": "d73971e420c3ea26ce90b03686ac92f1"
     },
     "d749da79b391570f22fc1c13b9fb3d9d":
     {
         "full_name": "methoxyfuraneol",
         "smiles": "CC1C(=O)C(=C(O1)C)OC",
+        "isomers":
+        {
+            "(R)": "C[C@@H]1C(=O)C(=C(O1)C)OC",
+            "(S)": "C[C@H]1C(=O)C(=C(O1)C)OC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

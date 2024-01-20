@@ -28395,6 +28395,11 @@
     {
         "full_name": "cyclamen homoaldehyde",
         "smiles": "CC(C)CC1=CC=C(C=C1)CC(C)C=O",
+        "isomers":
+        {
+            "(R)": "CC(C)CC1=CC=C(C=C1)C[C@@H](C)C=O",
+            "(S)": "CC(C)CC1=CC=C(C=C1)C[C@H](C)C=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -28431,7 +28436,7 @@
     "c725403c407c7e7d2812c16d58b177d8":
     {
         "full_name": "amberketal",
-        "smiles": "CC1(CCCC2(C1CCC34C2CCC(O3)(OC4)C)C)C",
+        "smiles": "CC1(CCCC2(C1CC[C@]34C2CCC(O3)(OC4)C)C)C",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

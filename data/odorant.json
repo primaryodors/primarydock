@@ -35050,7 +35050,14 @@
     "f3a332a898cd3e650b3c4283cf098bb4":
     {
         "full_name": "florymoss",
-        "smiles": "CCC(C1CCCC\/C=CC1)O",
+        "smiles": "CCC(C1CCCCC=CC1)O",
+        "isomers":
+        {
+            "(3R,4R)": "CC[C@H]([C@@H]1CCCCC=CC1)O",
+            "(3S,4R)": "CC[C@@H]([C@@H]1CCCCC=CC1)O",
+            "(3R,4S)": "CC[C@H]([C@H]1CCCCC=CC1)O",
+            "(3S,4S)": "CC[C@@H]([C@H]1CCCCC=CC1)O"
+        },
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
@@ -35305,7 +35312,12 @@
     "f427585da4558f6306d404ed34207874":
     {
         "full_name": "methyl ionone gamma",
-        "smiles": "CC1=CCCC(C1\/C=C(\\C)\/C(=O)C)(C)C",
+        "smiles": "CC1=CCCC(C1C=C(C)C(=O)C)(C)C",
+        "isomers":
+        {
+            "(R)": "CC1=CCCC([C@H]1C=C(C)C(=O)C)(C)C",
+            "(S)": "CC1=CCCC([C@@H]1C=C(C)C(=O)C)(C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -35541,6 +35553,11 @@
     {
         "full_name": "3-mercapto-1-hexanol",
         "smiles": "CCCC(CCO)S",
+        "isomers":
+        {
+            "(R)": "CCC[C@H](CCO)S",
+            "(S)": "CCC[C@@H](CCO)S"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -35761,6 +35778,11 @@
     {
         "full_name": "tetrahydrogeraniol",
         "smiles": "CC(C)CCCC(C)CCO",
+        "isomers":
+        {
+            "(R)": "CC(C)CCC[C@@H](C)CCO",
+            "(S)": "CC(C)CCC[C@H](C)CCO"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -35957,6 +35979,11 @@
     {
         "full_name": "2-butanethiol",
         "smiles": "CCC(C)S",
+        "isomers":
+        {
+            "(R)": "CC[C@@H](C)S",
+            "(S)": "CC[C@H](C)S"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -35982,6 +36009,11 @@
     {
         "full_name": "2-sec-butyl-3-methoxypyrazine",
         "smiles": "CCC(C)C1=NC=CN=C1OC",
+        "isomers":
+        {
+            "(R)": "CC[C@@H](C)C1=NC=CN=C1OC",
+            "(S)": "CC[C@H](C)C1=NC=CN=C1OC"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -36114,6 +36146,13 @@
     {
         "full_name": "galaxolide",
         "smiles": "CC1COCC2=CC3=C(C=C12)C(C(C3(C)C)C)(C)C",
+        "isomers":
+        {
+            "(4R,7R)": "C[C@@H]1COCC2=CC3=C(C=C12)C([C@H](C3(C)C)C)(C)C|rflp C13",
+            "(4S,7R)": "C[C@H]1COCC2=CC3=C(C=C12)C([C@H](C3(C)C)C)(C)C|rflp C13",
+            "(4R,7S)": "C[C@@H]1COCC2=CC3=C(C=C12)C([C@@H](C3(C)C)C)(C)C",
+            "(4S,7S)": "C[C@H]1COCC2=CC3=C(C=C12)C([C@@H](C3(C)C)C)(C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -36788,6 +36827,13 @@
     {
         "full_name": "methyl phenyl pentanal",
         "smiles": "O=CC(c1ccccc1)C(CC)C",
+        "isomers":
+        {
+            "(2R,3R)": "O=C[C@@H](c1ccccc1)[C@@H](CC)C",
+            "(2S,3R)": "O=C[C@H](c1ccccc1)[C@@H](CC)C",
+            "(2R,3S)": "O=C[C@H](c1ccccc1)[C@H](CC)C",
+            "(2S,3S)": "O=C[C@@H](c1ccccc1)[C@H](CC)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

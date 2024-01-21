@@ -17348,7 +17348,7 @@
             "(2S,4R)-(-)-(Z)": "C[C@@H]1CCO[C@@H](C1)C=C(C)C|rflp C2 C6",
             "(2R,4S)-(+)-(Z)": "C[C@H]1CCO[C@H](C1)C=C(C)C",
             "(2S,4S)-(+)-(E)": "C[C@H]1CCO[C@@H](C1)C=C(C)C",
-            "(2R,4R)-(-)-(E)": "C[C@@H]1CCO[C@H](C1)C=C(C)C|rflip C2"
+            "(2R,4R)-(-)-(E)": "C[C@@H]1CCO[C@H](C1)C=C(C)C|rflp C2"
         },
         "aroma":
         {

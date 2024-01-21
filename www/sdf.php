@@ -24,12 +24,21 @@ chdir("..");
 $fullname = $odor['full_name'];
 ensure_sdf_exists($fullname);
 $sdfname = str_replace(' ','_',"sdf/$fullname.sdf");
-if (isset($odor["isomers"])) $sdfname = str_replace(' ','_',"sdf/".(array_keys($odor["isomers"])[0])."-$fullname.sdf");
+
+if (isset($odor["isomers"]))
+{
+    if (@$_REQUEST['iso'])
+    {
+        $iso = $_REQUEST['iso'];
+        $sdfname = str_replace(' ','_',"sdf/$iso-$fullname.sdf");
+    }
+    else $sdfname = str_replace(' ','_',"sdf/".(array_keys($odor["isomers"])[0])."-$fullname.sdf");
+}
 if (file_exists($sdfname))
 {
     $sdfdat = file_get_contents($sdfname);
 }
-else die("File not found $sdfname\n");
+else die("File not found.\n");
 
 $sdfdat = explode("\n", $sdfdat);
 $sdfdat[0] = $fullname;

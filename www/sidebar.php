@@ -15,6 +15,7 @@ chdir($cwd);
     <li><a href="mixture.php">Mixture</a></li>
     <li><a href="refs.php">References</a></li>
     <li><a href="viewer.php" target="_VIEWER">3D Viewer</a></li>
+    <li><a href="smiles_view.php" target="_VIEWER">SMILES Viewer</a></li>
 
     <?php
     foreach ($sidelinks as $sl)

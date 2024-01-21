@@ -6839,22 +6839,20 @@
         "smiles": "C1CC2C(C1)C3CC2CC3CC=O",
         "isomers":
         {
-            "(R,S,S,S,S)": "C1C[C@@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
-            "(S,S,S,S,S)": "C1C[C@@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@SH]3CC=O",
-            "(R,S,S,R,R)": "C1C[C@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
-            "(S,S,S,R,R)": "C1C[C@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O",
-            "(R,R,R,S,S)": "C1C[C@@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
-            "(S,R,R,S,S)": "C1C[C@@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@SH]3CC=O",
-            "(R,R,R,R,R)": "C1C[C@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
-            "(S,R,R,R,R)": "C1C[C@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
-            "(R,R,S,S,R)": "C1C[C@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
-            "(S,R,S,S,R)": "C1C[C@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
-            "(R,S,S,S,R)": "C1C[C@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
-            "(S,S,S,S,R)": "C1C[C@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O",
-            "(R,R,S,R,S)": "C1C[C@@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
-            "(S,R,S,R,S)": "C1C[C@@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
-            "(R,S,S,R,S)": "C1C[C@@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
-            "(S,S,S,R,S)": "C1C[C@@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O"
+            "(3'S,4S,5R,7S,7'S)": "C1C[C@@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
+            "(3'R,4S,5R,7S,7'R)": "C1C[C@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
+            "(3'R,4S,5S,7S,7'R)": "C1C[C@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O",
+            "(3'S,4R,5R,7R,7'S)": "C1C[C@@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
+            "(3'R,4R,5R,7R,7'R)": "C1C[C@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
+            "(3'R,4R,5S,7R,7'R)": "C1C[C@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
+            "(3'S,4R,5R,7S,7'R)": "C1C[C@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
+            "(3'S,4R,5S,7S,7'R)": "C1C[C@H]2[C@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
+            "(3'S,4S,5R,7S,7'R)": "C1C[C@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
+            "(3'S,4S,5S,7S,7'R)": "C1C[C@H]2[C@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O",
+            "(3'R,4R,5R,7S,7'S)": "C1C[C@@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@H]3CC=O",
+            "(3'R,4R,5S,7S,7'S)": "C1C[C@@H]2[C@@H](C1)[C@H]3C[C@@H]2C[C@@H]3CC=O",
+            "(3'R,4S,5R,7S,7'S)": "C1C[C@@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@H]3CC=O",
+            "(3'R,4S,5S,7S,7'S)": "C1C[C@@H]2[C@@H](C1)[C@@H]3C[C@H]2C[C@@H]3CC=O"
         },
         "aroma":
         {
@@ -12556,24 +12554,6 @@
         },
         "oid": "57963b20c1673eac076cffb5e4aaa0ee"
     },
-    "57a16425d522bb29f2e4245481a27dc5":
-    {
-        "full_name": "alpha-methyl cinnamaldehyde",
-        "smiles": "CC(=CC1=CC=CC=C1)C=O",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "sweet",
-                "cinnamon",
-                "spicy",
-                "cassia",
-                "warm",
-                "balsamic",
-                "pungent"
-            ]
-        }
-    },
     "57aa6bb2210215f3b9d7ec2131f9b391":
     {
         "full_name": "2-methylthio-3-methylpyrazine",
@@ -17362,12 +17342,13 @@
     {
         "full_name": "rose oxide",
         "smiles": "CC1CCOC(C1)C=C(C)C",
+        "iupac": "2-(2-methylprop-1-enyl)-4-methyltetrahydropyran",
         "isomers":
         {
-            "(S,R)-l-cis": "C[C@@H]1CCO[C@@H](C1)C=C(C)C|rflp C2 C6",
-            "(R,S)-d-cis": "C[C@H]1CCO[C@H](C1)C=C(C)C",
-            "(S,S)-d-trans": "C[C@H]1CCO[C@@H](C1)C=C(C)C",
-            "(R,R)-l-trans": "C[C@@H]1CCO[C@H](C1)C=C(C)C"
+            "(2S,4R)-(-)-(Z)": "C[C@@H]1CCO[C@@H](C1)C=C(C)C|rflp C2 C6",
+            "(2R,4S)-(+)-(Z)": "C[C@H]1CCO[C@H](C1)C=C(C)C",
+            "(2S,4S)-(+)-(E)": "C[C@H]1CCO[C@@H](C1)C=C(C)C",
+            "(2R,4R)-(-)-(E)": "C[C@@H]1CCO[C@H](C1)C=C(C)C|rflip C2"
         },
         "aroma":
         {

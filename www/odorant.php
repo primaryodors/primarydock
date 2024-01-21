@@ -128,8 +128,22 @@ function load_viewer(obj)
                 var embdd = $('#viewer')[0];
                 $("[type=file]", embdd.contentDocument).hide();
                 var filediv = $("#filediv", embdd.contentDocument)[0];
-                
-                filediv.innerText = "<?php echo @$odrow['full_name']; ?>";
+                $("#posey", embdd.contentDocument).css("position", "absolute").css("left", "-262144px");
+
+                <?php if (@$odor['isomers'])
+                {
+                    echo "filediv.innerHTML = \"".@$odor['full_name'];
+                    foreach (array_keys($odor['isomers']) as $iso)
+                    {
+                        $isou = urlencode($iso);
+                        echo " &#xb7; <small><a href=\\\"#\\\" onclick=\\\"load_remote_sdf('sdf.php?mol={$odor['oid']}&iso=$isou');\\\">$iso</a></small>";
+                    }
+                    echo "\";";
+                }
+                else
+                {
+                    ?>filediv.innerText = "<?php echo @$odor['full_name']; ?>";
+                <?php } ?>
             });
             $('#viewer')[0].src = '<?php echo "viewer.php?url=sdf.php&mol={$odor['oid']}"; ?>'; 
         }, 259); 

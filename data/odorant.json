@@ -7007,6 +7007,7 @@
     "2c003354d06febf2e5e08118688f824b":
     {
         "full_name": "triplal",
+        "name1": "ivy carbaldehyde",
         "smiles": "CC1C=C(CCC1C=O)C",
         "isomers":
         {
@@ -7044,6 +7045,24 @@
                 {
                     "type": "ia",
                     "adjusted_curve_top": "-0.67142857419593"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.16260161995888"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.16260161995888"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         },
@@ -30859,7 +30878,7 @@
     "d74d60303d275de642ef1d89bd61b8c2":
     {
         "full_name": "myrtenal",
-        "smiles": "CC1(C2CC=C(C1C2)C=O)C",
+        "smiles": "CC1([C@H]2CC=C(C1C2)C=O)C",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -30902,6 +30921,11 @@
     {
         "full_name": "mefrosol",
         "smiles": "CC(CCC1=CC=CC=C1)CCO",
+        "isomers":
+        {
+            "(R)": "C[C@H](CCC1=CC=CC=C1)CCO",
+            "(S)": "C[C@@H](CCC1=CC=CC=C1)CCO"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31228,6 +31252,13 @@
     {
         "full_name": "grapefruit pentanol",
         "smiles": "CC(CC(C)C1=CC=CC=C1)CO",
+        "isomers":
+        {
+            "(2R,4R)": "C[C@H](C[C@@H](C)C1=CC=CC=C1)CO",
+            "(2S,4R)": "C[C@@H](C[C@@H](C)C1=CC=CC=C1)CO",
+            "(2R,4S)": "C[C@H](C[C@H](C)C1=CC=CC=C1)CO",
+            "(2S,4S)": "C[C@@H](C[C@H](C)C1=CC=CC=C1)CO"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31341,6 +31372,7 @@
     "d8b3c2b5ddb55cd09d85cc1007cbba52":
     {
         "full_name": "isomuscone",
+        "iupac": "cyclohexadecanone",
         "smiles": "O=C1CCCCCCCCCCCCCCC1",
         "aroma":
         {
@@ -31556,6 +31588,11 @@
     {
         "full_name": "florhydral",
         "smiles": "CC(C)C1=CC(=CC=C1)C(C)CC=O",
+        "isomers":
+        {
+            "(R)": "CC(C)C1=CC(=CC=C1)[C@H](C)CC=O",
+            "(S)": "CC(C)C1=CC(=CC=C1)[C@@H](C)CC=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31661,6 +31698,11 @@
     {
         "full_name": "jasmatone",
         "smiles": "CCCCCCC1CCCC1=O",
+        "isomers":
+        {
+            "(R)": "CCCCCC[C@@H]1CCCC1=O",
+            "(S)": "CCCCCC[C@H]1CCCC1=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31683,50 +31725,15 @@
         },
         "oid": "dce6fdfa30906995022c843d5568a9fe"
     },
-    "dcf630fbb45a7cb745abf3cdb58a4272":
-    {
-        "full_name": "ivy carbaldehyde",
-        "smiles": "CC1C=CCCC1(C)C=O",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "green",
-                "aldehydic",
-                "weedy",
-                "herbal",
-                "cortex",
-                "privet",
-                "soapy"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
-            {
-                "OR2W1":
-                {
-                    "type": "ia",
-                    "adjusted_curve_top": "-0.16260161995888"
-                },
-                "OR5P3":
-                {
-                    "type": "ia",
-                    "adjusted_curve_top": "-0.16260161995888"
-                },
-                "OR8H1":
-                {
-                    "type": "ia",
-                    "adjusted_curve_top": "-0.16260161995888"
-                }
-            }
-        },
-        "oid": "dcf630fbb45a7cb745abf3cdb58a4272"
-    },
     "dd05ac2161154126a22a8114fea385bc":
     {
         "full_name": "lavandulol",
         "smiles": "CC(=CCC(CO)C(=C)C)C",
+        "isomers":
+        {
+            "(R)": "CC(=CC[C@@H](CO)C(=C)C)C",
+            "(S)": "CC(=CC[C@H](CO)C(=C)C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31832,7 +31839,14 @@
     "dddc0fb03f8ed009ba2ec8e733bb852f":
     {
         "full_name": "carveol",
-        "smiles": "OC1C(=C\/CC(\/C(=C)C)C1)\\C",
+        "smiles": "OC1C(=CCC(C(=C)C)C1)C",
+        "isomers":
+        {
+            "(-)-(E)": "O[C@@H]1C(=CC[C@@H](C(=C)C)C1)C",
+            "(+)-(E)": "O[C@H]1C(=CC[C@H](C(=C)C)C1)C|rflp C6",
+            "(-)-(Z)": "O[C@H]1C(=CC[C@@H](C(=C)C)C1)C",
+            "(+)-(Z)": "O[C@@H]1C(=CC[C@H](C(=C)C)C1)C|rflp C6"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31892,8 +31906,15 @@
     "dec3a04b5aaf4d5a7ac7b7582b6c095c":
     {
         "full_name": "milk lactone",
-        "iupac": "5(6)-decenoic acid",
+        "iupac": "decenoic acid",
         "smiles": "CCCCC=CCCCC(=O)[O-]",
+        "isomers":
+        {
+            "(E)-5": "CCCC\\C=C\\CCCC(=O)[O-]",
+            "(E)-6": "CCC\\C=C\\CCCCC(=O)[O-]",
+            "(Z)-5": "CCCC\\C=C\/CCCC(=O)[O-]",
+            "(Z)-6": "CCC\\C=C\/CCCCC(=O)[O-]"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31954,6 +31975,11 @@
     {
         "full_name": "aldehyde TPM",
         "smiles": "CC(CC1=CC=C(C=C1)C)C=O",
+        "isomers":
+        {
+            "(R)": "C[C@H](CC1=CC=C(C=C1)C)C=O",
+            "(S)": "C[C@@H](CC1=CC=C(C=C1)C)C=O"
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1111\/j.1471-4159.2006.03771.x":
@@ -31978,7 +32004,7 @@
     "e079ad580bd31e3912ac91ee1128f734":
     {
         "full_name": "(+)-menthol",
-        "smiles": "CC1CCC(C(C1)O)C(C)C",
+        "smiles": "C[C@H]1CC[C@@H]([C@H](C1)O)C(C)C",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -32181,6 +32207,11 @@
     {
         "full_name": "3-hydroxybutan-2-one",
         "smiles": "CC(O)C(=O)C",
+        "isomers":
+        {
+            "(R)": "C[C@@H](O)C(=O)C",
+            "(S)": "C[C@H](O)C(=O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -32321,6 +32352,11 @@
     {
         "full_name": "linalool",
         "smiles": "CC(=CCCC(C)(C=C)O)C",
+        "isomers":
+        {
+            "(R)-(-)": "CC(=CCC[C@](C)(C=C)O)C",
+            "(S)-(+)": "CC(=CCC[C@@](C)(C=C)O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -32920,6 +32956,11 @@
     {
         "full_name": "frutonile",
         "smiles": "CCCCCCCCC(C)C#N",
+        "isomers":
+        {
+            "(R)": "CCCCCCCC[C@@H](C)C#N",
+            "(S)": "CCCCCCCC[C@H](C)C#N"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -32947,6 +32988,11 @@
     {
         "full_name": "4-octanol",
         "smiles": "CCCCC(O)CCC",
+        "isomers":
+        {
+            "(R)": "CCCC[C@H](O)CCC",
+            "(S)": "CCCC[C@@H](O)CCC"
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1093\/chemse\/bji002":
@@ -33000,6 +33046,11 @@
     {
         "full_name": "2-methylvaleric acid",
         "smiles": "CCCC(C)C(=O)[O-]",
+        "isomers":
+        {
+            "(R)": "CCC[C@@H](C)C(=O)[O-]",
+            "(S)": "CCC[C@H](C)C(=O)[O-]"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -33111,7 +33162,12 @@
     "e7120c699de9152cf3b78fd0a811fd23":
     {
         "full_name": "beta-pinene",
-        "smiles": "CC1=CCC2CC1C2(C)C",
+        "smiles": "C=C1CCC2CC1C2(C)C",
+        "isomers":
+        {
+            "(1S)-(-)": "C=C1CC[C@H]2CC1C2(C)C",
+            "(1R)-(+)": "C=C1CC[C@@H]2CC1C2(C)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -33153,7 +33209,19 @@
     "e77e5d61c7e9eef27b97ad49afaed42d":
     {
         "full_name": "nectaryl",
+        "iupac": "2-(2-(4-methyl-3-cyclohexen-1-yl)propyl)cyclopentanone",
         "smiles": "CC1=CCC(CC1)C(C)CC2CCCC2=O",
+        "isomers":
+        {
+            "(2R,2'R,1''R)": "CC1=CC[C@@H](CC1)[C@@H](C)C[C@H]2CCCC2=O",
+            "(2S,2'R,1''R)": "CC1=CC[C@@H](CC1)[C@@H](C)C[C@@H]2CCCC2=O",
+            "(2R,2'S,1''R)": "CC1=CC[C@@H](CC1)[C@H](C)C[C@H]2CCCC2=O",
+            "(2S,2'S,1''R)": "CC1=CC[C@@H](CC1)[C@H](C)C[C@@H]2CCCC2=O",
+            "(2R,2'R,1''S)": "CC1=CC[C@H](CC1)[C@H](C)C[C@H]2CCCC2=O",
+            "(2S,2'R,1''S)": "CC1=CC[C@H](CC1)[C@H](C)C[C@@H]2CCCC2=O",
+            "(2R,2'S,1''S)": "CC1=CC[C@H](CC1)[C@@H](C)C[C@H]2CCCC2=O",
+            "(2S,2'S,1''S)": "CC1=CC[C@H](CC1)[C@@H](C)C[C@@H]2CCCC2=O"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -33539,7 +33607,13 @@
     "e968ff0db2d5e0d2d747520316854796":
     {
         "full_name": "patchouli hexanol",
+        "iupac": "4-tert-butylcyclohexan-1-ol",
         "smiles": "CC(C)(C)C1CCC(CC1)O",
+        "isomers":
+        {
+            "(E)": "CC(C)(C)[C@H]1CC[C@@H](CC1)O",
+            "(Z)": "CC(C)(C)[C@H]1CC[C@H](CC1)O|rflp C8"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -33693,6 +33767,11 @@
     {
         "full_name": "lactic acid",
         "smiles": "CC(O)C(=O)[O-]",
+        "isomers":
+        {
+            "(R)": "C[C@@H](O)C(=O)[O-]",
+            "(S)": "C[C@H](O)C(=O)[O-]"
+        },
         "oid": "ea3aa2ce83f85abb30978d22e76ef0ee"
     },
     "ea8db6e456685f34a4e23772cc833775":
@@ -33753,6 +33832,11 @@
     {
         "full_name": "melafleur",
         "smiles": "CC1(CCCC2=C1CC(CC2)C=O)C",
+        "isomers":
+        {
+            "(R)": "CC1(CCCC2=C1C[C@@H](CC2)C=O)C|rflp C9",
+            "(S)": "CC1(CCCC2=C1C[C@H](CC2)C=O)C"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -34239,6 +34323,11 @@
     {
         "full_name": "cosmone",
         "smiles": "CC1CC=CCCCCCCCCC(=O)C1",
+        "isomers":
+        {
+            "(R)": "C[C@@H]1CC=CCCCCCCCCC(=O)C1",
+            "(S)": "C[C@H]1CC=CCCCCCCCCC(=O)C1"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -34313,7 +34402,7 @@
     "f03135fad450cfb5947852e4756402f0":
     {
         "full_name": "beta-damascone",
-        "smiles": "O=C(\\C1=C(\\CCCC1(C)C)C)\\C=C\\C",
+        "smiles": "O=C(C1=C(CCCC1(C)C)C)\\C=C\\C",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

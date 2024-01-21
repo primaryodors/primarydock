@@ -288,11 +288,13 @@ function ensure_sdf_exists($ligname)
 		if (isset($o["isomers"]))
 		{
 			$fullname = str_replace(" ", "_", $o["full_name"]);
+			$first = true;
 			foreach ($o["isomers"] as $iso => $ismiles)
 			{
 				$parts = explode("|", $ismiles);
 				$ismiles = $parts[0];
-				exec("obabel -:\"$ismiles\" --gen3D -osdf -O\"sdf/$iso-$fullname.sdf\"");
+				$isofname = escapeshellarg("sdf/$iso-$fullname.sdf");
+				exec("obabel -:\"$ismiles\" --gen3D -osdf -O$isofname");
 				if (@$parts[1])
 				{
 					$sub4 = substr($parts[1], 0, 4);
@@ -300,7 +302,7 @@ function ensure_sdf_exists($ligname)
 					switch ($sub4)
 					{
 						case "rflp":
-						$cmd = "bin/ringflip \"sdf/$iso-$fullname.sdf\" $rest";
+						$cmd = "bin/ringflip $isofname $rest";
 						// echo "$cmd\n";
 						exec($cmd);
 						break;
@@ -309,13 +311,20 @@ function ensure_sdf_exists($ligname)
 						die("Unknown modifier $sub4.\n");
 					}
 				}
+
+				if ($first)
+				{
+					copy("sdf/$iso-$fullname.sdf", "sdf/$fullname.sdf");
+					$first = false;
+				}
 			}
 		}
 		else
 		{
 			$smiles = $o["smiles"];
 			$fullname = str_replace(" ", "_", $o["full_name"]);
-			$cmd = "obabel -:\"$smiles\" --gen3D -osdf -O\"sdf/$fullname.sdf\"";
+			$ffname = escapeshellarg("sdf/$fullname.sdf");
+			$cmd = "obabel -:\"$smiles\" --gen3D -osdf -O$ffname";
 			// echo "$cmd\n";
 			exec($cmd);
 		}

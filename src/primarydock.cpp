@@ -2033,6 +2033,7 @@ int main(int argc, char** argv)
     {
         ligand = &pose_ligands[l];
         std::string ligname = get_fttl_no_path_or_ext(ligfname);
+        std::string lligfname = ligfname;
         ligand->set_name(ligname.c_str());
         char* ext = get_file_ext(ligfname);
         if (!ext)
@@ -2055,12 +2056,12 @@ int main(int argc, char** argv)
                 i = rand() % isomers.size();
                 ligname = get_fttl_no_path_or_ext(isomers[i].c_str());
                 ligand->set_name(ligname.c_str());
-                pf = fopen(isomers[i].c_str(), "r");
+                lligfname = isomers[i].c_str();
             }
-            else pf = fopen(ligfname, "r");
+            pf = fopen(lligfname.c_str(), "rb");
             if (!pf)
             {
-                cout << "Error trying to read " << ligfname << endl;
+                cout << "Error trying to read " << lligfname << endl;
                 return 0xbadf12e;
             }
             wgaf = fread(buffer, 1, 65535, pf);
@@ -2075,12 +2076,12 @@ int main(int argc, char** argv)
                 i = rand() % isomers.size();
                 ligname = get_fttl_no_path_or_ext(isomers[i].c_str());
                 ligand->set_name(ligname.c_str());
-                pf = fopen(isomers[i].c_str(), "r");
+                lligfname = isomers[i].c_str();
             }
-            else pf = fopen(ligfname, "r");
+            pf = fopen(lligfname.c_str(), "rb");
             if (!pf)
             {
-                cout << "Error trying to read " << ligfname << endl;
+                cout << "Error trying to read " << lligfname << endl;
                 return 0xbadf12e;
             }
             ligand->from_pdb(pf);

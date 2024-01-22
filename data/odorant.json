@@ -9709,27 +9709,6 @@
         },
         "oid": "40973c002c4d6466861f9d66e828d35f"
     },
-    "41080ee7045437ce429653c97a065dec":
-    {
-        "full_name": "beta-damascenone",
-        "smiles": "C\\C=CC\\(=O)C1=C(C=CCC1(C)C)C",
-        "aroma":
-        [
-            "natural",
-            "sweet",
-            "fruity",
-            "rose",
-            "plum",
-            "grape",
-            "raspberry",
-            "sugar",
-            "woody",
-            "earthy",
-            "green",
-            "floral"
-        ],
-        "oid": "41080ee7045437ce429653c97a065dec"
-    },
     "4152229d1ebe991be4fa3a219facc6f7":
     {
         "full_name": "delta-2-decenolactone",
@@ -24418,15 +24397,18 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "floral",
-                "fruity",
-                "grape",
                 "natural",
-                "plum",
-                "raspberry",
+                "sweet",
+                "fruity",
                 "rose",
+                "plum",
+                "grape",
+                "raspberry",
                 "sugar",
-                "sweet"
+                "woody",
+                "earthy",
+                "green",
+                "floral"
             ]
         },
         "activity":

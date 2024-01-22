@@ -54,8 +54,10 @@ function correlate_receptors_aromanotes()
     $notes = [];
     foreach ($odors as $oid => $odor)
     {
+        if (!isset($odor['aroma']) || !is_array($odor['aroma'])) continue;
         foreach ($odor['aroma'] as $refurl => $pqlist)
         {
+            if (!is_array($pqlist)) die("Problem with odorant ".print_r($odor, true));
             $notes = array_merge($notes, $pqlist);
         }
     }

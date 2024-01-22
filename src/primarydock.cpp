@@ -2963,6 +2963,7 @@ _try_again:
             dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
+            float we = dr[drcount][nodeno].worst_energy;
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
             n = protein->get_end_resno();
@@ -3157,7 +3158,7 @@ _try_again:
 
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
-            if (btot < kJmol_cutoff && !differential_dock)
+            if ((btot < kJmol_cutoff || we > clash_limit_per_aa) && !differential_dock)
             {
                 drcount++;
                 break;

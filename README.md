@@ -14,6 +14,10 @@ PrimaryDock is a lightweight stochastic molecular docking software package that 
 
 PrimaryDock comes with Pepteditor, a tool for editing proteins using a scripting language.
 
+PrimaryDock has a prediction feature that attempts to predict receptor responses to odorants.
+The prediction feature requires php and <a href="https://openbabel.org">openbabel</a> to be installed.
+See `PREDICTION.md` for more info.
+
 PrimaryDock also offers a web interface that allows you to run a local copy of the same data explorer pages that power
 the PrimaryOdors website.
 
@@ -32,7 +36,7 @@ in the `pdbs/` folder for olfactory docking. They have been modified from the PD
 It will also be necessary to obtain 3D models of your ligand(s). Currently, only SDF format is supported.
 SDFs can be obtained a few different ways:
 <ul>
-  <li>If you have <a href="https://openbabel.org">obabel</a>, you can generate 3 dimensional SDFs from SMILES input. Example syntax:<br>
+  <li>Using openbabel, you can generate 3 dimensional SDFs from SMILES input. Example syntax:<br>
     <code>obabel -:'CCO' --gen3D -osdf -Osdf/ethanol.sdf</code><br>
     There is also a PHP script located at <code>data/gensdf.php</code> that will make the obabel call, as well as add the molecule to
     odorants.json, if given a compound name and a SMILES string.
@@ -66,12 +70,8 @@ pocket, and PrimaryDock might find zero output poses. If this happens, you can t
 PrimaryDock is stochastic so that its output will be different each time, and rerunning the application can often catch poses that
 previous runs may have missed.
 
-If you would like to contribute to this project:
-- We would be sooo very grateful for the help!
-- Please create a branch off of stable, then submit a pull request;
-- All PRs that change the C++ classes or any of the apps must pass the master unit tests (`test/unit_test_master.sh`) before merge.
-- Use whichever { style you prefer; as long as the code is readable and it works, that's all we care about.
-- Have fun and try not to let the project vex you. (:
+Contributions are always welcome! Please create a branch off of stable, then submit a pull request.
+All PRs that change the C++ classes or any of the apps must pass the master unit tests (`test/unit_test_master.sh`) before merge.
 
 Note to developers: if you run PrimaryDock under a memory utility such as valgrind, you are likely to see a lot of errors saying that
 uninitialized variables are being used or that conditional jumps depend on them. Most of these are false positives. Many places in the

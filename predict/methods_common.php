@@ -138,6 +138,7 @@ ensure_sdf_exists($ligname);
 
 echo "Beginning prediction of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
+$isomers = check_isomers($ligname);
 
 
 extract(binding_site($protid));
@@ -408,7 +409,7 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
+    global $ligname, $isomers, $protid, $configf, $dock_retries, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
     global $cenres, $size, $docker, $mcoord, $atomto, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
@@ -655,11 +656,20 @@ heredoc;
         }
 
         $fam = family_from_protid($protid);
+        if ($isomers)
+        {
+            $iso = [];
+            foreach ($isomers as $k => $v) $iso[] = "ISO sdf/".str_replace(' ','_',$v).".sdf";
+            $iso = implode("\n", $iso);
+            if ($pose < 4*count($isomers)) $pose = 4*count($isomers);
+        }
+        else $iso = "";
 
         $configf = <<<heredoc
 
 PROT $pdbfname
 LIG sdf/$ligname.sdf
+$iso
 
 CEN RES $cenres
 SIZE $size

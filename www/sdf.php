@@ -22,37 +22,23 @@ else
 chdir(__DIR__);
 chdir("..");
 $fullname = $odor['full_name'];
-$sdfname = "sdf/$fullname.sdf";
-if (!file_exists($sdfname))
+ensure_sdf_exists($fullname);
+$sdfname = str_replace(' ','_',"sdf/$fullname.sdf");
+
+if (isset($odor["isomers"]))
 {
-    $smilesu = urlencode($odor['smiles']);
-    $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/SDF";
-
-    $ch = curl_init( $url );
-    curl_setopt( $ch, CURLOPT_POST, 1);
-    curl_setopt( $ch, CURLOPT_POSTFIELDS, $arg = "record_type=3d&smiles=$smilesu");
-    curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt( $ch, CURLOPT_HEADER, 0);
-    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
-
-    $sdfdat = curl_exec( $ch );
-    $sdfln = explode("\n", $sdfdat);
-    if (false!==strpos($sdfln[0], "Status: ")) die("$arg\n\n$sdfdat");
-
-    $fp = fopen($sdfname, "wb");
-    if ($fp)
+    if (@$_REQUEST['iso'])
     {
-        fwrite($fp, $sdfdat);
-        fclose($fp);
+        $iso = $_REQUEST['iso'];
+        $sdfname = str_replace(' ','_',"sdf/$iso-$fullname.sdf");
     }
-    else error_log("Warning: Unable to write to $sdfname");
+    else $sdfname = str_replace(' ','_',"sdf/".(array_keys($odor["isomers"])[0])."-$fullname.sdf");
 }
-else
+if (file_exists($sdfname))
 {
     $sdfdat = file_get_contents($sdfname);
-    $sdfln = explode("\n", $sdfdat);
-    if (false!==strpos($sdfln[0], "Status: ")) unlink($sdfname);
 }
+else die("File not found.\n");
 
 $sdfdat = explode("\n", $sdfdat);
 $sdfdat[0] = $fullname;

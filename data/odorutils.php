@@ -259,34 +259,74 @@ function all_empirical_pairs_for_receptor($protein, $return_1dim = false, $agoni
 	return $retval;
 }
 
+function check_isomers($ligname, $randomize=true)
+{
+    $odor = find_odorant($ligname);
+	if (!$odor) die("Odorant not found $ligname.\n");
+	if (!isset($odor["isomers"])) return false;
+
+	$result = [];
+	foreach (array_keys($odor["isomers"]) as $iso) $result[] = "$iso-{$odor["full_name"]}";
+	return $result;
+}
+
 function ensure_sdf_exists($ligname)
 {
 	global $odors;
 
 	$o = find_odorant($ligname);
 	if (!$o) die("Odorant not found $ligname.\n");
-		
+	$isomers = check_isomers($ligname);
+	$lignamei = $isomers ? $isomers[0] : $ligname;
+
 	$pwd = getcwd();
 	chdir(__DIR__);
 	chdir("..");
-	$sdfname = str_replace(" ", "_", "sdf/$ligname.sdf");
-	if (!file_exists($sdfname) || filesize($sdfname) < 10)
+	$sdfname = str_replace(" ", "_", "sdf/$lignamei.sdf");
+	if (!file_exists($sdfname) || filesize($sdfname) < 20)
 	{
-		$obresult = [];
-		exec("which obabel", $obresult);
-		if (trim(@$obresult[0]))
+		if (isset($o["isomers"]))
 		{
-			echo "Running obabel for SMILES {$o['smiles']}...\n";
-			$cmd = "obabel -:\"{$o['smiles']}\" --gen3D -osdf -O\"$sdfname\"";
-			exec($cmd);
+			$fullname = str_replace(" ", "_", $o["full_name"]);
+			$first = true;
+			foreach ($o["isomers"] as $iso => $ismiles)
+			{
+				$parts = explode("|", $ismiles);
+				$ismiles = $parts[0];
+				$isofname = escapeshellarg("sdf/$iso-$fullname.sdf");
+				exec("obabel -:\"$ismiles\" --gen3D -osdf -O$isofname");
+				if (@$parts[1])
+				{
+					$sub4 = substr($parts[1], 0, 4);
+					$rest = substr($parts[1], 4);
+					switch ($sub4)
+					{
+						case "rflp":
+						$cmd = "bin/ringflip $isofname $rest";
+						// echo "$cmd\n";
+						exec($cmd);
+						break;
+
+						default:
+						die("Unknown modifier $sub4.\n");
+					}
+				}
+
+				if ($first)
+				{
+					copy("sdf/$iso-$fullname.sdf", "sdf/$fullname.sdf");
+					$first = false;
+				}
+			}
 		}
 		else
 		{
-			$f = fopen($sdfname, "wb");
-			if (!$f) die("Unable to create $sdfname, please ensure write access.\n");
-			$sdfdat = file_get_contents("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{$o['smiles']}/SDF?record_type=3d");
-			fwrite($f, $sdfdat);
-			fclose($f);
+			$smiles = $o["smiles"];
+			$fullname = str_replace(" ", "_", $o["full_name"]);
+			$ffname = escapeshellarg("sdf/$fullname.sdf");
+			$cmd = "obabel -:\"$smiles\" --gen3D -osdf -O$ffname";
+			// echo "$cmd\n";
+			exec($cmd);
 		}
 	}
 	chdir($pwd);

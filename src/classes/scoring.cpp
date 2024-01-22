@@ -374,6 +374,11 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
 {
     int l;
 
+    if (dr.isomer.length())
+    {
+        output << "Isomer: " << dr.isomer << endl << endl;
+    }
+
     if (differential_dock)
     {
         output << "# Binding energies: delta = with ligand minus without ligand." << endl;

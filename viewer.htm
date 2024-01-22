@@ -2632,22 +2632,12 @@ function apply_pdb(poresult)
 	set_gmdl_opacity();
 }
 
-var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+website+'/sdf.php';
-var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
-var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
-
-var literal_pdb = false;
-var literal_fname = "";
-
-if (literal_pdb)
+function load_remote_pdb(pdburl)
 {
-	loadFile(literal_pdb, literal_fname);
-}
-else if (protid)
-{
+	stage.removeAllComponents();
 	$.ajax(
 	{
-		url: url,
+		url: pdburl,
 		cache: false,
 		data:
 		{
@@ -2696,11 +2686,18 @@ else if (protid)
 		}
 	});
 }
-else if (molid != "~")
+
+function load_remote_sdf(sdfurl)
 {
+	stage.removeAllComponents();
+	gmodel = [];
+	gmvisible = [];
+	mdlligands = [];
+	gmrep = [];
+	gmrparams = [];
 	$.ajax(
 	{
-		url: url,
+		url: sdfurl,
 		cache: false,
 		data:
 		{
@@ -2713,22 +2710,44 @@ else if (molid != "~")
 			var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
 		    stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
 		    {
+				var reptype = spcfill ? "spacefill" : (hydrogens ? "ball+stick" : "licorice");
 		        var rparam =
 				{
 		        	multipleBond: true,
 					colorScheme: PODefSchemeHilite,
 		        	metalness: mtl_bs,
 		        }
-		        comp.addRepresentation("ball+stick", rparam);
+				if (!hydrogens) rparam.sele = "* and not hydrogen";
+		        comp.addRepresentation(reptype, rparam);
 		        gmodel.push(comp);
 				gmvisible.push(true);
 				mdlligands.push(comp);
-				gmrep.push("ball+stick");
+				gmrep.push(reptype);
 				gmrparams.push(rparam);
 		        comp.autoView();
 		    } );
 		}
 	});
+}
+
+var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+website+'/sdf.php';
+var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
+var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
+
+var literal_pdb = false;
+var literal_fname = "";
+
+if (literal_pdb)
+{
+	loadFile(literal_pdb, literal_fname);
+}
+else if (protid)
+{
+	load_remote_pdb(url);
+}
+else if (molid != "~")
+{
+	load_remote_sdf(url);
 }
 
 function showPose(p)

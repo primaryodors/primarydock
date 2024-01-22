@@ -1250,7 +1250,7 @@ void Bond::fill_moves_with_cache()
     btom->used = true;
     Bond* b[16];
     btom->fetch_bonds(b);
-    if (!b) return;
+    if (!b[0]) return;
     for (i=0; b[i]; i++)
     {
         if (b[i]->btom && b[i]->btom != atom && b[i]->btom->residue == btom->residue)
@@ -1266,6 +1266,12 @@ void Bond::fill_moves_with_cache()
         k=0;
         for (j=0; j<tmplen; j++)
         {
+            if (attmp[j]->in_same_ring_as(atom))
+            {
+                attmp[j]->used = true;
+                continue;
+            }
+
             attmp[j]->fetch_bonds(b);
             if (b)
             {
@@ -1274,6 +1280,11 @@ void Bond::fill_moves_with_cache()
                     if (_DBGMOVES) if (b[i]->btom) cout << "(" << attmp[j]->name << "-" << b[i]->btom->name << (b[i]->btom->used ? "*" : "") << "?) ";
                     if (b[i]->btom && !b[i]->btom->used && b[i]->btom != atom && b[i]->btom->residue == btom->residue)
                     {
+                        if (b[i]->btom->in_same_ring_as(atom))
+                        {
+                            b[i]->btom->used = true;
+                            continue;
+                        }
                         attmp[tmplen++] = b[i]->btom;
                         b[i]->btom->used = true;
                         if (_DBGMOVES) cout << b[i]->btom->name << " " << flush;
@@ -1344,8 +1355,8 @@ void Bond::enforce_moves_with_uniqueness()
     if (!atom->doing_ring_closure && !btom->doing_ring_closure && atom && btom && atom->in_same_ring_as(btom))
     {
         can_rotate = false;
-        if (moves_with_btom) delete[] moves_with_btom;
-        moves_with_btom = nullptr;
+        // if (moves_with_btom) delete[] moves_with_btom;
+        // moves_with_btom = nullptr;
         // cout << atom->name << " is in the same ring as " << btom->name << "; no rotations allowed." << endl;
         return;
     }
@@ -1511,6 +1522,171 @@ _cannot_reverse_bondrot:
 
     if (last_fail != bf_limited_rotation) last_fail = bf_none;
     return true;
+}
+
+Point Bond::ring_rotate(float theta, Atom* sa)
+{
+    Point result(0,0,0);
+
+    last_fail = bf_unknown;
+    if (!btom)
+    {
+        last_fail = bf_empty_atom;
+        return result;
+    }
+
+    if (!btom->is_bonded_to(sa))
+    {
+        last_fail = bf_not_connected;
+        return result;
+    }
+
+    if (!moves_with_btom) fill_moves_with_cache();
+    enforce_moves_with_uniqueness();
+
+    if (cardinality > 1.25)
+    {
+        last_fail = bf_disallowed_rotation;
+        return result;
+    }
+
+    int i;
+    Point cen = btom->get_location();
+    Point bas = atom->get_location();
+    Point dir = cen.subtract(&bas);
+    SCoord v(&dir);
+
+    Rotation rot;
+    rot.v = v;
+    rot.a = theta;
+
+    btom->rotate_geometry(rot);
+
+    for (i=0; moves_with_btom[i]; i++)
+    {
+        if (moves_with_btom[i]->residue != btom->residue) continue;
+
+        Point loc = moves_with_btom[i]->get_location();
+        Point nl  = rotate3D(&loc, &cen, &v, theta);
+
+        if (moves_with_btom[i] == sa)
+        {
+            result = nl;
+            continue;
+        }
+
+        moves_with_btom[i]->move(&nl);
+        moves_with_btom[i]->rotate_geometry(rot);
+        // cout << "Moved " << moves_with_btom[i]->name << endl;
+    }
+
+    total_rotations += theta;
+    last_fail = bf_none;
+
+    return result;
+}
+
+Atom* Ring::traverse_ring(Atom* f, Atom* af)
+{
+    if (!f || !f->is_in_ring(this)) return nullptr;
+    if (af)
+    {
+        if (!af->is_in_ring(this)) return nullptr;
+        if (!f->is_bonded_to(af)) return nullptr;
+    }
+
+    int i;
+    for (i=0; i<atcount; i++)
+    {
+        if (atoms[i] == af) continue;
+        if (atoms[i]->is_bonded_to(f)) return atoms[i];
+    }
+
+    return nullptr;
+}
+
+float Ring::flip_atom(Atom* wa)
+{
+    if (type == UNKNOWN) determine_type();
+    if (type == AROMATIC || type == ANTIAROMATIC || type == COPLANAR) return 0;
+    if (atcount < 4) return 0;
+    if (!wa || wa->num_rings() != 1) return 0;
+    if (!wa->is_in_ring(this)) return 0;
+    if (wa->is_pi()) return 0;
+
+    Atom* xa = traverse_ring(wa);
+    Atom* va = traverse_ring(wa, xa);
+    Atom* ya = traverse_ring(xa, wa);
+    Atom* ua = traverse_ring(va, wa);
+    Bond* buv = ua->get_bond_between(va);
+    Bond* bvw = va->get_bond_between(wa);
+    Bond* bxw = xa->get_bond_between(wa);
+    Bond* byx = ya->get_bond_between(xa);
+    float rvw = bvw->optimal_radius;
+    float rxw = bxw->optimal_radius;
+    SCoord auv = va->get_location().subtract(ua->get_location());
+    SCoord ayx = xa->get_location().subtract(ya->get_location());
+
+    float theta = 0, step = 0.1*fiftyseventh;
+    Point ol = wa->get_location();
+    bool far_enough = false;
+    float lr = 0;
+    while (theta<M_PI*2)
+    {
+        buv->ring_rotate( step, wa);
+        byx->ring_rotate(-step, wa);
+        Point pt1 = rotate3D(ol, va->get_location(), auv,  theta);
+        Point pt2 = rotate3D(ol, xa->get_location(), ayx, -theta);
+
+        theta += step;
+        Point nl = pt2.subtract(pt1);
+        nl.multiply(0.5);
+        nl = nl.add(pt1);
+        wa->move(nl);
+
+        float r; // = pt1.get_3d_distance(ol);
+        if (!far_enough && theta > hexagonal / 3) far_enough = true;
+        if (far_enough)
+        {
+            r = pt1.get_3d_distance(pt2);
+            // cout << (theta*fiftyseven) << "deg: r = " << r << " step = " << (step*fiftyseven) << endl;
+            if (theta > hexagonal/2 && r < 0.33 && r > lr)
+            {
+                Bond* wbonds[16];
+                wa->fetch_bonds(wbonds);
+                int i, j;
+                Point origin = xa->get_location();
+                SCoord axis = origin.subtract(va->get_location());
+                float vxtheta = -find_angle_along_vector(wa->get_location(), ol, origin, axis);
+                for (i=0; wbonds[i]; i++)
+                {
+                    if (!wbonds[i]->btom) continue;
+                    if (wbonds[i]->btom->in_same_ring_as(wa)) continue;
+
+                    Point lpt = wbonds[i]->btom->get_location();
+                    lpt = rotate3D(lpt, origin, axis, vxtheta);
+                    wbonds[i]->btom->move(lpt);
+
+                    Atom* movesw[1024];
+                    wbonds[i]->fetch_moves_with_btom(movesw);
+                    for (j=0; movesw[j]; j++)
+                    {
+                        lpt = movesw[j]->get_location();
+                        lpt = rotate3D(lpt, origin, axis, vxtheta);
+                        movesw[j]->move(lpt);
+                    }
+                }
+                return theta;
+            }
+            step = fmax(0.01, r * 0.1 * fiftyseventh);
+        }
+
+        lr = r;
+    }
+
+    buv->ring_rotate(-theta, wa);
+    byx->ring_rotate( theta, wa);
+    return 0;
 }
 
 void Atom::rotate_geometry(Rotation rot)

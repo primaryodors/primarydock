@@ -215,6 +215,7 @@ var color_scheme = NGL.ColormakerRegistry.addScheme(function (params)
 
 function go(smiles_string)
 {
+    $('#gobtn').prop('disabled', true);
     stage.removeAllComponents();
     stage.setSpin(false);
     url = "<?php echo $_SERVER["PHP_SELF"]; ?>";
@@ -247,6 +248,7 @@ function go(smiles_string)
                         }
                         comp.addRepresentation("ball+stick", rparam);
                         comp.autoView();
+                        $('#gobtn').prop('disabled', false);
                     });
                 }
             });
@@ -266,7 +268,7 @@ function go(smiles_string)
 <br>
 <input type="text" name="rflp" id="rflp" value="">
 <br>
-<input type="button" value="Go" onclick="go($('#smiles')[0].value);" onchange="go($('#smiles')[0].value);">
+<input type="button" id="gobtn" value="Go" onclick="go($('#smiles')[0].value);" onchange="go($('#smiles')[0].value);">
 <br><br>
 <textarea id="result">
 </textarea>

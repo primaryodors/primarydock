@@ -157,7 +157,7 @@ $(BINDIR)/ramachandran: src/ramachandran.cpp $(OBJS) $(OBJDIR)/protein.o
 	$(CC) src/ramachandran.cpp $(OBJS) -o $(BINDIR)/ramachandran $(CFLAGS)
 
 $(BINDIR)/ringflip: src/ringflip.cpp $(OBJS) $(OBJDIR)/molecule.o
-	obabel -:"C1CCC(CC)CC1" --gen3D -osdf -O"sdf/cyclohexane_test.sdf"
+	obabel -:"C1CCC(CC)CC1" --gen3D -osdf -O"sdf/cyclohexane.sdf"
 	$(CC) src/ringflip.cpp $(OBJS) -o $(BINDIR)/ringflip $(CFLAGS)
 
 performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.upright.pdb testdata/CAD_ion.sdf

@@ -24,7 +24,7 @@
 #define helix_hbond_cutoff 2.8
 #define peptide_bond_length 1.32
 #define unconnected_residue_mindist 4.82
-#define clash_limit_per_aa 5.7
+#define clash_limit_per_aa 6.0
 #define contact_r_5x58_7x53 3.93
 #define eclipsing_kJmol_per_radian 1.86453
 #define memsanity 0x10000000
@@ -121,7 +121,7 @@
 #define charge_repulsion 5.0
 
 #define global_clash_allowance 0.4
-#define double_hydrogen_clash_allowance_multiplier 1.5
+#define double_hydrogen_clash_allowance_multiplier 1.0
 #define ignore_double_hydrogen_clashes 0
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0

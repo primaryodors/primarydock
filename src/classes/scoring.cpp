@@ -421,6 +421,7 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
         }
     }
     output << endl;
+    // output << "Worst energy: " << dr.worst_energy << endl;
 
     for (l=0; l<_INTER_TYPES_LIMIT; l++)
     {

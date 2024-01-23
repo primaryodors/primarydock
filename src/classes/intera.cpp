@@ -1084,7 +1084,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
             else
             {
-                rdecayed = r1 * r1 * r1;
+                rdecayed = r1*r1*r1*r1*r1*r1;
                 partial = aniso * forces[i]->kJ_mol * rdecayed;
             }
 

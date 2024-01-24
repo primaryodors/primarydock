@@ -213,6 +213,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
         if (lb < -maxclash) maxclash = -lb;
+        if (ligand->clash_worst > worst_energy) worst_energy = ligand->clash_worst;
 
         if (lb > 0 && ligand->clash1 && ligand->clash2)
         {
@@ -241,8 +242,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         {
             if (lb > 500) lb = 0;
             lmkJmol[metcount] = lb;
-
-            if (-lb > worst_energy) worst_energy = -lb;
         }
 
         lma1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;

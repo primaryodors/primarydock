@@ -236,6 +236,7 @@ public:
     std::vector<std::shared_ptr<GroupPair>> agroups;
     Molecule** mclashables = nullptr;
     Atom *clash1 = nullptr, *clash2 = nullptr;
+    float clash_worst = 0;
 
 protected:
 

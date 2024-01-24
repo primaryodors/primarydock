@@ -3158,7 +3158,7 @@ _try_again:
 
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
-            if ((btot < kJmol_cutoff || we > clash_limit_per_aa) && !differential_dock)
+            if ((btot < kJmol_cutoff || we > clash_limit_per_atom) && !differential_dock)
             {
                 // cout << "Total binding energy " << -btot << " and worst energy " << we << "; skipping." << endl << endl;
                 drcount++;
@@ -3191,7 +3191,7 @@ _try_again:
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
-                if (dr[j][0].worst_energy > clash_limit_per_aa) continue;
+                if (dr[j][0].worst_energy > clash_limit_per_atom) continue;
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)
                 {
                     for (k=0; k<=pathnodes; k++)

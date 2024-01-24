@@ -13,6 +13,7 @@ if (isset($_REQUEST['smiles']))
     {
         chdir("..");
         $rflp = escapeshellarg($_REQUEST['rflp']);
+        $rflp = str_replace(' ', "' '", $rflp);
         $cmd = "bin/ringflip \"www/test.sdf\" $rflp";
         echo ("$cmd\n");
         passthru($cmd);

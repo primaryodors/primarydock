@@ -2232,7 +2232,7 @@ int main(int argc, char** argv)
 
     found_poses = 0;
     int wrote_acvmx = -1, wrote_acvmr = -1;
-    float l_individual_clash_limit = individual_clash_limit - kJmol_cutoff;
+    float l_atom_clash_limit = clash_limit_per_atom - kJmol_cutoff;
 
 _try_again:
     // srand(0xb00d1cca);
@@ -3106,15 +3106,30 @@ _try_again:
 
             if (!nodeno)
             {
-                if ((dr[drcount][nodeno].ligand_self + ligand->total_eclipses()) < -individual_clash_limit)
+                if ((dr[drcount][nodeno].ligand_self + ligand->total_eclipses()) < -clash_limit_per_atom*3)
                 {
-                    // cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " out of range." << endl << endl;
+                    #if _dbg_worst_energy
+                    cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " out of range." << endl << endl;
+                    #endif
+
                     break;          // Exit nodeno loop.
                 }
                 // else cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " satisfactory." << endl << endl;
 
-                if (dr[drcount][nodeno].worst_energy > l_individual_clash_limit)
+                if (dr[drcount][nodeno].worst_energy > l_atom_clash_limit)
                 {
+                    #if _dbg_worst_energy
+                    cout << "Total binding energy " << dr[drcount][nodeno].kJmol
+                        << " and worst energy " << dr[drcount][nodeno].worst_energy;
+                    if (dr[drcount][nodeno].worst_clash_1 && dr[drcount][nodeno].worst_clash_2)
+                    {
+                        cout << " (" << dr[drcount][nodeno].worst_clash_1->residue << ":" << dr[drcount][nodeno].worst_clash_1->name
+                            << "-" << dr[drcount][nodeno].worst_clash_2->residue << ":" << dr[drcount][nodeno].worst_clash_2->name
+                            << ") ";
+                    }
+                    cout << "; skipping." << endl << endl;
+                    #endif
+
                     // cout << "Least favorable binding energy " << dr[drcount][nodeno].worst_energy << " out of range." << endl << endl;
                     break;          // Exit nodeno loop.
                 }
@@ -3193,13 +3208,6 @@ _try_again:
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
-                if (dr[j][0].worst_energy > clash_limit_per_atom)
-                {
-                    #if _dbg_worst_energy
-                    cout << "Total binding energy " << dr[j][0].kJmol << " and worst energy " << dr[j][0].worst_energy << "; skipping." << endl << endl;
-                    #endif
-                    continue;
-                }
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)
                 {
                     for (k=0; k<=pathnodes; k++)

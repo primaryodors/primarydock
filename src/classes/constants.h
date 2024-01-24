@@ -25,7 +25,7 @@
 #define peptide_bond_length 1.32
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 20.0
-#define clash_limit_per_atom 5.0
+#define clash_limit_per_atom 6.0
 #define contact_r_5x58_7x53 3.93
 #define eclipsing_kJmol_per_radian 1.86453
 #define memsanity 0x10000000
@@ -122,13 +122,13 @@
 #define charge_repulsion 5.0
 
 #define global_clash_allowance 0.4
-#define double_hydrogen_clash_allowance_multiplier 1.0
+#define double_hydrogen_clash_allowance_multiplier 1.5
 #define ignore_double_hydrogen_clashes 0
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 3.0
-#define lmpull 0.5
+#define lmpush 4.0
+#define lmpull 0.3
 #define lmsteps 3
 #define recapture_ejected_ligand 0
 
@@ -143,10 +143,10 @@
 #define bb_enable_residue_disqualifications 0
 #define bb_disqualification_energy 1000
 #define enforce_no_bb_pullaway 0
-#define bb_pullaway_allowance 0.5
-#define bb_realign_amount 0.2
+#define bb_pullaway_allowance 1.0
+#define bb_realign_amount 0.1
 #define bb_realign_mol 0
-#define bb_realign_threshold_distance 1.5
+#define bb_realign_threshold_distance 2.8
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
 #define bb_scooch_threshold_distance 1.5
@@ -247,9 +247,6 @@
 // Uses the ligand's most strongly bound atom as the center for full molecule rotations,
 // instead of the barycenter, to prevent "letting go" of the strongest binding.
 #define allow_tethered_rotations 1
-
-// Reject any conformation where any single residue's total clashes exceed this threshold.
-#define individual_clash_limit 15
 
 // Overwrite the user supplied pocket center with the loneliest point as determined by
 // distances to the nearest residue atoms to the supplied pocket center.

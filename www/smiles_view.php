@@ -38,6 +38,16 @@ input
     color: #fff;
 }
 
+input[type=button]:hover
+{
+    background-color: #006;
+}
+
+input[type=button].grayed
+{
+    color: #666;
+}
+
 textarea
 {
     border: 1px solid #0ff;
@@ -215,7 +225,7 @@ var color_scheme = NGL.ColormakerRegistry.addScheme(function (params)
 
 function go(smiles_string)
 {
-    $('#gobtn').prop('disabled', true);
+    $('#gobtn').prop('disabled', true).addClass('grayed');
     stage.removeAllComponents();
     stage.setSpin(false);
     url = "<?php echo $_SERVER["PHP_SELF"]; ?>";
@@ -248,7 +258,7 @@ function go(smiles_string)
                         }
                         comp.addRepresentation("ball+stick", rparam);
                         comp.autoView();
-                        $('#gobtn').prop('disabled', false);
+                        $('#gobtn').prop('disabled', false).removeClass('grayed');
                     });
                 }
             });

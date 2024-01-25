@@ -1,4 +1,5 @@
 
+#include <string.h>
 #include "intera.h"
 
 #ifndef _MOLECULE

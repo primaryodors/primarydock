@@ -202,12 +202,11 @@ void Pose::restore_state(Molecule* m)
     }
 }
 
-
-
 void Molecule::delete_atom(Atom* a)
 {
     if (!a) return;
     paths = nullptr;
+    a->mol = nullptr;
 
     int i, j;
 
@@ -319,6 +318,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* lo
     Atom* a = new Atom(elemsym, location, charge);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
+    a->mol = this;
     strcpy(a->name, aname);
     if (bond_to && bcard) a->bond_to(bond_to, bcard);
 
@@ -344,6 +344,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
     Atom* a = new Atom(elemsym);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
+    a->mol = this;
     strcpy(a->name, aname);
 
     try
@@ -4748,7 +4749,7 @@ bool Molecule::ring_is_coplanar(int ringid)
 bool Molecule::ring_is_aromatic(int ringid) const
 {
     if (!rings) return false;
-    return rings[ringid]->get_type() == AROMATIC;
+    return rings[ringid]->get_type() == RT_AROMATIC;
 }
 
 Point Molecule::get_ring_center(int ringid)

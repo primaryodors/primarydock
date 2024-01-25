@@ -1787,7 +1787,7 @@ Ring* AminoAcid::get_most_distal_arom_ring()
     float r = 0;
     for (i=0; rings[i]; i++)
     {
-        if (rings[i]->get_type() == AROMATIC)
+        if (rings[i]->get_type() == RT_AROMATIC)
         {
             float lr = caloc.get_3d_distance(rings[i]->get_center());
             if ((lr > r) || !i)
@@ -1850,7 +1850,7 @@ bool AminoAcid::is_tyrosine_like()
 
     for (i=0; rings[i]; i++)
     {
-        if (rings[i]->get_type() == AROMATIC) has_aromatic_ring = true;
+        if (rings[i]->get_type() == RT_AROMATIC) has_aromatic_ring = true;
         #if DBG_TYRLIKE
         cout << "Ring " << i << " type " << rings[i]->get_type() << endl;
         #endif
@@ -1877,7 +1877,7 @@ bool AminoAcid::is_tyrosine_like()
                 bool atom_is_in_ring = atoms[i]->is_in_ring(rings[j]);
                 if (!atom_is_in_ring) continue;
 
-                bool ring_is_aromatic = rings[j]->get_type() == AROMATIC;
+                bool ring_is_aromatic = rings[j]->get_type() == RT_AROMATIC;
                 if (!ring_is_aromatic) continue;
 
                 #if DBG_TYRLIKE

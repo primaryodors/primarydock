@@ -387,10 +387,6 @@ Atom::Atom(FILE* is)
 
 Atom::~Atom()
 {
-    /*if (region) delete[] region;
-    if (name) delete[] name;
-    if (bonded_to) delete[] bonded_to;*/
-
     if (geov) delete[] geov;
 
     if (bonded_to)
@@ -1605,8 +1601,8 @@ Atom* Ring::traverse_ring(Atom* f, Atom* af)
 
 float Ring::flip_atom(Atom* wa)
 {
-    if (type == UNKNOWN) determine_type();
-    if (type == AROMATIC || type == ANTIAROMATIC || type == COPLANAR) return 0;
+    if (type == RT_UNKNOWN) determine_type();
+    if (type == RT_AROMATIC || type == RT_ANTIAROMATIC || type == RT_COPLANAR) return 0;
     if (atcount < 4) return 0;
     if (!wa || wa->num_rings() != 1) return 0;
     if (!wa->is_in_ring(this)) return 0;
@@ -2703,7 +2699,7 @@ int Ring::get_overlap_count(Ring* ringb)
 
 RING_TYPE Ring::get_type()
 {
-    if (type == UNKNOWN) determine_type();
+    if (type == RT_UNKNOWN) determine_type();
     return type;
 }
 
@@ -2752,9 +2748,9 @@ bool Ring::is_conjugated()
 
 bool Ring::is_coplanar()
 {
-    if (type != UNKNOWN)
+    if (type != RT_UNKNOWN)
     {
-        return (type == AROMATIC || type == ANTIAROMATIC || type == COPLANAR);
+        return (type == RT_AROMATIC || type == RT_ANTIAROMATIC || type == RT_COPLANAR);
     }
     else
     {
@@ -2952,7 +2948,7 @@ void Ring::determine_type()
         cout << "# Ring is not conjugated." << endl;
         #endif
 
-        type = OTHER;
+        type = RT_OTHER;
         return;
     }
 
@@ -2962,13 +2958,13 @@ void Ring::determine_type()
         cout << "# Ring is not coplanar." << endl;
         #endif
 
-        type = OTHER;
+        type = RT_OTHER;
         return;
     }
 
-    if (Huckel()) type = AROMATIC;
-    else if (0) type = ANTIAROMATIC;		// TODO
-    else type = COPLANAR;
+    if (Huckel()) type = RT_AROMATIC;
+    else if (0) type = RT_ANTIAROMATIC;		// TODO
+    else type = RT_COPLANAR;
 }
 
 Atom* Atom::get_heaviest_bonded_atom_that_isnt(Atom* e)

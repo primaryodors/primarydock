@@ -1,24 +1,35 @@
 
-#include "intera.h"
+#include "point.h"
 #include <vector>
 
 #ifndef _NEIGHBOR
 #define _NEIGHBOR
 
+#define block_size 8.0
+#define block_max_atoms 256
+
+class Atom;
+
+struct Block
+{
+    int cx, cy, cz;
+    Atom* atoms[block_max_atoms];
+    int atom_count = 0;
+};
+
 class Neighborhood
 {
     public:
     void add_atom(Atom* neighborly_atom);
-    int fetch_atoms_near(Atom* results, const Point location, int depth = 1);
+    void update_atom(Atom* neighborly_atom, Point old_location);
+    int fetch_atoms_near(Atom** results, const int max_results, const Point location, const int depth = 1);
 
     protected:
-    //
+    // TODO: Want some kind of index on cx, cy, cz values.
+    std::vector<Block> blocks;
+    Block* get_block_from_location(Point location);
 };
 
-
-
-
-
-
+extern Neighborhood the_neighborhood;
 
 #endif

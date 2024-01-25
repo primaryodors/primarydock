@@ -4,7 +4,7 @@
 #include <vector>
 #include <iomanip>
 #include <memory>
-#include "point.h"
+#include "neighbor.h"
 
 #ifndef _ATOM
 #define _ATOM

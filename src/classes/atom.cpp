@@ -222,6 +222,7 @@ Atom::Atom(const char* elem_sym)
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
+    the_neighborhood.add_atom(this);
 }
 
 Atom::Atom(const char* elem_sym, const Point* l_location)
@@ -242,6 +243,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
+    the_neighborhood.add_atom(this);
 }
 
 Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
@@ -263,6 +265,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
+    the_neighborhood.add_atom(this);
 }
 
 Atom::Atom(FILE* is)
@@ -378,6 +381,8 @@ Atom::Atom(FILE* is)
         }
         buffer[0] = 0;
     }
+
+    the_neighborhood.add_atom(this);
 }
 
 Atom::~Atom()
@@ -481,11 +486,13 @@ bool Atom::move(Point* pt)
         return false;
     }
 
+    Point old = location;
     location = *pt;
     location.weight = at_wt;
     if (geov) delete[] geov;
     geov = NULL;
     geometry_dirty = true;
+    the_neighborhood.update_atom(this, old);
     return true;
 }
 
@@ -500,15 +507,6 @@ bool Atom::move_rel(SCoord* v)
         return false;
     }
 
-    /*if (name && !strcmp(name, "CB"))
-    {
-    	Bond* b = get_bond_between("CA");
-    	if (b && b->btom)
-    	{
-    		float r = b->btom->get_location().get_3d_distance(location.add(v));
-    		if (r > 1.55) throw 0x7e57196;
-    	}
-    }*/
     move(location.add(v));
     return true;
 }

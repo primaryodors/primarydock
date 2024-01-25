@@ -31,12 +31,12 @@ function make_prediction($data)
 {
     global $protid, $ligname, $pose;
 
-    if (isset($data["a_BENERG"]) || isset($data["a_BindingEnergy"]))
+    if (isset($data["a_Pose1"]) || isset($data["a_BindingEnergy"]))
     {
-        $ascore = min(0, floatval(@$data['a_BENERG']));
-        $iscore = min(0, floatval(@$data['i_BENERG']));
+        $ascore = min(0, floatval(@$data['a_Pose1']));
+        $iscore = min(0, floatval(@$data['i_Pose1']));
 
-        if ($ascore > $iscore)
+        if ($ascore >= $iscore)
         {
             $ascore = min(0, floatval(@$data['a_BindingEnergy']));
             $iscore = min(0, floatval(@$data['i_BindingEnergy']));

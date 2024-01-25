@@ -36,7 +36,7 @@ function make_prediction($data)
         $ascore = min(0, floatval(@$data['a_BENERG']));
         $iscore = min(0, floatval(@$data['i_BENERG']));
 
-        if ($ascore < $iscore)
+        if ($ascore > $iscore)
         {
             $ascore = min(0, floatval(@$data['a_BindingEnergy']));
             $iscore = min(0, floatval(@$data['i_BindingEnergy']));

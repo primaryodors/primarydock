@@ -4992,7 +4992,6 @@
                     "type": "na"
                 }
             },
-
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
             {
                 "OR5A1":
@@ -5365,7 +5364,7 @@
         "refs":
         [
             "https:\/\/doi.org\/10.1002\/(SICI)1522-2675(19991006)82:10%3C1762::AID-HLCA1762%3E3.0.CO;2-1",
-            "https://doi.org/10.3390%2Fijms13055542"
+            "https:\/\/doi.org\/10.3390%2Fijms13055542"
         ]
     },
     "2071c456bef0f0a366e3173b4bcb7c42":
@@ -13862,6 +13861,22 @@
             }
         },
         "oid": "605345a8e9a54a4fd533f1d432b51726"
+    },
+    "60913f4becd6122c8f4311819753ea22":
+    {
+        "full_name": "pivalic_acid",
+        "smiles": "[O-]C(=O)C(C)(C)C",
+        "aroma":
+        {
+            "https://www.reddit.com/r/chemistry/comments/165glxh/comment/jye5as9/":
+            [
+                "sickly",
+                "sweet",
+                "vomit",
+                "unpleasant"
+            ]
+        },
+        "oid": "60913f4becd6122c8f4311819753ea22"
     },
     "609a61147940ccdd91fd53b3b1493788":
     {

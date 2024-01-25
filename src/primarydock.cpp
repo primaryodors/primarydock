@@ -12,6 +12,7 @@
 #include "classes/dynamic.h"
 #include "classes/group.h"
 #include "classes/protein.h"
+#include "classes/neighbor.h"
 #include "classes/scoring.h"
 
 using namespace std;

@@ -19,7 +19,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     AminoAcid* reaches_spheroid[end1];
     int sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, ligand->get_barycenter(), size, addl_resno);
     // cout << "sphres " << sphres << endl;
-    float maxclash = 0;
     Molecule* met = protein->metals_as_molecule();
     int i, j;
 
@@ -39,7 +38,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = 0;
     }
 
-    worst_energy = 0;
+    worst_energy = worst_nrg_aa = 0;
+    worst_clash_1 = worst_clash_2 = nullptr;
 
     // if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
 
@@ -212,7 +212,13 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         int resno = reaches_spheroid[i]->get_residue_no();
 
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
-        if (lb < -maxclash) maxclash = -lb;
+        if (ligand->clash_worst > worst_energy)
+        {
+            worst_energy = ligand->clash_worst;
+            worst_clash_1 = ligand->clash1;
+            worst_clash_2 = ligand->clash2;
+        }
+        if (-lb > worst_nrg_aa) worst_nrg_aa = -lb;
 
         if (lb > 0 && ligand->clash1 && ligand->clash2)
         {
@@ -241,8 +247,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         {
             if (lb > 500) lb = 0;
             lmkJmol[metcount] = lb;
-
-            if (-lb > worst_energy) worst_energy = -lb;
         }
 
         lma1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;
@@ -309,9 +313,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #endif
 
     if (btot > 100*ligand->get_atom_count()) btot = 0;
-    if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
+    if (differential_dock && (worst_energy > clash_limit_per_aa)) btot = -Avogadro;
 
-    kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;
+    kJmol = (differential_dock && (worst_energy > clash_limit_per_aa)) ? -Avogadro : btot;
     ikJmol = 0;
     polsat  = pstot;
     metric   = new char*[metcount+4];
@@ -421,6 +425,7 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
         }
     }
     output << endl;
+    // output << "Worst energy: " << dr.worst_energy << endl;
 
     for (l=0; l<_INTER_TYPES_LIMIT; l++)
     {

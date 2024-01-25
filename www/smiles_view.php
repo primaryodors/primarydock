@@ -13,6 +13,7 @@ if (isset($_REQUEST['smiles']))
     {
         chdir("..");
         $rflp = escapeshellarg($_REQUEST['rflp']);
+        $rflp = str_replace(' ', "' '", $rflp);
         $cmd = "bin/ringflip \"www/test.sdf\" $rflp";
         echo ("$cmd\n");
         passthru($cmd);
@@ -36,6 +37,16 @@ input
     border: 1px solid #0ff;
     background-color: #000;
     color: #fff;
+}
+
+input[type=button]:hover
+{
+    background-color: #006;
+}
+
+input[type=button].grayed
+{
+    color: #666;
 }
 
 textarea
@@ -215,6 +226,7 @@ var color_scheme = NGL.ColormakerRegistry.addScheme(function (params)
 
 function go(smiles_string)
 {
+    $('#gobtn').prop('disabled', true).addClass('grayed');
     stage.removeAllComponents();
     stage.setSpin(false);
     url = "<?php echo $_SERVER["PHP_SELF"]; ?>";
@@ -247,6 +259,7 @@ function go(smiles_string)
                         }
                         comp.addRepresentation("ball+stick", rparam);
                         comp.autoView();
+                        $('#gobtn').prop('disabled', false).removeClass('grayed');
                     });
                 }
             });
@@ -266,7 +279,7 @@ function go(smiles_string)
 <br>
 <input type="text" name="rflp" id="rflp" value="">
 <br>
-<input type="button" value="Go" onclick="go($('#smiles')[0].value);" onchange="go($('#smiles')[0].value);">
+<input type="button" id="gobtn" value="Go" onclick="go($('#smiles')[0].value);" onchange="go($('#smiles')[0].value);">
 <br><br>
 <textarea id="result">
 </textarea>

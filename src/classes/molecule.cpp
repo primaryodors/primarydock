@@ -2754,7 +2754,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
         atoms[i]->strongest_bind_atom = nullptr;
     }
 
-    float worst = 0;
+    clash_worst = 0;
     for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
@@ -2822,9 +2822,9 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
                             }
 
-                            if (abind < 0 && -abind > worst)
+                            if (abind < 0 && -abind > clash_worst)
                             {
-                                worst = -abind;
+                                clash_worst = -abind;
                                 clash1 = atoms[i];
                                 clash2 = ligands[l]->atoms[j];
                             }

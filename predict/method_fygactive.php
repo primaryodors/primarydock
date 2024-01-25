@@ -33,13 +33,17 @@ function make_prediction($data)
 
     if (isset($data["a_BENERG"]) || isset($data["a_BindingEnergy"]))
     {
-        // TODO: For ascore and iscore each, require contact between ligand and TMR6 and
-        // contact between ligand and any of TMR3, TMR4, EXR2, TMR5, TMR7. If either condition
-        // not met, zero out that score. For FYG activation receptors with no rock6, also require
-        // that the ligand extend far enough in the -Y direction impinge on the vdW space of at
-        // least one side chain displaced by FYG activation.
-        $ascore = min(0, floatval(@$data['a_BENERG']), floatval(@$data['a_BindingEnergy']));
-        $iscore = min(0, floatval(@$data['i_BENERG']), floatval(@$data['i_BindingEnergy']));
+        $ascore = min(0, floatval(@$data['a_BENERG']));
+        $iscore = min(0, floatval(@$data['i_BENERG']));
+
+        if ($ascore < $iscore)
+        {
+            $ascore = min(0, floatval(@$data['a_BindingEnergy']));
+            $iscore = min(0, floatval(@$data['i_BindingEnergy']));
+        }
+
+        $aeff = isset($data["a_POSES"]) ? (floatval($data["a_POSES"]) / $pose) : 1;
+        $ieff = isset($data["i_POSES"]) ? (floatval($data["i_POSES"]) / $pose) : 1;
 
         if (floatval(@$data['a_Pose1']) < floatval(@$data['i_Pose1']))
         {
@@ -47,6 +51,9 @@ function make_prediction($data)
             $iscore = floatval(@$data['i_Pose1']);
         }
 
+        // For ascore and iscore each, require contact between ligand and TMR6 and
+        // contact between ligand and any of TMR3, TMR4, EXR2, TMR5, TMR7. If either condition
+        // not met, zero out that score.
         if (!@$data["a_BindingEnergy.6"]) $ascore = 0;
         if (!@$data["a_BindingEnergy.3"] && !@$data["a_BindingEnergy.4"] && !@$data["a_BindingEnergy.45"]
             && !@$data["a_BindingEnergy.5"] && !@$data["a_BindingEnergy.7"]) $iscore = 0;
@@ -54,15 +61,19 @@ function make_prediction($data)
         if (!@$data["i_BindingEnergy.3"] && !@$data["i_BindingEnergy.4"] && !@$data["i_BindingEnergy.45"]
             && !@$data["i_BindingEnergy.5"] && !@$data["i_BindingEnergy.7"]) $iscore = 0;
 
+        // TODO: For FYG activation receptors with no rock6, also require
+        // that the ligand extend far enough in the -Y direction impinge on the vdW space of at
+        // least one side chain displaced by FYG activation.
+
         if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($iscore, 0) - $ascore);
+            $data['DockScore'] = (min($iscore, 0) - $ascore)*$aeff;
         }
         else if ($iscore < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = (min($iscore, 0) - $ascore);
+            $data['DockScore'] = (min($iscore, 0) - $ascore)*$ieff;
         }
         else
         {

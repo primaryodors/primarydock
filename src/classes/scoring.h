@@ -24,6 +24,7 @@ class DockResult
     float* imvdWrepl = 0;
     float ligand_self = 0;
     float worst_energy = 0;
+    float worst_nrg_aa = 0;
     Atom* worst_clash_1 = nullptr;
     Atom* worst_clash_2 = nullptr;
     float* residue_clash = nullptr;

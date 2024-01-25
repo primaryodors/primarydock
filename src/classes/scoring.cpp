@@ -38,7 +38,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = 0;
     }
 
-    worst_energy = 0;
+    worst_energy = worst_nrg_aa = 0;
     worst_clash_1 = worst_clash_2 = nullptr;
 
     // if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
@@ -218,6 +218,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             worst_clash_1 = ligand->clash1;
             worst_clash_2 = ligand->clash2;
         }
+        if (-lb > worst_nrg_aa) worst_nrg_aa = -lb;
 
         if (lb > 0 && ligand->clash1 && ligand->clash2)
         {
@@ -312,9 +313,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #endif
 
     if (btot > 100*ligand->get_atom_count()) btot = 0;
-    if (differential_dock && (worst_energy > clash_limit_per_atom)) btot = -Avogadro;
+    if (differential_dock && (worst_energy > clash_limit_per_aa)) btot = -Avogadro;
 
-    kJmol = (differential_dock && (worst_energy > clash_limit_per_atom)) ? -Avogadro : btot;
+    kJmol = (differential_dock && (worst_energy > clash_limit_per_aa)) ? -Avogadro : btot;
     ikJmol = 0;
     polsat  = pstot;
     metric   = new char*[metcount+4];

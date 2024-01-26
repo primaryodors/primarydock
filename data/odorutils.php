@@ -63,6 +63,18 @@ $types =
    -999 => "?",
 ];
 
+$typenames =
+[
+	0 => "non-agonist",
+	1 => "v. weak agonist",
+	2 => "weak agonist",
+	3 => "mod. agonist",
+	4 => "strong agonist",
+	5 => "v. strong agonist",
+   -1 => "inv. agonist",
+   -999 => "unknown",
+];
+
 $sepyt = array_flip($types);
 
 function hellenicize($what)
@@ -79,37 +91,33 @@ function hellenicize($what)
 function best_empirical_pair($protein, $aroma, $as_object = false)
 {
 	global $odors, $sepyt;
-	
-	$btyp = $as_object ? false : $sepyt["?"];
-	
-	foreach ($odors as $oid => $o)
-	{
-		if ($oid == $aroma
-			||
-			$o['full_name'] == $aroma
-			||
-			str_replace(" ", "_", $o['full_name']) == $aroma
-		)
-		{
-			if (@$o['activity']) foreach ($o['activity'] as $ref => $acv)
-			{
-				if (isset($acv[$protein]))
-				{
-					// echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
 
-					// TODO: This is horribly inadequate for $as_object=true.
-					if (isset($acv[$protein]['type']) && $sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
-					{
-						$btyp = $as_object ? $acv[$protein] : $sepyt[trim($acv[$protein]['type'])];
-						if ($as_object) $btyp['ref'] = $ref;
-						// echo "Ligand type set to $btyp.\n";
-					}
+	$btyp = $as_object ? false : $sepyt["?"];
+
+	$o = find_odorant($aroma);
+
+	if ($o)
+	{
+		if (@$o['activity']) foreach ($o['activity'] as $ref => $acv)
+		{
+			if (isset($acv[$protein]))
+			{
+				// echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
+
+				// TODO: This is horribly inadequate for $as_object=true.
+				if (isset($acv[$protein]['type']) && $sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
+				{
+					$btyp = $as_object ? $acv[$protein] : $sepyt[trim($acv[$protein]['type'])];
+					if ($as_object) $btyp['ref'] = $ref;
+					// echo "Ligand type set to $btyp.\n";
 				}
 			}
-			
-			return $btyp;
 		}
+
+		return $btyp;
 	}
+
+	return $btyp;
 }
 
 function empirical_response($protein, $odorobj)

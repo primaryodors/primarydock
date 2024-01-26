@@ -8,7 +8,6 @@ include("header.php");
 ?>
 <h1>Odorants List</h1>
 
-
 <div class="box">
 <div class="row content scrollh">
 <?php

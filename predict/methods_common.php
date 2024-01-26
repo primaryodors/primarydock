@@ -346,7 +346,7 @@ function prepare_outputs()
                             }
                             else $mbp[$key] = $value;
                         }
-                        break;
+                        break 2;
                     }
                 }
             }

@@ -21,12 +21,16 @@ elif [ -z "$LIG" ]; then
 else
     LIGF="sdf/$LIG.sdf"
     LIGARG="lig=$LIG"
+    LIGW=$( echo "$LIG" | tr '_' ' ' )
     if ! test -f "$LIGF"; then
-        if [ -z "$SMILES" ]; then
-            echo "Odorant not found; please specify SMILES string for third argument."
-            exit
-        else
-            php -f "data/gensdf.php" "$LIG" "$SMILES"
+        INJSON=$( cat data/odorant.json | grep "$LIGW" )
+        if [ -z "$INJSON" ]; then
+            if [ -z "$SMILES" ]; then
+                echo "Odorant not found; please specify SMILES string for third argument."
+                exit
+            else
+                php -f "data/gensdf.php" "$LIG" "$SMILES"
+            fi
         fi
     fi
 fi

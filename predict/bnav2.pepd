@@ -192,6 +192,45 @@ GOSUB measure
 UNLIG
 
 
+IF NOT EXISTS ../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb THEN QUIT
+
+UNCHAIN I
+LOAD "pdbs/OR5/OR5K1.upright.pdb" A I
+UPRIGHT I
+BWCENTER
+
+UNCHAIN A
+LOAD "../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb" A A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/OR5K1.hazelnut_pyrazine.1015.bna.pdb"
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1254_MM_5_IFD3_cmpd2_38.pdb" A A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/OR5K1.hazelnut_pyrazine.1254.bna.pdb"
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1811_MM_56_IFD3_cmpd1_2.pdb" A A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/OR5K1.hazelnut_pyrazine.1811.bna.pdb"
+GOSUB measure
+UNLIG
+
+
+
 QUIT
 
 measure:

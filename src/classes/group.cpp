@@ -504,7 +504,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 g->remove_duplicates();
                 retval.push_back(g);
 
-                if (g->atoms.size() > 2 && g->get_pi() > 0.5*g->atoms.size() && (g->has_hbond_acceptors() || g->has_hbond_donors()))
+                if (g->atoms.size() > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atoms.size()
+                    && (g->has_hbond_acceptors() || g->has_hbond_donors()))
                 {
                     std::vector<std::shared_ptr<AtomGroup>> subg = make_hbond_subgroups(g);
                     retval.insert(std::end(retval), std::begin(subg), std::end(subg));
@@ -703,7 +704,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         cout << "Group complete." << endl << endl;
         #endif
 
-        if (g->atoms.size() > 2 && g->get_pi() > 0.5*g->atoms.size() && (g->has_hbond_acceptors() || g->has_hbond_donors()))
+        if (g->atoms.size() > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atoms.size()
+            && (g->has_hbond_acceptors() || g->has_hbond_donors()))
         {
             std::vector<std::shared_ptr<AtomGroup>> subg = make_hbond_subgroups(g);
             retval.insert(std::end(retval), std::begin(subg), std::end(subg));

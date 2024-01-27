@@ -801,6 +801,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::sha
         {
             std::shared_ptr<AtomGroup> g1(new AtomGroup());
             g1->atoms.push_back(g->atoms[l]);
+            g1->ligand = g->ligand;
 
             #if _dbg_groupsel
             cout << "Creating subgroup from " << g->atoms[l]->name << "..." << endl;

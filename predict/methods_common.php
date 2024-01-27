@@ -687,6 +687,7 @@ ELIM $elim
 $flex_constraints
 ITERS $iter
 PROGRESS
+MOVIE
 
 FLEX 1
 WET
@@ -741,7 +742,15 @@ heredoc;
         }
 
         if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
-        if (!$retvar) unlink($cnfname);
+        $num_poses = 0;
+        foreach ($outlines as $ln)
+        {
+            if (false !== strpos($ln, "pose(s) found"))
+            {
+                $num_poses = intval($ln);
+            }
+        }
+        if (!$retvar && $num_poses) unlink($cnfname);
 
         break;
 

@@ -41,8 +41,20 @@ foreach ($dock_results as $rcpid => $results)
     }
 }
 
+$fh = 44;
+$fw = 30;
+$nih = 25;
+$nt = 20;
+$noh = $nih + $nt;
+$nw = 18;
+$filter_svgdat = "m 0,0 $fw,$fh 0,$nih $nw,$nt 0,-$noh $fw,-$fh Z"
+
 ?>
 <h1>Predictions List</h1>
+
+<?php 
+// echo "<svg height=\"81px\" viewBox=\"0 0 80 90\" xmlns=\"http://www.w3.org/2000/svg\"><path fill=\"magenta\" d=\"$filter_svgdat\"></path></svg>";
+?>
 
 <div class="box">
 <div class="row content scrollh">
@@ -59,15 +71,24 @@ foreach ($dock_results as $rcpid => $results)
     </tr>
 <?php
 
+$frcp = false;
+$flig = false;
 foreach ($predictions as $p)
 {
     echo "<tr>\n";
 
-    echo "<td><a href=\"predlist.php?r={$p['r']}\">{$p['r']}</a></td>\n";
+    echo "<td><a href=\"receptor.php?r={$p['r']}\">{$p['r']}</a>";
+    if ($frcp != $p['r'])
+        echo " <a href=\"predlist.php?r={$p['r']}\"><svg height=\"13px\" viewBox=\"0 0 80 90\" xmlns=\"http://www.w3.org/2000/svg\"><path fill=\"#50cea8\" d=\"$filter_svgdat\"></path></svg></a>";
+    echo "</td>\n";
+    $frcp = $p['r'];
 
     $o = $odors[$p['o']];
     $fn = $o['full_name'];
-    echo "<td><a href=\"predlist.php?o={$p['o']}\">$fn</a></td>\n";
+    echo "<td><a href=\"odorant.php?o={$p['o']}\">$fn</a>";
+    if ($flig != $p['o'])
+        echo " <a href=\"predlist.php?o={$p['o']}\"><svg height=\"13px\" viewBox=\"0 0 80 90\" xmlns=\"http://www.w3.org/2000/svg\"><path fill=\"#50cea8\" d=\"$filter_svgdat\"></path></svg></a>";
+    echo "</td>\n";
 
     $type = $typenames[intval($p['a'])];
     echo "<td>$type</td>\n";

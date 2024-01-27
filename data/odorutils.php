@@ -68,10 +68,10 @@ $typenames =
 	0 => "non-agonist",
 	1 => "v. weak agonist",
 	2 => "weak agonist",
-	3 => "mod. agonist",
+	3 => "moderate agonist",
 	4 => "strong agonist",
 	5 => "v. strong agonist",
-   -1 => "inv. agonist",
+   -1 => "inverse agonist",
    -999 => "unknown",
 ];
 

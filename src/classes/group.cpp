@@ -144,6 +144,30 @@ float AtomGroup::hydrophilicity()
     return result;
 }
 
+bool AtomGroup::has_hbond_acceptors()
+{
+    int atct = atoms.size();
+    if (!atct) return 0;
+    int i;
+    bool result = false;
+
+    for (i=0; i<atct; i++) if (atoms[i]->is_polar() <= -hydrophilicity_cutoff && atoms[i]->get_bonded_atoms_count() < 4) result = true;
+
+    return result;
+}
+
+bool AtomGroup::has_hbond_donors()
+{
+    int atct = atoms.size();
+    if (!atct) return 0;
+    int i;
+    bool result = false;
+
+    for (i=0; i<atct; i++) if (atoms[i]->is_polar() >= -hydrophilicity_cutoff) result = true;
+
+    return result;
+}
+
 int AtomGroup::contains_element(const char* esym)
 {
     int i;
@@ -449,7 +473,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 if (any_dirty) continue;
 
                 #if _dbg_groupsel
-                cout << predef_grp[i].pattern << " matched:";
+                cout << predef_grp[i].pattern << "Matched:";
                 for (j=0; matches[j]; j++) cout << " " << *matches[j];
                 cout << endl;
                 #endif
@@ -464,19 +488,6 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                     g->atoms.push_back(a);
                     int fam = a->get_family();
 
-                    // Pyrazine/indole/furan fix.
-                    bool skip_dirty;
-                    if (a->num_rings() && (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN) || a->is_bonded_to(TETREL, 2)))
-                    {
-                        #if _dbg_groupsel
-                        cout << *a << " is in " << a->num_rings() << " rings, "
-                            << (a->is_pi() ? "" : "not ") << "pi, marked dirty." << endl;
-                        #endif
-                        dirty[k] = true;
-                        skip_dirty = false;
-                    }
-                    else skip_dirty = true;
-
                     Bond* bonds[16];
                     a->fetch_bonds(bonds);
                     for (m=0; bonds[m]; m++)
@@ -486,15 +497,18 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         k = mol->atom_idx_from_ptr(bonds[m]->btom);
                         if (dirty[k]) continue;
                         g->atoms.push_back(bonds[m]->btom);
-                        if (!skip_dirty)
-                        {
-                            dirty[k] = true;
-                        }
+                        dirty[k] = true;
                     }
                 }
 
                 g->remove_duplicates();
                 retval.push_back(g);
+
+                if (g->atoms.size() > 2 && g->get_pi() > 0.5*g->atoms.size() && (g->has_hbond_acceptors() || g->has_hbond_donors()))
+                {
+                    std::vector<std::shared_ptr<AtomGroup>> subg = make_hbond_subgroups(g);
+                    retval.insert(std::end(retval), std::begin(subg), std::end(subg));
+                }
             }
         }
     }
@@ -688,6 +702,12 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         #if _dbg_groupsel
         cout << "Group complete." << endl << endl;
         #endif
+
+        if (g->atoms.size() > 2 && g->get_pi() > 0.5*g->atoms.size() && (g->has_hbond_acceptors() || g->has_hbond_donors()))
+        {
+            std::vector<std::shared_ptr<AtomGroup>> subg = make_hbond_subgroups(g);
+            retval.insert(std::end(retval), std::begin(subg), std::end(subg));
+        }
     }
 
     l = retval.size();
@@ -764,6 +784,47 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                     }
                 }
             }
+        }
+    }
+
+    return retval;
+}
+
+std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::shared_ptr<AtomGroup> g)
+{
+    std::vector<std::shared_ptr<AtomGroup>> retval;
+    int j, l;
+
+    for (l=0; l<g->atoms.size(); l++)
+    {
+        if (g->atoms[l]->get_family() == CHALCOGEN || g->atoms[l]->get_family() == PNICTOGEN || g->atoms[l]->get_family() == HALOGEN)
+        {
+            std::shared_ptr<AtomGroup> g1(new AtomGroup());
+            g1->atoms.push_back(g->atoms[l]);
+
+            #if _dbg_groupsel
+            cout << "Creating subgroup from " << g->atoms[l]->name << "..." << endl;
+            #endif
+
+            Bond* lbb[16];
+            g->atoms[l]->fetch_bonds(lbb);
+            for (j=0; lbb[j]; j++)
+            {
+                if (lbb[j]->btom && lbb[j]->btom->get_Z() == 1)
+                {
+                    g1->atoms.push_back(lbb[j]->btom);
+
+                    #if _dbg_groupsel
+                    cout << "Adding " << lbb[j]->btom->name << "..." << endl;
+                    #endif
+                }
+            }
+
+            retval.push_back(g1);
+
+            #if _dbg_groupsel
+            cout << "Group complete." << endl << endl;
+            #endif
         }
     }
 

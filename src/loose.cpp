@@ -58,6 +58,7 @@ int main(int argc, char** argv)
     std::vector<Point> orig_CA_locs, new_CA_locs;
     Protein p("TheReceptor");
     Molecule lig("TheLigand");
+    Pose putitback;
 
     int i, j, l, m, n, pose = 0;
     out_fname = "tmp/loose.pdb";
@@ -173,6 +174,8 @@ int main(int argc, char** argv)
     fclose(fp);
     cout << "Dock file loaded." << endl;
 
+    putitback.copy_state(&lig);
+
     n = docked_resnos.size();
     Molecule* mols[n + 4];
     j = 0;
@@ -221,7 +224,16 @@ int main(int argc, char** argv)
         }
     }
 
-    const Region* reg = p.get_regions();
+
+    Protein p1;
+    FILE* fpdb = fopen(pdb_fname.c_str(), "r");
+    p1.load_pdb(fpdb);
+    fclose(fpdb);
+
+    putitback.restore_state(&lig);
+
+
+    const Region* reg = p1.get_regions();
     m = docked_resnos.size();
     for (i=0; reg[i].start && reg[i].end; i++)
     {
@@ -242,12 +254,12 @@ int main(int argc, char** argv)
         pt.multiply(1.0/l);
         rgcen.multiply(1.0/l);
 
-        float rcm = p.region_can_move(reg[i].start, reg[i].end, pt);
+        float rcm = p1.region_can_move(reg[i].start, reg[i].end, pt);
         if (rcm > pt.magnitude()) rcm = pt.magnitude();
         else pt.scale(rcm);
         if (rcm > 0)
         {
-            p.move_piece(reg[i].start, reg[i].end, (SCoord)pt);
+            p1.move_piece(reg[i].start, reg[i].end, (SCoord)pt);
             for (j=0; j<m; j++)
             {
                 if (docked_resnos[j] >= reg[i].start && docked_resnos[j] <= reg[i].end)
@@ -257,10 +269,12 @@ int main(int argc, char** argv)
             }
         }
 
+        continue;               // Debug moving regions without rotating.
+
         int hxno = atoi(((std::string)reg[i].name).substr(3).c_str());
         if (hxno < 1 || hxno > 7) continue;
 
-        int bw50 = p.get_bw50(hxno);
+        int bw50 = p1.get_bw50(hxno);
 
         SCoord axis;
         float theta = 0;
@@ -287,16 +301,17 @@ int main(int argc, char** argv)
 
         axis = compute_normal(oldtop, topdir, rgcen);
         theta = fmin(find_angle_along_vector(oldtop, topdir, rgcen, axis)
-            , p.region_can_rotate(reg[i].start, reg[i].end, axis)
+            , p1.region_can_rotate(reg[i].start, reg[i].end, axis)
             );
 
-        if (theta) p.rotate_piece(reg[i].start, reg[i].end, rgcen, axis, theta);
+        if (theta) p1.rotate_piece(reg[i].start, reg[i].end, rgcen, axis, theta);
     }
 
     fp = fopen(out_fname.c_str(), "w");
-    p.save_pdb(fp, &lig);
-    p.end_pdb(fp);
+    p1.save_pdb(fp, &lig);
+    p1.end_pdb(fp);
     fclose(fp);
+    cout << "Saved " << out_fname << endl;
 
     return 0;
 }

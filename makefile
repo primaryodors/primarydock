@@ -11,7 +11,7 @@ TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
 	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or $(BINDIR)/fyg_activate_or \
-	 $(BINDIR)/score_pdb $(BINDIR)/ramachandran $(BINDIR)/ringflip
+	 $(BINDIR)/score_pdb $(BINDIR)/ramachandran $(BINDIR)/ringflip $(BINDIR)/loose
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -159,6 +159,9 @@ $(BINDIR)/ramachandran: src/ramachandran.cpp $(OBJS) $(OBJDIR)/protein.o
 $(BINDIR)/ringflip: src/ringflip.cpp $(OBJS) $(OBJDIR)/molecule.o
 	obabel -:"C1CCC(CC)CC1" --gen3D -osdf -O"sdf/cyclohexane.sdf"
 	$(CC) src/ringflip.cpp $(OBJS) -o $(BINDIR)/ringflip $(CFLAGS)
+
+$(BINDIR)/loose: src/loose.cpp $(OBJS) $(OBJDIR)/protein.o
+	$(CC) src/loose.cpp $(OBJS) -o $(BINDIR)/loose $(CFLAGS)
 
 performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.upright.pdb testdata/CAD_ion.sdf
 	./$(BINDIR)/primarydock testdata/test_TAAR8.config

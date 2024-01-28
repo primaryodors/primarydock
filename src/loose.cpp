@@ -47,8 +47,8 @@ int main(int argc, char** argv)
     std::string dock_fname, pdb_fname, sdf_fname;
     std::vector<int> docked_resnos;
     std::vector<Point> orig_CA_locs;
-    Protein p("TheProt");
-    Molecule lig("TheLig");
+    Protein p("TheReceptor");
+    Molecule lig("TheLigand");
 
     int i, j, l, m, n, pose = 0;
 
@@ -76,7 +76,23 @@ int main(int argc, char** argv)
             FILE* fpdb = fopen(pdb_fname.c_str(), "r");
             p.load_pdb(fpdb);
             fclose(fpdb);
-            cout << "Loaded " << pdb_fname << endl << flush;
+            cout << "Loaded " << pdb_fname << endl;
+
+            for (j=1; j<=7; j++)
+            {
+                std::string regno = (std::string)"TMR" + std::to_string(j);
+                int sr = p.get_region_start(regno), er = p.get_region_end(regno);
+                if (sr && er)
+                {
+                    cout << regno << " begin " << sr << " @ " << p.get_atom_location(sr, "CA");
+                    int bw50 = p.get_bw50(j);
+                    cout << " n.50 " << bw50 << " @ " << p.get_atom_location(bw50, "CA");
+                    cout << regno << " end " << er << " @ " << p.get_atom_location(er, "CA");
+                    cout << endl;
+                }
+            }
+
+            cout << endl << flush;
             continue;
         }
 

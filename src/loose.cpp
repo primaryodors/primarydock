@@ -337,9 +337,10 @@ int main(int argc, char** argv)
     char l6x59 = aa6x59->get_letter();
     char l7x53 = aa7x53->get_letter();
 
+    int npivot = n6x49;
     if (l6x59 == 'R')
     {
-        Region rg = p.get_region("TMR6");
+        Region rg = p1.get_region("TMR6");
         Point pt = aa4x60->get_CA_location();
         Point origin = aa6x48->get_CA_location();
         SCoord axis = compute_normal(aa6x59->get_CA_location(), pt, origin);
@@ -355,7 +356,7 @@ int main(int argc, char** argv)
     }
     else if ((l45x51 == 'D' || l45x51 == 'E') && l6x55 == 'Y')
     {
-        Region rg = p.get_region("TMR6");
+        Region rg = p1.get_region("TMR6");
         Point pt = aa45x51->get_CA_location().subtract(aa6x55->get_CA_location());
         Atom* a51 = aa45x51->get_nearest_atom(aa6x55->get_CA_location());
         if (a51)
@@ -385,7 +386,7 @@ int main(int argc, char** argv)
     }
     else if ((l45x53 == 'N' || l45x53 == 'Q') && (l6x55 == 'D' || l6x55 == 'E'))
     {
-        Region rg = p.get_region("TMR6");
+        Region rg = p1.get_region("TMR6");
         Point pt = aa45x53->get_CA_location().subtract(aa6x55->get_CA_location());
         Atom* a53 = aa45x53->get_nearest_atom(aa6x55->get_CA_location());
         if (a53)
@@ -413,6 +414,57 @@ int main(int argc, char** argv)
             }
         }
     }
+
+
+    // TMR6 motion.
+    Region rg5 = p1.get_region("TMR5");
+    Region rg6 = p1.get_region("TMR6");
+    float theta6_phi_initial = 10;
+    LocatedVector lv6 = aa6x49->get_phi_vector();
+    p1.rotate_piece(rg6.start, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_phi_initial);
+    float theta6_psi_initial = 40;
+    lv6 = aa6x49->get_psi_vector();
+    p1.rotate_piece(rg6.start, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_psi_initial);
+
+    // 5.58 ~ 7.53 contact.
+    p1.bridge(n5x58, n7x53);
+
+    int n5x50 = p1.get_bw50(5);
+    AminoAcid* aa5x33 = p1.get_residue(rg5.start), *aa5x68 = p1.get_residue(rg5.end), *aa5x50 = p1.get_residue(n5x50);
+    LocatedVector lv5 = compute_normal(aa5x58->get_CA_location(), aa7x53->get_CA_location(), aa5x33->get_CA_location());
+    lv5.origin = aa5x50->get_CA_location();
+
+    float theta5 = p1.region_can_rotate(n5x50, rg5.end, lv5, false, 0, rg6.start, n6x59);
+    Point pt = aa7x53->get_reach_atom()->get_location().subtract(aa5x58->get_reach_atom()->get_location());
+    pt.scale(fmax(0, pt.magnitude() - contact_r_5x58_7x53));
+    if (pt.magnitude())
+    {
+        Point pt5x58 = aa5x58->get_reach_atom()->get_location();
+        float f = find_3d_angle(pt5x58, pt5x58.add(pt), lv5.origin);
+        if (f < theta5) theta5 = f;
+
+        p1.rotate_piece(n5x50, rg5.end, lv5.origin, lv5, theta5);
+        cout << "TMR5 bends " << theta5*fiftyseven << "deg, limited by " << *(p1.stop1) << "->" << *(p1.stop2) << endl;
+    }
+    else cout << "5.58~7.53 bridge already met." << endl;
+
+    // Adjust TMR6.
+    AminoAcid* aapivot = p1.get_residue(npivot);
+    float theta6 = p1.region_can_rotate(rg6.start, npivot, lv6);
+    AminoAcid* aa6x28 = p1.get_residue(rg6.start);
+    Point pt6x28 = rotate3D(aa6x28->get_CA_location(), aapivot->get_CA_location(), lv6, theta6);
+    float r56 = pt6x28.get_3d_distance(aa5x68->get_CA_location());
+    cout << "r56 = " << r56 << endl;
+    if (r56 > 4)
+    {
+        theta6 = fmin(theta6, find_3d_angle(aa5x68->get_CA_location(), aa6x28->get_CA_location(), aapivot->get_CA_location()));
+        p1.stop1 = aa5x68;
+        p1.stop2 = aa6x28;
+    }
+    cout << "TMR6 bends " << (theta6_phi_initial + theta6_psi_initial - theta6 * fiftyseven) << "deg limited by " << *(p1.stop1) << "->" << *(p1.stop2) << endl;
+    p1.rotate_piece(rg6.start, npivot, lv6.origin, lv6, theta6);
+
+    p1.bridge(n5x58, n7x53);
 
 
     fp = fopen(out_fname.c_str(), "w");

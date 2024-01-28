@@ -53,19 +53,26 @@ void iteration_callback(int iter, Molecule** mols)
 
 int main(int argc, char** argv)
 {
-    std::string dock_fname, pdb_fname, sdf_fname;
+    std::string dock_fname, pdb_fname, sdf_fname, out_fname;
     std::vector<int> docked_resnos;
-    std::vector<Point> orig_CA_locs;
+    std::vector<Point> orig_CA_locs, new_CA_locs;
     Protein p("TheReceptor");
     Molecule lig("TheLigand");
 
     int i, j, l, m, n, pose = 0;
+    out_fname = "tmp/loose.pdb";
 
     for (i=1; i<argc; i++)
     {
         if (argv[i][0] == '-')
         {
             if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--iters")) iters = atoi(argv[++i]);
+            else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--out")) out_fname = argv[++i];
+            else
+            {
+                cout << "Unrecognized option " << argv[i] << endl;
+                return -1;
+            }
         }
         else
         {
@@ -151,6 +158,7 @@ int main(int argc, char** argv)
                 {
                     docked_resnos.push_back(resno);
                     orig_CA_locs.push_back(aa->get_CA_location());
+                    new_CA_locs.push_back(aa->get_CA_location());
                 }
             }
 
@@ -195,6 +203,8 @@ int main(int argc, char** argv)
             if (docked_resnos[j] == l)
             {
                 Point newloc = aa->get_CA_location();
+                new_CA_locs[j] = newloc;
+
                 Point delta = newloc.subtract(orig_CA_locs[j]);
                 if (delta.magnitude() < 0.1) continue;
                 cout << l << ": " << delta;
@@ -210,6 +220,83 @@ int main(int argc, char** argv)
             }
         }
     }
+
+    const Region* reg = p.get_regions();
+    m = docked_resnos.size();
+    for (i=0; reg[i].start && reg[i].end; i++)
+    {
+        l = 0;
+        Point pt, rgcen;
+        for (j=0; j<m; j++)
+        {
+            if (docked_resnos[j] >= reg[i].start && docked_resnos[j] <= reg[i].end)
+            {
+                rgcen = rgcen.add(new_CA_locs[j]);
+                Point delta = new_CA_locs[j].subtract(orig_CA_locs[j]);
+                pt = pt.add(delta);
+                l++;
+            }
+        }
+
+        if (!l) continue;
+        pt.multiply(1.0/l);
+        rgcen.multiply(1.0/l);
+
+        float rcm = p.region_can_move(reg[i].start, reg[i].end, pt);
+        if (rcm > pt.magnitude()) rcm = pt.magnitude();
+        else pt.scale(rcm);
+        if (rcm > 0)
+        {
+            p.move_piece(reg[i].start, reg[i].end, (SCoord)pt);
+            for (j=0; j<m; j++)
+            {
+                if (docked_resnos[j] >= reg[i].start && docked_resnos[j] <= reg[i].end)
+                {
+                    orig_CA_locs[j] = orig_CA_locs[j].add(pt);
+                }
+            }
+        }
+
+        int hxno = atoi(((std::string)reg[i].name).substr(3).c_str());
+        if (hxno < 1 || hxno > 7) continue;
+
+        int bw50 = p.get_bw50(hxno);
+
+        SCoord axis;
+        float theta = 0;
+        Point topdir, oldtop;
+        l = 0;
+        for (j=0; j<m; j++)
+        {
+            if (abs(docked_resnos[j] - bw50) < 3) continue;
+            if (docked_resnos[j] >= reg[i].start && docked_resnos[j] <= reg[i].end)
+            {
+                if (!l || new_CA_locs[j].y > oldtop.y) oldtop = new_CA_locs[j];
+
+                Point delta = new_CA_locs[j].subtract(rgcen);
+                delta.multiply(1.0 / delta.y);
+                delta.y = 0;
+                topdir = topdir.add(delta);
+                l++;
+            }
+        }
+
+        if (!l) continue;
+        topdir.multiply(1.0/l);
+        topdir = topdir.add(oldtop);
+
+        axis = compute_normal(oldtop, topdir, rgcen);
+        theta = fmin(find_angle_along_vector(oldtop, topdir, rgcen, axis)
+            , p.region_can_rotate(reg[i].start, reg[i].end, axis)
+            );
+
+        if (theta) p.rotate_piece(reg[i].start, reg[i].end, rgcen, axis, theta);
+    }
+
+    fp = fopen(out_fname.c_str(), "w");
+    p.save_pdb(fp, &lig);
+    p.end_pdb(fp);
+    fclose(fp);
 
     return 0;
 }

@@ -307,6 +307,114 @@ int main(int argc, char** argv)
         if (theta) p1.rotate_piece(reg[i].start, reg[i].end, rgcen, axis, theta);
     }
 
+
+    AminoAcid *aa4x60 = p1.get_residue_bw("4.60");
+    AminoAcid *aa45x51 = p1.get_residue_bw("45.51");
+    AminoAcid *aa45x53 = p1.get_residue_bw("45.53");
+    AminoAcid *aa5x58 = p1.get_residue_bw("5.58");
+    AminoAcid *aa6x48 = p1.get_residue_bw("6.48");
+    AminoAcid *aa6x49 = p1.get_residue_bw("6.49");
+    AminoAcid *aa6x55 = p1.get_residue_bw("6.55");
+    AminoAcid *aa6x59 = p1.get_residue_bw("6.59");
+    AminoAcid *aa7x53 = p1.get_residue_bw("7.53");
+
+    int n4x60 = aa4x60->get_residue_no();
+    int n45x51 = aa45x51->get_residue_no();
+    int n45x53 = aa45x53->get_residue_no();
+    int n5x58 = aa5x58->get_residue_no();
+    int n6x48 = aa6x48->get_residue_no();
+    int n6x49 = aa6x49->get_residue_no();
+    int n6x55 = aa6x55->get_residue_no();
+    int n6x59 = aa6x59->get_residue_no();
+    int n7x53 = aa7x53->get_residue_no();
+
+    char l45x51 = aa45x51->get_letter();
+    char l45x53 = aa45x53->get_letter();
+    char l5x58 = aa5x58->get_letter();
+    char l6x48 = aa6x48->get_letter();
+    char l6x49 = aa6x49->get_letter();
+    char l6x55 = aa6x55->get_letter();
+    char l6x59 = aa6x59->get_letter();
+    char l7x53 = aa7x53->get_letter();
+
+    if (l6x59 == 'R')
+    {
+        Region rg = p.get_region("TMR6");
+        Point pt = aa4x60->get_CA_location();
+        Point origin = aa6x48->get_CA_location();
+        SCoord axis = compute_normal(aa6x59->get_CA_location(), pt, origin);
+        float theta = fmin(find_angle_along_vector(aa6x59->get_CA_location(), pt, origin, axis)/3.5
+            , p1.region_can_rotate(rg.start, rg.end, axis)
+            );
+        if (theta)
+        {
+            cout << "R6.55 Rock6 " << (theta*fiftyseven) << "deg." << endl;
+            p1.rotate_piece(rg.start, rg.end, origin, axis, theta);
+        }
+        aa6x59->conform_atom_to_location("NE", pt);
+    }
+    else if ((l45x51 == 'D' || l45x51 == 'E') && l6x55 == 'Y')
+    {
+        Region rg = p.get_region("TMR6");
+        Point pt = aa45x51->get_CA_location().subtract(aa6x55->get_CA_location());
+        Atom* a51 = aa45x51->get_nearest_atom(aa6x55->get_CA_location());
+        if (a51)
+        {
+            Atom* a55 = aa6x55->get_nearest_atom(a51->get_location());
+            if (a55)
+            {
+                float r = a51->distance_to(a55);
+                if (r > 2.0)
+                {
+                    pt.scale(r-2.0);
+                    pt = pt.add(aa6x55->get_CA_location());
+                    Point origin = aa6x48->get_CA_location();
+                    SCoord axis = compute_normal(aa6x55->get_CA_location(), pt, origin);
+                    float theta = fmin(find_angle_along_vector(aa6x55->get_CA_location(), pt, origin, axis)
+                        , p1.region_can_rotate(rg.start, rg.end, axis)
+                        );
+                    if (theta)
+                    {
+                        cout << "Y~D/E Rock6 " << (theta*fiftyseven) << "deg." << endl;
+                        p1.rotate_piece(rg.start, rg.end, origin, axis, theta);
+                    }
+                    p1.bridge(n45x51, n6x55);
+                }
+            }
+        }
+    }
+    else if ((l45x53 == 'N' || l45x53 == 'Q') && (l6x55 == 'D' || l6x55 == 'E'))
+    {
+        Region rg = p.get_region("TMR6");
+        Point pt = aa45x53->get_CA_location().subtract(aa6x55->get_CA_location());
+        Atom* a53 = aa45x53->get_nearest_atom(aa6x55->get_CA_location());
+        if (a53)
+        {
+            Atom* a55 = aa6x55->get_nearest_atom(a53->get_location());
+            if (a55)
+            {
+                float r = a53->distance_to(a55);
+                if (r > 2.0)
+                {
+                    pt.scale(r-2.0);
+                    pt = pt.add(aa6x55->get_CA_location());
+                    Point origin = aa6x48->get_CA_location();
+                    SCoord axis = compute_normal(aa6x55->get_CA_location(), pt, origin);
+                    float theta = fmin(find_angle_along_vector(aa6x55->get_CA_location(), pt, origin, axis)
+                        , p1.region_can_rotate(rg.start, rg.end, axis)
+                        );
+                    if (theta)
+                    {
+                        cout << "D/E~N/Q Rock6 " << (theta*fiftyseven) << "deg." << endl;
+                        p1.rotate_piece(rg.start, rg.end, origin, axis, theta);
+                    }
+                    p1.bridge(n45x53, n6x55);
+                }
+            }
+        }
+    }
+
+
     fp = fopen(out_fname.c_str(), "w");
     p1.save_pdb(fp);
     p1.end_pdb(fp);

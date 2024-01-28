@@ -2791,7 +2791,9 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             &&
                             !strcmp(ligands[l]->atoms[j]->name, "C")
                         )
-                    )) continue;			// kludge to prevent adjacent residue false clashes.
+                        || (ligands[l]->movability & MOV_CAN_RECEN)
+                    )
+                    ) continue;			// kludge to prevent adjacent residue false clashes.
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {

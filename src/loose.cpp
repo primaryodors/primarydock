@@ -269,7 +269,7 @@ int main(int argc, char** argv)
             }
         }
 
-        continue;               // Debug moving regions without rotating.
+        // continue;               // Debug moving regions without rotating.
 
         int hxno = atoi(((std::string)reg[i].name).substr(3).c_str());
         if (hxno < 1 || hxno > 7) continue;
@@ -308,7 +308,7 @@ int main(int argc, char** argv)
     }
 
     fp = fopen(out_fname.c_str(), "w");
-    p1.save_pdb(fp, &lig);
+    p1.save_pdb(fp);
     p1.end_pdb(fp);
     fclose(fp);
     cout << "Saved " << out_fname << endl;

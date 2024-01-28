@@ -6391,7 +6391,7 @@
     },
     "28c14686ff344bb15c2f1e1e0651e3ef":
     {
-        "full_name": "(-)-cis-rose oxide",
+        "full_name": "(-)-(Z)-rose oxide",
         "smiles": "C[C@@H]1CCO[C@@H](C1)C=C(C)C",
         "aroma":
         {
@@ -6789,7 +6789,7 @@
     },
     "2a696e83a2b91f970881aee10f43c8f8":
     {
-        "full_name": "cis-3-hexenyl hexanoate",
+        "full_name": "(Z)-3-hexenyl hexanoate",
         "smiles": "CC\/C=C\\CCOC(=O)CCCCC",
         "aroma":
         {
@@ -8057,7 +8057,7 @@
     },
     "31b1f546e0cadb59998f95ac11edec80":
     {
-        "full_name": "trans-anethole",
+        "full_name": "(E)-anethole",
         "smiles": "C\/C=C\/C1=CC=C(C=C1)OC",
         "aroma":
         {
@@ -8573,7 +8573,7 @@
     },
     "36a7914715d7af00f349ad43a2827eef":
     {
-        "full_name": "cis-4-hexen-1-ol",
+        "full_name": "(Z)-4-hexen-1-ol",
         "smiles": "C\\C=C\/CCCO",
         "aroma":
         {
@@ -18346,8 +18346,11 @@
     },
     "7d23be27809d3a8a7615d6c3e15450b1":
     {
-        "full_name": "cis-3-hexen-1-ol",
+        "full_name": "(Z)-3-hexen-1-ol",
         "name1": "leaf alcohol",
+        "name2": "cis-3-hexen-1-ol",
+        "name3": "cis-3-hexenol",
+        "name4": "(Z)-3-hexenol",
         "smiles": "CC\\C=C\/CCO",
         "aroma":
         {
@@ -23204,7 +23207,7 @@
     },
     "a0aba5665399521a07fd7fbd6fc463e9":
     {
-        "full_name": "cis-3-hexenyl salicylate",
+        "full_name": "(Z)-3-hexenyl salicylate",
         "smiles": "CC\/C=C\\CCOC(=O)C1=CC=CC=C1O",
         "aroma":
         {
@@ -25819,7 +25822,7 @@
     },
     "b0457d7db8c46ed17196b39af969dfa6":
     {
-        "full_name": "cis-5-octen-1-ol",
+        "full_name": "(Z)-5-octen-1-ol",
         "smiles": "CC\/C=C\\CCCCO",
         "aroma":
         {
@@ -27779,7 +27782,7 @@
     },
     "c3bd6aab2c06b8e5a4c6661de8476423":
     {
-        "full_name": "cis-6-nonen-1-ol",
+        "full_name": "(Z)-6-nonen-1-ol",
         "smiles": "CC\/C=C\\CCCCCO",
         "aroma":
         {
@@ -32161,7 +32164,7 @@
     },
     "e0f9fe1a96f75df87126b067042d5b48":
     {
-        "full_name": "trans-2-trans-4-nonadienal",
+        "full_name": "(E,E)-2,4-nonadienal",
         "smiles": "O=C\/C=C\/\/C=C\/CCCC",
         "aroma":
         {
@@ -32894,7 +32897,7 @@
     },
     "e49f842de770e882978c0d5f2edcea51":
     {
-        "full_name": "cis-jasmone",
+        "full_name": "(Z)-jasmone",
         "smiles": "CC\/C=C\\CC1=C(CCC1=O)C",
         "aroma":
         {
@@ -35723,7 +35726,7 @@
     },
     "f72e7d46bc31fb4e8d90f51ff3401be8":
     {
-        "full_name": "trans-cinnamic acid",
+        "full_name": "(E)-cinnamic acid",
         "smiles": "C1=CC=C(C=C1)\\C=C\\C(=O)[O-]",
         "aroma":
         {

@@ -329,7 +329,7 @@ void freeze_bridged_residues()
             forced_static_resnos[i].resolve_resno(protein);
             int resno = forced_static_resnos[i].resno;
             if (!resno) continue;
-            
+
             AminoAcid *aa = protein->get_residue(resno);
             if (!aa) continue;
 

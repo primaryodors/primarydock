@@ -202,6 +202,7 @@ public:
 
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
+    float contact_dist(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
     int replace_side_chains_from_other_protein(Protein* other);
 

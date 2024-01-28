@@ -435,10 +435,12 @@ int main(int argc, char** argv)
     lv5.origin = aa5x50->get_CA_location();
 
     float theta5 = p1.region_can_rotate(n5x50, rg5.end, lv5, false, 0, rg6.start, n6x59);
-    Point pt = aa7x53->get_reach_atom()->get_location().subtract(aa5x58->get_reach_atom()->get_location());
-    pt.scale(fmax(0, pt.magnitude() - contact_r_5x58_7x53));
-    if (pt.magnitude())
+    Point pt;
+    float r = p1.contact_dist(n5x58, n7x53);
+    r = fmax(0, r - contact_r_5x58_7x53);
+    if (r) // pt.magnitude())
     {
+        pt = aa7x53->get_reach_atom()->get_location().subtract(aa5x58->get_reach_atom()->get_location());
         Point pt5x58 = aa5x58->get_reach_atom()->get_location();
         float f = find_3d_angle(pt5x58, pt5x58.add(pt), lv5.origin);
         if (f < theta5) theta5 = f;
@@ -465,6 +467,8 @@ int main(int argc, char** argv)
     p1.rotate_piece(rg6.start, npivot, lv6.origin, lv6, theta6);
 
     p1.bridge(n5x58, n7x53);
+    r = p1.contact_dist(n5x58, n7x53);
+    cout << "5~7 contact distance: " << r << "A." << endl;
 
 
     fp = fopen(out_fname.c_str(), "w");

@@ -3799,6 +3799,20 @@ void Protein::bridge(int resno1, int resno2)
     _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
 }
 
+float Protein::contact_dist(int resno1, int resno2)
+{
+    AminoAcid *aa1 = get_residue(resno1), *aa2 = get_residue(resno2);
+    if (!aa1 || !aa2) return INFINITY;
+    
+    Atom *a1 = aa1->get_reach_atom(), *a2 = aa2->get_reach_atom();
+    a1 = aa1->get_nearest_atom(a2->get_location());
+    a2 = aa2->get_nearest_atom(a1->get_location());
+    a1 = aa1->get_nearest_atom(a2->get_location());
+    a2 = aa2->get_nearest_atom(a1->get_location());
+
+    return a1->distance_to(a2);
+}
+
 void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
 {
     save_undo_state();

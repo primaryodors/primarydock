@@ -35,7 +35,7 @@ void iteration_callback(int iter, Molecule** mols)
     {
         Point pt = mols[i]->get_barycenter();
         SCoord v = lbc.subtract(pt);
-        v.r = 0.25;
+        v.r = 0.333;
         mols[i]->move(v);
     }
 
@@ -196,6 +196,7 @@ int main(int argc, char** argv)
             {
                 Point newloc = aa->get_CA_location();
                 Point delta = newloc.subtract(orig_CA_locs[j]);
+                if (delta.magnitude() < 0.1) continue;
                 cout << l << ": " << delta;
 
                 Point lbc = lig.get_barycenter();

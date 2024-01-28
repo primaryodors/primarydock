@@ -431,14 +431,19 @@ int main(int argc, char** argv)
 
     int n5x50 = p1.get_bw50(5);
     AminoAcid* aa5x33 = p1.get_residue(rg5.start), *aa5x68 = p1.get_residue(rg5.end), *aa5x50 = p1.get_residue(n5x50);
-    LocatedVector lv5 = compute_normal(aa5x58->get_CA_location(), aa7x53->get_CA_location(), aa5x33->get_CA_location());
+    AminoAcid* aa6x28 = p1.get_residue(rg6.start);
+    LocatedVector lv5 = compute_normal(aa5x68->get_CA_location(), aa6x28->get_CA_location(), aa5x50->get_CA_location());
     lv5.origin = aa5x50->get_CA_location();
 
-    float theta5 = p1.region_can_rotate(n5x50, rg5.end, lv5, false, 0, rg6.start, n6x59);
+    float theta5 = fmin(15*fiftyseven, p1.region_can_rotate(n5x50, rg5.end, lv5));
+    p1.rotate_piece(n5x50, rg5.end, lv5.origin, lv5, theta5);
+
+    lv5 = compute_normal(aa5x58->get_CA_location(), aa7x53->get_CA_location(), aa5x50->get_CA_location());
+    theta5 = p1.region_can_rotate(n5x50, rg5.end, lv5, false, 0, rg6.start, n6x59);
     Point pt;
     float r = p1.contact_dist(n5x58, n7x53);
     r = fmax(0, r - contact_r_5x58_7x53);
-    if (r) // pt.magnitude())
+    if (r)
     {
         pt = aa7x53->get_reach_atom()->get_location().subtract(aa5x58->get_reach_atom()->get_location());
         Point pt5x58 = aa5x58->get_reach_atom()->get_location();
@@ -453,7 +458,6 @@ int main(int argc, char** argv)
     // Adjust TMR6.
     AminoAcid* aapivot = p1.get_residue(npivot);
     float theta6 = p1.region_can_rotate(rg6.start, npivot, lv6);
-    AminoAcid* aa6x28 = p1.get_residue(rg6.start);
     Point pt6x28 = rotate3D(aa6x28->get_CA_location(), aapivot->get_CA_location(), lv6, theta6);
     float r56 = pt6x28.get_3d_distance(aa5x68->get_CA_location());
     cout << "r56 = " << r56 << endl;

@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     Protein p("TheProt");
     Molecule lig("TheLig");
 
-    int i, j, l, m, n;
+    int i, j, l, m, n, pose = 0;
 
     for (i=1; i<argc; i++)
     {
@@ -90,6 +90,13 @@ int main(int argc, char** argv)
             lig.from_sdf(sdfdat);
             fclose(fsdf);
             cout << "Loaded " << sdf_fname << endl << flush;
+            continue;
+        }
+
+        if (!strcmp(ln.substr(0, 6).c_str(), "Pose: "))
+        {
+            pose = atoi(ln.substr(6).c_str());
+            if (pose > 1) break;                    // for now.
             continue;
         }
 

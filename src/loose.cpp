@@ -14,7 +14,7 @@
 
 using namespace std;
 
-int iters = 20;
+int iters = 50;
 
 // https://stackoverflow.com/a/6039648/18753403
 long GetFileSize(std::string filename)
@@ -30,6 +30,15 @@ void iteration_callback(int iter, Molecule** mols)
     float percentage = progress * 100;
 
     int i;
+    Point lbc = mols[0]->get_barycenter();
+    for (i=1; mols[i]; i++)
+    {
+        Point pt = mols[i]->get_barycenter();
+        SCoord v = lbc.subtract(pt);
+        v.r = 0.25;
+        mols[i]->move(v);
+    }
+
     cout << "\033[A|";
     for (i=0; i<80; i++)
     {
@@ -87,7 +96,7 @@ int main(int argc, char** argv)
                     cout << regno << " begin " << sr << " @ " << p.get_atom_location(sr, "CA");
                     int bw50 = p.get_bw50(j);
                     cout << " n.50 " << bw50 << " @ " << p.get_atom_location(bw50, "CA");
-                    cout << regno << " end " << er << " @ " << p.get_atom_location(er, "CA");
+                    cout << " end " << er << " @ " << p.get_atom_location(er, "CA");
                     cout << endl;
                 }
             }
@@ -185,8 +194,17 @@ int main(int argc, char** argv)
         {
             if (docked_resnos[j] == l)
             {
-                Point delta = aa->get_CA_location().subtract(orig_CA_locs[j]);
-                cout << l << ": " << delta << endl;
+                Point newloc = aa->get_CA_location();
+                Point delta = newloc.subtract(orig_CA_locs[j]);
+                cout << l << ": " << delta;
+
+                Point lbc = lig.get_barycenter();
+                lbc.y = newloc.y = orig_CA_locs[j].y;
+
+                float theta = find_3d_angle(newloc, lbc, orig_CA_locs[j]);
+                cout << " ligand angle " << (theta*fiftyseven) << "deg.";
+
+                cout << endl;
                 break;
             }
         }

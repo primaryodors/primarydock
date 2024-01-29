@@ -100,7 +100,7 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 $cmd = "bin/loose -o '$pdbfname_active' '$outfname'";
 echo "$cmd\n";
-exec($cmd);
+passthru($cmd);
 
 if (!file_exists($pdbfname_active)) dock_failed("The bin/loose tool did not generate an active model.");
 

@@ -28,6 +28,7 @@ void iteration_callback(int iter, Molecule** mols)
 {
     float progress = (float)iter / iters;
     float percentage = progress * 100;
+    float convergence = 2.5 * pow(1.0-progress, 3);
 
     int i;
     Point lbc = mols[0]->get_barycenter();
@@ -35,7 +36,7 @@ void iteration_callback(int iter, Molecule** mols)
     {
         Point pt = mols[i]->get_barycenter();
         SCoord v = lbc.subtract(pt);
-        v.r = 0.333;
+        v.r = convergence;
         mols[i]->move(v);
     }
 

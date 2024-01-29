@@ -157,7 +157,6 @@ $(BINDIR)/ramachandran: src/ramachandran.cpp $(OBJS) $(OBJDIR)/protein.o
 	$(CC) src/ramachandran.cpp $(OBJS) -o $(BINDIR)/ramachandran $(CFLAGS)
 
 $(BINDIR)/ringflip: src/ringflip.cpp $(OBJS) $(OBJDIR)/molecule.o
-	obabel -:"C1CCC(CC)CC1" --gen3D -osdf -O"sdf/cyclohexane.sdf"
 	$(CC) src/ringflip.cpp $(OBJS) -o $(BINDIR)/ringflip $(CFLAGS)
 
 $(BINDIR)/loose: src/loose.cpp $(OBJS) $(OBJDIR)/protein.o

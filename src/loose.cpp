@@ -101,11 +101,11 @@ int main(int argc, char** argv)
                 int sr = p.get_region_start(regno), er = p.get_region_end(regno);
                 if (sr && er)
                 {
-                    cout << regno << " begin " << sr << " @ " << p.get_atom_location(sr, "CA");
+                    /* cout << regno << " begin " << sr << " @ " << p.get_atom_location(sr, "CA");
                     int bw50 = p.get_bw50(j);
                     cout << " n.50 " << bw50 << " @ " << p.get_atom_location(bw50, "CA");
                     cout << " end " << er << " @ " << p.get_atom_location(er, "CA");
-                    cout << endl;
+                    cout << endl; */
                 }
             }
 
@@ -210,15 +210,15 @@ int main(int argc, char** argv)
 
                 Point delta = newloc.subtract(orig_CA_locs[j]);
                 if (delta.magnitude() < 0.1) continue;
-                cout << l << ": " << delta;
+                // cout << l << ": " << delta;
 
                 Point lbc = lig.get_barycenter();
                 lbc.y = newloc.y = orig_CA_locs[j].y;
 
                 float theta = find_3d_angle(newloc, lbc, orig_CA_locs[j]);
-                cout << " ligand angle " << (theta*fiftyseven) << "deg.";
+                // cout << " ligand angle " << (theta*fiftyseven) << "deg.";
 
-                cout << endl;
+                // cout << endl;
                 break;
             }
         }
@@ -259,6 +259,7 @@ int main(int argc, char** argv)
         else pt.scale(rcm);
         if (rcm > 0)
         {
+            cout << "Moving " << reg[i].name << " rel. " << pt << "..." << endl;
             p1.move_piece(reg[i].start, reg[i].end, (SCoord)pt);
             for (j=0; j<m; j++)
             {
@@ -268,8 +269,6 @@ int main(int argc, char** argv)
                 }
             }
         }
-
-        // continue;               // Debug moving regions without rotating.
 
         int hxno = atoi(((std::string)reg[i].name).substr(3).c_str());
         if (hxno < 1 || hxno > 7) continue;
@@ -304,7 +303,11 @@ int main(int argc, char** argv)
             , p1.region_can_rotate(reg[i].start, reg[i].end, axis)
             );
 
-        if (theta) p1.rotate_piece(reg[i].start, reg[i].end, rgcen, axis, theta);
+        if (theta)
+        {
+            cout << "Rotating " << reg[i].name << " " << (theta*fiftyseven) << "deg..." << endl;
+            p1.rotate_piece(reg[i].start, reg[i].end, rgcen, axis, theta);
+        }
     }
 
 
@@ -421,6 +424,8 @@ int main(int argc, char** argv)
     Region rg6 = p1.get_region("TMR6");
     float theta6_phi_initial = 10;
     LocatedVector lv6 = aa6x49->get_phi_vector();
+    AminoAcid* aapivot = p1.get_residue(npivot);
+    lv6.origin = aapivot->get_CA_location();
     p1.rotate_piece(rg6.start, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_phi_initial);
     float theta6_psi_initial = 40;
     lv6 = aa6x49->get_psi_vector();
@@ -435,7 +440,7 @@ int main(int argc, char** argv)
     LocatedVector lv5 = compute_normal(aa5x68->get_CA_location(), aa6x28->get_CA_location(), aa5x50->get_CA_location());
     lv5.origin = aa5x50->get_CA_location();
 
-    float theta5 = fmin(15*fiftyseven, p1.region_can_rotate(n5x50, rg5.end, lv5));
+    float theta5 = fmin(10*fiftyseven, p1.region_can_rotate(n5x50, rg5.end, lv5)/2);
     p1.rotate_piece(n5x50, rg5.end, lv5.origin, lv5, theta5);
 
     lv5 = compute_normal(aa5x58->get_CA_location(), aa7x53->get_CA_location(), aa5x50->get_CA_location());
@@ -456,7 +461,8 @@ int main(int argc, char** argv)
     else cout << "5.58~7.53 bridge already met." << endl;
 
     // Adjust TMR6.
-    AminoAcid* aapivot = p1.get_residue(npivot);
+    #if 0
+    lv6.origin = aapivot->get_CA_location();
     float theta6 = p1.region_can_rotate(rg6.start, npivot, lv6);
     Point pt6x28 = rotate3D(aa6x28->get_CA_location(), aapivot->get_CA_location(), lv6, theta6);
     float r56 = pt6x28.get_3d_distance(aa5x68->get_CA_location());
@@ -469,6 +475,7 @@ int main(int argc, char** argv)
     }
     cout << "TMR6 bends " << (theta6_phi_initial + theta6_psi_initial - theta6 * fiftyseven) << "deg limited by " << *(p1.stop1) << "->" << *(p1.stop2) << endl;
     p1.rotate_piece(rg6.start, npivot, lv6.origin, lv6, theta6);
+    #endif
 
     p1.bridge(n5x58, n7x53);
     r = p1.contact_dist(n5x58, n7x53);

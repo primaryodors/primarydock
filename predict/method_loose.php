@@ -83,3 +83,30 @@ chdir("..");
 
 $pdbfname_inactive = $pdbfname;
 $pdbfname_active = "tmp/$protid.$ligname.loose.pdb";
+
+$fam = family_from_protid($protid);
+$pdbfname = $pdbfname_inactive;
+$outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
+$cenres = substr($cenres_inactive, 8);
+
+chdir(__DIR__);
+chdir("..");
+if (!file_exists("output/$fam")) mkdir("output/$fam");
+if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
+
+prepare_receptor($pdbfname, "$flxr $iflxr");
+prepare_ligand($ligname);
+if (!@$_REQUEST["acvonly"]) process_dock("i");
+
+$cmd = "bin/loose -o '$pdbfname_active' '$outfname'";
+echo "$cmd\n";
+exec($cmd);
+
+if (!file_exists($pdbfname_active)) dock_failed("The bin/loose tool did not generate an active model.");
+
+$pdbfname = $pdbfname_active;
+$outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
+$cenres = substr($cenres_active, 8);
+
+prepare_receptor($pdbfname, "$flxr $aflxr");
+$poses = process_dock("a");

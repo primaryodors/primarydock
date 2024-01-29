@@ -1,6 +1,6 @@
 
 IF EXISTS "../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb" GOTO _ready
-ECHO "To use this feature, please clone the following repository alongside primarydock:"
+ECHO "To use the OR5K1 direct models, please clone the following repository alongside primarydock:"
 ECHO "git clone https://github.com/dipizio/OR5K1_binding_site.git"
 QUIT
 

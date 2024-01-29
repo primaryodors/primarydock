@@ -87,15 +87,15 @@ $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 if (!file_exists($pdbfname_inactive) && file_exists($pdbfname_active))              // If no apo model, just use upright.
     $pdbfname_inactive = $pdbfname;
 
-if (!file_exists($pdbfname_active) && (substr($protid, 0, 4) == "OR51" || substr($protid, 0, 4) == "OR52"))
+if (!file_exists($pdbfname_active))
 {
     exec("php -f predict/cryoem_motions.php");
-    exec("bin/pepteditor data/OR51.pepd");
-    exec("bin/pepteditor data/OR52.pepd");
-    exec("bin/pepteditor data/OR5K.pepd");
+    if (substr($protid, 0, 4) == "OR51") exec("bin/pepteditor data/OR51.pepd");
+    else if (substr($protid, 0, 4) == "OR52") exec("bin/pepteditor data/OR52.pepd");
+    else if (substr($protid, 0, 4) == "OR5K") exec("bin/pepteditor data/OR5K.pepd");
 }
 
-if (!file_exists($pdbfname_active)) die("No bound model.\n");
+if (!file_exists($pdbfname_active)) dock_failed("No bound model.");
 
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);

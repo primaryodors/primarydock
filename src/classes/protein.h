@@ -40,6 +40,7 @@ struct ResiduePlaceholder
     int node = 0;
     int resno = 0;
     std::string bw;
+    std::string allowed_aas;
 
     void set(const char* str);
     void resolve_resno(Protein* prot);

@@ -16,8 +16,24 @@ float *g_rgnrot_alpha = nullptr, *g_rgnrot_w = nullptr, *g_rgnrot_u = nullptr;
 
 void ResiduePlaceholder::set(const char* str)
 {
-    if (strchr(str, '.')) bw = str;
-    else resno = atoi(str);
+    char buffer[256];
+    char* lstr = buffer;
+    strcpy(buffer, str);
+
+    if (lstr[0] >= 'A' && lstr[0] <= 'Z')
+    {
+        int i;
+        for (i=0; lstr[i] && lstr[i] >= 'A'; i++);
+        if (!lstr[i]) return;
+        char c = buffer[i];
+        buffer[i] = 0;
+        allowed_aas = buffer;
+        buffer[i] = c;
+        lstr = &buffer[i];
+    }
+
+    if (strchr(lstr, '.')) bw = lstr;
+    else resno = atoi(lstr);
 }
 
 void ResiduePlaceholder::resolve_resno(Protein* prot)
@@ -28,10 +44,19 @@ void ResiduePlaceholder::resolve_resno(Protein* prot)
     if (!dot)
     {
         resno = atoi(bw.c_str());
-        return;
     }
-    int bwpos = atoi(dot+1);
-    resno = prot->get_bw50(hxno) + bwpos - 50;
+    else
+    {
+        int bwpos = atoi(dot+1);
+        resno = prot->get_bw50(hxno) + bwpos - 50;
+    }
+
+    if (allowed_aas.length())
+    {
+        AminoAcid* aa = prot->get_residue(resno);
+        char c = aa->get_letter();
+        if (!strchr(allowed_aas.c_str(), c)) resno = 0;
+    }
 }
 
 Protein::Protein()

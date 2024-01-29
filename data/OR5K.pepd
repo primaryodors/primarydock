@@ -1,0 +1,75 @@
+
+IF EXISTS "../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb" GOTO _ready
+ECHO "To use this feature, please clone the following repository alongside primarydock:"
+ECHO "git clone https://github.com/dipizio/OR5K1_binding_site.git"
+QUIT
+
+_ready:
+ECHO "Extrapolating active and inactive protein structures from successful homology models. This will take some time."
+
+STRAND B
+LOAD "pdbs/OR5/OR5K1.upright.pdb"
+STRAND A
+LOAD "../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb"
+BWCOPY B A
+UNCHAIN B
+UPRIGHT
+BWCENTER
+REMARK   1
+REMARK   1  AUTH   Alessandro Nicoli, Franziska Haag, Patrick Marcinek, Ruiming He, Johanna Kreißl,
+REMARK   1  AUTH 2 Jörg Stein, Alessandro Marchetto, Andreas Dunkel, Thomas Hofmann, Dietmar Krautwurst,
+REMARK   1  AUTH 3 Antonella Di Pizio
+REMARK   1  TITL   Modeling the Orthosteric Binding Site of the G Protein-Coupled Odorant Receptor OR5K1 
+REMARK   1  DOI    10.1101/2022.06.01.494157
+REMARK   1
+REMARK   1  This file has been modified for PrimaryDock compatibility.
+REMARK   1
+SAVE "pdbs/OR5/OR5K1.bound.pdb"
+UNCHAIN A
+
+STRAND A
+LOAD "pdbs/OR5/OR5K1.bound.pdb"
+SIDEREPL "pdbs/OR5/OR5K2.upright.pdb"
+REMARK   1
+REMARK   1  AUTH   Alessandro Nicoli, Franziska Haag, Patrick Marcinek, Ruiming He, Johanna Kreißl,
+REMARK   1  AUTH 2 Jörg Stein, Alessandro Marchetto, Andreas Dunkel, Thomas Hofmann, Dietmar Krautwurst,
+REMARK   1  AUTH 3 Antonella Di Pizio
+REMARK   1  TITL   Modeling the Orthosteric Binding Site of the G Protein-Coupled Odorant Receptor OR5K1 
+REMARK   1  DOI    10.1101/2022.06.01.494157
+REMARK   1
+REMARK   1  This file has been modified for PrimaryDock compatibility.
+REMARK   1
+SAVE "pdbs/OR5/OR5K2.bound.pdb"
+UNCHAIN A
+
+STRAND A
+LOAD "pdbs/OR5/OR5K1.bound.pdb"
+SIDEREPL "pdbs/OR5/OR5K3.upright.pdb"
+REMARK   1
+REMARK   1  AUTH   Alessandro Nicoli, Franziska Haag, Patrick Marcinek, Ruiming He, Johanna Kreißl,
+REMARK   1  AUTH 2 Jörg Stein, Alessandro Marchetto, Andreas Dunkel, Thomas Hofmann, Dietmar Krautwurst,
+REMARK   1  AUTH 3 Antonella Di Pizio
+REMARK   1  TITL   Modeling the Orthosteric Binding Site of the G Protein-Coupled Odorant Receptor OR5K1 
+REMARK   1  DOI    10.1101/2022.06.01.494157
+REMARK   1
+REMARK   1  This file has been modified for PrimaryDock compatibility.
+REMARK   1
+SAVE "pdbs/OR5/OR5K3.bound.pdb"
+UNCHAIN A
+
+STRAND A
+LOAD "pdbs/OR5/OR5K1.bound.pdb"
+SIDEREPL "pdbs/OR5/OR5K4.upright.pdb"
+REMARK   1
+REMARK   1  AUTH   Alessandro Nicoli, Franziska Haag, Patrick Marcinek, Ruiming He, Johanna Kreißl,
+REMARK   1  AUTH 2 Jörg Stein, Alessandro Marchetto, Andreas Dunkel, Thomas Hofmann, Dietmar Krautwurst,
+REMARK   1  AUTH 3 Antonella Di Pizio
+REMARK   1  TITL   Modeling the Orthosteric Binding Site of the G Protein-Coupled Odorant Receptor OR5K1 
+REMARK   1  DOI    10.1101/2022.06.01.494157
+REMARK   1
+REMARK   1  This file has been modified for PrimaryDock compatibility.
+REMARK   1
+SAVE "pdbs/OR5/OR5K4.bound.pdb"
+UNCHAIN A
+
+

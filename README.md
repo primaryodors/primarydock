@@ -38,14 +38,14 @@ SDFs can be obtained a few different ways:
 <ul>
   <li>Using openbabel, you can generate 3 dimensional SDFs from SMILES input. Example syntax:<br>
     <code>obabel -:'CCO' --gen3D -osdf -Osdf/ethanol.sdf</code><br>
-    There is also a PHP script located at <code>data/gensdf.php</code> that will make the obabel call, as well as add the molecule to
-    odorants.json, if given a compound name and a SMILES string.
+    There is also a PHP script located at `data/gensdf.php` that will make the `obabel` call, as well as add the molecule to
+    `odorants.json`, if given a compound name and a SMILES string.
   </li>
   <li>SDFs are available from PubChem at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{pubchem_cid}/SDF?record_type=3d</li>
   <li>Or at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{SMILES}/SDF?record_type=3d</li>
 </ul>
 
-Please take a look at the primarydock.config file as a sample of the format for dock settings. You will want to edit this file,
+Please take a look at the `primarydock.config` file as a sample of the format for dock settings. You will want to edit this file,
 or create a new one, for each receptor+ligand pair that you wish to dock. There are lines for repointing to your PDB and SDF
 model input files, as well as various other options that may be useful to your purposes.
 
@@ -73,23 +73,23 @@ previous runs may have missed.
 Contributions are always welcome! Please create a branch off of stable, then submit a pull request.
 All PRs that change the C++ classes or any of the apps must pass the master unit tests (`test/unit_test_master.sh`) before merge.
 
-Note to developers: if you run PrimaryDock under a memory utility such as valgrind, you are likely to see a lot of errors saying that
+Note to developers: if you run PrimaryDock under a memory utility such as Valgrind, you are likely to see a lot of errors saying that
 uninitialized variables are being used or that conditional jumps depend on them. Most of these are false positives. Many places in the
 code create temporary arrays of pointers and then assign those pointers addresses of objects that persist throughout the entire program
-execution. The memory tool "thinks" the objects have not been initialized even when they have. We recommend using the --undef-value-errors=no option with valgrind or the equivalent switch in your
-utility of choice.
+execution. The memory tool "thinks" the objects have not been initialized even when they have. We recommend using the 
+`--undef-value-errors=no` option with valgrind or the equivalent switch in your utility of choice.
 
 
-# Web Application (optional)
+# Web Application
 
-You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web
+You may optionally host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web
 application that is used for the Primary Odors website.
 
 ![Web app screenshot](www/assets/webapp.png?raw=true "Web App")
 
 To enable the web app:
 - Either set up a local web server or checkout primarydock in a folder on a web host.
-- Make sure your server has the `php`, `php-curl`, and `php-gd` packages installed.
+- Make sure your server has the `php`, `php-curl`, `php-gd`, and `openbabel` packages installed.
 - After installing `php-curl`, it's important to restart the web service e.g. `sudo apache2ctl -k restart`.
 - Then open the `www/symlink.sh` file in a text editor, make sure the destination folder is correct (by default it will show `/var/www/html/`
   which is usually correct for Apache2 installations), make sure you have write permissions in the 

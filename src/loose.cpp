@@ -428,14 +428,18 @@ int main(int argc, char** argv)
     Point pt56 = aa6x28->get_CA_location().subtract(aa5x68->get_CA_location());
 
     // TMR6 motion.
-    float theta6_phi_initial = 20;
+    float theta6_phi_initial = 10;
     LocatedVector lv6 = aa6x49->get_phi_vector();
     AminoAcid* aapivot = p1.get_residue(npivot);
-    lv6.origin = aapivot->get_CA_location();
-    p1.rotate_piece(rg6.start, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_phi_initial);
+    int nbend = n6x49;
+    if (l6x48 == 'W') nbend -= 3;
+    AminoAcid* aabend = p1.get_residue(nbend);
+
+    lv6.origin = aabend->get_CA_location();
+    p1.rotate_piece(rg6.start, nbend, lv6.origin, lv6, -fiftyseventh*theta6_phi_initial);
     float theta6_psi_initial = 50;
-    lv6 = aa6x49->get_psi_vector();
-    p1.rotate_piece(rg6.start, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_psi_initial);
+    lv6 = aabend->get_psi_vector();
+    p1.rotate_piece(rg6.start, nbend, lv6.origin, lv6, -fiftyseventh*theta6_psi_initial);
 
     // 5.58 ~ 7.53 contact.
     p1.bridge(n5x58, n7x53);
@@ -443,25 +447,36 @@ int main(int argc, char** argv)
     LocatedVector lv5 = compute_normal(aa5x68->get_CA_location(), aa6x28->get_CA_location(), aa5x50->get_CA_location());
     lv5.origin = aa5x50->get_CA_location();
 
-    float theta5 = fmin(5*fiftyseven, p1.region_can_rotate(n5x50, rg5.end, lv5)/2);
-    p1.rotate_piece(n5x50, rg5.end, lv5.origin, lv5, theta5);
-
-    lv5 = compute_normal(aa5x58->get_CA_location(), aa7x53->get_CA_location(), aa5x50->get_CA_location());
-    theta5 = p1.region_can_rotate(n5x50, rg5.end, lv5, false, 0);
+    float theta5;
     Point pt;
-    float r = p1.contact_dist(n5x58, n7x53);
-    r = fmax(0, r - contact_r_5x58_7x53);
-    if (r)
+    float r, bent5 = 0;
+    for (i=0; i<5; i++)
     {
-        pt = aa7x53->get_reach_atom()->get_location().subtract(aa5x58->get_reach_atom()->get_location());
-        Point pt5x58 = aa5x58->get_reach_atom()->get_location();
-        float f = find_3d_angle(pt5x58, pt5x58.add(pt), lv5.origin);
-        if (f < theta5) theta5 = f;
-
+        theta5 = p1.region_can_rotate(n5x50, rg5.end, lv5)/(1.5+0.5*i);
         p1.rotate_piece(n5x50, rg5.end, lv5.origin, lv5, theta5);
-        cout << "TMR5 bends " << theta5*fiftyseven << "deg, limited by " << *(p1.stop1) << "->" << *(p1.stop2) << endl;
+
+        lv5 = compute_normal(aa5x58->get_CA_location(), aa7x53->get_CA_location(), aa5x50->get_CA_location());
+        theta5 = p1.region_can_rotate(n5x50, rg5.end, lv5, false, 0, rg6.start, n6x49);
+        p1.bridge(n5x58, n7x53);
+        r = p1.contact_dist(n5x58, n7x53);
+        r = fmax(0, r - contact_r_5x58_7x53);
+        if (r)
+        {
+            r = fmax(0, aa5x58->get_CA_location().get_3d_distance(aa7x53->get_CA_location()) - 15);
+            pt = aa7x53->get_reach_atom()->get_location().subtract(aa5x58->get_reach_atom()->get_location());
+            pt.scale(r);
+            Point pt5x58 = aa5x58->get_CA_location();
+            float f = find_3d_angle(pt5x58, pt5x58.add(pt), lv5.origin);
+            if (f < theta5) theta5 = f;
+
+            if (!theta5) break;
+            p1.rotate_piece(n5x50, rg5.end, lv5.origin, lv5, theta5);
+            bent5 += theta5;
+        }
+        else break;
     }
-    else cout << "5.58~7.53 bridge already met." << endl;
+
+    cout << "TMR5 bends " << bent5*fiftyseven << "deg, limited by " << *(p1.stop1) << "->" << *(p1.stop2) << endl;
 
     // Adjust TMR6.
     pt = aa5x68->get_CA_location().add(pt56);
@@ -478,7 +493,7 @@ int main(int argc, char** argv)
         p1.stop2 = aa6x28;
     }
     cout << "TMR6 bends " << (theta6_phi_initial + theta6_psi_initial - theta6 * fiftyseven) << "deg limited by " << *(p1.stop1) << "->" << *(p1.stop2) << endl;
-    p1.rotate_piece(rg6.start, npivot, lv6.origin, lv6, theta6);
+    // p1.rotate_piece(rg6.start, npivot, lv6.origin, lv6, theta6);
 
     p1.bridge(n5x58, n7x53);
     r = p1.contact_dist(n5x58, n7x53);

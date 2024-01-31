@@ -149,19 +149,33 @@ double Neighborhood::total_system_energy()
         for (j=0; j<atomct; j++)
         {
             Atom* a = the_neighborhood.blocks[i].atoms[j];
+            if (a->residue <= 1 && !a->get_molecule())
+            {
+                the_neighborhood.remove_atom(a);
+                continue;
+            }
             Atom* nearby[1024];
             interct = the_neighborhood.fetch_atoms_near(nearby, 1023, a->get_location(), 1);
             for (l=0; l<interct; l++)
             {
                 Atom* b = nearby[l];
-                if (a->is_bonded_to(b)) continue;
+                if (a->is_bonded_to(b) || a->shares_bonded_with(b)) continue;
+                if ((b->residue <= 1 && !b->get_molecule())
+                    ||
+                    atoi(b->name) > 3
+                    )
+                {
+                    the_neighborhood.remove_atom(b);
+                    continue;
+                }
+                if (a->aaletter == 'R' && b->aaletter == 'R' && !strcmp(a->name, "CZ") && !strcmp(b->name, "HE1")) continue;        // KLUDGE!!!
                 if (b > a)
                 {
                     double d = -InteratomicForce::total_binding(a, b);
                     if (d > 1000)
                     {
-                        cout << "CLASH " << a->aa3let << ":" << a->name
-                            << " ! " << b->aa3let << ":" << b->name << ": " << d << endl << flush;
+                        cout << "CLASH " << a->aa3let << a->residue << ":" << a->name
+                            << " ! " << b->aa3let << b->residue << ":" << b->name << ": " << d << endl << flush;
                     }
                     result += d;
                 }

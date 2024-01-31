@@ -13,6 +13,7 @@ class Molecule;
 
 struct Block
 {
+    int serial;
     int cx, cy, cz;
     Atom* atoms[block_max_atoms];
     int atom_count = 0;
@@ -25,6 +26,7 @@ class Neighborhood
     public:
     void add_atom(Atom* neighborly_atom);
     void update_atom(Atom* neighborly_atom, Point old_location);
+    void remove_atom(Atom* vacating_atom);
     int fetch_atoms_near(Atom** results, const int max_results, const Point location, const int depth = 1);
     int fetch_molecules_near(Molecule** results, const int max_results, const Point location, const int depth = 1);
     static double total_system_energy();

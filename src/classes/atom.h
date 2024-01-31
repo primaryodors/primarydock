@@ -323,7 +323,7 @@ public:
     char aa3let[4];					// "
     char* region;					// "
     bool is_backbone=false;			// "
-    char* name;						// "
+    char* name=nullptr;				// "
     bool used = false;      		// Required for certain algorithms such as Molecule::identify_rings().
     int mirror_geo=-1;				// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
     bool flip_mirror=false;			// If true, do trans rather than cis bond conformation.

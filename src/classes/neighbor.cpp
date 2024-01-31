@@ -21,6 +21,9 @@ void Neighborhood::add_atom(Atom* a)
             for (i=0; i<pb->mol_count; i++) if (pb->mols[i] == mol) return;
             pb->mols[pb->mol_count++] = mol;
         }
+
+        /*cout << "Atom located at " << a->get_location() << " belongs to block " << pb->serial
+            << " with xyz = " << pb->cx << "," << pb->cy << "," << pb->cz << "." << endl << flush;*/
     }
     else
     {
@@ -33,7 +36,11 @@ void Neighborhood::add_atom(Atom* a)
         b.atom_count = 1;
         b.mols[0] = mol;
         b.mol_count = 1;
+        b.serial = blocks.size();
         blocks.push_back(b);
+
+        /*cout << "Atom located at " << a->get_location()
+            << " belongs to new block " << b.serial << " with xyz = " << b.cx << "," << b.cy << "," << b.cz << "." << endl << flush;*/
     }
 }
 
@@ -55,6 +62,24 @@ void Neighborhood::update_atom(Atom* a, Point old)
     }
 
     add_atom(a);
+}
+
+void Neighborhood::remove_atom(Atom* a)
+{
+    Block* ob = get_block_from_location(a->get_location());
+    if (ob)
+    {
+        int i, j, n = ob->atom_count;
+        for (i=0; i<n; i++)
+        {
+            if (ob->atoms[i] == a)
+            {
+                for (j=i+1; j<n; j++) ob->atoms[j-1] = ob->atoms[j];
+                ob->atom_count--;
+                break;
+            }
+        }
+    }
 }
 
 int Neighborhood::fetch_atoms_near(Atom** r, const int m, const Point p, const int d)
@@ -106,7 +131,7 @@ Block* Neighborhood::get_block_from_location(Point p)
 
     for (i=0; i<n; i++)
     {
-        if (blocks[i].cx = x && blocks[i].cy == y && blocks[i].cz == z) return &blocks[i];
+        if (blocks[i].cx == x && blocks[i].cy == y && blocks[i].cz == z) return &blocks[i];
     }
 
     return nullptr;
@@ -129,13 +154,14 @@ double Neighborhood::total_system_energy()
             for (l=0; l<interct; l++)
             {
                 Atom* b = nearby[l];
+                if (a->is_bonded_to(b)) continue;
                 if (b > a)
                 {
                     double d = -InteratomicForce::total_binding(a, b);
                     if (d > 1000)
                     {
                         cout << "CLASH " << a->aa3let << ":" << a->name
-                            << " ! " << b->aa3let << ":" << b->name << ": " << d << endl;
+                            << " ! " << b->aa3let << ":" << b->name << ": " << d << endl << flush;
                     }
                     result += d;
                 }

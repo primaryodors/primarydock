@@ -1187,6 +1187,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     if (aaa && !aaa->aabonds)
                     {
                         AminoAcid* tempaa = new AminoAcid(aaa->_1let, 0, false);
+                        tempaa->remove_atoms_from_neighborhood();
                         delete tempaa;
                     }
 
@@ -1688,6 +1689,7 @@ float AminoAcid::similarity_to(const char letter)
     if (aa_sim_xref[i] >= 0) return aa_sim_xref[i];
     
     a = new AminoAcid(letter);
+    a->remove_atoms_from_neighborhood();
     float s = similarity_to(a);
     delete a;
 
@@ -2396,7 +2398,11 @@ void AminoAcid::hydrogenate(bool steric_only)
             if (a && a->is_backbone) continue;
             if (b && b->is_backbone) continue;
 
-            if (!aa_archetypes[aadef->_1let]) aa_archetypes[aadef->_1let] = new AminoAcid(aadef->_1let);
+            if (!aa_archetypes[aadef->_1let])
+            {
+                aa_archetypes[aadef->_1let] = new AminoAcid(aadef->_1let);
+                aa_archetypes[aadef->_1let]->remove_atoms_from_neighborhood();
+            }
             AminoAcid* at = aa_archetypes[aadef->_1let];
             if (!at->get_atom("CB")) continue;
 

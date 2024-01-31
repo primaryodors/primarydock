@@ -384,6 +384,17 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
     }
 }
 
+void Molecule::remove_atoms_from_neighborhood()
+{
+    if (!atoms) return;
+    int i;
+
+    for (i=0; atoms[i]; i++)
+    {
+        the_neighborhood.remove_atom(atoms[i]);
+    }
+}
+
 void Molecule::clear_all_bond_caches()
 {
     if (!atoms) return;

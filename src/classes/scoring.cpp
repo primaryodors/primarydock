@@ -488,6 +488,8 @@ _btyp_unassigned:
         if (dr.do_output_colors) colorless();
     }
 
+    output << "Total system energy: " << Neighborhood::total_system_energy() << endl;
+
     output << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
 
     if (dr.miscdata.size())

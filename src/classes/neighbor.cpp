@@ -33,6 +33,7 @@ void Neighborhood::add_atom(Atom* a)
         b.atom_count = 1;
         b.mols[0] = mol;
         b.mol_count = 1;
+        blocks.push_back(b);
     }
 }
 
@@ -111,10 +112,10 @@ Block* Neighborhood::get_block_from_location(Point p)
     return nullptr;
 }
 
-float Neighborhood::total_system_energy()
+double Neighborhood::total_system_energy()
 {
     int i, j, l, blockct, atomct, interct;
-    float result = 0;
+    double result = 0;
 
     blockct = the_neighborhood.blocks.size();
     for (i=0; i<blockct; i++)
@@ -128,7 +129,16 @@ float Neighborhood::total_system_energy()
             for (l=0; l<interct; l++)
             {
                 Atom* b = nearby[l];
-                if (b > a) result += InteratomicForce::total_binding(a, b);
+                if (b > a)
+                {
+                    double d = -InteratomicForce::total_binding(a, b);
+                    if (d > 1000)
+                    {
+                        cout << "CLASH " << a->aa3let << ":" << a->name
+                            << " ! " << b->aa3let << ":" << b->name << ": " << d << endl;
+                    }
+                    result += d;
+                }
             }
         }
     }

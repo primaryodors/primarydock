@@ -317,7 +317,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* lo
 
     Atom* a = new Atom(elemsym, location, charge);
     a->name = new char[strlen(aname)+1];
-    a->residue = 0;
+    a->residue = is_residue();
     a->mol = this;
     strcpy(a->name, aname);
     if (bond_to && bcard) a->bond_to(bond_to, bcard);

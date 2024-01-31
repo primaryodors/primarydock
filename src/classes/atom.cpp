@@ -872,6 +872,11 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
     int i;
 
     geometry_dirty = true;
+    if (!mol)
+    {
+        mol = lbtom->mol;
+        residue = lbtom->residue;
+    }
 
     // if (this < lbtom && Z > 1 && lbtom->Z > 1) cout << "Bond " << name << cardinality_printable(lcard) << lbtom->name << endl;
 

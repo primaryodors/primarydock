@@ -27,6 +27,7 @@ class Neighborhood
     void update_atom(Atom* neighborly_atom, Point old_location);
     int fetch_atoms_near(Atom** results, const int max_results, const Point location, const int depth = 1);
     int fetch_molecules_near(Molecule** results, const int max_results, const Point location, const int depth = 1);
+    static float total_system_energy();
 
     protected:
     // TODO: Want some kind of index on cx, cy, cz values.
@@ -35,5 +36,6 @@ class Neighborhood
 };
 
 extern Neighborhood the_neighborhood;
+
 
 #endif

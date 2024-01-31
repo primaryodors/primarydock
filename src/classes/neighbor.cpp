@@ -110,3 +110,28 @@ Block* Neighborhood::get_block_from_location(Point p)
 
     return nullptr;
 }
+
+float Neighborhood::total_system_energy()
+{
+    int i, j, l, blockct, atomct, interct;
+    float result = 0;
+
+    blockct = the_neighborhood.blocks.size();
+    for (i=0; i<blockct; i++)
+    {
+        atomct = the_neighborhood.blocks[i].atom_count;
+        for (j=0; j<atomct; j++)
+        {
+            Atom* a = the_neighborhood.blocks[i].atoms[j];
+            Atom* nearby[1024];
+            interct = the_neighborhood.fetch_atoms_near(nearby, 1023, a->get_location(), 1);
+            for (l=0; l<interct; l++)
+            {
+                Atom* b = nearby[l];
+                if (b > a) result += InteratomicForce::total_binding(a, b);
+            }
+        }
+    }
+
+    return result;
+}

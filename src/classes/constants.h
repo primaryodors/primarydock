@@ -127,7 +127,7 @@
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 4.0
+#define lmpush 0.5
 #define lmpull 0.3
 #define lmsteps 3
 #define recapture_ejected_ligand 0
@@ -393,7 +393,7 @@
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0
 #define _DBG_TUMBLE_SPHERES 0
-#define _dbg_worst_energy 0
+#define _dbg_worst_energy 1
 #define _debug_active_bond_rot 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0

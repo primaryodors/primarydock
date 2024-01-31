@@ -2831,20 +2831,25 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 clash2 = ligands[l]->atoms[j];
                             }
 
-                            if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
+                            if (/*ligands[l]->is_residue() &&*/ movability >= MOV_ALL)
                             {
-                                Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
-                                ptd.multiply(fmin(fabs(-abind) / 1000, 1));
-                                lmx += lmpush * sgn(ptd.x);
-                                lmy += lmpush * sgn(ptd.y);
-                                lmz += lmpush * sgn(ptd.z);
+                                if (abind < 0)
+                                {
+                                    Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
+                                    ptd.multiply(fmin(fabs(-abind) / 100, 1));
+                                    lmx += lmpush * sgn(ptd.x);
+                                    lmy += lmpush * sgn(ptd.y);
+                                    lmz += lmpush * sgn(ptd.z);
+                                }
+                                else
+                                {
+                                    Point mc = missed_connection;
+                                    lmx += lmpull * mc.x;
+                                    lmy += lmpull * mc.y;
+                                    lmz += lmpull * mc.z;
+                                }
                             }
                         }
-                        Point mc = missed_connection;
-                        // cout << mc << endl;
-                        lmx += lmpull * mc.x;
-                        lmy += lmpull * mc.y;
-                        lmz += lmpull * mc.z;
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                 }

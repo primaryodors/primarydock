@@ -732,6 +732,11 @@ void iteration_callback(int iter, Molecule** mols)
             fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
             int foff = 0;
 
+            DockResult dr(protein, ligand, size, addl_resno, pose, differential_dock);
+            std::stringstream drdat;
+            drdat << dr << endl;
+            fprintf(fp, "%s", drdat.str().c_str());
+
             for (i=0; reaches_spheroid[nodeno][i]; i++)
             {
                 reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
@@ -3120,7 +3125,7 @@ _try_again:
                 if (dr[drcount][nodeno].worst_energy > l_atom_clash_limit)
                 {
                     #if _dbg_worst_energy
-                    cout << "Total binding energy " << dr[drcount][nodeno].kJmol
+                    cout << "Total binding energy " << -dr[drcount][nodeno].kJmol
                         << " and worst energy " << dr[drcount][nodeno].worst_energy;
                     if (dr[drcount][nodeno].worst_clash_1 && dr[drcount][nodeno].worst_clash_2)
                     {
@@ -3177,7 +3182,10 @@ _try_again:
             if ((btot < kJmol_cutoff || we > clash_limit_per_atom || weaa > clash_limit_per_aa) && !differential_dock)
             {
                 #if _dbg_worst_energy
-                cout << "Total binding energy " << -btot << " and worst energy " << we << "; skipping." << endl << endl;
+                cout << "Total binding energy " << -btot
+                    << " & worst energy " << we
+                    << " & worst aa energy " << weaa
+                    << "; skipping." << endl << endl;
                 #endif
                 drcount++;
                 break;

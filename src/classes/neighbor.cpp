@@ -1,7 +1,7 @@
 
 #include "neighbor.h"
 #include "atom.h"
-#include "molecule.h"
+#include "protein.h"
 
 Neighborhood the_neighborhood;
 
@@ -82,9 +82,45 @@ void Neighborhood::remove_atom(Atom* a)
     }
 }
 
+void Neighborhood::set_active_protein(Protein* p)
+{
+    int i, n = p->get_end_resno();
+
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid* aa = p->get_residue(i);
+        if (!aa) continue;
+
+        set_active_ligand(aa);
+    }
+}
+
+void Neighborhood::set_active_ligand(Molecule* m)
+{
+    int i, n = m->get_atom_count();
+    for (i=0; i<n; i++)
+    {
+        Atom* a = m->get_atom(i);
+        if (!a) continue;
+        a->active_neighbor = true;
+        actives.push_back(a);
+    }
+}
+
+void Neighborhood::clear_active_neighbors()
+{
+    int i, n = actives.size();
+    for (i=0; i<n; i++)
+    {
+        actives[i]->active_neighbor = false;
+    }
+    actives.clear();
+}
+
+
 int Neighborhood::fetch_atoms_near(Atom** r, const int m, const Point p, const int d)
 {
-    int i, j, n = blocks.size(), count = 0;
+    int i, j, l, n = blocks.size(), count = 0;
     if (!n) return 0;
 
     int x = round(p.x / block_size), y = round(p.y / block_size), z = round(p.z / block_size);
@@ -93,11 +129,19 @@ int Neighborhood::fetch_atoms_near(Atom** r, const int m, const Point p, const i
     {
         if (abs(blocks[i].cx - x) <= d && abs(blocks[i].cy - y) <= d && abs(blocks[i].cz - z) <= d)
         {
-            n = blocks[i].atom_count;
-            for (j=0; j<n; j++) r[count++] = blocks[i].atoms[j];
+            l = blocks[i].atom_count;
+            for (j=0; j<l; j++)
+            {
+                if (blocks[i].atoms[j]->active_neighbor)
+                {
+                    r[count++] = blocks[i].atoms[j];
+                    if (count >= m) goto _too_many_atoms;
+                }
+            }
         }
     }
 
+    _too_many_atoms:
     r[count] = nullptr;
     return count;
 }
@@ -114,10 +158,15 @@ int Neighborhood::fetch_molecules_near(Molecule** r, const int m, const Point p,
         if (abs(blocks[i].cx - x) <= d && abs(blocks[i].cy - y) <= d && abs(blocks[i].cz - z) <= d)
         {
             n = blocks[i].mol_count;
-            for (j=0; j<n; j++) r[count++] = blocks[i].mols[j];
+            for (j=0; j<n; j++)
+            {
+                r[count++] = blocks[i].mols[j];
+                if (count >= m) goto _too_many_mols;
+            }
         }
     }
 
+    _too_many_mols:
     r[count] = nullptr;
     return count;
 }
@@ -149,34 +198,23 @@ double Neighborhood::total_system_energy()
         for (j=0; j<atomct; j++)
         {
             Atom* a = the_neighborhood.blocks[i].atoms[j];
-            if (a->residue <= 1 && !a->get_molecule())
-            {
-                the_neighborhood.remove_atom(a);
-                continue;
-            }
-            Atom* nearby[1024];
-            interct = the_neighborhood.fetch_atoms_near(nearby, 1023, a->get_location(), 1);
+            if (!a->active_neighbor) continue;
+            Atom* nearby[16384];
+            interct = the_neighborhood.fetch_atoms_near(nearby, 16380, a->get_location(), 1);
             for (l=0; l<interct; l++)
             {
                 Atom* b = nearby[l];
                 if (a->is_bonded_to(b) || a->shares_bonded_with(b)) continue;
-                if ((b->residue <= 1 && !b->get_molecule())
-                    ||
-                    atoi(b->name) > 3
-                    )
-                {
-                    the_neighborhood.remove_atom(b);
-                    continue;
-                }
+                if (!b->active_neighbor) continue;
                 if (a->aaletter == 'R' && b->aaletter == 'R' && !strcmp(a->name, "CZ") && !strcmp(b->name, "HE1")) continue;        // KLUDGE!!!
                 if (b > a)
                 {
                     double d = -InteratomicForce::total_binding(a, b);
-                    if (d > 1000)
+                    /*if (d > 1000)
                     {
                         cout << "CLASH " << a->aa3let << a->residue << ":" << a->name
                             << " ! " << b->aa3let << b->residue << ":" << b->name << ": " << d << endl << flush;
-                    }
+                    }*/
                     result += d;
                 }
             }

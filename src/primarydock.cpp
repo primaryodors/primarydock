@@ -2250,10 +2250,12 @@ _try_again:
         region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
     }
 
+    the_neighborhood.clear_active_neighbors();
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
         ligand->movability = MOV_ALL;
+        the_neighborhood.set_active_ligand(ligand);
 
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
@@ -2277,10 +2279,10 @@ _try_again:
             }
         }
 
-
         // delete protein;
         // protein = new Protein(protfname);
         protein = &pose_proteins[pose-1];
+        the_neighborhood.set_active_protein(protein);
 
         if (temp_pdb_file.length())
         {

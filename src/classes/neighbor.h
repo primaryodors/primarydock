@@ -30,11 +30,15 @@ class Neighborhood
     int fetch_atoms_near(Atom** results, const int max_results, const Point location, const int depth = 1);
     int fetch_molecules_near(Molecule** results, const int max_results, const Point location, const int depth = 1);
     static double total_system_energy();
+    void set_active_protein(Protein* p);
+    void set_active_ligand(Molecule* m);
+    void clear_active_neighbors();
 
     protected:
     // TODO: Want some kind of index on cx, cy, cz values.
     std::vector<Block> blocks;
     Block* get_block_from_location(Point location);
+    std::vector<Atom*> actives;
 };
 
 extern Neighborhood the_neighborhood;

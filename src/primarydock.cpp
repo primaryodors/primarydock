@@ -2260,7 +2260,6 @@ _try_again:
     {
         ligand = &pose_ligands[pose];
         ligand->movability = MOV_ALL;
-        the_neighborhood.set_active_ligand(ligand);
 
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
@@ -2288,6 +2287,8 @@ _try_again:
         // protein = new Protein(protfname);
         protein = &pose_proteins[pose-1];
         the_neighborhood.set_active_protein(protein);
+        the_neighborhood.set_initial_energy();
+        the_neighborhood.set_active_ligand(ligand);
 
         if (temp_pdb_file.length())
         {

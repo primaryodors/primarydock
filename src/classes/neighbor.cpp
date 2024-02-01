@@ -191,16 +191,16 @@ double Neighborhood::total_system_energy()
     int i, j, l, blockct, atomct, interct;
     double result = 0;
 
-    blockct = the_neighborhood.blocks.size();
+    blockct = blocks.size();
     for (i=0; i<blockct; i++)
     {
-        atomct = the_neighborhood.blocks[i].atom_count;
+        atomct = blocks[i].atom_count;
         for (j=0; j<atomct; j++)
         {
-            Atom* a = the_neighborhood.blocks[i].atoms[j];
+            Atom* a = blocks[i].atoms[j];
             if (!a->active_neighbor) continue;
             Atom* nearby[16384];
-            interct = the_neighborhood.fetch_atoms_near(nearby, 16380, a->get_location(), 1);
+            interct = fetch_atoms_near(nearby, 16380, a->get_location(), 1);
             for (l=0; l<interct; l++)
             {
                 Atom* b = nearby[l];
@@ -222,4 +222,14 @@ double Neighborhood::total_system_energy()
     }
 
     return result;
+}
+
+void Neighborhood::set_initial_energy()
+{
+    initial_energy = total_system_energy();
+}
+
+double Neighborhood::total_energy_delta()
+{
+    return total_system_energy() - initial_energy;
 }

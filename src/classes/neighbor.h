@@ -29,7 +29,9 @@ class Neighborhood
     void remove_atom(Atom* vacating_atom);
     int fetch_atoms_near(Atom** results, const int max_results, const Point location, const int depth = 1);
     int fetch_molecules_near(Molecule** results, const int max_results, const Point location, const int depth = 1);
-    static double total_system_energy();
+    double total_system_energy();
+    void set_initial_energy();
+    double total_energy_delta();
     void set_active_protein(Protein* p);
     void set_active_ligand(Molecule* m);
     void clear_active_neighbors();
@@ -39,6 +41,7 @@ class Neighborhood
     std::vector<Block> blocks;
     Block* get_block_from_location(Point location);
     std::vector<Atom*> actives;
+    double initial_energy = 0;
 };
 
 extern Neighborhood the_neighborhood;

@@ -202,12 +202,11 @@ void Pose::restore_state(Molecule* m)
     }
 }
 
-
-
 void Molecule::delete_atom(Atom* a)
 {
     if (!a) return;
     paths = nullptr;
+    a->mol = nullptr;
 
     int i, j;
 
@@ -318,7 +317,8 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* lo
 
     Atom* a = new Atom(elemsym, location, charge);
     a->name = new char[strlen(aname)+1];
-    a->residue = 0;
+    a->residue = is_residue();
+    a->mol = this;
     strcpy(a->name, aname);
     if (bond_to && bcard) a->bond_to(bond_to, bcard);
 
@@ -344,6 +344,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
     Atom* a = new Atom(elemsym);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
+    a->mol = this;
     strcpy(a->name, aname);
 
     try
@@ -380,6 +381,17 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
                  << " cardinality " << bcard
                  << ". Please check bindings.dat." << endl;
         throw 0xbad6160;
+    }
+}
+
+void Molecule::remove_atoms_from_neighborhood()
+{
+    if (!atoms) return;
+    int i;
+
+    for (i=0; atoms[i]; i++)
+    {
+        the_neighborhood.remove_atom(atoms[i]);
     }
 }
 
@@ -4755,7 +4767,7 @@ bool Molecule::ring_is_coplanar(int ringid)
 bool Molecule::ring_is_aromatic(int ringid) const
 {
     if (!rings) return false;
-    return rings[ringid]->get_type() == AROMATIC;
+    return rings[ringid]->get_type() == RT_AROMATIC;
 }
 
 Point Molecule::get_ring_center(int ringid)

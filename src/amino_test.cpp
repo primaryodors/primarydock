@@ -129,6 +129,7 @@ int main(int argc, char** argv)
             for (i=0; i<n; i++)
             {
                 all_aa[i] = new AminoAcid(all_letters[i]);
+                all_aa[i]->remove_atoms_from_neighborhood();
                 cout << all_letters[i] << " ";
             }
             cout << endl;

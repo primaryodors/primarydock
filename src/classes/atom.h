@@ -4,7 +4,7 @@
 #include <vector>
 #include <iomanip>
 #include <memory>
-#include "point.h"
+#include "neighbor.h"
 
 #ifndef _ATOM
 #define _ATOM
@@ -81,11 +81,11 @@ protected:
 
 enum RING_TYPE
 {
-    AROMATIC,
-    ANTIAROMATIC,
-    COPLANAR,
-    OTHER,
-    UNKNOWN
+    RT_AROMATIC,
+    RT_ANTIAROMATIC,
+    RT_COPLANAR,
+    RT_OTHER,
+    RT_UNKNOWN
 };
 
 class Ring
@@ -115,17 +115,19 @@ public:
 protected:
     Atom* atoms[256];
     int atcount = 0;
-    RING_TYPE type = UNKNOWN;
+    RING_TYPE type = RT_UNKNOWN;
 
     void fill_with_atoms(Atom** from_atoms);
     void determine_type();
     void make_coplanar();
 };
 
+class Molecule;
 class Atom
 {
     friend class Bond;
     friend class Ring;
+    friend class Molecule;
 
 public:
     // Constructors and destructors.
@@ -177,6 +179,10 @@ public:
     bool is_pi();
     bool is_amide();
     bool is_aldehyde();
+    Molecule* get_molecule()
+    {
+        return mol;
+    }
 
     // Setters.
     void set_aa_properties();
@@ -317,7 +323,7 @@ public:
     char aa3let[4];					// "
     char* region;					// "
     bool is_backbone=false;			// "
-    char* name;						// "
+    char* name=nullptr;				// "
     bool used = false;      		// Required for certain algorithms such as Molecule::identify_rings().
     int mirror_geo=-1;				// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
     bool flip_mirror=false;			// If true, do trans rather than cis bond conformation.
@@ -328,6 +334,7 @@ public:
     Atom* strongest_bind_atom = nullptr;
     float shielding_angle = 0;
     char pdbchain = ' ';
+    bool active_neighbor = false;
     bool doing_ring_closure = false;
     Conjugation* conjugation = nullptr;
 
@@ -338,6 +345,7 @@ public:
 protected:
     int Z=0;
     Point location;
+    Molecule* mol = nullptr;
     int valence=0;
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
     bool geometry_dirty = true;

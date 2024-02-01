@@ -1187,6 +1187,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     if (aaa && !aaa->aabonds)
                     {
                         AminoAcid* tempaa = new AminoAcid(aaa->_1let, 0, false);
+                        tempaa->remove_atoms_from_neighborhood();
                         delete tempaa;
                     }
 
@@ -1688,6 +1689,7 @@ float AminoAcid::similarity_to(const char letter)
     if (aa_sim_xref[i] >= 0) return aa_sim_xref[i];
     
     a = new AminoAcid(letter);
+    a->remove_atoms_from_neighborhood();
     float s = similarity_to(a);
     delete a;
 
@@ -1787,7 +1789,7 @@ Ring* AminoAcid::get_most_distal_arom_ring()
     float r = 0;
     for (i=0; rings[i]; i++)
     {
-        if (rings[i]->get_type() == AROMATIC)
+        if (rings[i]->get_type() == RT_AROMATIC)
         {
             float lr = caloc.get_3d_distance(rings[i]->get_center());
             if ((lr > r) || !i)
@@ -1850,7 +1852,7 @@ bool AminoAcid::is_tyrosine_like()
 
     for (i=0; rings[i]; i++)
     {
-        if (rings[i]->get_type() == AROMATIC) has_aromatic_ring = true;
+        if (rings[i]->get_type() == RT_AROMATIC) has_aromatic_ring = true;
         #if DBG_TYRLIKE
         cout << "Ring " << i << " type " << rings[i]->get_type() << endl;
         #endif
@@ -1877,7 +1879,7 @@ bool AminoAcid::is_tyrosine_like()
                 bool atom_is_in_ring = atoms[i]->is_in_ring(rings[j]);
                 if (!atom_is_in_ring) continue;
 
-                bool ring_is_aromatic = rings[j]->get_type() == AROMATIC;
+                bool ring_is_aromatic = rings[j]->get_type() == RT_AROMATIC;
                 if (!ring_is_aromatic) continue;
 
                 #if DBG_TYRLIKE
@@ -2396,7 +2398,11 @@ void AminoAcid::hydrogenate(bool steric_only)
             if (a && a->is_backbone) continue;
             if (b && b->is_backbone) continue;
 
-            if (!aa_archetypes[aadef->_1let]) aa_archetypes[aadef->_1let] = new AminoAcid(aadef->_1let);
+            if (!aa_archetypes[aadef->_1let])
+            {
+                aa_archetypes[aadef->_1let] = new AminoAcid(aadef->_1let);
+                aa_archetypes[aadef->_1let]->remove_atoms_from_neighborhood();
+            }
             AminoAcid* at = aa_archetypes[aadef->_1let];
             if (!at->get_atom("CB")) continue;
 

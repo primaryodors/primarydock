@@ -39,7 +39,7 @@ foreach ($dock_results as $protid => $dr)
     }
 }
 
-
+/*
 $md5 = md5($odor['smiles']);
 $imgfname = "assets/pngs/$md5.png";
 if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
@@ -105,7 +105,7 @@ if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
         fclose($fp);
     }
     else die("Failed to open $imgfname for writing!");
-}
+}*/
 
 $page_title = $odor['full_name'];
 $extra_js = ['js/tabs.js'];
@@ -153,9 +153,11 @@ function load_viewer(obj)
 
 window.setTimeout( function()
 {
+    $('#skeletal')[0].innerHTML = svg_from_smiles('<?php echo str_replace("\\", "\\\\", $odor['smiles']); ?>', 300, 300);
     var boundary = parseInt($(".tab")[0].getClientRects()[0].bottom);
     $("#tabAroma").click();
 }, 123);
+
 
 </script>
 <div class="tab" style="display: inline-block; margin-top: 30px;">
@@ -175,7 +177,7 @@ window.setTimeout( function()
 
 <div class="scrollw">
     <div>
-        <img class="skeletal" src="<?php echo $imgfname; ?>">
+        <div id="skeletal">&nbsp;</div>
         <img class="barchart" src="barchart.php?o=<?php echo urlencode($odor['smiles']); ?>">
     </div>
 </div>

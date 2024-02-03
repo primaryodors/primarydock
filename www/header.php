@@ -16,6 +16,18 @@ if ($extra_js  && !is_array($extra_js )) $extra_js  = [$extra_js ];
     <head>
         <title><?php echo @$page_title ?: @$customizations['title'] ?: "PrimaryDock Web App"; ?></title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://www.lactame.com/lib/openchemlib/5.2.0/openchemlib-minimal.js"></script>
+        <script>
+        function svg_from_smiles(smiles, w, h)
+        {
+            var molecule=OCL.Molecule.fromSmiles(smiles);
+            return molecule.toSVG(w, h, Math.random.toString(36), {fontWeight: 900})
+                .replace(/rgb\(0,0,0\)/g,"rgb(255,255,255)")
+                .replace(/fill=\"rgb\(160,0,0\)\">.*<\/text/g, '></text')
+                .replace(/rgb\(160,0,0\)/g,"rgb(170,187,204)")
+                ;
+        }
+        </script>
         <link rel="stylesheet" href="assets/style.css?<?php echo time();?>">
 
         <?php 

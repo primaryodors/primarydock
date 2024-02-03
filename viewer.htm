@@ -2689,6 +2689,7 @@ function load_remote_pdb(pdburl)
 
 function load_remote_sdf(sdfurl)
 {
+	$("#pleasewait").show();
 	stage.removeAllComponents();
 	gmodel = [];
 	gmvisible = [];
@@ -2725,6 +2726,7 @@ function load_remote_sdf(sdfurl)
 				gmrep.push(reptype);
 				gmrparams.push(rparam);
 		        comp.autoView();
+				$("#pleasewait").hide();
 		    } );
 		}
 	});

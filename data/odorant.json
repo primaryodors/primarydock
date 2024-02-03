@@ -29698,6 +29698,13 @@
     {
         "full_name": "hivernal",
         "smiles": "c1c(CCC=O)cc2c(c1)C(C)(C)CC2",
+        "isomers":
+        {
+            "4": "c1cc(CCC=O)c2c(c1)C(C)(C)CC2",
+            "5": "c1c(CCC=O)cc2c(c1)C(C)(C)CC2",
+            "6": "c1(CCC=O)ccc2c(c1)C(C)(C)CC2",
+            "7": "c1ccc2c(c1(CCC=O))C(C)(C)CC2"
+        },
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -29710,7 +29717,6 @@
                 "laundered_cloth"
             ]
         },
-        "comment": "This structure represents one isomer. The actual substance is a mixture of isomers that vary by which aryl carbon attaches to the propanal group.",
         "oid": "ce80b5519d0fb549ac4016ff788486cb"
     },
     "d0a6910e697722b693023d286f5e8c4d":

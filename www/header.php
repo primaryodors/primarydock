@@ -28,6 +28,11 @@ if ($extra_js  && !is_array($extra_js )) $extra_js  = [$extra_js ];
                 ;
         }
         </script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <?php if (@$customizations['logo']['font']) { ?>
+            <link href="<?php echo $customizations['logo']['font']; ?>&display=swap" rel="stylesheet">
+        <?php } ?>
         <link rel="stylesheet" href="assets/style.css?<?php echo time();?>">
 
         <?php 
@@ -41,11 +46,20 @@ if ($extra_js  && !is_array($extra_js )) $extra_js  = [$extra_js ];
         ?>
     </head>
     <body>
-        <div id="logo">
+        <div id="logo" style="<?php
+        if (@$customizations['logo']['font'])
+        {
+            $pieces = explode("family=", $customizations['logo']['font']);
+            $pieces = explode('&', $pieces[1]);
+            echo " font-family: {$pieces[0]};";
+        }
+        ?>">
             <?php if (@$customizations['logo']['href']) echo "<a href=\"{$customizations['logo']['href']}\">"; ?>
             <img src="<?php echo @$customizations['logo']['url'] ?: "assets/logo.png"; ?>"
                alt="<?php echo @$customizations['logo']['alt'] ?: "Main Logo"; ?>"
-               style="float: left;">            
+               style="float: left;<?php
+               if (@$customizations['logo']['height']) echo " height: {$customizations['logo']['height']};";
+               ?>">            
             <?php if (@$customizations['logo']['text']) echo "<h2>{$customizations['logo']['text']}</h2>"; ?>
             <?php if (@$customizations['logo']['href']) echo "</a>"; ?>
         </div>

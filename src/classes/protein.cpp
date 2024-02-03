@@ -508,6 +508,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
 
                 Atom* ia = residues[i]->get_nearest_atom(residues[j]->get_CA_location());
                 Atom* ja = residues[j]->get_nearest_atom(ia->get_location());
+                if (!ia || !ja) continue;
                 r = ia->distance_to(ja);
                 if (r > ia->get_vdW_radius() + ja->get_vdW_radius()) continue;
 

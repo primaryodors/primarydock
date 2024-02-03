@@ -319,7 +319,7 @@ public:
     float pK = nanf("n/a");         // To be managed and used by external classes.
     int pdbidx=0;                   // "
     int residue=0;					// "
-    char aaletter;					// "
+    char aaletter=0;				// "
     char aa3let[4];					// "
     char* region;					// "
     bool is_backbone=false;			// "

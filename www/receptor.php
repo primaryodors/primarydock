@@ -746,7 +746,8 @@ foreach ($pairs as $oid => $pair)
     echo "<tr>\n";
     echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
 
-    echo " onmouseenter=\"showSkeletal(event, '{$odor['smiles']}');\"";
+    $smilesesc = str_replace("\\", "\\\\", $odor['smiles']);
+    echo " onmouseenter=\"showSkeletal(event, '$smilesesc');\"";
     echo " onmouseout=\"$('#skeletal').hide();\"";
     echo ">{$odor['full_name']}</a>";
     echo "</td>\n";
@@ -791,7 +792,8 @@ if (count($predictions))
             echo "<tr>\n";
             echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
         
-            echo " onmouseenter=\"showSkeletal(event, '{$lodor['smiles']}');\"";
+            $smilesesc = str_replace("\\", "\\\\", $lodor['smiles']);
+            echo " onmouseenter=\"showSkeletal(event, '$smilesesc');\"";
             echo " onmouseout=\"$('#skeletal').hide();\"";
             echo ">{$lodor['full_name']}</td>\n";
             echo "<td>&nbsp;</td>\n";

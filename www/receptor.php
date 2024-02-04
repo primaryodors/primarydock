@@ -238,22 +238,12 @@ function load_viewer(obj)
     }
 }
 
-function showSkeletal(e, img)
+function showSkeletal(e, smiles)
 {
     var skeletal = $("#skeletal")[0];
     skeletal.style.left = `${e.pageX}px`;
     skeletal.style.top = `${e.pageY}px`;
-    skeletal.innerText = "Please wait...";
-    
-	$.ajax(
-	{
-		url: img,
-		cache: false,
-		success: function(result)
-		{
-            skeletal.innerHTML = result;
-        }
-    });
+    skeletal.innerHTML = svg_from_smiles(smiles, 300, 300);
 
     $(skeletal).show();
 }
@@ -756,9 +746,7 @@ foreach ($pairs as $oid => $pair)
     echo "<tr>\n";
     echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
 
-    $skelurl = "skeletal.php?oid=$oid";
-
-    echo " onmouseenter=\"showSkeletal(event, '$skelurl');\"";
+    echo " onmouseenter=\"showSkeletal(event, '{$odor['smiles']}');\"";
     echo " onmouseout=\"$('#skeletal').hide();\"";
     echo ">{$odor['full_name']}</a>";
     echo "</td>\n";
@@ -802,10 +790,8 @@ if (count($predictions))
             $lodor = $odors[$oid];
             echo "<tr>\n";
             echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
-
-            $skelurl = "skeletal.php?oid=$oid";
         
-            echo " onmouseenter=\"showSkeletal(event, '$skelurl');\"";
+            echo " onmouseenter=\"showSkeletal(event, '{$lodor['smiles']}');\"";
             echo " onmouseout=\"$('#skeletal').hide();\"";
             echo ">{$lodor['full_name']}</td>\n";
             echo "<td>&nbsp;</td>\n";

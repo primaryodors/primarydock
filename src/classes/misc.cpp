@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <fstream>
+#include <unistd.h>
 #include <sys/stat.h>
 #include "point.h"
 
@@ -28,6 +29,14 @@ int active_persistence_resno[active_persistence_limit];
 #if active_persistence_noflex
 bool allow_ligand_flex = true;
 #endif
+
+// https://stackoverflow.com/a/6039648/18753403
+long GetFileSize(std::string filename)
+{
+    struct stat stat_buf;
+    int rc = stat(filename.c_str(), &stat_buf);
+    return rc == 0 ? stat_buf.st_size : -1;
+}
 
 int in_array(void* needle, void** haystack)
 {

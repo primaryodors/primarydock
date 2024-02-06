@@ -3181,6 +3181,7 @@ _try_again:
                 #endif
             }
 
+            the_neighborhood.clear_active_neighbors();
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
             if ((btot < kJmol_cutoff || we > clash_limit_per_atom || weaa > clash_limit_per_aa) && !differential_dock)
@@ -3216,8 +3217,11 @@ _try_again:
     {
         for (j=0; j<poses; j++)
         {
+            the_neighborhood.clear_active_neighbors();
             protein = &pose_proteins[j];
             ligand = &pose_ligands[j+1];
+            the_neighborhood.set_active_protein(protein);
+            the_neighborhood.set_active_ligand(ligand);
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
@@ -3412,21 +3416,26 @@ _exitposes:
     if (debug) *debug << "\nCalculation took: " << (finished-began) << " seconds." << endl;
 
     if (output) output->close();
+    the_neighborhood.clear_active_neighbors();
     if (append_pdb)
     {
         if (output)
         {
-            pf = fopen(temp_pdb_file.length() ? temp_pdb_file.c_str() : protfname, "r");
+            std::string append_fname = temp_pdb_file.length() ? temp_pdb_file.c_str() : protfname;
+            int fsz = GetFileSize(append_fname);
+            char abuf[fsz+1024];
+            pf = fopen(append_fname.c_str(), "r");
             if (!pf)
             {
                 cout << "Error trying to read " << protfname << endl;
                 return 0xbadf12e;
             }
-            protein->load_pdb(pf);
+            fread(abuf, sizeof(char), fsz, pf);
+            // protein->load_pdb(pf);
             fclose(pf);
             FILE* pf = fopen(outfname, "ab");
-            fprintf(pf, "\nOriginal PDB:\n");
-            protein->save_pdb(pf);
+            fprintf(pf, "\nOriginal PDB:\n%s\n", abuf);
+            // protein->save_pdb(pf);
             fclose(pf);
             cout << "PDB appended to output file." << endl;
         }

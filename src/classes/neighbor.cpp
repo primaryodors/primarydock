@@ -204,19 +204,26 @@ double Neighborhood::total_system_energy()
             for (l=0; l<interct; l++)
             {
                 Atom* b = nearby[l];
+                if (b <= a) continue;
                 if (a->is_bonded_to(b) || a->shares_bonded_with(b)) continue;
                 if (!b->active_neighbor) continue;
-                if (a->aaletter == 'R' && b->aaletter == 'R' && !strcmp(a->name, "CZ") && !strcmp(b->name, "HE1")) continue;        // KLUDGE!!!
-                if (b > a)
+                if (a->residue == b->residue)
                 {
-                    double d = -InteratomicForce::total_binding(a, b);
-                    /*if (d > 1000)
+                    if (a->aaletter == 'R' && b->aaletter == 'R' && !strcmp(a->name, "CZ") && !strcmp(b->name, "HE1")) continue;        // KLUDGE!!!
+                    if (!strcmp(a->name, b->name))
                     {
-                        cout << "CLASH " << a->aa3let << a->residue << ":" << a->name
-                            << " ! " << b->aa3let << b->residue << ":" << b->name << ": " << d << endl << flush;
-                    }*/
-                    result += d;
+                        cout << "Active neighbor fault." << endl;
+                        throw -1;
+                    }
                 }
+                
+                double d = -InteratomicForce::total_binding(a, b);
+                /*if (d > 1000)
+                {
+                    cout << "CLASH " << a->aa3let << a->residue << ":" << a->name
+                        << " ! " << b->aa3let << b->residue << ":" << b->name << ": " << d << endl << flush;
+                }*/
+                result += d;
             }
         }
     }

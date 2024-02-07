@@ -4039,6 +4039,12 @@ void Protein::minimize_residue_clashes(int resno)
     aa->movability = mt[0];
 }
 
+void Protein::minimize_internal_clashes()
+{
+    int i, n = get_end_resno();
+    for (i=1; i<=n; i++) minimize_residue_clashes(i);
+}
+
 float Protein::binding_to_nearby_residues(int resno)
 {
     AminoAcid** caa = get_residues_can_clash(resno);

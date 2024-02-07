@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "molecule.h"
 #include "aminoacid.h"
+#include "neighbor.h"
 
 #define _DBGCLSLOOP 0
 

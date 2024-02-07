@@ -161,6 +161,7 @@ public:
     Point find_loneliest_point(Point search_center, Point spheroid_size);
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
     float binding_to_nearby_residues(int resno);
+    void minimize_internal_clashes();
     void minimize_residue_clashes(int resno);
     float region_can_move(int startres, int endres, SCoord direction, bool repack = false, int ignore_startres = 0, int ignore_endres = 0);
     float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false, float extra_clash_allowance = 0, int ignore_startres = 0, int ignore_endres = 0);     // Searches positive theta.

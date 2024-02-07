@@ -489,6 +489,12 @@ _btyp_unassigned:
     }
 
     output << "Total system energy: " << the_neighborhood.total_energy_delta() << endl;
+    if (the_neighborhood.get_worst_clash() >= 1e4)
+    {
+        output << "Worst neighbor clash: ";
+        the_neighborhood.output_worst_clash(output);
+        output << endl;
+    }
 
     output << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
 

@@ -6,7 +6,7 @@
 #define _NEIGHBOR
 
 #define block_size 8.0
-#define block_max_atoms 1024
+#define block_max_atoms 8192
 
 class Atom;
 class Molecule;
@@ -32,9 +32,13 @@ class Neighborhood
     double total_system_energy();
     void set_initial_energy();
     double total_energy_delta();
+    double total_molecule_energy(Molecule* mol);
     void set_active_protein(Protein* p);
     void set_active_ligand(Molecule* m);
     void clear_active_neighbors();
+
+    double get_worst_clash() { return worst_neighbor_clash; }
+    void output_worst_clash(std::ostream& os);
 
     protected:
     // TODO: Want some kind of index on cx, cy, cz values.
@@ -42,6 +46,8 @@ class Neighborhood
     Block* get_block_from_location(Point location);
     std::vector<Atom*> actives;
     double initial_energy = 0;
+    Atom *worst_clash_1, *worst_clash_2;
+    double worst_neighbor_clash = 0;
 };
 
 extern Neighborhood the_neighborhood;

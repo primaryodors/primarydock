@@ -1801,6 +1801,11 @@ int main(int argc, char** argv)
                     {
                         res->hydrogenate();
 
+                        if (resno == 301)
+                        {
+                            n++;
+                        }
+
                         AminoAcid** rcc = working->get_residues_can_clash(resno);
                         if (!rcc) continue;
                         for (n=0; rcc[n]; n++);
@@ -1811,6 +1816,7 @@ int main(int argc, char** argv)
                         {
                             working->minimize_residue_clashes(resno);
                         }
+                        f = res->get_intermol_clashes(mols);
                     }
                     cout << "." << flush;
                 }

@@ -2255,7 +2255,6 @@ _try_again:
         region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
     }
 
-    the_neighborhood.clear_active_neighbors();
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -2286,8 +2285,17 @@ _try_again:
         // delete protein;
         // protein = new Protein(protfname);
         protein = &pose_proteins[pose-1];
+        // protein->minimize_internal_clashes();
+        the_neighborhood.clear_active_neighbors();
         the_neighborhood.set_active_protein(protein);
         the_neighborhood.set_initial_energy();
+        if (the_neighborhood.get_worst_clash() >= 1e4)
+        {
+            cout << "Fatal error: input PDB has too great a clash for system energy calculations: ";
+            the_neighborhood.output_worst_clash(cout);
+            cout << endl;
+            throw -1;
+        }
         the_neighborhood.set_active_ligand(ligand);
 
         if (temp_pdb_file.length())

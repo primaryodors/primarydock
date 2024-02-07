@@ -13,11 +13,12 @@ void Neighborhood::add_atom(Atom* a)
     if (pb)
     {
         if (pb->atom_count >= block_max_atoms) throw 0x700a7077;
+        int i;
+        for (i=0; i<pb->atom_count; i++) if (pb->atoms[i] == a) return;
         pb->atoms[pb->atom_count++] = a;
 
         if (mol)
         {
-            int i;
             for (i=0; i<pb->mol_count; i++) if (pb->mols[i] == mol) return;
             pb->mols[pb->mol_count++] = mol;
         }
@@ -102,6 +103,7 @@ void Neighborhood::set_active_ligand(Molecule* m)
     {
         Atom* a = m->get_atom(i);
         if (!a) continue;
+        add_atom(a);
         a->active_neighbor = true;
         actives.push_back(a);
     }
@@ -115,6 +117,9 @@ void Neighborhood::clear_active_neighbors()
         actives[i]->active_neighbor = false;
     }
     actives.clear();
+
+    n = blocks.size();
+    for (i=0; i<n; i++) blocks[i].atom_count = 0;
 }
 
 
@@ -186,10 +191,52 @@ Block* Neighborhood::get_block_from_location(Point p)
     return nullptr;
 }
 
+double Neighborhood::total_molecule_energy(Molecule* mol)
+{
+    int i, j, l, n;
+    Atom* latoms[block_max_atoms];
+    int latct = 0;
+
+    n = mol->get_atom_count();
+    for (i=0; i<n; i++)
+    {
+        Atom* a = mol->get_atom(i);
+        Atom* nearby[block_max_atoms];
+        fetch_atoms_near(nearby, block_max_atoms-2, a->get_location());
+
+        for (j=0; nearby[j]; j++)
+        {
+            for (l=0; l<latct; l++) if (latoms[l] == nearby[j]) goto _next_i;
+            latoms[latct++] = nearby[j];
+            latoms[latct] = nullptr;
+        }
+        _next_i:
+        ;
+    }
+
+    double result = 0;
+    for (i=0; i<latct; i++)
+    {
+        Atom* a = latoms[i];
+        for (j=i+1; j<latct; j++)
+        {
+            Atom* b = latoms[j];
+
+            float partial = InteratomicForce::total_binding(a, b);
+            result -= partial;
+        }
+    }
+
+    return result;
+}
+
 double Neighborhood::total_system_energy()
 {
     int i, j, l, blockct, atomct, interct;
     double result = 0;
+
+    this->worst_clash_1 = this->worst_clash_2 = nullptr;
+    worst_neighbor_clash = 0;
 
     blockct = blocks.size();
     for (i=0; i<blockct; i++)
@@ -223,12 +270,23 @@ double Neighborhood::total_system_energy()
                     cout << "CLASH " << a->aa3let << a->residue << ":" << a->name
                         << " ! " << b->aa3let << b->residue << ":" << b->name << ": " << d << endl << flush;
                 }*/
+                if (d > worst_neighbor_clash)
+                {
+                    worst_neighbor_clash = d;
+                    this->worst_clash_1 = a;
+                    this->worst_clash_2 = b;
+                }
                 result += d;
             }
         }
     }
 
     return result;
+}
+
+void Neighborhood::output_worst_clash(std::ostream& os)
+{
+    os << *(this->worst_clash_1) << " ! " << *(this->worst_clash_2) << " " << worst_neighbor_clash;
 }
 
 void Neighborhood::set_initial_energy()

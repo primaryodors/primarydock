@@ -3169,6 +3169,9 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     float result = -a->total_eclipses();
     if (a->is_residue()) result += reinterpret_cast<AminoAcid*>(a)->initial_eclipses;
 
+    result -= the_neighborhood.total_molecule_energy(a);
+    return result;
+
     int j;
     for (j=0; nearby[j]; j++)
     {

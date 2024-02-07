@@ -201,6 +201,7 @@ double Neighborhood::total_molecule_energy(Molecule* mol)
     for (i=0; i<n; i++)
     {
         Atom* a = mol->get_atom(i);
+        if (!a) continue;
         Atom* nearby[block_max_atoms];
         fetch_atoms_near(nearby, block_max_atoms-2, a->get_location());
 

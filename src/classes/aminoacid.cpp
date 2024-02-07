@@ -2398,6 +2398,9 @@ void AminoAcid::hydrogenate(bool steric_only)
             if (a && a->is_backbone) continue;
             if (b && b->is_backbone) continue;
 
+            if (a == oxt && b && b->get_Z() <= 1) continue;
+            if (b == oxt && a && a->get_Z() <= 1) continue;
+
             if (!aa_archetypes[aadef->_1let])
             {
                 aa_archetypes[aadef->_1let] = new AminoAcid(aadef->_1let);

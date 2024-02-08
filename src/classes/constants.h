@@ -127,9 +127,9 @@
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 1.3
+#define lmpush 0.8
 #define lmpull 0.8
-#define lmsteps 3
+#define lmsteps 5
 #define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1

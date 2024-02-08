@@ -200,7 +200,7 @@ double Neighborhood::total_atom_energy(Atom* a)
 
     int i;
     Atom* nearby[block_max_atoms];
-    fetch_atoms_near(nearby, block_max_atoms-2, a->get_location());
+    fetch_atoms_near(nearby, block_max_atoms-2, a->get_location(), 2);
 
     double result = 0;
     for (i=0; nearby[i]; i++)

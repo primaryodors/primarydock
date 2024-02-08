@@ -4,7 +4,6 @@ ECHO "Extrapolating active protein structures from known cryo-EM models. This wi
 LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
 HYDRO
 SAVE "pdbs/OR51/OR51E2.bound.pdb"
-QUIT
 SIDEREPL "pdbs/OR51/OR51A2.upright.pdb"
 SAVE "pdbs/OR51/OR51A2.bound.pdb"
 UNCHAIN A

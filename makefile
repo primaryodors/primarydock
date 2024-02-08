@@ -92,7 +92,7 @@ test/point_test: src/point_test.cpp $(OBJDIR)/point.o
 	$(CC) src/point_test.cpp $(OBJDIR)/point.o $(OBJDIR)/misc.o -o test/point_test $(CFLAGS)
 
 test/atom_test: src/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
-	$(CC) src/atom_test.cpp $(OBJDIR)/misc.o $(OBJDIR)/atom.o $(OBJDIR)/point.o -o test/atom_test $(CFLAGS)
+	$(CC) src/atom_test.cpp $(OBJS) -o test/atom_test $(CFLAGS)
 
 test/molecule_test: src/molecule_test.cpp $(OBJS)
 	$(CC) src/molecule_test.cpp $(OBJS) -o test/molecule_test $(CFLAGS)

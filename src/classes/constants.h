@@ -127,8 +127,8 @@
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.5
-#define lmpull 0.3
+#define lmpush 1.3
+#define lmpull 0.8
 #define lmsteps 3
 #define recapture_ejected_ligand 0
 
@@ -144,7 +144,7 @@
 #define bb_disqualification_energy 1000
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 1.0
-#define bb_realign_amount 0.1
+#define bb_realign_amount 0.25
 #define bb_realign_mol 0
 #define bb_realign_threshold_distance 2.8
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
@@ -378,6 +378,7 @@
 #define _dbg_mol_flexion 0
 #define _dbg_mol_frames 0
 #define _dbg_multiflex 0
+#define _dbg_multimol 0
 #define _dbg_null_flexions 0
 #define _dbg_path_search 0
 #define _dbg_point_avg 0

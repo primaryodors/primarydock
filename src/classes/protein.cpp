@@ -4007,6 +4007,7 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
 
 void Protein::minimize_residue_clashes(int resno)
 {
+    the_neighborhood.set_active_protein(this);
     AminoAcid** caa = get_residues_can_clash(resno);
     if (!caa) return;
 
@@ -4041,6 +4042,7 @@ void Protein::minimize_residue_clashes(int resno)
 
 void Protein::minimize_internal_clashes()
 {
+    the_neighborhood.set_active_protein(this);
     int i, n = get_end_resno();
     for (i=1; i<=n; i++) minimize_residue_clashes(i);
 }

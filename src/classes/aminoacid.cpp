@@ -63,6 +63,7 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
     if (prevaa) prevaa->next_aa = this;
+    set_atom_parents();
     identify_conjugations();
     find_his_flips();
 }
@@ -655,6 +656,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
     ensure_pi_atoms_coplanar();
 
+    set_atom_parents();
     identify_acidbase();
     identify_rings();
     identify_conjugations();
@@ -1389,6 +1391,7 @@ _return_added:
         }
         rings[i] = nullptr;
     }
+    set_atom_parents();
     // identify_rings();
     identify_conjugations();
 

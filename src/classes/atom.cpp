@@ -2993,6 +2993,13 @@ Atom* Atom::get_heaviest_bonded_atom_that_isnt(Atom* e)
     return result;
 }
 
+bool Atom::set_molecule(Molecule* pm)
+{
+    if (mol) return false;
+    mol = pm;
+    return true;
+}
+
 std::ostream& operator<<(std::ostream& os, const Atom& a)
 {
     if (a.residue) os << a.residue << ":";

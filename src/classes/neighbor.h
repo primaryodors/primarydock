@@ -32,6 +32,7 @@ class Neighborhood
     double total_system_energy();
     void set_initial_energy();
     double total_energy_delta();
+    double total_atom_energy(Atom* atom);
     double total_molecule_energy(Molecule* mol);
     void set_active_protein(Protein* p);
     void set_active_ligand(Molecule* m);

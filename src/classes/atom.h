@@ -196,6 +196,7 @@ public:
         charge += lcharge;
         origchg = charge;
     }
+    bool set_molecule(Molecule* parent_mol);
 
     // Bond functions.
     void fetch_bonds(Bond** result);

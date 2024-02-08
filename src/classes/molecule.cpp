@@ -114,6 +114,7 @@ Molecule::Molecule(char const* lname, Atom** collection)
 
     smiles = nullptr;
     rings = nullptr;
+    set_atom_parents();
     reset_conformer_momenta();
     identify_conjugations();
     rotatable_bonds = 0;
@@ -907,6 +908,7 @@ int Molecule::from_sdf(char const* sdf_dat)
     atoms[atcount] = 0;
     if (words) delete[] words;
 
+    set_atom_parents();
     identify_conjugations();
     identify_rings();
     identify_acidbase();
@@ -1064,6 +1066,7 @@ int Molecule::from_pdb(FILE* is, bool het_only)
         delete words;
     }
 
+    set_atom_parents();
     identify_conjugations();
     return added;
 }
@@ -1427,6 +1430,13 @@ void Molecule::echo_path(int i)
         cout << " " << paths[i][j]->name;
     
     cout << endl;
+}
+
+void Molecule::set_atom_parents()
+{
+    if (!atoms || !atoms[0]) return;
+    int i;
+    for (i=0; atoms[i]; i++) atoms[i]->set_molecule(this);
 }
 
 void Molecule::find_paths()
@@ -3162,30 +3172,31 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     return lbind;
 }
 
-float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
+float Molecule::cfmol_multibind(Molecule* a)
 {
-    if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic()) ((AminoAcid*)a)->set_conditional_basicity(nearby);
+    if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic())
+    {
+        Molecule* nearby[256];
+        the_neighborhood.fetch_molecules_near(nearby, 254, a->get_barycenter(), 1);
+        ((AminoAcid*)a)->set_conditional_basicity(nearby);
+    }
 
     float result = -a->total_eclipses();
     if (a->is_residue()) result += reinterpret_cast<AminoAcid*>(a)->initial_eclipses;
 
-    result -= the_neighborhood.total_molecule_energy(a);
-    return result;
+    #if _dbg_multimol
+    /*if (a->is_residue() == _dbg_multimol || (!a->is_residue() && _dbg_multimol < 0))
+    {
+        Atom* nearby[256];
+        the_neighborhood.fetch_atoms_near(nearby, 254, a->get_barycenter(), 1);
+        int i;
+        cout << "Nearby:";
+        for (i=0; nearby[i]; i++) cout << " " << *(nearby[i]);
+        cout << endl;
+    }*/
+    #endif
 
-    int j;
-    for (j=0; nearby[j]; j++)
-    {
-        float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
-        result += f;
-    }
-    if (a->mclashables)
-    {
-        for (j=0; a->mclashables[j]; j++)
-        {
-            float f = a->intermol_bind_for_multimol_dock(a->mclashables[j], false);
-            result += f;
-        }
-    }
+    result -= the_neighborhood.total_molecule_energy(a);
     return result;
 }
 
@@ -3319,10 +3330,14 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
     for (iter=0; iter<iters; iter++)
     {
-        for (i=0; mm[i]; i++) mm[i]->lastbind = 0;
+        for (i=0; mm[i]; i++)
+        {
+            mm[i]->lastbind = 0;
+            mm[i]->set_atom_parents();
+            // the_neighborhood.set_active_ligand(mm[i]);
+        }
 
         for (n=0; mm[n]; n++);      // Get count.
-        Molecule* nearby[n+8];
         bool do_full_rotation = ((iter % _fullrot_every) == 0);
 
         for (i=0; i<n; i++)
@@ -3339,20 +3354,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             float benerg = 0;
             l = 0;
-            for (j=0; j<n; j++)
-            {
-                if (j==i) continue;
-                Molecule* b = mm[j];
-                Point bloc = b->get_barycenter();
-
-                Atom* na = a->get_nearest_atom(bloc);
-                if (!na) continue;
-                float r = na->distance_to(b->get_nearest_atom(aloc));
-                if (r > _INTERA_R_CUTOFF) continue;
-                nearby[l++] = b;
-            }
-            nearby[l] = 0;
-            benerg = cfmol_multibind(a, nearby);
+            benerg = cfmol_multibind(a);
 
             #if _dbg_fitness_plummet
             if (!i) cout << "# mol " << a->name << " iter " << iter << ": initial " << -benerg << " ";
@@ -3373,7 +3375,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 Point motion(a->lmx, a->lmy, a->lmz);
                 if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
 
-                benerg = cfmol_multibind(a, nearby);
+                benerg = cfmol_multibind(a);
                 if (motion.magnitude() > 0.01*speed_limit)
                 {
                     pib.copy_state(a);
@@ -3386,7 +3388,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                         a->move(motion);
                         // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
-                        tryenerg = cfmol_multibind(a, nearby);
+                        tryenerg = cfmol_multibind(a);
 
                         if (tryenerg > benerg)
                         {
@@ -3395,7 +3397,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         }
                     }
                     pib.restore_state(a);
-                    benerg = cfmol_multibind(a, nearby);
+                    benerg = cfmol_multibind(a);
                 }
                 pib.copy_state(a);
 
@@ -3425,7 +3427,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                     a->move(motion);
 
-                    tryenerg = cfmol_multibind(a, nearby);
+                    tryenerg = cfmol_multibind(a);
 
                     #if _dbg_fitness_plummet
                     if (!i) cout << "(linear motion try " << -tryenerg << ") ";
@@ -3457,7 +3459,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                         a->move(motion);
 
-                        tryenerg = cfmol_multibind(a, nearby);
+                        tryenerg = cfmol_multibind(a);
 
                         if (tryenerg > benerg)
                         {
@@ -3505,7 +3507,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     #endif
                     mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
 
-                    tryenerg = cfmol_multibind(a, nearby);
+                    tryenerg = cfmol_multibind(a);
 
                     if (tryenerg > benerg)
                     {
@@ -3543,7 +3545,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     #endif
 
                     a->rotate(&axis, theta);
-                    tryenerg = cfmol_multibind(a, nearby);
+                    tryenerg = cfmol_multibind(a);
 
                     if (tryenerg > benerg)
                     {
@@ -3597,9 +3599,17 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         bool is_flexion_dbg_mol_bond = is_flexion_dbg_mol & !strcmp(bb[q]->btom->name, "OG");
                         #endif
 
+                        #if _dbg_multimol
+                        if (a->is_residue() == _dbg_multimol || (!a->is_residue() && _dbg_multimol < 0))
+                        {
+                            cout << endl << *a << " energy: " << benerg << endl;
+                            cout << "Attempting rotation of " << *(bb[q]->atom) << "-" << *(bb[q]->btom) << "..." << endl;
+                        }
+                        #endif
+
                         if (do_full_rotation && a->is_residue() /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {
-                            float best_theta = 0;
+                            float best_theta = 0, best_energy = benerg;
                             Pose prior_state;
                             prior_state.copy_state(a);
                             for (theta=_fullrot_steprad; theta < M_PI*2; theta += _fullrot_steprad)
@@ -3609,15 +3619,15 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 {
                                     // group_realign(a, a->agroups);
                                 }
-                                tryenerg = cfmol_multibind(a, nearby);
+                                tryenerg = cfmol_multibind(a);
 
                                 #if _dbg_mol_flexion
                                 if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;
                                 #endif
 
-                                if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
+                                if (tryenerg > best_energy && a->get_internal_clashes() <= self_clash)
                                 {
-                                    benerg = tryenerg;
+                                    best_energy = tryenerg;
                                     best_theta = theta;
                                 }
                             }
@@ -3626,6 +3636,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 prior_state.restore_state(a);
                                 bb[q]->rotate(best_theta, false);
                                 a->been_flexed = true;
+                                benerg = best_energy;
 
                                 if (a->agroups.size() && group_realign)
                                 {
@@ -3634,6 +3645,13 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                                 #if _dbg_mol_flexion
                                 if (is_flexion_dbg_mol_bond) cout << "Rotating to " << (best_theta*fiftyseven) << "deg." << endl << endl;
+                                #endif
+
+                                #if _dbg_multimol
+                                if (a->is_residue() == _dbg_multimol || (!a->is_residue() && _dbg_multimol < 0))
+                                {
+                                    cout << "Fullrot best theta " << (best_theta*fiftyseven) << "deg resulted in best energy " << best_energy << endl << endl << flush;
+                                }
                                 #endif
                             }
                         }
@@ -3658,7 +3676,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 // group_realign(a, a->agroups);
                             }
 
-                            tryenerg = cfmol_multibind(a, nearby);
+                            tryenerg = cfmol_multibind(a);
 
                             #if _dbg_mol_flexion
                             if (is_flexion_dbg_mol_bond) cout << "Trying " << (theta*fiftyseven) << "deg rotation...";
@@ -3673,6 +3691,13 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 #if _dbg_mol_flexion
                                 if (is_flexion_dbg_mol_bond) cout << " energy now " << -tryenerg << ", keeping." << endl << endl;
                                 #endif
+
+                                #if _dbg_multimol
+                                if (a->is_residue() == _dbg_multimol || (!a->is_residue() && _dbg_multimol < 0))
+                                {
+                                    cout << "Incremental theta " << (theta*fiftyseven) << "deg resulted in energy " << tryenerg << endl << endl << flush;
+                                }
+                                #endif
                             }
                             else
                             {
@@ -3680,6 +3705,13 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                                 #if _dbg_mol_flexion
                                 if (is_flexion_dbg_mol_bond) cout << " energy from " << -benerg << " to " << -tryenerg << ", reverting." << endl << endl;
+                                #endif
+
+                                #if _dbg_multimol
+                                if (a->is_residue() == _dbg_multimol || (!a->is_residue() && _dbg_multimol < 0))
+                                {
+                                    cout << "Energy " << tryenerg << " not favorable; reverting." << endl << endl << flush;
+                                }
                                 #endif
                             }
                         }
@@ -3702,9 +3734,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if (a->agroups.size() && group_realign)
             {
                 Pose pre_realign(a);
-                benerg = cfmol_multibind(a, nearby);
+                benerg = cfmol_multibind(a);
                 group_realign(a, a->agroups);
-                tryenerg = cfmol_multibind(a, nearby);
+                tryenerg = cfmol_multibind(a);
 
                 if (tryenerg < benerg) pre_realign.restore_state(a);
             }
@@ -3846,6 +3878,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
         retval &= from_smiles(paren[i].smilesstr, paren[i].startsfrom);
     }
 
+    set_atom_parents();
     // hydrogenate(true);
     float anomaly = correct_structure();
     cout << "# Structural anomaly = " << anomaly << endl;
@@ -4304,6 +4337,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     }
     atoms[atcount]=0;
 
+    set_atom_parents();
     identify_conjugations();
     return true;
 }
@@ -5076,7 +5110,12 @@ bool Molecule::is_thiol()
     return false;
 }
 
+std::ostream& operator<<(std::ostream& os, const Molecule& m)
+{
+    os << m.get_name();
 
+    return os;
+}
 
 
 

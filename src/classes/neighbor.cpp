@@ -23,8 +23,8 @@ void Neighborhood::add_atom(Atom* a)
             pb->mols[pb->mol_count++] = mol;
         }
 
-        /*cout << "Atom located at " << a->get_location() << " belongs to block " << pb->serial
-            << " with xyz = " << pb->cx << "," << pb->cy << "," << pb->cz << "." << endl << flush;*/
+        /*cout << "Atom located at " << a->get_location() << " of molecule " << (mol ? mol->get_name() : "(null)")
+            << " belongs to block " << pb->serial << " with xyz = " << pb->cx << "," << pb->cy << "," << pb->cz << "." << endl << flush;*/
     }
     else
     {
@@ -35,12 +35,15 @@ void Neighborhood::add_atom(Atom* a)
         b.cz = z;
         b.atoms[0] = a;
         b.atom_count = 1;
-        b.mols[0] = mol;
-        b.mol_count = 1;
+        if (mol)
+        {
+            b.mols[0] = mol;
+            b.mol_count = 1;
+        }
         b.serial = blocks.size();
         blocks.push_back(b);
 
-        /*cout << "Atom located at " << a->get_location()
+        /*cout << "Atom located at " << a->get_location() << " of molecule " << (mol ? mol->get_name() : "(null)")
             << " belongs to new block " << b.serial << " with xyz = " << b.cx << "," << b.cy << "," << b.cz << "." << endl << flush;*/
     }
 }
@@ -191,41 +194,36 @@ Block* Neighborhood::get_block_from_location(Point p)
     return nullptr;
 }
 
+double Neighborhood::total_atom_energy(Atom* a)
+{
+    if (!a) return 0;
+
+    int i;
+    Atom* nearby[block_max_atoms];
+    fetch_atoms_near(nearby, block_max_atoms-2, a->get_location());
+
+    double result = 0;
+    for (i=0; nearby[i]; i++)
+    {
+        if (nearby[i] == a) continue;
+        float partial = InteratomicForce::total_binding(a, nearby[i]);
+        result -= partial;
+    }
+
+    return result;
+}
+
 double Neighborhood::total_molecule_energy(Molecule* mol)
 {
-    int i, j, l, n;
-    Atom* latoms[block_max_atoms];
-    int latct = 0;
+    int i, n;
+    double result = 0;
 
     n = mol->get_atom_count();
     for (i=0; i<n; i++)
     {
         Atom* a = mol->get_atom(i);
         if (!a) continue;
-        Atom* nearby[block_max_atoms];
-        fetch_atoms_near(nearby, block_max_atoms-2, a->get_location());
-
-        for (j=0; nearby[j]; j++)
-        {
-            for (l=0; l<latct; l++) if (latoms[l] == nearby[j]) goto _next_i;
-            latoms[latct++] = nearby[j];
-            latoms[latct] = nullptr;
-        }
-        _next_i:
-        ;
-    }
-
-    double result = 0;
-    for (i=0; i<latct; i++)
-    {
-        Atom* a = latoms[i];
-        for (j=i+1; j<latct; j++)
-        {
-            Atom* b = latoms[j];
-
-            float partial = InteratomicForce::total_binding(a, b);
-            result -= partial;
-        }
+        result += total_atom_energy(a);
     }
 
     return result;

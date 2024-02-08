@@ -267,6 +267,7 @@ protected:
     int spnum = 0;
     MoleculeType mol_typ = MOLTYP_UNKNOWN;
 
+    void set_atom_parents();
     void find_paths();
     int path_contains_atom(int path_idx, Atom* a);
     int path_get_length(int path_idx);
@@ -288,7 +289,7 @@ protected:
     void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
-    static float cfmol_multibind(Molecule* mol, Molecule** nearby_mols);
+    static float cfmol_multibind(Molecule* mol);
 };
 
 extern float conformer_momenta_multiplier;
@@ -299,6 +300,8 @@ extern bool wet_environment;
 extern float _momentum_rad_ceiling;
 extern Molecule *worst_clash_1, *worst_clash_2;
 extern float worst_mol_clash;
+
+std::ostream& operator<<(std::ostream& os, const Molecule& m);
 
 #if _dbg_improvements_only_rule
 extern Molecule** check_mols;

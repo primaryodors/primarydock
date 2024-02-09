@@ -2252,6 +2252,8 @@ int main(int argc, char** argv)
                     if (!strands[new_chain - 65]) strands[new_chain - 65] = new Protein(psz);
                     working = strands[new_chain - 65];
                     g_chain = new_chain;
+                    the_neighborhood.clear_active_neighbors();
+                    the_neighborhood.set_active_protein(working);
                 }
 
                 pf = fopen(psz, "rb");
@@ -2921,13 +2923,17 @@ int main(int argc, char** argv)
                 ptmp.load_pdb(pf, 0, words[2] ? words[2][0] : 'A');
 
                 working->replace_side_chains_from_other_protein(&ptmp);
+                the_neighborhood.clear_active_neighbors();
+                the_neighborhood.set_active_protein(working);
 
                 n = working->get_end_resno();
                 for (l=1; l<=n; l++)
                 {
                     f = working->get_internal_clashes(l, l);
                     if (f > clash_limit_per_aa) working->minimize_residue_clashes(l);
+                    cout << ".";
                 }
+                cout << endl;
             }   // SIDEREPL
 
             else if (!strcmp(words[0], "STRAND"))
@@ -2950,6 +2956,9 @@ int main(int argc, char** argv)
                     working = strands[chain];
                     g_chain = chain+65;
                 }
+
+                the_neighborhood.clear_active_neighbors();
+                the_neighborhood.set_active_protein(working);
             }   // STRAND
 
             else if (!strcmp(words[0], "STRLEN"))
@@ -3008,7 +3017,11 @@ int main(int argc, char** argv)
                     delete strands[chain];
                     strands[chain] = nullptr;
                 }
-                if (g_chain == 65+chain) working = strands[chain] = new Protein("TheProt");
+                if (g_chain == 65+chain)
+                {
+                    the_neighborhood.clear_active_neighbors();
+                    working = strands[chain] = new Protein("TheProt");
+                }
             }   // UNCHAIN
 
             else if (!strcmp(words[0], "UNLIG"))
@@ -3016,6 +3029,8 @@ int main(int argc, char** argv)
                 if (words[1]) raise_error("Too many parameters given for UNLIG.");
                 ligand.delete_all_atoms();
                 lig_chain = '\0';
+                the_neighborhood.clear_active_neighbors();
+                the_neighborhood.set_active_protein(working);
             }   // UNLIG
 
             else if (!strcmp(words[0], "UPRIGHT"))

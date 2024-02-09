@@ -67,36 +67,37 @@ void InteratomicForce::read_all_forces()
                 /*if (all_forces[ifcount]->type == mcoord)
                 	cout << all_forces[ifcount]->Za << "*M*" << all_forces[ifcount]->Zb << endl;*/
 
-                if (all_forces[ifcount]->Za >= 1 && all_forces[ifcount]->Za < 36 
-                    &&
-                    all_forces[ifcount]->Zb >= 1 && all_forces[ifcount]->Zb < 36
-                )
+                if (all_forces[ifcount]->type != covalent)
                 {
-                    append_by_Z(all_forces[ifcount]->Za, all_forces[ifcount]->Zb, all_forces[ifcount]);
-                    append_by_Z(all_forces[ifcount]->Zb, all_forces[ifcount]->Za, all_forces[ifcount]);
-                }
-
-                if (all_forces[ifcount]->Za == any_element
-                    &&
-                    all_forces[ifcount]->Zb >= 1 && all_forces[ifcount]->Zb < 36
-                )
-                {
-                    for (i=1; i<36; i++)
+                    if (all_forces[ifcount]->Za >= 1 && all_forces[ifcount]->Za < 36 
+                        &&
+                        all_forces[ifcount]->Zb >= 1 && all_forces[ifcount]->Zb < 36
+                    )
                     {
-                        append_by_Z(i, all_forces[ifcount]->Zb, all_forces[ifcount]);
-                        append_by_Z(all_forces[ifcount]->Zb, i, all_forces[ifcount]);
+                        append_by_Z(all_forces[ifcount]->Za, all_forces[ifcount]->Zb, all_forces[ifcount]);
+                        append_by_Z(all_forces[ifcount]->Zb, all_forces[ifcount]->Za, all_forces[ifcount]);
                     }
-                }
-
-                if (all_forces[ifcount]->Zb == any_element
-                    &&
-                    all_forces[ifcount]->Za >= 1 && all_forces[ifcount]->Za < 36
-                )
-                {
-                    for (i=1; i<36; i++)
+                    else if (all_forces[ifcount]->Za == any_element
+                        &&
+                        all_forces[ifcount]->Zb >= 1 && all_forces[ifcount]->Zb < 36
+                    )
                     {
-                        append_by_Z(i, all_forces[ifcount]->Za, all_forces[ifcount]);
-                        append_by_Z(all_forces[ifcount]->Za, i, all_forces[ifcount]);
+                        for (i=1; i<36; i++)
+                        {
+                            append_by_Z(i, all_forces[ifcount]->Zb, all_forces[ifcount]);
+                            append_by_Z(all_forces[ifcount]->Zb, i, all_forces[ifcount]);
+                        }
+                    }
+                    else if (all_forces[ifcount]->Zb == any_element
+                        &&
+                        all_forces[ifcount]->Za >= 1 && all_forces[ifcount]->Za < 36
+                    )
+                    {
+                        for (i=1; i<36; i++)
+                        {
+                            append_by_Z(i, all_forces[ifcount]->Za, all_forces[ifcount]);
+                            append_by_Z(all_forces[ifcount]->Za, i, all_forces[ifcount]);
+                        }
                     }
                 }
 
@@ -269,8 +270,8 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
 
                 case ionic:
                     if (a->get_charge()
-                            ||
-                            a->get_acidbase()
+                        ||
+                        a->get_acidbase()
                        )
                         return true;
                     break;

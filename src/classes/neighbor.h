@@ -5,7 +5,6 @@
 #ifndef _NEIGHBOR
 #define _NEIGHBOR
 
-#define block_size 8.0
 #define block_max_atoms 8192
 
 class Atom;
@@ -19,6 +18,8 @@ struct Block
     int atom_count = 0;
     Molecule* mols[block_max_atoms];
     int mol_count = 0;
+    Block* next_door[26];
+    int nxdrct = 0;
 };
 
 class Neighborhood
@@ -43,7 +44,8 @@ class Neighborhood
 
     protected:
     // TODO: Want some kind of index on cx, cy, cz values.
-    std::vector<Block> blocks;
+    Block* blocks[65536];
+    int blockqty = 0;
     Block* get_block_from_location(Point location);
     std::vector<Atom*> actives;
     double initial_energy = 0;

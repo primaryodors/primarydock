@@ -30,6 +30,23 @@ const aa3let =
 	'HIP', 'HID', 'HIE', 'HSD', 'HSE',
 ];
 
+/******************************************************************************/
+// http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+function getParameterByName(name, url)
+{
+    if (!url)
+    {
+        url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+    results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+/******************************************************************************/
+
 const aa_aliphatic = 0,
 	aa_aromatic = 1,
 	aa_hydrophilic = 2,
@@ -49,13 +66,16 @@ var mtl_licorice = 0.0;
 var mtl_cartoon = 0.1;
 var mtl_metal = 0.5;
 
-var website = "www.primaryodors.org";
+var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
+var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
+
+var website = "http://www.primaryodors.org";
 var is_localhost = false;
 
-var test = "127.0.0.1";
+var test = "http://127.0.0.1";
 if (!is_localhost) $.ajax(
 {
-	url: "http://" + test + "/instcheck.php",
+	url: test + "/instcheck.php",
 	cache: false,
 	success: function(result)
 	{
@@ -63,24 +83,54 @@ if (!is_localhost) $.ajax(
 		{
 			website = test;
 			is_localhost = true;
+			do_initial_load();
 		}
+	},
+	error: function(result)
+	{
+		test = "http://127.0.0.1/primarydock";
+		if (!is_localhost) $.ajax(
+		{
+			url: test + "/instcheck.php",
+			cache: false,
+			success: function(result)
+			{
+				if (result == "b00d1cca")
+				{
+					website = test;
+					is_localhost = true;
+					do_initial_load();
+				}
+			},
+			error: function(result)
+			{
+				do_initial_load();
+			}
+		});
 	}
 });
 
-test = "127.0.0.1/primarydock";
-if (!is_localhost) $.ajax(
+function do_initial_load()
 {
-	url: "http://" + test + "/instcheck.php",
-	cache: false,
-	success: function(result)
+	var url = getParameterByName('url') ? getParameterByName('url') : website+'/sdf.php';
+
+	var literal_pdb = false;
+	var literal_fname = "";
+
+	if (literal_pdb)
 	{
-		if (result == "b00d1cca")
-		{
-			website = test;
-			is_localhost = true;
-		}
+		loadFile(literal_pdb, literal_fname);
 	}
-});
+	else if (protid)
+	{
+		load_remote_pdb(url);
+	}
+	else if (molid != "~")
+	{
+		load_remote_sdf(url);
+	}
+}
+
 
 </script>
 <style>
@@ -596,23 +646,6 @@ function exitFullscreen()
 	}
 }
 var is_fullscreen = false;
-
-/******************************************************************************/
-// http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-function getParameterByName(name, url)
-{
-    if (!url)
-    {
-        url = window.location.href;
-    }
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-    results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
-/******************************************************************************/
 
 function rotate3D(point, source, axis, theta)
 {
@@ -2732,26 +2765,6 @@ function load_remote_sdf(sdfurl)
 	});
 }
 
-var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+website+'/sdf.php';
-var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
-var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
-
-var literal_pdb = false;
-var literal_fname = "";
-
-if (literal_pdb)
-{
-	loadFile(literal_pdb, literal_fname);
-}
-else if (protid)
-{
-	load_remote_pdb(url);
-}
-else if (molid != "~")
-{
-	load_remote_sdf(url);
-}
-
 function showPose(p)
 {
     var i;
@@ -3118,7 +3131,7 @@ function loadFile(fileData, fileName = "")
 
     $.ajax(
     {
-		url: "http://" + website + "/recepinfo.php",
+		url: website + "/recepinfo.php",
 		data:
         {
 			recep: orid,
@@ -3467,7 +3480,7 @@ function loadFile(fileData, fileName = "")
 				{
 		            $.ajax(
 		            {
-						url: "http://" + website + "/pdb.php",
+						url: website + "/pdb.php",
 						data:
 		                {
 							"p": orid,

@@ -18,7 +18,7 @@ if (!$smiles) echo_usage();
 
 $hash = md5($smiles);
 
-$odors[$hash]["full_name"] = $name;
+$odors[$hash]["full_name"] = str_replace("_", " ", $name);
 $odors[$hash]["smiles"] = $smiles;
 
 ksort($odors);

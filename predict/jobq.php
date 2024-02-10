@@ -4,6 +4,10 @@ $procs = [];
 exec("ps -ef | grep obabel | grep -v grep", $procs);
 if (count($procs)) die("Waiting for obabel.");
 
+$procs = [];
+exec("ps -ef | grep bin/fyg_activate_or | grep -v grep", $procs);
+if (count($procs)) die("Waiting for activation.");
+
 $max_concurrent = 2;
 $queue = [];
 

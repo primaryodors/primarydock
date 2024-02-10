@@ -9,6 +9,12 @@ $queue = [];
 
 chdir(__DIR__);
 chdir("..");
+$dock_results = json_decode(file_get_contents("predict/dock_results.json"), true);
+$version = max(filemtime("bin/primarydock"),
+    filemtime("predict/methods_common.php"),
+    filemtime("predict/method_directmdl.php"),
+    filemtime("predict/method_fygactive.php")
+    );
 $lines = explode("\n", @file_get_contents("jobq"));
 
 foreach ($lines as $ln)
@@ -34,6 +40,11 @@ foreach ($queue as $q)
     $already = false;
     $prot = $q[0];
     $lig = $q[1];
+
+    if (isset($dock_results[$prot][$lig]))
+    {
+        if (intval($dock_results[$prot][$lig]['version']) >= $version) continue;
+    }
 
     foreach ($procs as $p)
     {

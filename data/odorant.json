@@ -13868,7 +13868,7 @@
         "smiles": "[O-]C(=O)C(C)(C)C",
         "aroma":
         {
-            "https://www.reddit.com/r/chemistry/comments/165glxh/comment/jye5as9/":
+            "https:\/\/www.reddit.com\/r\/chemistry\/comments\/165glxh\/comment\/jye5as9\/":
             [
                 "sickly",
                 "sweet",
@@ -20125,6 +20125,32 @@
             }
         },
         "oid": "865f7f2e52aeed5ab40b709e9d1f2e4b"
+    },
+    "86b2ccf7d68271f9d54e44fa8bc79c83":
+    {
+        "full_name": "hydroxypyruvic acid",
+        "smiles": "O=C([O-])C(=O)CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sour",
+                "radish",
+                "cabbage"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3389\/fonc.2018.00162":
+            {
+                "OR51E2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.38",
+                    "adjusted_curve_top": "11.00"
+                }
+            }
+        }
     },
     "86bd1a10bf74d7227a7881822d7c57a2":
     {

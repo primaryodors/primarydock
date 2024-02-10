@@ -333,7 +333,7 @@ function prepare_outputs()
                 $result = [];
                 $mol = ($odor && $odor['smiles']) ? $odor['smiles'] : $sdfname;
                 $cmd = "test/moiety_test \"$mol\" \"$moiety\"";
-                echo "$cmd\n";
+                // echo "$cmd\n";
                 exec("$cmd", $result);
                 foreach ($result as $line)
                 {

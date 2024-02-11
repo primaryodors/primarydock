@@ -74,7 +74,7 @@ foreach ($queue as $q)
                 else
                 {
                     $text = "ERROR";
-                    $color = 0xff3300;
+                    $color = 0xff0000;
                 }
             }
             else

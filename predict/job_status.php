@@ -56,7 +56,8 @@ foreach ($queue as $q)
     $prot = $q[0];
     $lig = $q[1];
 
-    echo "$prot - $lig: ";
+    $text = "unknown";
+    $color = 0x996699;
 
     if (isset($dock_results[$prot][$lig]))
     {
@@ -65,17 +66,36 @@ foreach ($queue as $q)
         {
             if (isset($dr['Actual']))
             {
-                if (($dr['Actual'] == "Agonist") == ($dr['Predicted'] == "Agonist")) colorful_text("Good!", 0x00ff00);
-                else colorful_text("ERROR", 0xff3300);
+                if (($dr['Actual'] == "Agonist") == ($dr['Predicted'] == "Agonist"))
+                {
+                    $text = "good!";
+                    $color = 0x00ff00;
+                }
+                else
+                {
+                    $text = "ERROR";
+                    $color = 0xff3300;
+                }
             }
             else
             {
-                colorful_text( @$dr['Predicted'] ?: "incomplete", 0x0066ff);
+                $text = @$dr['Predicted'] ?: "incomplete";
+                $color = 0x0066ff;
             }
         }
-        else colorful_text("outdated", 0x666666);
+        else
+        {
+            $text = "outdated";
+            $color = 0x666666;
+        }
     }
-    else colorful_text("incomplete", 0x999999);
+    else
+    {
+        $text = "incomplete";
+        $color = 0x999999;
+    }
 
+    colorful_text(mb_chr(0x2588).mb_chr(0x2588).mb_chr(0x2588).mb_chr(0x2588).mb_chr(0x2588), $color);
+    echo " $prot - $lig: $text";
     echo "\n";
 }

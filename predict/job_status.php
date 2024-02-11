@@ -73,7 +73,7 @@ foreach ($queue as $q)
                 }
                 else
                 {
-                    $text = "ERROR";
+                    $text = "FAIL";
                     $color = 0xff0000;
                 }
             }

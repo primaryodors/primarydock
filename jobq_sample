@@ -1,4 +1,7 @@
 
+# Running the setup_jobq.sh script will create a cron job in the current user
+# (or root if sudo) to read the job queue and continuously maintain up to date predictions.
+
 # Sample jobq file to illustrate format.
 # The actual job queue would be named jobq without the _sample at the end.
 # All lines beginning with a hash are treated as comments.

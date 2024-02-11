@@ -1,0 +1,54 @@
+
+# Running the setup_jobq.sh script will create a cron job in the current user
+# (or root if sudo) to read the job queue and continuously maintain up to date predictions.
+
+# Sample jobq file to illustrate format.
+# The actual job queue would be named jobq without the _sample at the end.
+# All lines beginning with a hash are treated as comments.
+
+# Maximum number of concurrent predictions.
+# Recommend setting to less than the number of CPU cores.
+MAX 2
+
+# Queued prediction jobs. Will be run if absent or outdated in dock_results.json.
+PRDT OR51E2 propionic_acid
+PRDT OR51E2 acetic_acid
+PRDT OR51E2 butyric_acid
+PRDT OR51E2 formic_acid
+PRDT OR51E2 isovaleric_acid
+PRDT OR51E2 valeric_acid
+PRDT OR51E2 caproic_acid
+PRDT OR51E2 oenanthic_acid
+PRDT OR51E2 caprylic_acid
+PRDT OR51E2 pelargonic_acid
+PRDT OR51E2 capric_acid
+PRDT OR51E2 lauric_acid
+PRDT OR51E2 myristic_acid
+PRDT OR51E2 isobutyric_acid
+PRDT OR51E2 pivalic_acid
+
+PRDT OR2M3 3-mercapto-2-methylpentan-1-ol
+PRDT OR2T11 tert-butyl_mercaptan
+PRDT OR5K1 hazelnut_pyrazine
+PRDT OR8H1 skatole
+
+PRDT TAAR5 trimethylamine
+PRDT TAAR6 cadaverine
+PRDT TAAR8 N-methylpiperidine
+PRDT TAAR9 N-methylpiperidine
+
+PRDT OR1A1 geraniol
+PRDT OR1D2 bourgeonal
+PRDT OR1G1 2-undecanone
+PRDT OR2W1 geraniol
+PRDT OR3A1 helional
+PRDT OR5A2 habanolide
+PRDT OR5P3 coumarin
+PRDT OR5AN1 muscone
+PRDT OR6P1 phenylacetaldehyde
+PRDT OR8D1 caramel_furanone
+PRDT OR9Q2 p-cresol
+PRDT OR10G7 eugenol
+PRDT OR10J5 lyral
+PRDT OR11A1 2-ethyl_fenchol
+PRDT OR11H7 isovaleric_acid

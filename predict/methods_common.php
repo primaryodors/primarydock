@@ -279,13 +279,14 @@ function prepare_outputs()
     if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
 
     $binding_pockets = json_decode(file_get_contents("data/binding_pocket.json"), true);
-    
+
     $ligname = str_replace(" ", "_", $ligname);
     $suffix = ($dock_metals) ? "metal" : "upright";
     $pdbfname = "pdbs/$fam/$protid.$suffix.pdb";
     if ($dock_metals && !file_exists($pdbfname)) $pdbfname = "pdbs/$fam/$protid.upright.pdb";
     if (!file_exists($pdbfname)) die("Missing PDB.\n");
     $outfname = "output/$fam/$protid/$protid-$ligname.dock";
+    $odor = find_odorant($ligname);
 
     $size = "7.5 7.5 7.5";
     $search = "BB";
@@ -330,7 +331,10 @@ function prepare_outputs()
             foreach ($mbp['odorophores'] as $moiety => $params)
             {
                 $result = [];
-                exec("test/moiety_test \"$sdfname\" \"$moiety\"", $result);
+                $mol = ($odor && $odor['smiles']) ? $odor['smiles'] : $sdfname;
+                $cmd = "test/moiety_test \"$mol\" \"$moiety\"";
+                // echo "$cmd\n";
+                exec("$cmd", $result);
                 foreach ($result as $line)
                 {
                     if (preg_match("/ occurs [1-9][0-9]* times/", $line))
@@ -750,6 +754,7 @@ heredoc;
                 $num_poses = intval($ln);
             }
         }
+
         if (!$retvar && $num_poses) unlink($cnfname);
 
         break;

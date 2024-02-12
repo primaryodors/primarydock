@@ -99,8 +99,7 @@ bool out_prox = false;
 bool out_pro_clash = false;
 bool out_vdw_repuls = false;
 bool out_pdbdat_lig = true;
-bool out_pdbdat_res = true;         // Valid only if FLEX is enabled.
-bool out_pdbdat_res_specified = false;
+bool out_pdbdat_res = true;
 
 Protein* protein;
 Protein* ptemplt;
@@ -1148,7 +1147,6 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "OUTPDBR"))
     {
         bool out_pdbdat_res = atoi(words[1]);
-        out_pdbdat_res_specified = true;
         return 1;
     }
     else if (!strcmp(words[0], "POSE"))
@@ -1893,11 +1891,6 @@ int main(int argc, char** argv)
             argv[i] -= 2;
             i += j;
         }
-    }
-
-    if (out_pdbdat_res_specified && out_pdbdat_res && !flex)
-    {
-        cout << "Warning: OUTPDBR is only valid when flexion is enabled." << endl;
     }
 
     if (out_bb_pairs && !use_bestbind_algorithm)
@@ -3148,7 +3141,7 @@ _try_again:
 
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, pocketcen, size, addl_resno);
 
-            if (flex && out_pdbdat_res)
+            if (out_pdbdat_res)
             {
                 int en = protein->get_end_resno();
                 int resno;
@@ -3156,7 +3149,7 @@ _try_again:
                 {
                     AminoAcid* laa = protein->get_residue(resno);
                     if (!laa) continue;
-                    if (!laa->been_flexed)
+                    if (!flex || !laa->been_flexed)
                     {
                         if (laa->distance_to(ligand) > 5) continue;
                         for (k=0; reaches_spheroid[nodeno][k]; k++)

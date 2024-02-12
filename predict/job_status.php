@@ -64,7 +64,7 @@ foreach ($queue as $q)
         $dr = $dock_results[$prot][$lig];
         if (intval($dr['version']) >= $version)
         {
-            if (isset($dr['Actual']))
+            if (isset($dr['Actual']) && $dr['Actual'] != "(unknown)")
             {
                 if (($dr['Actual'] == "Agonist") == ($dr['Predicted'] == "Agonist"))
                 {
@@ -80,7 +80,7 @@ foreach ($queue as $q)
             else
             {
                 $text = @$dr['Predicted'] ?: "incomplete";
-                $color = 0x0066ff;
+                $color = (@$dr['Predicted'] == "Agonist") ? 0xffffee : 0x0000ff;
             }
         }
         else

@@ -1079,7 +1079,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 partial = aniso * forces[i]->kJ_mol / rdecayed;
 
                 SCoord mc = bloc.subtract(aloc);
-                mc.r = fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
+                mc.r = r - forces[i]->distance; // fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
                 missed_connection = missed_connection.add(mc);
             }
             else

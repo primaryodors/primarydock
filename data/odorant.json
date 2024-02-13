@@ -1238,11 +1238,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "buttermilk",
-                "buttery",
-                "cheesy",
-                "creamy",
-                "dairy"
+                "creamy buttery buttermilk dairy cheesy fatty waxy sweaty green"
             ]
         },
         "activity":
@@ -1965,15 +1961,16 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "acacia",
-                "anisic",
-                "balsamic",
-                "cherry",
-                "hawthorn",
-                "maraschino_cherry",
-                "powdery",
                 "sweet",
-                "vanilla"
+                "hawthorn",
+                "anisic",
+                "powdery",
+                "balsamic",
+                "acacia",
+                "vanilla",
+                "maraschino_cherry",
+                "fruity",
+                "cherry"
             ]
         },
         "activity":
@@ -3207,9 +3204,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "alliaceous",
-                "garlic",
-                "onion"
+                "alliaceous garlic onion sulfurous savory"
             ]
         },
         "activity":
@@ -3307,9 +3302,9 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "horseradish",
-                "mustard",
                 "pungent",
+                "mustard",
+                "horseradish",
                 "wasabi"
             ]
         },
@@ -3538,10 +3533,10 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "banana",
                 "ethereal",
+                "solvent",
                 "fruity",
-                "solvent"
+                "banana"
             ]
         },
         "activity":
@@ -5419,8 +5414,8 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
-                "green",
-                "mushroom"
+                "mushroom",
+                "green"
             ]
         },
         "oid": "208126b0b0342d3260d62543fdfa84f9"
@@ -7392,16 +7387,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "amber",
-                "ambergris",
-                "cedar",
-                "dry",
-                "green",
-                "musk",
-                "paper",
-                "pine",
-                "seedy",
-                "woody"
+                "dry amber ambergris paper musk woody cedar pine green seedy"
             ]
         },
         "activity":
@@ -7462,15 +7448,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "alliaceous",
-                "charred",
-                "cooked",
-                "garlic",
-                "grilled",
-                "meaty",
-                "onion",
-                "roasted",
-                "sulfurous"
+                "alliaceous sulfurous garlic onion roasted cooked_onion grilled charred meaty"
             ]
         },
         "activity":
@@ -20368,7 +20346,11 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
-                "roasted"
+                "nutty",
+                "floral",
+                "fruity",
+                "smoky",
+                "musty"
             ]
         },
         "oid": "88e574d1d8cfa60da4e30780d6c11fb2"
@@ -20681,15 +20663,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "beefy",
-                "coffee",
-                "cooked",
-                "eggnog",
-                "fatty",
-                "garlic",
-                "onion",
-                "roasted",
-                "sulfurous"
+                "sulfurous garlic onion eggnog coffee fatty beefy roasted cooked"
             ]
         },
         "activity":
@@ -22571,8 +22545,8 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "apricot",
-                "sweet"
+                "sweet",
+                "apricot"
             ]
         },
         "activity":
@@ -22595,14 +22569,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "apple",
-                "candy",
-                "fruity",
-                "green",
-                "pineapple",
-                "sweet",
-                "tropical",
-                "waxy"
+                "sweet pineapple tropical fruity candy waxy apple green"
             ]
         },
         "activity":
@@ -23696,12 +23663,12 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "sweet",
                 "buttery",
                 "creamy",
                 "dairy",
-                "fatty",
                 "milky",
-                "sweet"
+                "fatty"
             ]
         },
         "oid": "a3cf80cc781a4b75f7a493ae3fd7f346"
@@ -26882,8 +26849,8 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "balsamic",
                 "floral",
+                "balsamic",
                 "strawberry"
             ]
         },
@@ -27582,14 +27549,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "apple",
-                "estery",
-                "fatty",
-                "fruity",
-                "green",
-                "pear",
-                "pineapple",
-                "sweet"
+                "sweet green fruity estery pineapple apple pear fatty waxy cognac melon"
             ]
         },
         "activity":
@@ -28280,11 +28240,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "beany",
-                "chocolate",
-                "earthy",
-                "green_pea",
-                "nutty"
+                "green_pea earthy beany chocolate nutty"
             ]
         },
         "activity":
@@ -28594,10 +28550,10 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "brandy",
                 "fruity",
                 "plum",
-                "rummy"
+                "rummy",
+                "brandy"
             ]
         },
         "activity":
@@ -29487,14 +29443,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "balsamic",
-                "cherry",
-                "fruity",
-                "plum",
-                "powdery",
-                "sweet",
-                "tonka",
-                "vanilla"
+                "sweet powdery balsamic vanilla fruity plum cherry tonka creamy spicy coumarinic licorice"
             ]
         },
         "activity":
@@ -29789,14 +29738,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "apple",
-                "balsamic",
-                "banana",
-                "floral",
-                "fruity",
-                "jammy",
-                "jasmine",
-                "sweet"
+                "sweet fruity floral banana jasmin balsamic apple jammy"
             ]
         },
         "activity":
@@ -29852,14 +29794,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "buttery",
-                "caramellic",
-                "cheesy",
-                "creamy",
-                "nutty",
-                "pungent",
-                "sweet",
-                "toasted"
+                "pungent sweet buttery creamy caramellic nutty cheesy toasted"
             ]
         },
         "oid": "d29864c976c6cfe62702be8c00a6a64b"
@@ -30354,10 +30289,10 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "grain",
-                "malty",
                 "popcorn",
-                "toasted"
+                "toasted",
+                "grain",
+                "malty"                
             ]
         },
         "oid": "d5ca075c633a3f8067608fae49d2d7e8"
@@ -33812,12 +33747,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "balsamic",
-                "fermented",
-                "fusel",
-                "oily",
-                "sweet",
-                "whiskey"
+                "fusel oily sweet balsamic whiskey banana"
             ]
         },
         "activity":
@@ -34026,12 +33956,13 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "aldehydic",
+                "pungent",
                 "ethereal",
-                "fresh",
+                "aldehydic",
                 "fruity",
+                "fresh",
                 "musty",
-                "pungent"
+                "green"
             ]
         },
         "oid": "ee4712455d4830701a6b998d87a6d9bb"
@@ -35414,13 +35345,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "banana",
-                "cognac",
-                "fruity",
-                "fusel",
-                "pineapple",
-                "sweet",
-                "waxy"
+                "sweet pineapple fruity waxy banana fusel cognac ripe fermented"
             ]
         },
         "activity":
@@ -36094,11 +36019,10 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "alcoholic",
-                "cucumber",
+                "solvent",
                 "ethereal",
-                "fruity",
-                "sweet"
+                "apple",
+                "pear"
             ]
         },
         "oid": "fa0d6b210c7526b5976c0d59860b1cf6"
@@ -36565,6 +36489,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "acidic",
                 "sharp",
                 "vinegar"
             ]
@@ -36579,8 +36504,8 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "fruity",
                 "honey",
+                "fruity",
                 "rummy"
             ]
         },
@@ -36755,8 +36680,9 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "acrid",
                 "sharp",
+                "pungent",
+                "sour",
                 "vinegar"
             ]
         },

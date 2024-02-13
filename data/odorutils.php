@@ -16,6 +16,11 @@ foreach ($odors as $oid => $odor)
 	{
 		if (@$refs[$url]["hidden"]) unset($odors[$oid]["activity"][$url]);
 	}
+
+	if (!empty($odor["aroma"])) foreach ($odor["aroma"] as $url => $aroma)
+	{
+		if (count($aroma) == 1 && false!==strpos($aroma[0], " ")) $odors[$oid]['aroma'][$url] = explode(" ", $aroma[0]);
+	}
 }
 
 function trim_prefixes($what)

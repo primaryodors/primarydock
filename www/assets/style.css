@@ -303,6 +303,7 @@ table.rcplist tr:nth-of-type(odd), table.liglist tr:nth-of-type(odd)
 {
     float: left;
     margin-right: 15px;
+    width: 97%;
 }
 
 .rcptile

@@ -1096,57 +1096,57 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "PERRES"))
     {
-        bool out_per_res_e = atoi(words[1]);
+        out_per_res_e = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "PERBTYP"))
     {
-        bool out_per_btyp_e = atoi(words[1]);
+        out_per_btyp_e = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "ELIMITEM"))
     {
-        float out_itemized_e_cutoff = atoi(words[1]);
+        out_itemized_e_cutoff = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "LIGINTE"))
     {
-        bool out_lig_int_e = atoi(words[1]);
+        out_lig_int_e = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "OUTBBP"))
     {
-        bool out_bb_pairs = atoi(words[1]);
+        out_bb_pairs = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "OUTLPS"))
     {
-        bool out_lig_pol_sat = atoi(words[1]);
+        out_lig_pol_sat = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "OUTPROX"))
     {
-        bool out_prox = atoi(words[1]);
+        out_prox = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "OUTPCLSH"))
     {
-        bool out_pro_clash = atoi(words[1]);
+        out_pro_clash = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "OUTVDWR"))
     {
-        bool out_vdw_repuls = atoi(words[1]);
+        out_vdw_repuls = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "OUTPDBL"))
     {
-        bool out_pdbdat_lig = atoi(words[1]);
+        out_pdbdat_lig = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "OUTPDBR"))
     {
-        bool out_pdbdat_res = atoi(words[1]);
+        out_pdbdat_res = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "POSE"))
@@ -3173,6 +3173,7 @@ _try_again:
                 if (debug) *debug << "Prepared flex PDBs." << endl;
                 #endif
             }
+            else if (!out_pdbdat_lig) pdbdat << " ";
 
             if (mtlcoords.size() && out_pdbdat_lig)
             {

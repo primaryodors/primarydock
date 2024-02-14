@@ -2263,7 +2263,7 @@ var PODefSchemeRainbow = NGL.ColormakerRegistry.addScheme(function (params)
 		}
 
 		var rnbint = parseInt(255*atom.structure.rnbPos)
-		var acol = hsl_to_rgb(rnbint, 81, 173);
+		var acol = hsl_to_rgb(rnbint, 123, 123);
 		return acol;
 	}
 });
@@ -2938,7 +2938,7 @@ function rainbowNodes()
     var i, bbi=-1;
     var nmax = 0;
 
-	gmodel[0].autoView();
+	// gmodel[0].autoView();
 	cen_ligand = false;
 
 	$(".nodebtn").removeClass("hilite");
@@ -2957,6 +2957,7 @@ function rainbowNodes()
         {
 			var mrp = mrparams[i];
 			if (mrp.colorScheme == PODefSchemeLigand) mrp.colorScheme = PODefSchemeRainbow;
+			else continue;
 			model[i].removeAllRepresentations();
 			if (spcfill || whtbk) mrp.opacity = 1;
 			if (!hydrogens) mrp.sele = "* and not hydrogen";

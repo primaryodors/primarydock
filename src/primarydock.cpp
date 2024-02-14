@@ -97,6 +97,7 @@ bool out_bb_pairs = false;
 bool out_lig_pol_sat = false;
 bool out_prox = false;
 bool out_pro_clash = false;
+bool out_mc = false;
 bool out_vdw_repuls = false;
 bool out_pdbdat_lig = true;
 bool out_pdbdat_res = true;
@@ -1132,6 +1133,11 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "OUTPCLSH"))
     {
         out_pro_clash = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTMC"))
+    {
+        out_mc = atoi(words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "OUTVDWR"))
@@ -3040,6 +3046,7 @@ _try_again:
             dr[drcount][nodeno].out_lig_pol_sat = out_lig_pol_sat;
             dr[drcount][nodeno].out_prox = out_prox;
             dr[drcount][nodeno].out_pro_clash = out_pro_clash;
+            dr[drcount][nodeno].out_mc = out_mc;
             dr[drcount][nodeno].out_vdw_repuls = out_vdw_repuls;
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;

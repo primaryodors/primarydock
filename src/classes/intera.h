@@ -74,6 +74,7 @@ std::ostream& operator<<(std::ostream& os, const InteratomicForce& f);
 extern float total_binding_by_type[_INTER_TYPES_LIMIT];
 extern float minimum_searching_aniso;                       // Should be a small positive number for searching, and zero for scoring.
 extern SCoord missed_connection;
+extern float mc_bpotential;
 
 #if active_persistence
 extern int active_persistence_resno[active_persistence_limit];

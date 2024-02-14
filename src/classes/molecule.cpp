@@ -2800,7 +2800,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             !ligands[l]->shielded(atoms[i], ligands[l]->atoms[j])
                        )
                     {
-                        missed_connection.r = 0;
+                        missed_connection.r = -Avogadro;
+                        mc_bpotential = 0;
                         // cout << ligands[l]->atoms[j]->get_location().subtract(atoms[i]->get_location()) << ": ";
                         float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                         #if _dbg_internal_energy
@@ -2838,11 +2839,15 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 lmz += lmpush * sgn(ptd.z);
                             }
                         }
-                        Point mc = missed_connection;
-                        // cout << mc << endl;
-                        lmx += lmpull * mc.x;
-                        lmy += lmpull * mc.y;
-                        lmz += lmpull * mc.z;
+
+                        if (missed_connection.r > 0)
+                        {
+                            Point mc = missed_connection;
+                            // cout << mc << endl;
+                            lmx += lmpull * mc.x * mc_bpotential / missed_connection.r / missed_connection.r;
+                            lmy += lmpull * mc.y * mc_bpotential / missed_connection.r / missed_connection.r;
+                            lmz += lmpull * mc.z * mc_bpotential / missed_connection.r / missed_connection.r;
+                        }
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                 }

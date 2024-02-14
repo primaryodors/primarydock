@@ -14,6 +14,7 @@ float total_binding_by_type[_INTER_TYPES_LIMIT];
 float minimum_searching_aniso = 0;
 InteratomicForce* lif = nullptr;
 SCoord missed_connection(0,0,0);
+float mc_bpotential = 0;
 
 #if _peratom_audit
 std::vector<std::string> interaudit;
@@ -1079,8 +1080,19 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 partial = aniso * forces[i]->kJ_mol / rdecayed;
 
                 SCoord mc = bloc.subtract(aloc);
-                mc.r = fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
+                mc.r = r - forces[i]->distance; // fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
+
+                #if summed_missed_connections
                 missed_connection = missed_connection.add(mc);
+                mc_bpotential += forces[i]->kJ_mol;
+                #else
+                if ((mc.r < fabs(missed_connection.r) && forces[i]->kJ_mol >= mc_bpotential)
+                    || forces[i]->kJ_mol > mc_bpotential)
+                {
+                    missed_connection = mc;
+                    mc_bpotential = forces[i]->kJ_mol;
+                }
+                #endif
             }
             else
             {

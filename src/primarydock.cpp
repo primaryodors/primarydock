@@ -89,6 +89,19 @@ std::vector<DynamicMotion> dyn_motions;
 
 bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
+bool out_per_res_e = true;
+bool out_per_btyp_e = true;
+float out_itemized_e_cutoff = 0.01;
+bool out_lig_int_e = true;
+bool out_bb_pairs = false;
+bool out_lig_pol_sat = false;
+bool out_prox = false;
+bool out_pro_clash = false;
+bool out_mc = false;
+bool out_vdw_repuls = false;
+bool out_pdbdat_lig = true;
+bool out_pdbdat_res = true;
+
 Protein* protein;
 Protein* ptemplt;
 Protein* ptplref;
@@ -1082,6 +1095,66 @@ int interpret_config_line(char** words)
         optsecho = "Path node set #" + to_string(nodeno);
         return i-1;
     }
+    else if (!strcmp(words[0], "PERRES"))
+    {
+        out_per_res_e = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "PERBTYP"))
+    {
+        out_per_btyp_e = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "ELIMITEM"))
+    {
+        out_itemized_e_cutoff = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "LIGINTE"))
+    {
+        out_lig_int_e = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTBBP"))
+    {
+        out_bb_pairs = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTLPS"))
+    {
+        out_lig_pol_sat = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTPROX"))
+    {
+        out_prox = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTPCLSH"))
+    {
+        out_pro_clash = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTMC"))
+    {
+        out_mc = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTVDWR"))
+    {
+        out_vdw_repuls = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTPDBL"))
+    {
+        out_pdbdat_lig = atoi(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "OUTPDBR"))
+    {
+        out_pdbdat_res = atoi(words[1]);
+        return 1;
+    }
     else if (!strcmp(words[0], "POSE"))
     {
         poses = atoi(words[1]);
@@ -1824,6 +1897,11 @@ int main(int argc, char** argv)
             argv[i] -= 2;
             i += j;
         }
+    }
+
+    if (out_bb_pairs && !use_bestbind_algorithm)
+    {
+        cout << "Warning: OUTBBP is enabled but the search mode is not the best-binding algorithm." << endl;
     }
 
     char* pcntp = strstr(outfname, "%p");
@@ -2961,6 +3039,15 @@ _try_again:
             cout << aadbg->get_name() << " charge = " << aadbg->get_charge() << endl;
             #endif
             dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
+            dr[drcount][nodeno].out_per_res_e = out_per_res_e;
+            dr[drcount][nodeno].out_per_btyp_e = out_per_btyp_e;
+            dr[drcount][nodeno].out_itemized_e_cutoff = out_itemized_e_cutoff;
+            dr[drcount][nodeno].out_lig_int_e = out_lig_int_e;
+            dr[drcount][nodeno].out_lig_pol_sat = out_lig_pol_sat;
+            dr[drcount][nodeno].out_prox = out_prox;
+            dr[drcount][nodeno].out_pro_clash = out_pro_clash;
+            dr[drcount][nodeno].out_mc = out_mc;
+            dr[drcount][nodeno].out_vdw_repuls = out_vdw_repuls;
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
             float we = dr[drcount][nodeno].worst_energy;
@@ -2990,7 +3077,7 @@ _try_again:
 
             dr[drcount][nodeno].proximity = ligand->get_barycenter().get_3d_distance(nodecen);
 
-            if (use_bestbind_algorithm)
+            if (use_bestbind_algorithm && out_bb_pairs)
             {
                 dr[drcount][nodeno].miscdata += (std::string)"Best-Binding Pairs:\n";
                 for (i=0; i<3 && i<global_pairs.size(); i++)
@@ -3033,16 +3120,19 @@ _try_again:
             // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
             n = ligand->get_atom_count();
             int offset = n;
-            for (l=0; l<n; l++) ligand->get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
-            #if _DBG_STEPBYSTEP
-            if (debug) *debug << "Prepared ligand PDB." << endl;
-            #endif
-
-            if (waters)
+            if (out_pdbdat_lig)
             {
-                for (k=0; k<maxh2o; k++)
+                for (l=0; l<n; l++) ligand->get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
+                #if _DBG_STEPBYSTEP
+                if (debug) *debug << "Prepared ligand PDB." << endl;
+                #endif
+
+                if (waters)
                 {
-                    for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l+3*k);
+                    for (k=0; k<maxh2o; k++)
+                    {
+                        for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l+3*k);
+                    }
                 }
             }
 
@@ -3058,7 +3148,7 @@ _try_again:
 
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, pocketcen, size, addl_resno);
 
-            if (flex)
+            if (out_pdbdat_res)
             {
                 int en = protein->get_end_resno();
                 int resno;
@@ -3066,7 +3156,7 @@ _try_again:
                 {
                     AminoAcid* laa = protein->get_residue(resno);
                     if (!laa) continue;
-                    if (!laa->been_flexed)
+                    if (!flex || !laa->been_flexed)
                     {
                         if (laa->distance_to(ligand) > 5) continue;
                         for (k=0; reaches_spheroid[nodeno][k]; k++)
@@ -3090,8 +3180,9 @@ _try_again:
                 if (debug) *debug << "Prepared flex PDBs." << endl;
                 #endif
             }
+            else if (!out_pdbdat_lig) pdbdat << " ";
 
-            if (mtlcoords.size())
+            if (mtlcoords.size() && out_pdbdat_lig)
             {
                 for (l=0; l<mtlcoords.size(); l++)
                 {

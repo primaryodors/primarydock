@@ -29,6 +29,7 @@ class DockResult
     Atom* worst_clash_2 = nullptr;
     float* residue_clash = nullptr;
     SCoord* res_clash_dir = nullptr;
+    float* missed_connections = 0;
     const char** m_atom1_name = nullptr;
     const char** m_atom2_name = nullptr;
     std::string pdbdat;
@@ -48,6 +49,16 @@ class DockResult
     bool display_clash_atom1 = false;
     bool display_clash_atom2 = false;
     float energy_mult = 1;
+
+    bool out_per_res_e = true;
+    bool out_per_btyp_e = true;
+    float out_itemized_e_cutoff = 0.01;
+    bool out_lig_int_e = true;
+    bool out_lig_pol_sat = false;
+    bool out_prox = false;
+    bool out_pro_clash = false;
+    bool out_mc = false;
+    bool out_vdw_repuls = false;
 };
 
 extern float init_total_binding_by_type[_INTER_TYPES_LIMIT];

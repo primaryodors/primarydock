@@ -32,10 +32,11 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     float pstot = 0;
     char* lma1n[end1];
     char* lma2n[end1];
+    float lmc[end1];
 
     for (i=0; i<end1; i++)
     {
-        lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = 0;
+        lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = lmc[i] = 0;
     }
 
     worst_energy = worst_nrg_aa = 0;
@@ -47,11 +48,13 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
     if (met)
     {
+        mc_bpotential = 0;
         met->clear_atom_binding_energies();
         float lb = ligand->get_intermol_binding(met);
         strcpy(metrics[metcount], "Metals");
         lmkJmol[metcount] = lb;
         limkJmol[metcount] = 0;								// TODO
+        lmc[metcount] = -mc_bpotential / missed_connection.r;
 
         lmvdWrepl[metcount] = 0;
         lmvdWrepl[metcount] += ligand->get_vdW_repulsion(met);		// TODO: Include repulsions with non-mcoord side chains.
@@ -211,6 +214,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         reaches_spheroid[i]->clear_atom_binding_energies();
         int resno = reaches_spheroid[i]->get_residue_no();
 
+        mc_bpotential = 0;
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
         if (ligand->clash_worst > worst_energy)
         {
@@ -248,6 +252,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             if (lb > 500) lb = 0;
             lmkJmol[metcount] = lb;
         }
+        lmc[metcount] = -mc_bpotential / missed_connection.r;
 
         lma1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;
         lma2n[metcount] = ligand->clash2 ? ligand->clash2->name : nullptr;
@@ -315,16 +320,17 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     if (btot > 100*ligand->get_atom_count()) btot = 0;
     if (differential_dock && (worst_energy > clash_limit_per_aa)) btot = -Avogadro;
 
-    kJmol = (differential_dock && (worst_energy > clash_limit_per_aa)) ? -Avogadro : btot;
-    ikJmol = 0;
-    polsat  = pstot;
-    metric   = new char*[metcount+4];
-    this->mkJmol    = new float[metcount];
-    this->imkJmol    = new float[metcount];
-    this->mvdWrepl    = new float[metcount];
-    this->imvdWrepl    = new float[metcount];
-    this->m_atom1_name  = new const char*[metcount];
-    this->m_atom2_name  = new const char*[metcount];
+    kJmol          = (differential_dock && (worst_energy > clash_limit_per_aa)) ? -Avogadro : btot;
+    ikJmol          = 0;
+    polsat           = pstot;
+    metric            = new char*[metcount+4];
+    this->mkJmol       = new float[metcount];
+    this->imkJmol       = new float[metcount];
+    this->mvdWrepl       = new float[metcount];
+    this->imvdWrepl       = new float[metcount];
+    this->m_atom1_name     = new const char*[metcount];
+    this->m_atom2_name      = new const char*[metcount];
+    this->missed_connections = new float[metcount];
     ligand_self = ligand->get_intermol_binding(ligand) - ligand->total_eclipses();
     kJmol += ligand_self;
     #if _dbg_internal_energy
@@ -361,6 +367,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         imvdWrepl[i] = limvdWrepl[i];
         m_atom1_name[i] = lma1n[i];
         m_atom2_name[i] = lma2n[i];
+        missed_connections[i] = lmc[i];
         // cout << "*" << metric[i] << ": " << mkJmol[i] << endl;
     }
 
@@ -383,52 +390,60 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
         output << "Isomer: " << dr.isomer << endl << endl;
     }
 
-    if (differential_dock)
+    if (dr.out_per_res_e || dr.out_per_btyp_e)
     {
-        output << "# Binding energies: delta = with ligand minus without ligand." << endl;
-    }
-    else
-    {
-        output << "# Binding energies:" << endl;
-    }
-
-    output << "BENERG:" << endl;
-    for (	l=0;
-
-            dr.mkJmol
-            && dr.metric
-            && dr.metric[l]
-            && dr.metric[l][0]
-            ;
-
-            l++
-        )
-    {
-        if (fabs(dr.mkJmol[l]) < 0.001) continue;
-
         if (differential_dock)
         {
-            if (dr.metric[l]) output << dr.metric[l]
-                        << ": " << -(dr.mkJmol[l] - dr.imkJmol[l])*dr.energy_mult
-                        << " = " << -dr.mkJmol[l]*dr.energy_mult
-                        << " minus " << -dr.imkJmol[l]*dr.energy_mult
-                        << endl;
+            output << "# Binding energies: delta = with ligand minus without ligand." << endl;
         }
         else
         {
-            if (dr.do_output_colors) colorize(dr.mkJmol[l]);
-            output << dr.metric[l] << ": " << -dr.mkJmol[l]*dr.energy_mult;
-            if (dr.display_clash_atom1) output << " " << (dr.m_atom1_name[l] ? dr.m_atom1_name[l] : "-");
-            if (dr.display_clash_atom2) output << " " << (dr.m_atom2_name[l] ? dr.m_atom2_name[l] : "-");
-            output << endl;
-            if (dr.do_output_colors) colorless();
+            output << "# Binding energies:" << endl;
         }
     }
-    output << endl;
-    // output << "Worst energy: " << dr.worst_energy << endl;
 
-    for (l=0; l<_INTER_TYPES_LIMIT; l++)
+    if (dr.out_per_res_e)
     {
+        output << "BENERG:" << endl;
+        for (	l=0;
+
+                dr.mkJmol
+                && dr.metric
+                && dr.metric[l]
+                && dr.metric[l][0]
+                ;
+
+                l++
+            )
+        {
+            if (fabs(dr.mkJmol[l]) < dr.out_itemized_e_cutoff) continue;
+
+            if (differential_dock)
+            {
+                if (dr.metric[l]) output << dr.metric[l]
+                            << ": " << -(dr.mkJmol[l] - dr.imkJmol[l])*dr.energy_mult
+                            << " = " << -dr.mkJmol[l]*dr.energy_mult
+                            << " minus " << -dr.imkJmol[l]*dr.energy_mult
+                            << endl;
+            }
+            else
+            {
+                if (dr.do_output_colors) colorize(dr.mkJmol[l]);
+                output << dr.metric[l] << ": " << -dr.mkJmol[l]*dr.energy_mult;
+                if (dr.display_clash_atom1) output << " " << (dr.m_atom1_name[l] ? dr.m_atom1_name[l] : "-");
+                if (dr.display_clash_atom2) output << " " << (dr.m_atom2_name[l] ? dr.m_atom2_name[l] : "-");
+                output << endl;
+                if (dr.do_output_colors) colorless();
+            }
+        }
+        output << endl;
+        // output << "Worst energy: " << dr.worst_energy << endl;
+    }
+
+    if (dr.out_per_btyp_e) for (l=0; l<_INTER_TYPES_LIMIT; l++)
+    {
+        if (fabs(dr.bytype[l]) < dr.out_itemized_e_cutoff) continue;
+
         char lbtyp[64];
         switch (l+covalent)
         {
@@ -488,7 +503,7 @@ _btyp_unassigned:
         if (dr.do_output_colors) colorless();
     }
 
-    output << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
+    if (dr.out_lig_int_e) output << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
 
     if (dr.miscdata.size())
     {
@@ -501,12 +516,15 @@ _btyp_unassigned:
                 << dr.softrock << endl;
     }
 
-    output << "Ligand polar satisfaction: " << dr.polsat << endl;
-    output << endl;
+    if (dr.out_lig_pol_sat)
+    {
+        output << "Ligand polar satisfaction: " << dr.polsat << endl;
+        output << endl;
+    }
 
-    output << "Proximity: " << dr.proximity << endl << endl;
+    if (dr.out_prox) output << "Proximity: " << dr.proximity << endl << endl;
 
-    output << "Protein clashes: " << dr.protclash << endl << endl;
+    if (dr.out_pro_clash) output << "Protein clashes: " << dr.protclash << endl << endl;
 
     #if use_trip_switch
     if (tripswitch_clashables.size())
@@ -515,34 +533,57 @@ _btyp_unassigned:
     }
     #endif
 
-    output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
-    output << endl;
-    
-    for (	l=0;
-
-            dr.metric
-            && dr.metric[l]
-            && dr.metric[l][0];
-
-            l++
-        )
+    if (dr.out_mc)
     {
-        if (fabs(dr.mvdWrepl[l]) < 0.001) continue;
+        output << "# Missed Connections" << endl << "MC:" << endl;
+        output << endl;
+        
+        for (	l=0;
 
-        if (differential_dock)
+                dr.metric
+                && dr.metric[l]
+                && dr.metric[l][0];
+
+                l++
+            )
         {
-            if (dr.metric[l]) output << dr.metric[l]
-                << ": " << (dr.mvdWrepl[l] - dr.imvdWrepl[l])*dr.energy_mult
-                << " = " << dr.mvdWrepl[l]*dr.energy_mult
-                << " minus " << dr.imvdWrepl[l]*dr.energy_mult
-                << endl;
+            if (fabs(dr.missed_connections[l]) < dr.out_itemized_e_cutoff) continue;
+            if (dr.metric[l]) output << dr.metric[l] << ": " << dr.missed_connections[l]*dr.energy_mult << endl;
         }
-        else
-        {
-            if (dr.metric[l]) output << dr.metric[l] << ": " << dr.mvdWrepl[l]*dr.energy_mult << endl;
-        }
+        output << endl;
     }
-    output << endl;
+
+    if (dr.out_vdw_repuls)
+    {
+        output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+        output << endl;
+        
+        for (	l=0;
+
+                dr.metric
+                && dr.metric[l]
+                && dr.metric[l][0];
+
+                l++
+            )
+        {
+            if (fabs(dr.mvdWrepl[l]) < dr.out_itemized_e_cutoff) continue;
+
+            if (differential_dock)
+            {
+                if (dr.metric[l]) output << dr.metric[l]
+                    << ": " << (dr.mvdWrepl[l] - dr.imvdWrepl[l])*dr.energy_mult
+                    << " = " << dr.mvdWrepl[l]*dr.energy_mult
+                    << " minus " << dr.imvdWrepl[l]*dr.energy_mult
+                    << endl;
+            }
+            else
+            {
+                if (dr.metric[l]) output << dr.metric[l] << ": " << dr.mvdWrepl[l]*dr.energy_mult << endl;
+            }
+        }
+        output << endl;
+    }
 
     if (dr.include_pdb_data)
     {

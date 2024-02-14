@@ -246,7 +246,7 @@ foreach (array_keys($sorted) as $rcpid)
     if (@$agonist[$rcpid])
     {
         $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
-        $notes = make_clickable_notes(explode(", ", $notes));
+        $notes = make_clickable_notes(array_slice(explode(", ", $notes), 0, 10));
         $notes = implode(", ", $notes);
         if (substr($notes, 0, 1) == '(')
         {

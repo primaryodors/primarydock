@@ -131,6 +131,7 @@
 #define lmpull 0.3
 #define lmsteps 3
 #define recapture_ejected_ligand 0
+#define summed_missed_connections 1
 
 #define amide_zwitterionic_amount 0.1
 

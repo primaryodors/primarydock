@@ -22,7 +22,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     Molecule* met = protein->metals_as_molecule();
     int i, j;
 
-    char metrics[end1][10];
+    char metrics[end1][20];
     float lmkJmol[end1];
     float limkJmol[end1];
     float lmvdWrepl[end1];
@@ -261,7 +261,11 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         res_kJmol[resno] = lb;
         #endif
 
-        sprintf(metrics[metcount], "%s%d", reaches_spheroid[i]->get_3letter(), resno);
+        BallesterosWeinstein bw = protein->get_bw_from_resno(resno);
+        if (bw.helix_no)
+            sprintf(metrics[metcount], "%s%d(%d.%d)", reaches_spheroid[i]->get_3letter(), resno, bw.helix_no, bw.member_no);
+        else
+            sprintf(metrics[metcount], "%s%d", reaches_spheroid[i]->get_3letter(), resno);
         // cout << metrics[metcount] << ": " << lb << " . ";
 
         if (differential_dock)

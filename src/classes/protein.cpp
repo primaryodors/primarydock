@@ -153,7 +153,7 @@ bool Protein::add_residue(const int resno, const char aaletter)
     {
         Point pts[4];
         residues[i-1]->predict_next_NHCA(pts);
-        residues[i] = new AminoAcid(aaletter, residues[i-1], false);
+        residues[i] = new AminoAcid(aaletter, residues[i-1], false, this);
         residues[i]->ensure_pi_atoms_coplanar();
 
         residues[i]->establish_internal_clash_baseline();
@@ -180,7 +180,7 @@ bool Protein::add_residue(const int resno, const char aaletter)
     }
     else
     {
-        residues[i] = new AminoAcid(aaletter, 0, false);
+        residues[i] = new AminoAcid(aaletter, 0, false, this);
         residues[i]->ensure_pi_atoms_coplanar();
     }
 
@@ -758,7 +758,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                 {
                     if (aa_defs[i].name[0] && !strcasecmp(aa_defs[i]._3let, tmp3let))
                     {
-                        AminoAcid* aa = new AminoAcid(is, prevaa, rno);
+                        AminoAcid* aa = new AminoAcid(is, prevaa, rno, this);
 
                         int n = aa->get_atom_count();
                         for (j=0; j<n; j++)

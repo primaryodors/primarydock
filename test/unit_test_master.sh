@@ -69,11 +69,11 @@ php -f predict/method_fygactive.php prot=TAAR8 lig=cadaverine | grep '[[]Predict
 RESULT=$(diff --unified $REPORT testdata/received/TAAR8_cadaverine_pred.received.txt)
 if [ -z "$RESULT" ]; then
     # printf "${GRN}TAAR8 cadaverine prediction test succeeded.${NC}\n"
-    ASP111=$( cat output/TAAR/TAAR8/TAAR8.cadaverine.active.dock | grep -m 1 "Asp111: " )
-    ASP111="${ASP111/Asp111: /}"
+    ASP111=$( cat output/TAAR/TAAR8/TAAR8.cadaverine.active.dock | grep -m 1 "Asp111(3.32): " )
+    ASP111="${ASP111/Asp111(3.32): /}"
     ASP111="${ASP111/[.][0-9]*/}"
-    ASP201=$( cat output/TAAR/TAAR8/TAAR8.cadaverine.active.dock | grep -m 1 "Asp201: " )
-    ASP201="${ASP201/Asp201: /}"
+    ASP201=$( cat output/TAAR/TAAR8/TAAR8.cadaverine.active.dock | grep -m 1 "Asp201(5.43): " )
+    ASP201="${ASP201/Asp201(5.43): /}"
     ASP201="${ASP201/[.][0-9]*/}"
     if [[ $ASP111 -gt "-30"  ]] || [[ $ASP201 -gt "-30"  ]]; then
         printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"

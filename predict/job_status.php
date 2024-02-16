@@ -80,7 +80,7 @@ foreach ($queue as $q)
             else
             {
                 $text = @$dr['Predicted'] ?: "incomplete";
-                $color = (@$dr['Predicted'] == "Agonist") ? 0xffffee : 0x0000ff;
+                $color = isset($dr['Predicted']) ? (($dr['Predicted'] == "Agonist") ? 0xffffee : 0x0000ff) : 0x999999;
             }
         }
         else

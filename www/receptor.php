@@ -241,8 +241,10 @@ function load_viewer(obj)
 function showSkeletal(e, smiles)
 {
     var skeletal = $("#skeletal")[0];
+    var top = e.pageY;
+    if (top > document.body.scrollHeight - 300) top -= 300;
     skeletal.style.left = `${e.pageX}px`;
-    skeletal.style.top = `${e.pageY}px`;
+    skeletal.style.top = `${top}px`;
     skeletal.innerHTML = svg_from_smiles(smiles, 300, 300);
 
     $(skeletal).show();

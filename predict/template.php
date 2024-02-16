@@ -46,6 +46,34 @@ function build_template()
                 }
             }
         }
+        else if ($fam > 50)
+        {
+            foreach ($cryoem["OR51E2"] as $hxno => $metrics)
+            {
+                foreach ($metrics as $metric => $dimensions)
+                {
+                    foreach (array_keys($dimensions) as $dimension)
+                    {
+                        if ($dimension == "sigma")
+                        {
+                            $template[$hxno][$metric][$dimension]
+                                = 0.2 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
+                                + 0.2 * $cryoem["mTAAR9"][$hxno][$metric][$dimension]
+                                + 0.6 * $cryoem["OR5K1"][$hxno][$metric][$dimension];
+                        }
+                        else
+                        {
+                            // TODO: Make the proportions dependent on sequence similarity.
+                            $template[$hxno][$metric][$dimension]
+                                = 0.40 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
+                                + 0.40 * $cryoem["OR52"][$hxno][$metric][$dimension]
+                                + 0.10 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
+                                + 0.10 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                        }
+                    }
+                }
+            }
+        }
         else
         {
             foreach ($cryoem["OR51E2"] as $hxno => $metrics)
@@ -57,17 +85,16 @@ function build_template()
                         if ($dimension == "sigma")
                         {
                             $template[$hxno][$metric][$dimension]
-                                = 0.4 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
-                                + 0.6 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                                = 0.8 * $cryoem["OR5K1"][$hxno][$metric][$dimension]
+                                + 0.2 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
                         }
                         else
                         {
                             // TODO: Make the proportions dependent on sequence similarity.
                             $template[$hxno][$metric][$dimension]
-                                = 0.40 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
-                                + 0.30 * $cryoem["OR52"][$hxno][$metric][$dimension]
-                                + 0.10 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
-                                + 0.20 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                                = 0.25 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
+                                + 0.25 * $cryoem["OR52"][$hxno][$metric][$dimension]
+                                + 0.50 * $cryoem["OR5K1"][$hxno][$metric][$dimension];
                         }
                     }
                 }

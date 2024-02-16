@@ -8,8 +8,7 @@
 #include <stdint.h>
 #include <cassert>
 #include <strings.h>
-#include "molecule.h"
-#include "aminoacid.h"
+#include "protein.h"
 
 using namespace std;
 
@@ -53,7 +52,7 @@ void AminoAcid::find_his_flips()
     }
 }
 
-AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
+AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno, Protein* parent)
 {
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
@@ -62,6 +61,7 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
     base_internal_clashes = get_internal_clashes();
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
+    protein = parent;
     if (prevaa) prevaa->next_aa = this;
     identify_conjugations();
     find_his_flips();
@@ -75,7 +75,7 @@ AminoAcid::~AminoAcid()
 }
 
 #define _ALGORITHMIC_GREEK 1
-AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
+AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein* parent)
 {
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
@@ -96,6 +96,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
     name = aa_defs[idx].name;
     prev_aa = prevaa;
     if (prevaa) prevaa->next_aa = this;
+    protein = parent;
 
     int i, j, k, l, n;
 

@@ -149,7 +149,7 @@ prepare_receptor($pdbfname, "$flxr $aflxr");
 
 $poses = process_dock("a");
 
-if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
+if (false && (!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
 {
     dynamic_clash_compensation();
 

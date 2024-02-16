@@ -691,7 +691,9 @@ ELIM $elim
 $flex_constraints
 ITERS $iter
 PROGRESS
-MOVIE
+OUTMC 1
+OUTVDWR 1
+# MOVIE
 
 FLEX 1
 WET

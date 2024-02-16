@@ -66,8 +66,8 @@ class AminoAcid : public Molecule
 {
 public:
     // Constructors.
-    AminoAcid(FILE* instream, AminoAcid* prev_res=0, int resno_offset = 0);
-    AminoAcid(const char letter, AminoAcid* prev_res=0, bool minimize_internal_clashes = true);
+    AminoAcid(FILE* instream, AminoAcid* prev_res=0, int resno_offset = 0, Protein* parent = nullptr);
+    AminoAcid(const char letter, AminoAcid* prev_res=0, bool minimize_internal_clashes = true, Protein* parent = nullptr);
     ~AminoAcid();
 
     // Getters and setters.
@@ -169,6 +169,7 @@ public:
     void set_conditional_basicity(Molecule** nearby_mols);
 
     // Misc.
+    Protein* get_parent() const { return protein; }
     void delete_sidechain();
     static Molecule** aas_to_mols(AminoAcid** aas);
     float similarity_to(const char letter);
@@ -191,6 +192,7 @@ protected:
     void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like);
     void find_his_flips();
 
+    Protein* protein = nullptr;
     int residue_no=0;
     char region[25];
     AADef* aadef=0;

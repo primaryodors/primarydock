@@ -60,7 +60,7 @@ foreach ($queue as $q)
 
     if (!$already)
     {
-        passthru("./run_prediction.sh $prot $lig &");
+        passthru("./run_prediction.sh $prot '$lig' &");
         exit;
     }
 }

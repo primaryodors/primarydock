@@ -2134,13 +2134,6 @@ std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
     }
 
     os << aa.get_residue_no();
-    /*Protein* p = aa.get_parent();
-    if (p)
-    {
-        BallesterosWeinstein bw = p->get_bw_from_resno(aa.get_residue_no());
-        if (bw.helix_no) os << "(" << bw.helix_no << "." << bw.member_no << ")";
-    }*/
-
     return os;
 }
 

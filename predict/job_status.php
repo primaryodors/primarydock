@@ -64,7 +64,7 @@ foreach ($queue as $q)
         $dr = $dock_results[$prot][$lig];
         if (intval($dr['version']) >= $version)
         {
-            if (isset($dr['Actual']) && $dr['Actual'] != "(unknown)")
+            if (isset($dr['Actual']) && $dr['Actual'] != "(unknown)" && isset($dr['Predicted']))
             {
                 if (($dr['Actual'] == "Agonist") == ($dr['Predicted'] == "Agonist"))
                 {

@@ -14,7 +14,9 @@ MOVEREL %6.28 %6.58 [0,3.0,0]
 
 # Outward tilt of entire TMR6.
 LET @axis = @7.53 - @5.58
-ROTATE @axis -16 %6.55 %6.28 %6.58
+ROTATE @axis -4 %6.55 %6.28 %6.58
+LET @axis = @2.40 - @5.58
+ROTATE @axis -11 %6.55 %6.28 %6.58
 
 # Slight tilt of TMR5 away from TMR3.
 ROTATE @axis -0.3 %5.32 %5.32 %5.68
@@ -24,7 +26,7 @@ LET &magn = @axis
 LET &mult = 1.5 / &magn
 LET @axis *= &mult
 LET @axis.x += 3.3
-LET @axis.z -= 2.2
+LET @axis.z -= 2.0
 MOVEREL %5.32 %5.68 @axis
 
 # Tilt entire TMR5 toward TMR7.
@@ -36,9 +38,11 @@ PTALIGN @5.68 @7.53 @5.50 @axis &angle
 ROTATE @axis 7 %5.50 %5.32 %5.68
 
 
+
 BRIDGE %45.51 %6.55
 MEASURE %45.51 "OD2" %6.55 "OH" &d6
 ECHO "New 45-6 Distance: " &d6
+ATOMTO %7.53 "OH" @5.58
 BRIDGE %5.58 %7.53
 MEASURE %5.58 "OH" %7.53 "OH" &d57
 ECHO "New 5-7 Distance: " &d57
@@ -52,5 +56,8 @@ DELETE %4.66 %45.45
 DELETE %45.57 %5.31
 DELETE %5.69 %6.27
 DELETE %6.60 %7.30
+
+INTC
+WORST
 
 SAVE "pdbs/OR5/OR5P3.manual.pdb"

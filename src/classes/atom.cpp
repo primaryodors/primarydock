@@ -2267,7 +2267,7 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
     for (i=0; i<3; i++) AA[i] &= 0x5f;
     os << AA << "  ";
 
-    os << setw(4) << residue << "     ";
+    os << setw(4) << residue << "    ";
 
     if (!location.x) location.x = 0;
     os << fixed << setprecision(3) << setw(8) << setfill(' ') << location.x;
@@ -2278,7 +2278,7 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
     if (!location.z) location.z = 0;
     os << fixed << setprecision(3) << setw(8) << setfill(' ') << location.z;
 
-    os << " 1.00  1.00           " << get_elem_sym();
+    os << "  1.00  1.00           " << get_elem_sym();
     os << (fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ');
     os << endl;
 }

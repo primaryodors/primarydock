@@ -2072,6 +2072,13 @@ int main(int argc, char** argv)
                 }
             }	// WORST
 
+            else if (!strcmp(words[0], "MINC"))
+            {
+                l = 1;
+                if (words[l]) raise_error("Too many parameters given for MINC.");
+                working->get_internal_clashes(1, working->get_end_resno(), true, 50);
+            }	// MINC
+
             else if (!strcmp(words[0], "LET"))
             {
                 if (!words[1]) raise_error("No parameters given for LET.");

@@ -12,11 +12,16 @@ PTALIGN @45.51 @6.55 @6.48 @axis &angle
 ROTATE @axis -5.3 %6.48 %6.28 %6.58
 MOVEREL %6.28 %6.58 [0,3.0,0]
 
+# Trip switch and CGSHL histidine.
+ATOMTO %6.48 "OH" @3.43
+ATOMTO %6.47 "CZ" @3.37
+ATOMTO %6.40 "NE2" @2.42
+
 # Outward tilt of entire TMR6.
 LET @axis = @7.53 - @5.58
-ROTATE @axis -4 %6.55 %6.28 %6.58
+ROTATE @axis -10 %6.55 %6.28 %6.58
 LET @axis = @2.40 - @5.58
-ROTATE @axis -11 %6.55 %6.28 %6.58
+ROTATE @axis -5 %6.55 %6.28 %6.58
 
 # Slight tilt of TMR5 away from TMR3.
 ROTATE @axis -0.3 %5.32 %5.32 %5.68
@@ -37,6 +42,17 @@ ROTATE @axis 5 %5.32 %5.32 %5.68
 PTALIGN @5.68 @7.53 @5.50 @axis &angle
 ROTATE @axis 7 %5.50 %5.32 %5.68
 
+# TMR7 to make room for TMR6.
+PTALIGN @45.54 @7.31 @7.49 @axis &angle
+ROTATE @axis -7.5 %7.49 %7.31 %7.49
+
+# TMR7 away from TMR2.
+PTALIGN @2.43 @7.53 @7.49 @axis &angle
+ROTATE @axis 5 %7.49 %7.49 %7.56
+
+# TMR7 away from EXR2.
+PTALIGN @45.57 @7.31 @7.49 @axis &angle
+ROTATE @axis 3 %7.49 %7.31 %7.49
 
 
 BRIDGE %45.51 %6.55
@@ -56,8 +72,13 @@ DELETE %4.66 %45.45
 DELETE %45.57 %5.31
 DELETE %5.69 %6.27
 DELETE %6.60 %7.30
+DELETE %7.57 9999
 
-INTC
-WORST
+MINC
+ECHO "Total clashes: " ~
+INTC ~
+ECHO ", worst between " ~
+WORST ~
+ECHO "."
 
 SAVE "pdbs/OR5/OR5P3.manual.pdb"

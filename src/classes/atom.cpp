@@ -2225,7 +2225,7 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     fprintf(pf, "%c%c%c %c", aa3let[0] & 0x5f, aa3let[1] & 0x5f, aa3let[2] & 0x5f, pdbchain);
 
     sprintf(numbuf, "%d", residue);
-    fprintf(pf, "%4s    ", numbuf);
+    fprintf(pf, "%4s     ", numbuf);
 
     if (!location.x) location.x = 0;
     sprintf(numbuf, "%4.3f", location.x);
@@ -2239,7 +2239,7 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     sprintf(numbuf, "%4.3f", location.z);
     fprintf(pf, "%7s ", numbuf);
 
-    fprintf(pf, "  1.00001.00           %s%c\n", get_elem_sym(), fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ' );
+    fprintf(pf, " 1.00  1.00           %s%c\n", get_elem_sym(), fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ' );
 }
 
 void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
@@ -2267,7 +2267,7 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
     for (i=0; i<3; i++) AA[i] &= 0x5f;
     os << AA << "  ";
 
-    os << setw(4) << residue << "    ";
+    os << setw(4) << residue << "     ";
 
     if (!location.x) location.x = 0;
     os << fixed << setprecision(3) << setw(8) << setfill(' ') << location.x;
@@ -2278,7 +2278,7 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
     if (!location.z) location.z = 0;
     os << fixed << setprecision(3) << setw(8) << setfill(' ') << location.z;
 
-    os << "  1.00001.00           " << get_elem_sym();
+    os << " 1.00  1.00           " << get_elem_sym();
     os << (fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ');
     os << endl;
 }

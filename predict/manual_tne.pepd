@@ -95,4 +95,4 @@ ECHO ", worst between " ~
 WORST ~
 ECHO "."
 
-SAVE "pdbs/OR5/OR5P3.manual.pdb"
+SAVE "pdbs/OR5/OR5P3.bound.pdb"

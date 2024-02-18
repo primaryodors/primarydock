@@ -1,8 +1,34 @@
 LOAD "pdbs/OR5/OR5P3.upright.pdb"
 
+# Configurable variables.
+LET &vrot6 = -5.3
+LET @xlat6 = [0,3.0,0]
+LET &tilt6a = -10
+LET &tilt6b = -5
+LET &tilt6c = -6
+LET &tilt5 = -0.3
+LET &mov5 = 1.0
+LET &mov5x = 3.3
+LET &mov5z = 2.0
+LET &tilt57 = 5
+LET &bend5 = 7
+LET &room76a = 7
+LET &room76b = 6
+LET &room7E = 5
+LET &room72 = 3
+LET &tilt1 = -7
+
+# Internal variables.
+IF $45.51 = "D" THEN LET $ExO1 = "OD1"
+ELSE IF $45.51 = "E" THEN LET $ExO1 = "OE1"
+LET $ExO2 = $ExO1 FROM 1 FOR 2
+LET $ExO2 += "2"
+
+
+# Initial measurements.
 BRIDGE %45.51 %6.55
-MEASURE %45.51 "OD1" %6.55 "OH" &d6
-MEASURE %45.51 "OD2" %6.55 "OH" &d6a
+MEASURE %45.51 $ExO1 %6.55 "OH" &d6
+MEASURE %45.51 $ExO2 %6.55 "OH" &d6a
 IF &d6a < &d6 THEN LET &d6 = &d6a
 ECHO "Old 45-6 Distance: " &d6
 MEASURE %5.58 "OH" %7.53 "OH" &d57
@@ -11,8 +37,8 @@ ECHO "Old 5-7 Distance: " &d57
 
 # Get TMR6 and EXR2 bridged.
 PTALIGN @45.51 @6.55 @6.48 @axis &angle
-ROTATE @axis -5.3 %6.48 %6.28 %6.58
-MOVEREL %6.28 %6.58 [0,3.0,0]
+ROTATE @axis &vrot6 %6.48 %6.28 %6.58
+MOVEREL %6.28 %6.58 @xlat6
 
 # Trip switch and CGSHL histidine.
 ATOMTO %6.48 "OH" @3.43
@@ -21,54 +47,54 @@ ATOMTO %6.40 "NE2" @5.68
 
 # Outward tilt of entire TMR6.
 LET @axis = @7.53 - @5.58
-ROTATE @axis -10 %6.55 %6.28 %6.58
+ROTATE @axis &tilt6a %6.55 %6.28 %6.58
 LET @axis = @2.40 - @5.58
-ROTATE @axis -5 %6.55 %6.28 %6.58
+ROTATE @axis &tilt6b %6.55 %6.28 %6.58
 LET @axis = @3.38 - @6.48
-ROTATE @axis -6 %6.49 %6.28 %6.49
+ROTATE @axis &tilt6c %6.49 %6.28 %6.49
 
 # Slight tilt of TMR5 away from TMR3.
 LET @axis = @2.40 - @5.58
-ROTATE @axis -0.3 %5.32 %5.32 %5.68
+ROTATE @axis &tilt5 %5.32 %5.32 %5.68
 
 # Move TMR5 closer to TMR7.
 LET &magn = @axis
-LET &mult = 1.5 / &magn
+LET &mult = &mov5 / &magn
 LET @axis *= &mult
-LET @axis.x += 3.3
-LET @axis.z -= 2.0
+LET @axis.x += &mov5x
+LET @axis.z -= &mov5z
 MOVEREL %5.32 %5.68 @axis
 
 # Tilt entire TMR5 toward TMR7.
 PTALIGN @5.68 @7.53 @5.32 @axis &angle
-ROTATE @axis 5 %5.32 %5.32 %5.68
+ROTATE @axis &tilt57 %5.32 %5.32 %5.68
 
 # Slight bend of TMR5.
 PTALIGN @5.68 @7.53 @5.50 @axis &angle
-ROTATE @axis 7 %5.50 %5.32 %5.68
+ROTATE @axis &bend5 %5.50 %5.32 %5.68
 
 # TMR7 to make room for TMR6.
 PTALIGN @45.54 @7.31 @7.49 @axis &angle
-ROTATE @axis 6 %7.49 %7.31 %7.49
+ROTATE @axis &room76b %7.49 %7.31 %7.49
 PTALIGN @5.36 @7.31 @7.49 @axis &angle
-ROTATE @axis 7 %7.49 %7.31 %7.49
+ROTATE @axis &room76a %7.49 %7.31 %7.49
 
 # TMR7 away from TMR2.
 PTALIGN @2.43 @7.53 @7.49 @axis &angle
-ROTATE @axis 5 %7.49 %7.49 %7.56
+ROTATE @axis &room7E %7.49 %7.49 %7.56
 
 # TMR7 away from EXR2.
 PTALIGN @45.57 @7.31 @7.49 @axis &angle
-ROTATE @axis 3 %7.49 %7.31 %7.49
+ROTATE @axis &room72 %7.49 %7.31 %7.49
 
 # TMR1 tilt.
 LET @axis = @2.38 - @1.57
-ROTATE @axis -7 %1.58 %1.28 %1.58
+ROTATE @axis &tilt1 %1.58 %1.28 %1.58
 
 
 BRIDGE %45.51 %6.55
-MEASURE %45.51 "OD1" %6.55 "OH" &d6
-MEASURE %45.51 "OD2" %6.55 "OH" &d6a
+MEASURE %45.51 $ExO1 %6.55 "OH" &d6
+MEASURE %45.51 $ExO2 %6.55 "OH" &d6a
 IF &d6a < &d6 THEN LET &d6 = &d6a
 ECHO "New 45-6 Distance: " &d6
 ATOMTO %7.53 "OH" @5.58

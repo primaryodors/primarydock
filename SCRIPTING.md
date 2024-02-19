@@ -448,6 +448,22 @@ in exactly this way by transparently replacing `AND` with `IF` behind the scenes
 When using `IF` with `GOTO`, it is possible to create loops as seen in the last example above.
 
 
+# INTC
+Examples:
+```
+INTC
+INTC ~
+INTC &clashes
+INTC A &clashes
+```
+
+Obtains the total internal clashes of the specified strand, or the working strand if no strand ID letter is given.
+
+If a float variable is specified, that variable will receive the internal clash total. Otherwise, it will be output to the command line.
+
+In the absence of an output variable, a tilde will prevent outputting a newline after the clash total.
+
+
 # LET
 Examples:
 ```
@@ -744,3 +760,22 @@ UNLIG
 ```
 
 Deletes any ligands that were loaded from a PDB by a `LOAD` command. Takes no arguments.
+
+
+# WORST
+Example:
+```
+WORST ~
+WORST %resno1 %resno2
+WORST $res1 $res2
+```
+
+Used after `INTC` to retrieve the two residues with the largest clashes.
+
+If no output variables are specified, the residue names (e.g. Asn152) will be written to the command line, separated by a space.
+The optional tilde means no newline at the end of the output.
+
+If integer variables are specified, the variables will be set to the residue numbers of the clashing residues. If string variables are specified,
+they will be set to the names of the clashing residues.
+
+Using `WORST` without an `INTC` causes undefined behavior.

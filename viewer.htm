@@ -1207,7 +1207,7 @@ function show_seqdd()
 		var resno;
 
 		var max_resno = 0;
-		for (resno = 1; resno <= resstrandid.length; resno++)
+		for (resno = 1; resno <= Math.max(...mdlresno); resno++)
 		{
 			var mdlidx = getResMdlIdx(resno, strandid);
 			if (mdlidx >= 0) max_resno = resno;
@@ -2464,6 +2464,7 @@ function apply_pdb(poresult)
 	{
 		var ln = result[i];
 		var resno = parseInt(ln.substr(22,4));
+		if (isNaN(resno)) resno = 0;
 		var strandid = ln.substr(21,1).trim();
 		if (!strandid) strandid = "A";
 		var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
@@ -2483,6 +2484,7 @@ function apply_pdb(poresult)
 						restoggled.push(0);
 						disable_spacefill();
 					});
+					if (isNaN(resno)) resno = 0;
 					mdlresno.push(resno);
 					resstrandid.push(strandid);
 					
@@ -2512,6 +2514,7 @@ function apply_pdb(poresult)
 			disable_spacefill();
 			$('#clip').trigger("input");
 		});
+		if (isNaN(resno)) resno = 0;
 		mdlresno.push(resno);
 		resstrandid.push(lstrandid);
 		sequence.push(aa1let);
@@ -2699,17 +2702,20 @@ function load_remote_pdb(pdburl)
 					else if (pieces[3] == "LIGAND_BINDING")
 					{
 						var resno = parseInt(pieces[4]);
+						if (isNaN(resno)) resno = 0;
 						ligbs.push(resno);
 					}
 					else if (pieces[3] == "BW")
 					{
 						var tmr = parseInt(pieces[4]);
 						var resno = parseInt(pieces[5]);
+						if (isNaN(resno)) resno = 0;
 						bw50r[tmr] = resno;
 					}
 					else if (pieces[3] == "MCOORD")
 					{
 						var resno = parseInt(pieces[4]);
+						if (isNaN(resno)) resno = 0;
 						mcres.push(resno);
 					}
 				}
@@ -3281,6 +3287,7 @@ function loadFile(fileData, fileName = "")
 										// console.log(tmpstr);
 										// console.log(aa1let + resno + " of strand " + strandid);
 										
+										if (isNaN(resno)) resno = 0;
 										lres = resno;
 										mdlresno.push(resno);
 										resstrandid.push(strandid);
@@ -3304,6 +3311,7 @@ function loadFile(fileData, fileName = "")
 	            			resmdl.push(comp6a);
 	            			restoggled.push(0);
 	            		});
+						if (isNaN(resno)) resno = 0;
 	            		mdlresno.push(resno);
 						resstrandid.push(last_strandid);
 						sequence.push(aa1let);

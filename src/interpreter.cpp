@@ -15,6 +15,7 @@
 #endif
 #include "classes/protein.h"
 #include "classes/group.h"
+#include "classes/dynamic.h"
 
 using namespace std;
 
@@ -1962,6 +1963,123 @@ int main(int argc, char** argv)
                 goto _interpret_command;
             }	// IF
 
+            else if (!strcmp(words[0], "INTC"))
+            {
+                l = 1;
+                n = -1;
+                if (!words[l])
+                {
+                    f = working->get_internal_clashes(1, working->get_end_resno());
+                }
+                else if (words[l][0] >= 'A' && words[l][0] <= 'Z')
+                {
+                    if (!strands[words[l][0]-'A']) raise_error("No strand with specified chain letter.");
+                    else f = strands[words[l][0]-'A']->get_internal_clashes(1, strands[words[l][0]-'A']->get_end_resno());
+                    l++;
+                }
+                else f = working->get_internal_clashes(1, working->get_end_resno());
+
+                if (words[l] && (words[l][0] == '&'))
+                {
+                    n = find_var_index(words[l++]);
+                    if (n<0)
+                    {
+                        n = vars++;
+                        script_var[n].name = words[l-1];
+                        script_var[n].vt = type_from_name(words[l-1]);
+                    }
+                }
+
+                if (n < 0)
+                {
+                    bool b = true;
+                    cout << f;
+                    if (words[l])
+                    {
+                        if (words[l][0] == '~')
+                        {
+                            b = false;
+                        }
+                        else raise_error("Unknown argument.");
+                    }
+                    
+                    if (b) cout << endl;
+                }
+                else script_var[n].value.f = f;
+            }	// INTC
+
+            else if (!strcmp(words[0], "WORST"))
+            {
+                l = 1;
+                j = -1;
+                if (words[l] && words[l][0] >= 'A' && words[l][0] <= 'Z')
+                {
+                    j = words[l++][0] - 'A';
+                    if (!strands[j]) raise_error("Empty strand.");
+                }
+
+                if (words[l] && words[l][0] != '~')
+                {
+                    n = find_var_index(words[l]);
+                    if (n<0)
+                    {
+                        n = vars++;
+                        script_var[n].name = words[l];
+                        script_var[n].vt = type_from_name(words[l]);
+                    }
+
+                    if (words[l][0] == '$')
+                    {
+                        script_var[n].value.psz = new char[65536];
+                        strcpy(script_var[n].value.psz, (j<0 ? working : strands[j])->stop1 ? (j<0 ? working : strands[j])->stop1->get_name() : "null");
+                        l++;
+                    }
+                    else if (words[l][0] == '%')
+                    {
+                        script_var[n].value.n = (j<0 ? working : strands[j])->stop1 ? (j<0 ? working : strands[j])->stop1->get_residue_no() : 0;
+                        l++;
+                    }
+                }
+                else cout << ((j<0 ? working : strands[j])->stop1 ? (j<0 ? working : strands[j])->stop1->get_name() : "null") << " ";
+
+                if (words[l] && words[l][0] != '~')
+                {
+                    n = find_var_index(words[l]);
+                    if (n<0)
+                    {
+                        n = vars++;
+                        script_var[n].name = words[l];
+                        script_var[n].vt = type_from_name(words[l]);
+                    }
+
+                    if (words[l][0] == '$')
+                    {
+                        script_var[n].value.psz = new char[65536];
+                        strcpy(script_var[n].value.psz, (j<0 ? working : strands[j])->stop1 ? (j<0 ? working : strands[j])->stop2->get_name() : "null");
+                        l++;
+                    }
+                    else if (words[l][0] == '%')
+                    {
+                        script_var[n].value.n = (j<0 ? working : strands[j])->stop1 ? (j<0 ? working : strands[j])->stop2->get_residue_no() : 0;
+                        l++;
+                    }
+                }
+                else
+                {
+                    bool b = false;
+                    if (words[l] && words[l][0] == '~') b = true;
+                    cout << ((j<0 ? working : strands[j])->stop1 ? (j<0 ? working : strands[j])->stop2->get_name() : "null");
+                    if (!b) cout << endl;
+                }
+            }	// WORST
+
+            else if (!strcmp(words[0], "MINC"))
+            {
+                l = 1;
+                if (words[l]) raise_error("Too many parameters given for MINC.");
+                working->get_internal_clashes(1, working->get_end_resno(), true, 50);
+            }	// MINC
+
             else if (!strcmp(words[0], "LET"))
             {
                 if (!words[1]) raise_error("No parameters given for LET.");
@@ -3050,7 +3168,25 @@ int main(int argc, char** argv)
                     if (ex == 0xbad7312) raise_error("Cannot UPRIGHT protein without transmembrane regions named TMR{n}.");
                     else raise_error("Unknown error.");
                 }
-            }	// UPRIGHT
+            }   // UPRIGHT
+            else if (!strcmp(words[0], "WIND"))
+            {
+                l = 1;
+                if (!words[l]) raise_error("Insufficient parameters for WIND");
+
+                DynamicMotion dyn(working);
+                dyn.type = dyn_wind;
+
+                dyn.start_resno = working->get_bw_from_resno(interpret_single_int(words[l++]));
+                if (!words[l]) raise_error("Insufficient parameters for WIND");
+                dyn.end_resno = working->get_bw_from_resno(interpret_single_int(words[l++]));
+
+                if (!words[l]) raise_error("Insufficient parameters for WIND");
+                dyn.bias = interpret_single_float(words[l++]);
+
+                if (words[l]) raise_error("Too many parameters for WIND");
+                dyn.apply_absolute(1);
+            }	// WIND
 
             else
             {

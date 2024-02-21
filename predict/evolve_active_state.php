@@ -144,6 +144,8 @@ foreach ($tne as $ln)
 
 for ($generation=1; $generation<=100; $generation++)
 {
+    echo "Beginning generation $generation...\n";
+
     // Create 20 hybrids. If there are no parents yet, create 20 mutants instead.
     $population = [];
     if (isset($best) && isset($secondbest))
@@ -170,11 +172,14 @@ for ($generation=1; $generation<=100; $generation++)
         }
     }
 
+    echo "Spawned population.\n";
+
     // Run each individual through pepteditor.
     foreach ($population as $i => $individual)
     {
         $result = runpepd($individual);
-    
+        echo ".";
+
         // Score the results.
         $score = score_result($result);
 
@@ -196,6 +201,7 @@ for ($generation=1; $generation<=100; $generation++)
             $secondbest = $individual;
         }
     }
+    echo "\n";
 
     echo "Best score: $best_score\n";
 }

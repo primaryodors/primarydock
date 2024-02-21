@@ -1,4 +1,6 @@
 <?php
+chdir(__DIR__);
+require_once("../data/protutils.php");
 
 $mutation_rate = 0.1;
 
@@ -14,7 +16,13 @@ function runpepd($values)
     foreach ($tne as $ln)
     {
         if (substr($ln, 0, 5) == "SAVE ") continue;
-        if (substr($ln, 0, 4) == "LET ")
+        else if (@$argv[1] && substr($ln, 0, 5) == "LOAD ")
+        {
+            $orid = $argv[1];
+            $fam = family_from_protid($orid);
+            $ln = "LOAD \"pdbs/$fam/$orid.upright.pdb\"";
+        }
+        else if (substr($ln, 0, 4) == "LET ")
         {
             $words = explode(" ", $ln);
             if ($words[2] == "=")
@@ -84,7 +92,12 @@ function score_result($result)
 
             if ($shouldbe1 && $is)
             {
-                if ($shouldbe0) $score += cos((($is-$shouldbe0) / ($shouldbe1-$shouldbe0) - 0.5)*6.28);
+                if ($shouldbe0)
+                {
+                    if ($score >= $shouldbe0 && $score <= $shouldbe1)
+                        $score += 0.5+0.5*cos((($is-$shouldbe0) / ($shouldbe1-$shouldbe0) - 0.5)*6.28);
+                    else $score -= min(abs($shouldbe0 - $score), abs($score - $shouldbe1)) / ($shouldbe1-$shouldbe0);
+                }
                 else $score += ($shouldbe1-$is) / $shouldbe1;
             }
         }

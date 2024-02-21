@@ -9,16 +9,16 @@ function frand($min, $max)
     return 1e-6 * rand($min*1e6, $max*1e6);
 }
 
-function runpepd($values)
+function runpepd($values, $save = false)
 {
     global $tne;
     $pepd = [];
     foreach ($tne as $ln)
     {
         if (substr($ln, 0, 5) == "SAVE ") continue;
-        else if (@$argv[1] && substr($ln, 0, 5) == "LOAD ")
+        else if (substr($ln, 0, 5) == "LOAD ")
         {
-            $orid = $argv[1];
+            $orid = @$argv[1] ?: explode(".upright.",explode("/", $ln)[2])[0];
             $fam = family_from_protid($orid);
             $ln = "LOAD \"pdbs/$fam/$orid.upright.pdb\"";
         }
@@ -48,13 +48,15 @@ function runpepd($values)
         $pepd[] = $ln;
     }
 
-    $fp = fopen("tmp/evolving.pepd", "wb");
-    if (!$fp) die("FAILED to open temporary file.\n");
+    if ($save) $pepd[] = "SAVE pdbs/$fam/$orid.evolved.pdb";
+    $pepdname = $save ? "pdbs/$fam/$orid.evolved.pepd" : "tmp/evolving.pepd";
+    $fp = fopen($pepdname, "wb");
+    if (!$fp) die("FAILED to open $pepdname for writing.\n");
     fwrite($fp, implode("\n", $pepd));
     fclose($fp);
 
     $output = [];
-    exec("bin/pepteditor tmp/evolving.pepd", $output);
+    exec("bin/pepteditor $pepdname", $output);
     return $output;
 }
 
@@ -219,3 +221,4 @@ for ($generation=1; $generation<=100; $generation++)
     echo "Best score: $best_score\n";
 }
 
+runpepd($best, true);

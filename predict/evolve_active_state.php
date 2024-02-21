@@ -219,6 +219,6 @@ for ($generation=1; $generation<=100; $generation++)
     echo "\n";
 
     echo "Best score: $best_score\n";
+    runpepd($best, true);
 }
 
-runpepd($best, true);

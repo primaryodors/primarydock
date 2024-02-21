@@ -1817,35 +1817,33 @@ Bond** Molecule::get_rotatable_bonds()
 
                 int fa = lb[j]->atom->get_family(),
                     fb = lb[j]->btom->get_family();
-                
-                // 2 years of development and still no ring rotations.
+
                 if (lb[j]->atom->in_same_ring_as(lb[j]->btom))
                 {
                     lb[j]->can_rotate = lb[j]->can_flip = false;
                     continue;
                 }
 
+                #if allow_rotate_conjugated_single_bonds
                 // Generally, a single bond from a pi atom to an amino group cannot rotate.
                 if (	(pia && (fb == PNICTOGEN || fb == CHALCOGEN))
                         ||
                         (pib && (fa == PNICTOGEN || fa == CHALCOGEN))
                    )
+                #else
+                if (pia && pib)
+                #endif
                 {
                     lb[j]->can_rotate = false;
+                    #if allow_rotate_conjugated_single_bonds
                     if ((fa == CHALCOGEN || fb == CHALCOGEN)
                         && fa != fb
                         && lb[j]->btom->get_bonded_atoms_count() > 1
-                        ) lb[j]->can_flip = true;
-                }
-
-                // If atoms a and b are pi, and a-b cannot rotate, then a-b can flip.
-                if (!lb[j]->can_rotate
-                    && lb[j]->btom->is_bonded_to(CHALCOGEN)
-                    && fa != CHALCOGEN
-                    && !(lb[j]->atom->in_same_ring_as(lb[j]->btom))
-                    )
-                {
-                    lb[j]->can_flip = true;
+                        )
+                    #else
+                    if (lb[j]->cardinality < 1.7)
+                    #endif
+                        lb[j]->can_flip = true;
                 }
 
                 if (lb[j]->btom

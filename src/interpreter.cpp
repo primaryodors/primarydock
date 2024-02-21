@@ -1611,6 +1611,8 @@ int main(int argc, char** argv)
                 sprintf(buffer1, "%s:", words[1]);
                 for (n=0; n<script_lines.size(); n++)
                 {
+                    if (script_lines[n][0] == '#') continue;
+
                     psz = new char[256];
                     strcpy(psz, script_lines[n].c_str());
                     if (!strcmp(psz, buffer1))

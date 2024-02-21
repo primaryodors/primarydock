@@ -192,6 +192,91 @@ GOSUB measure
 UNLIG
 
 
+DOWNLOAD RCSB 8J20 "pdbs/8j20.pdb" ONCE
+DOWNLOAD RCSB 8J21 "pdbs/8j21.pdb" ONCE
+DOWNLOAD RCSB 8J22 "pdbs/8j22.pdb" ONCE
+DOWNLOAD RCSB 8J24 "pdbs/8j24.pdb" ONCE
+
+DOWNLOAD AF O15552 "pdbs/FFAR2.pdb" ONCE
+DOWNLOAD AF O14843 "pdbs/FFAR3.pdb" ONCE
+
+UNCHAIN I
+UNCHAIN A
+LOAD "pdbs/FFAR3.pdb" A I
+REGION TMR1 14 44
+REGION TMR2 49 76
+REGION TMR3 87 118
+REGION TMR4 129 155
+REGION TMR5 175 212
+REGION TMR6 217 251
+REGION TMR7 258 279
+REGION HXR8 281 320
+BWMOTIF 1 flvglpaNllal
+BWMOTIF 2 ltlaDlllll
+BWMOTIF 3 laxxsieRylxva
+BWMOTIF 34 sierylxvaxPxxyk
+BWMOTIF 4 Wxxxxxhcsiv
+BWMOTIF 5 lpvrlexxvlfxxPxxxtxfcyxr
+BWMOTIF 6 tllnflvcfgPynvsh
+BWMOTIF 7 sslnxxxdPxlyyfsss
+UPRIGHT I
+LOAD "pdbs/8j20.pdb" D A +
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/FFAR3.valeric_acid.AR420626.bna.pdb"
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8j21.pdb" D A +
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/FFAR3.butyric_acid.bna.pdb"
+GOSUB measure
+UNLIG
+
+UNCHAIN I
+UNCHAIN A
+LOAD "pdbs/FFAR2.pdb" A I
+REGION TMR1 5 36
+REGION TMR2 43 70
+REGION TMR3 79 112
+REGION TMR4 123 149
+REGION TMR5 170 208
+REGION TMR6 214 248
+REGION TMR7 255 276
+REGION HXR8 278 312
+BWMOTIF 1 flvglpaNllal
+BWMOTIF 2 ltlaDlllll
+BWMOTIF 3 laxxsieRylxva
+BWMOTIF 34 sierylxvaxPxxyk
+BWMOTIF 4 Wxxxxxhcsiv
+BWMOTIF 5 lpvrlexxvlfxxPxxxtxfcyxr
+BWMOTIF 6 tllnflvcfgPynvsh
+BWMOTIF 7 sslnxxxdPxlyyfsss
+UPRIGHT I
+LOAD "pdbs/8j22.pdb" D A +
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/FFAR2.TUG-1375.bna.pdb"
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8j24.pdb" D A +
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/FFAR2.acetic_acid.bna.pdb"
+GOSUB measure
+UNLIG
+
+
+
+
 # https://github.com/dipizio/OR5K1_binding_site.git
 IF NOT EXISTS ../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb THEN QUIT
 

@@ -492,7 +492,7 @@ body.whtbk option.unknown
     width: 503px;
 }
 
-#seqdd
+#seqdd, #sfrndd
 {
 	background-color: #223355cc;
 	position: absolute;
@@ -721,8 +721,8 @@ function rotate3D(point, source, axis, theta)
 
 <a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
 <a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
-<a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="hydrogens=true; spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show(); $('#hydro').hide(); $('#nohyd').show(); ">&#x1F388;</a>
-<a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="if (mdlstrands.length) hydrogens=false; ballAndStick(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#spcfill').show(); if (mdlstrands.length) { $('#hydro').show(); $('#nohyd').hide(); } " style="display: none; background-color: #234;">&#x1F9B4;</a>
+<a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode);">&#x1F388;</a>
+<a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="ballAndStick();" style="display: none; background-color: #234;">&#x1F9B4;</a>
 <a id="spinon" title="Spin On" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
 <a id="spinoff" title="Spin Off" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
 
@@ -1207,7 +1207,7 @@ function show_seqdd()
 		var resno;
 
 		var max_resno = 0;
-		for (resno = 1; resno <= resstrandid.length; resno++)
+		for (resno = 1; resno <= Math.max(...mdlresno); resno++)
 		{
 			var mdlidx = getResMdlIdx(resno, strandid);
 			if (mdlidx >= 0) max_resno = resno;
@@ -1948,7 +1948,8 @@ function showMetalSideChains()
 
 function ballAndStick()
 {
-	
+	if (mdlstrands.length) hydrogens=false;
+
 	var i;
 	for (i=0; i<gmodel.length && i<gmrparams.length && i<gmrep.length; i++)
 	{
@@ -1972,33 +1973,83 @@ function ballAndStick()
 		curr_ligand.addRepresentation(model.length ? "licorice" : "ball+stick", p);
 	}
 	spcfill = false;
+
+	refreshSideChainsVisible();
+	showNode(gnode);
+	$('#bstick').hide();
+	$('#spcfill').show();
+	if (mdlstrands.length)
+	{
+		$('#hydro').show();
+		$('#nohyd').hide();
+	}
 }
 
-function spaceFill()
+var gspcfill_resnos = [];
+
+function spaceFill(resno = -1)
 {
-	var i;
-	for (i=0; i<gmodel.length && i<gmrparams.length && i<gmrep.length; i++)
+	if (model.length)
 	{
-		if (gmrep[i] == "ball+stick")
+		if (resno >= 0)
 		{
-			gmodel[i].removeAllRepresentations();
-			var p = gmrparams[i];
+			gspcfill_resnos.push(resno);
+			showNode(gnode);
+		}
+		else
+		{
+			// TODO: pull up a list from model[0].structure.residueStore.resno array.
+			var sfrndd = document.createElement('div');
+			sfrndd.id = "sfrndd";
+			sfrndd.style.position = "absolute";
+			sfrndd.style.top = 50;
+			sfrndd.style.right = "30%";
+			sfrndd.style.maxWidth = "33%";
+			sfrndd.setAttribute("onmouseleave", "document.body.removeChild(this);");
+			sfrndd.innerHTML = "<a href=\"#\" onclick=\"spaceFill(0);\">Ligand</a><hr>";
+
+			model[0].structure.residueStore.resno.forEach(function(value)
+			{
+				if (value) sfrndd.innerHTML += "<a href=\"#\" onclick=\"spaceFill(" + value + ");\">" + value + "</a> ";
+			});
+			
+			sfrndd.innerHTML += "<hr><a href=\"#\" onclick=\"gspcfill_resnos = []; ballAndStick();\">none</a>";
+
+			document.body.appendChild(sfrndd);
+		}
+	}
+	else
+	{
+		var i;
+		for (i=0; i<gmodel.length && i<gmrparams.length && i<gmrep.length; i++)
+		{
+			if (gmrep[i] == "ball+stick")
+			{
+				gmodel[i].removeAllRepresentations();
+				var p = gmrparams[i];
+				if (whtbk) p.opacity = 1;
+				if (!hydrogens) p.sele = "* and not hydrogen";
+				else p.sele = "";
+				gmodel[i].addRepresentation("spacefill", p);
+			}
+		}
+		if (curr_ligand)
+		{
+			curr_ligand.removeAllRepresentations();
+			var p = ligand_params;
 			if (whtbk) p.opacity = 1;
 			if (!hydrogens) p.sele = "* and not hydrogen";
 			else p.sele = "";
-			gmodel[i].addRepresentation("spacefill", p);
+			curr_ligand.addRepresentation("spacefill", p);
 		}
+		spcfill = true;
+		hydrogens=true;
+		showNode(gnode);
+		$('#spcfill').hide();
+		$('#bstick').show();
+		$('#hydro').hide();
+		$('#nohyd').show();
 	}
-	if (curr_ligand)
-	{
-		curr_ligand.removeAllRepresentations();
-		var p = ligand_params;
-		if (whtbk) p.opacity = 1;
-		if (!hydrogens) p.sele = "* and not hydrogen";
-		else p.sele = "";
-		curr_ligand.addRepresentation("spacefill", p);
-	}
-	spcfill = true;
 }
 
 function disable_spacefill()
@@ -2464,6 +2515,7 @@ function apply_pdb(poresult)
 	{
 		var ln = result[i];
 		var resno = parseInt(ln.substr(22,4));
+		if (isNaN(resno)) resno = 0;
 		var strandid = ln.substr(21,1).trim();
 		if (!strandid) strandid = "A";
 		var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
@@ -2483,6 +2535,7 @@ function apply_pdb(poresult)
 						restoggled.push(0);
 						disable_spacefill();
 					});
+					if (isNaN(resno)) resno = 0;
 					mdlresno.push(resno);
 					resstrandid.push(strandid);
 					
@@ -2512,6 +2565,7 @@ function apply_pdb(poresult)
 			disable_spacefill();
 			$('#clip').trigger("input");
 		});
+		if (isNaN(resno)) resno = 0;
 		mdlresno.push(resno);
 		resstrandid.push(lstrandid);
 		sequence.push(aa1let);
@@ -2699,17 +2753,20 @@ function load_remote_pdb(pdburl)
 					else if (pieces[3] == "LIGAND_BINDING")
 					{
 						var resno = parseInt(pieces[4]);
+						if (isNaN(resno)) resno = 0;
 						ligbs.push(resno);
 					}
 					else if (pieces[3] == "BW")
 					{
 						var tmr = parseInt(pieces[4]);
 						var resno = parseInt(pieces[5]);
+						if (isNaN(resno)) resno = 0;
 						bw50r[tmr] = resno;
 					}
 					else if (pieces[3] == "MCOORD")
 					{
 						var resno = parseInt(pieces[4]);
+						if (isNaN(resno)) resno = 0;
 						mcres.push(resno);
 					}
 				}
@@ -2851,6 +2908,9 @@ function showPose(p)
 
 function showNode(n)
 {
+	// TODO: get the resnos list from model[i].structure.residueStore.resno array and check global spacefill resnos - zero means ligand.
+	// Each spacefill resno, model[i].addRepresentation("spacefill", {sele: resno}); (but no sele resno if ligand).
+
     var i, bbi=-1;
     var nmax = 0;
     for (i=0; i<model.length; i++)
@@ -2862,12 +2922,27 @@ function showNode(n)
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
 			if (spcfill || whtbk) lparam.opacity = 1;
-			if (!hydrogens) lparam.sele = "* and not hydrogen";
+			if (is_ligand[i] && gspcfill_resnos.find((element) => element == 0) !== undefined)
+			{
+				lrep = "spacefill";
+				lparam.sele = "*";
+			}
+			else if (!hydrogens) lparam.sele = "* and not hydrogen";
             model[i].addRepresentation( lrep, lparam );
             if (is_ligand[i])
 			{
 				curr_ligand = model[i];
 				ligand_params = mrparams[i];
+			}
+			else
+			{
+				gspcfill_resnos.forEach(function(resno)
+				{
+					var lparam = Object.assign({}, mrparams[i]);
+					lparam.sele = resno.toString();
+					lparam.opacity = 1.0;
+					model[i].addRepresentation("spacefill", lparam);
+				});
 			}
         }
         else
@@ -3281,6 +3356,7 @@ function loadFile(fileData, fileName = "")
 										// console.log(tmpstr);
 										// console.log(aa1let + resno + " of strand " + strandid);
 										
+										if (isNaN(resno)) resno = 0;
 										lres = resno;
 										mdlresno.push(resno);
 										resstrandid.push(strandid);
@@ -3304,6 +3380,7 @@ function loadFile(fileData, fileName = "")
 	            			resmdl.push(comp6a);
 	            			restoggled.push(0);
 	            		});
+						if (isNaN(resno)) resno = 0;
 	            		mdlresno.push(resno);
 						resstrandid.push(last_strandid);
 						sequence.push(aa1let);

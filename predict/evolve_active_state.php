@@ -11,7 +11,7 @@ function frand($min, $max)
 
 function runpepd($values, $save = false)
 {
-    global $tne;
+    global $tne, $argv;
     $pepd = [];
     foreach ($tne as $ln)
     {

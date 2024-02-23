@@ -38,7 +38,7 @@ foreach ($lines as $ln)
             $emp = all_empirical_pairs_for_receptor($pieces[1]);
             foreach ($emp as $oid => $pair)
             {
-                $queue[] = [$pieces[1], str_replace(' ', '_', $pair['full_name'])];
+                $queue[] = [$pieces[1], str_replace(' ', '_', $odors[$oid]['full_name'])];
             }
         }
         else $queue[] = [$pieces[1], $pieces[2]];

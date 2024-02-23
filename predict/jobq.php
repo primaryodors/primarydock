@@ -1,4 +1,6 @@
 <?php
+chdir(__DIR__);
+require_once("../data/odorutils.php");
 
 $procs = [];
 exec("ps -ef | grep obabel | grep -v grep", $procs);
@@ -29,7 +31,18 @@ foreach ($lines as $ln)
     $pieces = explode(" ", $ln);
 
     if ($pieces[0] == "MAX") $max_concurrent = intval($pieces[1]);
-    else if ($pieces[0] == "PRDT") $queue[] = [$pieces[1], $pieces[2]];
+    else if ($pieces[0] == "PRDT")
+    {
+        if ($pieces[2] == "*")
+        {
+            $emp = all_empirical_pairs_for_receptor($pieces[1]);
+            foreach ($emp as $oid => $pair)
+            {
+                $queue[] = [$pieces[1], $pair['full_name']];
+            }
+        }
+        else $queue[] = [$pieces[1], $pieces[2]];
+    }
 }
 if (!count($queue)) die("No jobs.\n");
 

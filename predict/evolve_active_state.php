@@ -11,14 +11,14 @@ function frand($min, $max)
 
 function runpepd($values, $save = false)
 {
-    global $tne, $argv;
+    global $tne, $argv, $prots;
     $pepd = [];
     foreach ($tne as $ln)
     {
         if (substr($ln, 0, 5) == "SAVE ") continue;
         else if (substr($ln, 0, 5) == "LOAD ")
         {
-            $orid = @$argv[1] ?: explode(".upright.",explode("/", $ln)[2])[0];
+            $orid = (@$argv[1] && isset($prots[$argv[1]])) ? $argv[1] : explode(".upright.",explode("/", $ln)[2])[0];
             $fam = family_from_protid($orid);
             $ln = "LOAD \"pdbs/$fam/$orid.upright.pdb\"";
         }
@@ -72,6 +72,9 @@ function score_result($result)
             $shouldbe1 = 0;
             $is = 0;
 
+            $mult = 1.0;
+            if (false!==strpos($ln, "clashes")) $mult = 0.001;
+
             foreach ($words as $i => $w)
             {
                 if (substr($w, -1) == ':') $is = floatval($words[$i+1]);
@@ -97,10 +100,10 @@ function score_result($result)
                 if ($shouldbe0)
                 {
                     if ($score >= $shouldbe0 && $score <= $shouldbe1)
-                        $score += 0.5+0.5*cos((($is-$shouldbe0) / ($shouldbe1-$shouldbe0) - 0.5)*6.28);
-                    else $score -= min(abs($shouldbe0 - $score), abs($score - $shouldbe1)) / ($shouldbe1-$shouldbe0);
+                        $score += $mult * (0.5+0.5*cos((($is-$shouldbe0) / ($shouldbe1-$shouldbe0) - 0.5)*6.28));
+                    else $score -= $mult * (min(abs($shouldbe0 - $score), abs($score - $shouldbe1)) / ($shouldbe1-$shouldbe0));
                 }
-                else $score += ($shouldbe1-$is) / $shouldbe1;
+                else $score += $mult * (($shouldbe1-$is) / $shouldbe1);
             }
         }
     }
@@ -108,8 +111,8 @@ function score_result($result)
 }
 
 chdir(__DIR__);
-$tne = explode("\n", file_get_contents("manual_tne.pepd"));
 chdir("..");
+$tne = explode("\n", file_get_contents((@$argv[1] && file_exists($argv[1])) ? $argv[1] : "predict/manual_5P3.pepd"));
 
 $evparams = [];
 $evtypes = [];
@@ -157,7 +160,7 @@ foreach ($tne as $ln)
     }
 }
 
-for ($generation=1; $generation<=100; $generation++)
+for ($generation=1; $generation<=1000000; $generation++)
 {
     echo "Beginning generation $generation...\n";
 

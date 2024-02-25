@@ -3024,7 +3024,7 @@ int main(int argc, char** argv)
 
             }	// SEARCH
 
-            else if (!strcmp(words[0], "SIDEREPL"))
+            else if (!strcmp(words[0], "SIDEREPL") || !strcmp(words[0], "SCREPL"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for SIDEREPL.");
                 if (words[2] && words[3]) raise_error("Too many parameters given for SIDEREPL.");

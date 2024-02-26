@@ -28,7 +28,7 @@ exec("make primarydock", $output, $result);
 if ($result) die("Build fail.\n".print_r($output, true));
 
 // Configurable variables
-$dock_retries = 1;
+$elim = 0;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 if (!isset($do_scwhere)) $do_scwhere = false;
 $metrics_to_process =
@@ -413,7 +413,7 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
-    global $ligname, $isomers, $protid, $configf, $dock_retries, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
+    global $ligname, $isomers, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
     global $cenres, $size, $docker, $mcoord, $atomto, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
@@ -731,20 +731,12 @@ heredoc;
         }
         else
         {
-            $elim = 0;
-            for ($try = 0; $try < $dock_retries; $try++)
-            {            
-                set_time_limit(300);
-                $outlines = [];
-                $cmd = "bin/primarydock \"$cnfname\"";
-                if ($elim) $cmd .= " --elim $elim";
-                echo "$cmd\n";
-                passthru($cmd, $retvar);
-                $outlines = explode("\n", file_get_contents($outfname));
-                if (count($outlines) >= 200) break;
-                if (!$elim) $elim = 99;
-                else $elim *= 1.333;
-            }
+            set_time_limit(300);
+            $outlines = [];
+            $cmd = "bin/primarydock \"$cnfname\"";
+            echo "$cmd\n";
+            passthru($cmd, $retvar);
+            $outlines = explode("\n", file_get_contents($outfname));
         }
 
         if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";

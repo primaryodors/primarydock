@@ -7236,8 +7236,8 @@
     },
     "2cb1e8f9df11e35e3246d7a9b343ee78":
     {
-        "full_name": "caramel furanone",
-        "name2": "sotolone",
+        "full_name": "sotolone",
+        "name2": "caramel furanone",
         "smiles": "CC1C(=C(C(=O)O1)O)C",
         "isomers":
         {

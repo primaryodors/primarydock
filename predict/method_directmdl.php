@@ -83,7 +83,7 @@ $pdbfname_inactive = str_replace(".upright.pdb", ".apo.pdb", $pdbfname);
 $pdbfname_active = str_replace(".upright.pdb", ".bound.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
-if (!file_exists($pdbfname_inactive) && file_exists($pdbfname_active))              // If no apo model, just use upright.
+if (!file_exists($pdbfname_inactive))              // If no apo model, just use upright.
     $pdbfname_inactive = $pdbfname;
 
 if (!file_exists($pdbfname_active))

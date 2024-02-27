@@ -1238,7 +1238,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "creamy buttery buttermilk dairy cheesy fatty waxy sweaty green"
+                "creamy",
+                "buttery",
+                "buttermilk",
+                "dairy",
+                "cheesy",
+                "fatty",
+                "waxy",
+                "sweaty",
+                "green"
             ]
         },
         "activity":
@@ -3204,7 +3212,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "alliaceous garlic onion sulfurous savory"
+                "alliaceous",
+                "garlic",
+                "onion",
+                "sulfurous",
+                "savory"
             ]
         },
         "activity":
@@ -7387,7 +7399,16 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "dry amber ambergris paper musk woody cedar pine green seedy"
+                "dry",
+                "amber",
+                "ambergris",
+                "paper",
+                "musk",
+                "woody",
+                "cedar",
+                "pine",
+                "green",
+                "seedy"
             ]
         },
         "activity":
@@ -7448,7 +7469,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "alliaceous sulfurous garlic onion roasted cooked_onion grilled charred meaty"
+                "alliaceous",
+                "sulfurous",
+                "garlic",
+                "onion",
+                "roasted",
+                "cooked_onion",
+                "grilled",
+                "charred",
+                "meaty"
             ]
         },
         "activity":
@@ -18264,6 +18293,29 @@
         },
         "oid": "7bd9be1122eae430ae2f32aa2f5562fc"
     },
+    "7c319a314c48d85bd3de7f2ed621340f":
+    {
+        "full_name": "1,1,6-trimethyl-1,2-dihydronaphthalene",
+        "aroma":
+        {
+            "https://en.wikipedia.org/wiki/1,1,6-Trimethyl-1,2-dihydronaphthalene":
+            [
+                "petrol"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.jafc.3c08230":
+            {
+                "OR8H1":
+                {
+                    "adjusted_curve_top": "1.5",
+                    "ec50": "-4.49"
+                }
+            }
+        },
+        "smiles": "CC1=CC2=C(C=C1)C(CC=C2)(C)C"
+    },
     "7c39c04478b0ebb73a21dbb28ed2cd7a":
     {
         "full_name": "phenyl acetate",
@@ -19995,6 +20047,32 @@
         },
         "oid": "85e7a14fc546cbfa1ddd9cce0f303b56"
     },
+    "8605cd701ef83bfb773714cd01c6bf2b":
+    {
+        "full_name": "(S)-sotolone",
+        "aroma":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.jafc.3c09142":
+            [
+                "sweet",
+                "milky",
+                "acidic",
+                "nutty"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.jafc.3c09142":
+            {
+                "OR8D1":
+                {
+                    "ec50": "-4.07"
+                }
+            }
+        },
+        "smiles": "C[C@H]1C(=C(C(=O)O1)O)C",
+        "oid": "8605cd701ef83bfb773714cd01c6bf2b"
+    },
     "86208d18e5619cf3b167a5185465f418":
     {
         "full_name": "bicyclononalactone",
@@ -20128,7 +20206,8 @@
                     "adjusted_curve_top": "11.00"
                 }
             }
-        }
+        },
+        "oid": "86b2ccf7d68271f9d54e44fa8bc79c83"
     },
     "86bd1a10bf74d7227a7881822d7c57a2":
     {
@@ -20663,7 +20742,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sulfurous garlic onion eggnog coffee fatty beefy roasted cooked"
+                "sulfurous",
+                "garlic",
+                "onion",
+                "eggnog",
+                "coffee",
+                "fatty",
+                "beefy",
+                "roasted",
+                "cooked"
             ]
         },
         "activity":
@@ -22569,7 +22656,14 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sweet pineapple tropical fruity candy waxy apple green"
+                "sweet",
+                "pineapple",
+                "tropical",
+                "fruity",
+                "candy",
+                "waxy",
+                "apple",
+                "green"
             ]
         },
         "activity":
@@ -27549,7 +27643,17 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sweet green fruity estery pineapple apple pear fatty waxy cognac melon"
+                "sweet",
+                "green",
+                "fruity",
+                "estery",
+                "pineapple",
+                "apple",
+                "pear",
+                "fatty",
+                "waxy",
+                "cognac",
+                "melon"
             ]
         },
         "activity":
@@ -28240,7 +28344,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "green_pea earthy beany chocolate nutty"
+                "green_pea",
+                "earthy",
+                "beany",
+                "chocolate",
+                "nutty"
             ]
         },
         "activity":
@@ -29306,6 +29414,32 @@
         },
         "oid": "cc2cf68861f527bf30390cb049cea5e5"
     },
+    "cc8c5fc564380994ed3e2adfa62f7fd1":
+    {
+        "full_name": "(R)-sotolone",
+        "smiles": "C[C@@H]1C(=C(C(=O)O1)O)C",
+        "aroma":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.jafc.3c09142":
+            [
+                "smoky",
+                "burnt",
+                "herbal",
+                "green"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.jafc.3c09142":
+            {
+                "OR8D1":
+                {
+                    "ec50": "-3.78"
+                }
+            }
+        },
+        "oid": "cc8c5fc564380994ed3e2adfa62f7fd1"
+    },
     "cc968198024a099d88b830152dd29b15":
     {
         "full_name": "heptanethiol",
@@ -29443,7 +29577,18 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sweet powdery balsamic vanilla fruity plum cherry tonka creamy spicy coumarinic licorice"
+                "sweet",
+                "powdery",
+                "balsamic",
+                "vanilla",
+                "fruity",
+                "plum",
+                "cherry",
+                "tonka",
+                "creamy",
+                "spicy",
+                "coumarinic",
+                "licorice"
             ]
         },
         "activity":
@@ -29738,7 +29883,14 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sweet fruity floral banana jasmin balsamic apple jammy"
+                "sweet",
+                "fruity",
+                "floral",
+                "banana",
+                "jasmin",
+                "balsamic",
+                "apple",
+                "jammy"
             ]
         },
         "activity":
@@ -29794,7 +29946,14 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "pungent sweet buttery creamy caramellic nutty cheesy toasted"
+                "pungent",
+                "sweet",
+                "buttery",
+                "creamy",
+                "caramellic",
+                "nutty",
+                "cheesy",
+                "toasted"
             ]
         },
         "oid": "d29864c976c6cfe62702be8c00a6a64b"
@@ -30292,7 +30451,7 @@
                 "popcorn",
                 "toasted",
                 "grain",
-                "malty"                
+                "malty"
             ]
         },
         "oid": "d5ca075c633a3f8067608fae49d2d7e8"
@@ -33747,7 +33906,12 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "fusel oily sweet balsamic whiskey banana"
+                "fusel",
+                "oily",
+                "sweet",
+                "balsamic",
+                "whiskey",
+                "banana"
             ]
         },
         "activity":
@@ -35345,7 +35509,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sweet pineapple fruity waxy banana fusel cognac ripe fermented"
+                "sweet",
+                "pineapple",
+                "fruity",
+                "waxy",
+                "banana",
+                "fusel",
+                "cognac",
+                "ripe",
+                "fermented"
             ]
         },
         "activity":

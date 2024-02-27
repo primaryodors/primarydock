@@ -22,6 +22,12 @@ function runpepd($values, $save = false)
             $fam = family_from_protid($orid);
             $ln = "LOAD \"pdbs/$fam/$orid.upright.pdb\"";
         }
+        else if (substr($ln, 0, 7) == "SCREPL ")
+        {
+            $orid = (@$argv[1] && isset($prots[$argv[1]])) ? $argv[1] : explode(".upright.",explode("/", $ln)[2])[0];
+            $fam = family_from_protid($orid);
+            $ln = "SCREPL \"pdbs/$fam/$orid.upright.pdb\"";
+        }
         else if (substr($ln, 0, 4) == "LET ")
         {
             $words = explode(" ", $ln);

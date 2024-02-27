@@ -21,7 +21,7 @@ LET &tilt1a = 0
 LET &tilt1b = 0
 
 STRAND I
-LOAD "pdbs/OR5/OR5K1.upright.pdb" A I
+OPEN "pdbs/OR5/OR5K1.upright.pdb" A I
 UPRIGHT I
 BWCENTER
 
@@ -33,6 +33,9 @@ UPRIGHT A
 BWCENTER
 
 UNCHAIN I
+
+STRAND A
+SCREPL "pdbs/OR5/OR5K1.upright.pdb"
 
 # Internal variables.
 IF $45.51 = "D" THEN LET $ExO1 = "OD1"

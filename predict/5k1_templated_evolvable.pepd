@@ -20,7 +20,7 @@ LET &room72 = 0
 LET &tilt1a = 0
 LET &tilt1b = 0
 
-IF NOT EXISTS "pdbs/OR5K1.1015.pdb" GOTO _make1015
+IF NOT EXISTS "pdbs/OR5K1.1015.spliced.pdb" GOTO _make1015
 STRAND A
 OPEN "pdbs/OR5K1.1015.pdb"
 GOTO _have1015
@@ -44,6 +44,8 @@ STRAND A
 HYDRO
 
 IF 2 > 1 SAVE "pdbs/OR5K1.1015.pdb"
+ECHO "Necessary to run splice.php to cut and paste EXR2 from the AF model to the active model."
+QUIT
 
 _have1015:
 

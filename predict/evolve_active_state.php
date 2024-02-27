@@ -63,6 +63,12 @@ function runpepd($values, $save = false)
 
     $output = [];
     exec("bin/pepteditor $pepdname", $output);
+    if (false!==strpos(implode("\n", $output), " splice.php "))
+    {
+        exec("php -f predict/splice.php");
+        $output = [];
+        exec("bin/pepteditor $pepdname", $output);
+    }
     return $output;
 }
 

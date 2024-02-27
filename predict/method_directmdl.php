@@ -86,11 +86,15 @@ $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 if (!file_exists($pdbfname_inactive) && file_exists($pdbfname_active))              // If no apo model, just use upright.
     $pdbfname_inactive = $pdbfname;
 
-if (!file_exists($pdbfname_active) && (substr($protid, 0, 4) == "OR51" || substr($protid, 0, 4) == "OR52"))
+if (!file_exists($pdbfname_active))
 {
-    exec("php -f predict/cryoem_motions.php");
-    if (substr($protid, 0, 4) == "OR51") exec("bin/pepteditor data/OR51.pepd");
-    if (substr($protid, 0, 4) == "OR52") exec("bin/pepteditor data/OR52.pepd");
+    if (substr($protid, 0, 4) == "OR51" || substr($protid, 0, 4) == "OR52")
+    {
+        exec("php -f predict/cryoem_motions.php");
+        if (substr($protid, 0, 4) == "OR51") exec("bin/pepteditor data/OR51.pepd");
+        if (substr($protid, 0, 4) == "OR52") exec("bin/pepteditor data/OR52.pepd");
+    }
+    else $pdbfname_active = str_replace(".upright.pdb", ".evolved.pdb", $pdbfname);
 }
 
 if (!file_exists($pdbfname_active)) die("No bound model.\n");

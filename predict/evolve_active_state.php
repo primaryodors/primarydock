@@ -112,7 +112,7 @@ function score_result($result)
 
 chdir(__DIR__);
 chdir("..");
-$tne = explode("\n", file_get_contents((@$argv[1] && file_exists($argv[1])) ? $argv[1] : "predict/manual_5P3.pepd"));
+$tne = explode("\n", file_get_contents((@$argv[1] && file_exists($argv[1])) ? $argv[1] : "predict/5k1_templated_evolvable.pepd"));
 
 $evparams = [];
 $evtypes = [];

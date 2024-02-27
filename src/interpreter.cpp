@@ -1015,10 +1015,12 @@ int main(int argc, char** argv)
                 char c = words[1][0];
                 if (c < 'A' || c > 'Z') raise_error("Invalid source strand given for BWCOPY.");
                 Protein* source = strands[c-'A'];
+                if (!source) raise_error("BWCOPY source strand is null.");
 
                 c = words[2][0];
                 if (c < 'A' || c > 'Z') raise_error("Invalid destination strand given for BWCOPY.");
                 Protein* dest = strands[c-'A'];
+                if (!dest) raise_error("BWCOPY destination strand is null.");
 
                 for (l=1; l<=8; l++)
                 {
@@ -2339,7 +2341,7 @@ int main(int argc, char** argv)
                 }
             }	// LET
 
-            else if (!strcmp(words[0], "LOAD"))
+            else if (!strcmp(words[0], "LOAD") || !strcmp(words[0], "OPEN"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for LOAD.");
                 psz = interpret_single_string(words[1]);
@@ -3044,7 +3046,7 @@ int main(int argc, char** argv)
                 }
             }   // SIDEREPL
 
-            else if (!strcmp(words[0], "STRAND"))
+            else if (!strcmp(words[0], "STRAND") || !strcmp(words[0], "CHAIN"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for STRAND.");
                 if (words[2])

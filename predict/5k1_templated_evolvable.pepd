@@ -20,6 +20,12 @@ LET &room72 = 0
 LET &tilt1a = 0
 LET &tilt1b = 0
 
+IF NOT EXISTS "pdbs/OR5K1.1015.pdb" GOTO _make1015
+STRAND A
+OPEN "pdbs/OR5K1.1015.pdb"
+GOTO _have1015
+_make1015:
+
 STRAND I
 OPEN "pdbs/OR5/OR5K1.upright.pdb" A I
 UPRIGHT I
@@ -35,6 +41,11 @@ BWCENTER
 UNCHAIN I
 
 STRAND A
+HYDRO
+
+IF 2 > 1 SAVE "pdbs/OR5K1.1015.pdb"
+
+_have1015:
 SCREPL "pdbs/OR5/OR5K1.upright.pdb"
 
 # Internal variables.

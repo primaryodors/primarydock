@@ -216,6 +216,7 @@ Atom::Atom(const char* elem_sym)
     reciprocity = used = false;
 
     figure_out_valence();
+    if (Z <= 2) geometry = 2;
 
     bonded_to = new Bond[abs(geometry)+4];
     int i;
@@ -236,6 +237,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
     reciprocity = used = false;
 
     figure_out_valence();
+    if (Z <= 2) geometry = 2;
 
     bonded_to = new Bond[abs(geometry)+4];
     int i;
@@ -257,6 +259,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
     reciprocity = used = false;
 
     figure_out_valence();
+    if (Z <= 2) geometry = 2;
 
     bonded_to = new Bond[abs(geometry)];
     int i;
@@ -326,6 +329,7 @@ Atom::Atom(FILE* is)
 
                     Z = Z_from_esym(esym);
                     if (!Z && !strcmp(name, "OXT")) Z = 8;
+                    if (Z <= 2) geometry = 2;
 
                     reciprocity = used = false;
 
@@ -388,6 +392,7 @@ Atom::~Atom()
 
     if (geov) delete[] geov;
 
+    if (Z <= 2) geometry = 2;
     if (bonded_to)
     {
         int i;
@@ -405,6 +410,7 @@ void Atom::unbond(Atom* btom)
     if (bonded_to)
     {
         int i;
+        if (Z <= 2) geometry = 2;
         for (i=0; i<geometry; i++)
         {
             if (bonded_to[i].btom == btom)
@@ -426,6 +432,7 @@ void Atom::unbond(Atom* btom)
 void Atom::unbond_all()
 {
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom)
@@ -640,6 +647,7 @@ void Atom::fetch_bonds(Bond** result)
         result[0] = nullptr;
         return;
     }
+    if (Z <= 2) geometry = 2;
 
     int i;
     if (!geometry || geometry<0 || isnan(geometry)) geometry=4;
@@ -670,6 +678,7 @@ void Atom::clear_all_moves_cache()
 {
     if (!bonded_to) return;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++) bonded_to[i].clear_moves_with_cache();
     if (geov) delete[] geov;
     geov = NULL;
@@ -679,6 +688,7 @@ int Atom::get_bonded_atoms_count()
 {
     if (!bonded_to) return 0;
     int i, retval=0;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++) if (bonded_to[i].btom) retval++;
     return retval;
 }
@@ -687,6 +697,7 @@ int Atom::get_bonded_heavy_atoms_count()
 {
     if (!bonded_to) return 0;
     int i, retval=0;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++) if (bonded_to[i].btom && bonded_to[i].btom->get_Z() > 1) retval++;
     return retval;
 }
@@ -695,6 +706,7 @@ float Atom::is_bonded_to(Atom* lbtom)
 {
     if (!bonded_to) return 0;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom
@@ -711,6 +723,7 @@ bool Atom::shares_bonded_with(Atom* btom)
 {
     if (!bonded_to) return false;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom && abs(reinterpret_cast<long>(bonded_to[i].btom) - reinterpret_cast<long>(this)) < memsanity)
             if (bonded_to[i].btom->is_bonded_to(btom)) return true;
@@ -746,6 +759,7 @@ Atom* Atom::is_bonded_to(const char* element)
 {
     if (!bonded_to) return 0;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (!strcmp(element, "*")
@@ -760,6 +774,7 @@ int Atom::num_bonded_to(const char* element)
 {
     if (!bonded_to) return 0;
     int i, j=0;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
@@ -772,6 +787,7 @@ int Atom::num_bonded_to_in_ring(const char* element, Ring* member_of)
 {
     if (!bonded_to) return 0;
     int i, j=0;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
@@ -786,6 +802,7 @@ Bond* Atom::get_bond_between(Atom* btom)
 {
     if (!bonded_to) return 0;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (bonded_to[i].btom == btom)
@@ -797,6 +814,7 @@ Bond* Atom::get_bond_between(const char* bname)
 {
     if (!bonded_to) return 0;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (bonded_to[i].btom && !strcmp( bonded_to[i].btom->name, bname ))
@@ -808,6 +826,7 @@ int Atom::get_idx_bond_between(Atom* btom)
 {
     if (!bonded_to) return -1;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (bonded_to[i].btom == btom)
@@ -819,6 +838,7 @@ Atom* Atom::is_bonded_to(const char* element, const int lcardinality)
 {
     if (!bonded_to) return 0;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
@@ -833,6 +853,7 @@ Atom* Atom::is_bonded_to(const int family)
 {
     if (!bonded_to) return 0;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (   
@@ -846,6 +867,7 @@ Atom* Atom::is_bonded_to(const int family, const int lcardinality)
 {
     if (!bonded_to) return 0;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (    
@@ -861,6 +883,7 @@ Atom* Atom::is_bonded_to_pi(const int family, const bool other_atoms_pi)
 {
     if (!bonded_to) return 0;
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (    
@@ -878,6 +901,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
     int i;
 
     geometry_dirty = true;
+    if (Z <= 2) geometry = 2;
 
     // if (this < lbtom && Z > 1 && lbtom->Z > 1) cout << "Bond " << name << cardinality_printable(lcard) << lbtom->name << endl;
 
@@ -1087,6 +1111,7 @@ bool Atom::is_metal()
 bool Atom::is_pi()
 {
     if (!bonded_to) return false;
+    if (Z <= 2) geometry = 2;
 
     int i, n;
     if (family == TETREL)
@@ -1117,6 +1142,7 @@ bool Atom::is_pi()
 
 bool Atom::is_amide()
 {
+    if (Z <= 2) geometry = 2;
     if (family == PNICTOGEN)
     {
         if (bonded_to)
@@ -1696,6 +1722,7 @@ void Atom::rotate_geometry(Rotation rot)
     Point center;
 
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         Point pt(&geov[i]);
@@ -1735,6 +1762,8 @@ SCoord* Atom::get_basic_geometry()
 
     int i, j;
     float x, y, z;
+
+    if (Z <= 2) geometry = 2;
 
     if (geometry < 0)
     {
@@ -1864,6 +1893,7 @@ float Atom::get_bond_angle_anomaly(SCoord v, Atom* ignore)
     float lga = get_geometric_bond_angle();
 
     //cout << " -=- " << lga*fiftyseven << " | ";
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom && bonded_to[i].btom != ignore)
@@ -1937,6 +1967,7 @@ Bond* Atom::get_bond_closest_to(Point pt)
     float rmin = Avogadro;
     Bond* retval = nullptr;
 
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom)
@@ -1970,6 +2001,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
             geov = NULL;
         }
     }
+    if (Z <= 2) geometry = 2;
 
     if (geov)
     {
@@ -2100,6 +2132,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
 
 SCoord Atom::get_next_free_geometry(float lcard)
 {
+    if (Z <= 2) geometry = 2;
     int lgeo = geometry;
     if (lcard > 1)
     {
@@ -2171,6 +2204,7 @@ int Atom::get_count_pi_bonds()
 {
     if (!bonded_to) return 0;
     int i, retval=0;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval++;
@@ -2183,6 +2217,7 @@ float Atom::get_sum_pi_bonds()
     if (!bonded_to) return 0;
     int i;
     float retval=0;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom && bonded_to[i].btom->Z > 1)
@@ -2448,6 +2483,7 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
     bir->recursion_counter++;
 
     int i;
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom
@@ -2512,6 +2548,7 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
     else
     {
         int i;
+        if (Z <= 2) geometry = 2;
         for (i=0; i<geometry; i++)
         {
             if (bonded_to[i].btom
@@ -2557,6 +2594,8 @@ std::vector<Atom*> Atom::get_conjugated_atoms(Atom* bir, Atom* c)
     if (bir->recursion_counter > 10) return casf;
 
     bir->recursion_counter++;
+
+    if (Z < 3) geometry = 2;
 
     int i;
     for (i=0; i<geometry; i++)
@@ -2979,6 +3018,7 @@ Atom* Atom::get_heaviest_bonded_atom_that_isnt(Atom* e)
     float wt = 0;
     Atom* result = nullptr;
 
+    if (Z <= 2) geometry = 2;
     for (i=0; i<geometry; i++)
     {
         if (!bonded_to[i].btom) continue;

@@ -46,7 +46,6 @@ HYDRO
 IF 2 > 1 SAVE "pdbs/OR5K1.1015.pdb"
 
 _have1015:
-SCREPL "pdbs/OR5/OR5K1.upright.pdb"
 
 # Internal variables.
 IF $45.51 = "D" THEN LET $ExO1 = "OD1"
@@ -58,6 +57,8 @@ LET &ceil = &initintc / 100
 LET &ceil += 0.99
 LET %elim = &ceil * 100
 
+SCREPL "pdbs/OR5/OR5K1.upright.pdb"
+
 # Initial measurements.
 BRIDGE %45.51 %6.55
 MEASURE %45.51 $ExO1 %6.55 "OH" &d6
@@ -67,16 +68,15 @@ ECHO "Old 45-6 Distance: " &d6
 MEASURE %5.58 "OH" %7.53 "OH" &d57
 ECHO "Old 5-7 Distance: " &d57
 
-
 # Get TMR6 and EXR2 bridged.
 PTALIGN @45.51 @6.55 @6.48 @axis &angle
 ROTATE @axis &vrot6 %6.48 %6.28 %6.58
 MOVEREL %6.28 %6.58 @xlat6
 
 # Trip switch and CGSHL histidine.
-ATOMTO %6.48 "OH" @3.43
-ATOMTO %6.47 "CZ" @3.37
-ATOMTO %6.40 "NE2" @5.68
+ATOMTO %6.48 "EXTENT" @3.43
+ATOMTO %6.47 "EXTENT" @3.37
+ATOMTO %6.40 "EXTENT" @5.68
 
 # Outward tilt of entire TMR6.
 LET @axis = @7.53 - @5.58

@@ -152,6 +152,8 @@ function json_encode_pretty($array)
 
 function split_pdb_to_rigid_and_flex($protid, $pdblines, $flxr_array)
 {
+	global $prots;
+
 	$rigid = [];
 	$flex  = [];
 

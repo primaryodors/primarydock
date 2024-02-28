@@ -158,13 +158,27 @@ function split_pdb_to_rigid_and_flex($protid, $pdblines, $flxr_array)
 	$flxr_res = [];
 	foreach ($flxr_array as $bw)
 	{
+		$allowed = "*";
+		$matches = [];
+		if (preg_match("/^[A-Z]+/", $bw, $matches))
+		{
+			$bw = preg_replace("/[A-Z]/", "", $bw);
+			$allowed = $matches[0];
+		}
+
 		if (false===strpos($bw, "."))
 		{
-			if (intval($bw)) $flxr_res[] = intval($bw);
+			if (intval($bw))
+			{
+				$resno = intval($bw);
+				if ($resno && ($allowed == "*" || false!==strpos( $allowed, substr($prots[$protid]["sequence"], $resno-1, 1) )))
+					$flxr_res[] = $resno;
+			}
 			continue;
 		}
 		$resno = resno_from_bw($protid, $bw);
-		if ($resno) $flxr_res[] = $resno;
+		if ($resno && ($allowed == "*" || false!==strpos( $allowed, substr($prots[$protid]["sequence"], $resno-1, 1) )))
+			$flxr_res[] = $resno;
 	}
 
 	foreach ($pdblines as $ln)

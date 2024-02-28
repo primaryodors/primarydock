@@ -114,7 +114,7 @@ LOAD pdbs/OR5K1.1015.spliced.pdb
 LET @xlat45 = [$x,$y,$z]
 MOVEREL $start $end @xlat45
 SAVE pdbs/OR5K1.1015.spliced.pdb
-SAVE pdbs/OR5/OR5K1.bound.pdb
+SAVE pdbs/OR5/OR5K1.active.pdb
 heredoc;
 
 echo "$pepd\n";

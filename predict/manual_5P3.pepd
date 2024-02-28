@@ -135,4 +135,4 @@ ECHO ", worst between " ~
 WORST ~
 ECHO ", should be less than " %elim "."
 
-SAVE "pdbs/OR5/OR5P3.bound.pdb"
+SAVE "pdbs/OR5/OR5P3.active.pdb"

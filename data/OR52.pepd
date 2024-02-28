@@ -12,7 +12,7 @@ LOAD "pdbs/OR52.octanoate.bna.pdb" A A
 HYDRO
 SAVE "pdbs/OR52.bound.pdb"
 SIDEREPL "pdbs/OR52/OR52A1.upright.pdb"
-SAVE "pdbs/OR52/OR52A1.bound.pdb"
+SAVE "pdbs/OR52/OR52A1.active.pdb"
 UNCHAIN A
 
 
@@ -23,7 +23,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52A4.upright.pdb"
-SAVE "pdbs/OR52/OR52A4.bound.pdb"
+SAVE "pdbs/OR52/OR52A4.active.pdb"
 UNCHAIN A
 
 
@@ -34,7 +34,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52B2.upright.pdb"
-SAVE "pdbs/OR52/OR52B2.bound.pdb"
+SAVE "pdbs/OR52/OR52B2.active.pdb"
 UNCHAIN A
 
 
@@ -45,7 +45,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52B4.upright.pdb"
-SAVE "pdbs/OR52/OR52B4.bound.pdb"
+SAVE "pdbs/OR52/OR52B4.active.pdb"
 UNCHAIN A
 
 
@@ -56,7 +56,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52B6.upright.pdb"
-SAVE "pdbs/OR52/OR52B6.bound.pdb"
+SAVE "pdbs/OR52/OR52B6.active.pdb"
 UNCHAIN A
 
 
@@ -67,7 +67,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52D1.upright.pdb"
-SAVE "pdbs/OR52/OR52D1.bound.pdb"
+SAVE "pdbs/OR52/OR52D1.active.pdb"
 UNCHAIN A
 
 
@@ -78,7 +78,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52E2.upright.pdb"
-SAVE "pdbs/OR52/OR52E2.bound.pdb"
+SAVE "pdbs/OR52/OR52E2.active.pdb"
 UNCHAIN A
 
 
@@ -89,7 +89,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52E4.upright.pdb"
-SAVE "pdbs/OR52/OR52E4.bound.pdb"
+SAVE "pdbs/OR52/OR52E4.active.pdb"
 UNCHAIN A
 
 
@@ -100,7 +100,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52E6.upright.pdb"
-SAVE "pdbs/OR52/OR52E6.bound.pdb"
+SAVE "pdbs/OR52/OR52E6.active.pdb"
 UNCHAIN A
 
 
@@ -111,7 +111,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52E8.upright.pdb"
-SAVE "pdbs/OR52/OR52E8.bound.pdb"
+SAVE "pdbs/OR52/OR52E8.active.pdb"
 UNCHAIN A
 
 
@@ -122,7 +122,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52H1.upright.pdb"
-SAVE "pdbs/OR52/OR52H1.bound.pdb"
+SAVE "pdbs/OR52/OR52H1.active.pdb"
 UNCHAIN A
 
 
@@ -133,7 +133,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52I1.upright.pdb"
-SAVE "pdbs/OR52/OR52I1.bound.pdb"
+SAVE "pdbs/OR52/OR52I1.active.pdb"
 UNCHAIN A
 
 
@@ -144,7 +144,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52I2.upright.pdb"
-SAVE "pdbs/OR52/OR52I2.bound.pdb"
+SAVE "pdbs/OR52/OR52I2.active.pdb"
 UNCHAIN A
 
 
@@ -155,7 +155,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52K1.upright.pdb"
-SAVE "pdbs/OR52/OR52K1.bound.pdb"
+SAVE "pdbs/OR52/OR52K1.active.pdb"
 UNCHAIN A
 
 
@@ -166,7 +166,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52K2.upright.pdb"
-SAVE "pdbs/OR52/OR52K2.bound.pdb"
+SAVE "pdbs/OR52/OR52K2.active.pdb"
 UNCHAIN A
 
 
@@ -177,7 +177,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52L1.upright.pdb"
-SAVE "pdbs/OR52/OR52L1.bound.pdb"
+SAVE "pdbs/OR52/OR52L1.active.pdb"
 UNCHAIN A
 
 
@@ -188,7 +188,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52N4.upright.pdb"
-SAVE "pdbs/OR52/OR52N4.bound.pdb"
+SAVE "pdbs/OR52/OR52N4.active.pdb"
 UNCHAIN A
 
 
@@ -199,7 +199,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52N5.upright.pdb"
-SAVE "pdbs/OR52/OR52N5.bound.pdb"
+SAVE "pdbs/OR52/OR52N5.active.pdb"
 UNCHAIN A
 
 
@@ -210,7 +210,7 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52P1.upright.pdb"
-SAVE "pdbs/OR52/OR52P1.bound.pdb"
+SAVE "pdbs/OR52/OR52P1.active.pdb"
 UNCHAIN A
 
 
@@ -221,5 +221,5 @@ UNCHAIN A
 
 LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52W1.upright.pdb"
-SAVE "pdbs/OR52/OR52W1.bound.pdb"
+SAVE "pdbs/OR52/OR52W1.active.pdb"
 UNCHAIN A

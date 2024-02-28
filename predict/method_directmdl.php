@@ -40,8 +40,10 @@ function make_prediction($data)
             + floatval(@$data['a_BindingEnergy.4'])
             + floatval(@$data['a_BindingEnergy.45'])
             + floatval(@$data['a_BindingEnergy.5']);
+        
+        $aposes = intval(@$data["a_POSES"]);
 
-        $aeff = isset($data["a_POSES"]) ? (floatval($data["a_POSES"]) / $pose) : 1;
+        $aeff = isset($data["a_POSES"]) ? (floatval($aposes) / $pose) : 1;
         $ieff = isset($data["i_POSES"]) ? (floatval($data["i_POSES"]) / $pose) : 1;
 
         if ($ascore < 0 && $score345 <= 0)

@@ -4,6 +4,7 @@
 IF NOT EXISTS ../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb THEN QUIT
 
 # Configurable variables.
+LET @xlat45 = [0,0,0]
 LET &vrot6 = 0
 LET @xlat6 = [0,0,0]
 LET &tilt6a = 0
@@ -25,7 +26,7 @@ LET &tilt1b = 0
 
 IF NOT EXISTS "pdbs/OR5K1.1015.spliced.pdb" GOTO _make1015
 STRAND A
-OPEN "pdbs/OR5K1.1015.pdb"
+OPEN "pdbs/OR5K1.1015.spliced.pdb"
 GOTO _have1015
 _make1015:
 
@@ -74,6 +75,7 @@ MEASURE %5.58 "OH" %7.53 "OH" &d57
 ECHO "Old 5-7 Distance: " &d57
 
 # Get TMR6 and EXR2 bridged.
+MOVEREL %45.46 %45.56 @xlat45
 PTALIGN @45.51 @6.55 @6.48 @axis &angle
 ROTATE @axis &vrot6 %6.48 %6.28 %6.58
 MOVEREL %6.28 %6.58 @xlat6

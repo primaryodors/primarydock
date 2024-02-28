@@ -111,6 +111,10 @@
     "OR8D1":
     {
         "pocket": "5.46 6.55",
+        "atomto":
+        [
+            "5.46 ND2 7.42"
+        ],
         "refs":
         [
             "https://doi.org/10.1021/acs.jafc.3c09142"

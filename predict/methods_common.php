@@ -414,7 +414,7 @@ $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
     global $ligname, $isomers, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
-    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
+    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST;
     global $cenres, $size, $docker, $mcoord, $atomto, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
@@ -465,6 +465,8 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         }
 
         $best_energy = false;
+
+        if (@$_REQUEST['size']) $size = "--size_x {$_REQUEST['size']} --size_y {$_REQUEST['size']} --size_z {$_REQUEST['size']}";
 
         $outlines = [];
         if (@$_REQUEST['saved'])

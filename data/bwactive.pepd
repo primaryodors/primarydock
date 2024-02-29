@@ -1,0 +1,27 @@
+
+LET $destfile = $arg2
+IF $destfile != "" AND EXISTS $destfile GOTO _have_dest_file
+_show_usage:
+ECHO "Usage: bin/pepteditor path/to/ORX.active.pdb"
+QUIT
+
+_have_dest_file:
+LET $srcfile = $destfile
+REPLACE ".active.pdb" ".upright.pdb" $srcfile
+REPLACE ".bound.pdb" ".upright.pdb" $srcfile
+REPLACE ".evolved.pdb" ".upright.pdb" $srcfile
+REPLACE ".swiss.pdb" ".upright.pdb" $srcfile
+IF $srcfile = $destfile GOTO _show_usage
+
+STRAND B
+LOAD $srcfile
+
+STRAND A
+LOAD $destfile
+
+BWCOPY B A
+UNCHAIN B
+UPRIGHT
+BWCENTER
+
+SAVE $destfile

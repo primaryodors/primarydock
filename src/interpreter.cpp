@@ -2753,6 +2753,26 @@ int main(int argc, char** argv)
 				working->renumber_residues(sr, er, nsr);
             }	// RENUMBER
 
+            else if (!strcmp(words[0], "REPLACE"))
+            {
+                l = 1;
+                if (!words[l]) raise_error("Insufficient parameters given for REPLACE.");
+                std::string sagietion = interpret_single_string(words[l]);
+                if (!words[++l]) raise_error("Insufficient parameters given for REPLACE.");
+                std::string atelinatus = interpret_single_string(words[l]);
+                if (!words[++l]) raise_error("Insufficient parameters given for REPLACE.");
+                std::string cambiteion = interpret_single_string(words[l]);
+
+                size_t start_pos = cambiteion.find(sagietion);
+                if (start_pos != std::string::npos)
+                    cambiteion.replace(start_pos, sagietion.length(), atelinatus);
+
+                Star s;
+                s.psz = new char[cambiteion.length()+4];
+                strcpy(s.psz, cambiteion.c_str());
+                set_variable(words[l], s);
+            }	// REPLACE
+
             else if (!strcmp(words[0], "ROTATE"))
             {
                 int sr = working->get_start_resno(), er = working->get_end_resno(), piv = 0;

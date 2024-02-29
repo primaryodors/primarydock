@@ -78,5 +78,8 @@ foreach ($queue as $q)
     }
 }
 
+chdir(__DIR__);
+chdir("..");
+exec("rm tmp/prediction*");
 die("All done.\n");
 

@@ -78,6 +78,8 @@ function runpepd($values, $save = false)
         $pepd[] = $ln;
     }
 
+    chdir(__DIR__);
+    chdir("..");
     if ($save) $pepd[] = "SAVE pdbs/$fam/$orid.evolved.pdb";
     $pepdname = $save ? "pdbs/$fam/$orid.evolved.pepd" : "tmp/evolving.pepd";
     $fp = fopen($pepdname, "wb");

@@ -47,6 +47,8 @@ UNCHAIN I
 STRAND A
 HYDRO
 
+ATOMTO 45.56 "EXTENT" 5.32
+
 IF 2 > 1 SAVE "pdbs/OR5K1.1015.pdb"
 ECHO "Necessary to run splice.php to cut and paste EXR2 from the AF model to the active model."
 QUIT
@@ -61,7 +63,8 @@ LET $ExO2 += "2"
 INTC &initintc
 LET &ceil = &initintc / 100
 LET &ceil += 0.99
-LET %elim = &ceil * 100
+LET &elim = &ceil * 100
+IF &elim > 500 LET &elim = 500
 
 SCREPL "pdbs/OR5/OR5K1.upright.pdb"
 
@@ -168,7 +171,7 @@ ECHO "Total clashes: " ~
 INTC ~
 ECHO ", worst between " ~
 WORST ~
-ECHO ", should be less than " %elim "."
+ECHO ", should be less than " &elim "."
 
 SAVE "pdbs/OR5/OR5K1.bound.pdb"
 

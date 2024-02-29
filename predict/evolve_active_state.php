@@ -46,7 +46,11 @@ function runpepd($values, $save = false)
         {
             $orid = (@$argv[1] && isset($prots[$argv[1]])) ? $argv[1] : explode(".upright.",explode("/", $ln)[2])[0];
             $fam = family_from_protid($orid);
-            $ln = "SCREPL \"pdbs/$fam/$orid.upright.pdb\"";
+            chdir(__DIR__);
+            if (file_exists("../tmp/$orid.screpl.pdb"))
+                $ln = "LOAD tmp/$orid.screpl.pdb";
+            else
+                $ln = "SCREPL \"pdbs/$fam/$orid.upright.pdb\"\nSAVE tmp/$orid.screpl.pdb";
         }
         else if (substr($ln, 0, 4) == "LET ")
         {

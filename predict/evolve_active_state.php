@@ -4,6 +4,26 @@ require_once("../data/protutils.php");
 
 $mutation_rate = 0.1;
 
+if (!file_exists("../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb"))
+{
+    if (!file_exists("../../OR5K1_binding_site/OR5K1_IFD3_models.zip"))
+    {
+        chdir("../..");
+        exec("git clone https://github.com/dipizio/OR5K1_binding_site.git");
+        chdir("OR5K1_binding_site");
+        exec("unzip OR5K1_IFD3_models.zip");
+        chdir(__DIR__);
+    }
+}
+
+if (!file_exists("../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb"))
+{
+    echo "To use this feature, please clone the following repository alongside primarydock:\n";
+    echo "git clone https://github.com/dipizio/OR5K1_binding_site.git\n";
+    echo "Make sure to uncompress the two .zip files.\n";
+    exit;
+}
+
 function frand($min, $max)
 {
     return 1e-6 * rand($min*1e6, $max*1e6);

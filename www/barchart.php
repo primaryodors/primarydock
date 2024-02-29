@@ -157,20 +157,47 @@ $white = imagecolorallocate($im,240,240,240);
 $azure = imagecolorallocate($im,32,96,255);
 $sapphire = imagecolorallocate($im,32,16,224);
 
-$or1    = imagecolorallocate($im,255,255,255);
-$or2    = imagecolorallocate($im,250,192,  0);
-$or3    = imagecolorallocate($im,128,160, 96); 
-$or4    = imagecolorallocate($im, 64,  0,255);
-$or5    = imagecolorallocate($im,240,128,192);
-$or6    = imagecolorallocate($im,128,144,160); 
-$or7    = imagecolorallocate($im,255,  0,  0); 
-$or8    = imagecolorallocate($im,255,128,  0); 
-$or9    = imagecolorallocate($im,  0,  0,  0);
-$or10   = imagecolorallocate($im,160, 96, 64); 
-$or11   = imagecolorallocate($im,  0,255,255);
-$or12   = imagecolorallocate($im,255,255,  0);
-$or13   = imagecolorallocate($im,160,255,128);
-$or14   = imagecolorallocate($im,128,144,255);
+for ($fam=1; $fam<=16; $fam++)
+{
+    $i = $fam-1;
+    $var = "or$fam";
+
+    $i1 = boolval($i & 0x1);
+    $i2 = boolval($i & 0x2);
+    $i4 = boolval($i & 0x4);
+    $i8 = boolval($i & 0x8);
+
+    if (!($i & 0x8))
+    {
+        $r = ($i1 xor $i2 xor $i4) ? 255 : 0;
+        $g =  $i1 ? 255 : 0;
+        $b = ($i1 xor $i4) ? 255 : 0;
+    }
+    else
+    {
+        $r  = ((!$i1 xor $i4) && ($i != 0xd)) ? 0xc0 : 0;
+        $r += 0x30;
+        $r += !($i1 and $i2) ? 0x0f : 0;
+
+        $g  = ($i1 and $i4) ? 0xc0 : 0;
+        $g += ($i != 9) ? 0x30 : 0;
+        $g += !($i1 and $i2) ? 0x0f : 0;
+
+        $b  = ($i2 and $i4) ? 0xc0 : 0;
+        $b += ($i2 or $i4) ? 0x30 : 0;
+        $b += (!$i1 or $i1 == 0xd) ? 0x0c : 0;
+        $b += !($i1 and $i2) ? 0x03 : 0;
+    }
+
+    $$var = imagecolorallocate($im,$r,$g,$b);
+}
+
+$or1    = imagecolorallocate($im,255,255,224);          // off-white, representing waxy, aldehydic, citronella.
+$or2    = imagecolorallocate($im,250,192,  0);          // yellow representing sulfur, pineapple, Allium.
+$or3    = imagecolorallocate($im,128,160, 96);          // earthy olive-green.
+$or9    = imagecolorallocate($im, 64, 32,  0);          // dark brown representing leather, horse stable.
+$or10   = imagecolorallocate($im,224,128, 32);          // orange-brown representing clove, resin, vanilla.
+$or11   = imagecolorallocate($im,128,160,192);          // aqua-gray representing water, rock, mold, sweat.
 $or51   = imagecolorallocate($im,255,255,192);
 $or52   = imagecolorallocate($im,192,  0,224);
 $or56   = imagecolorallocate($im,  0,128,  0);

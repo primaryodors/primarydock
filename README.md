@@ -15,11 +15,22 @@ PrimaryDock is a lightweight stochastic molecular docking software package that 
 PrimaryDock comes with Pepteditor, a tool for editing proteins using a scripting language.
 
 PrimaryDock has a prediction feature that attempts to predict receptor responses to odorants.
-The prediction feature requires php and <a href="https://openbabel.org">OpenBabel</a> to be installed.
 See `PREDICTION.md` for more info.
 
 PrimaryDock also offers a web interface that allows you to run a local copy of the same data explorer pages that power
-the PrimaryOdors website. The web interface also requires OpenBabel.
+the PrimaryOdors website.
+
+
+# Requirements
+The following packages are required by PrimaryDock:
+
+`g++`
+`php7` or later
+`openbabel`
+`nlohmann-json3-dev`
+
+
+# Usage
 
 To use PrimaryDock and Pepteditor, please first clone the repository, then enter the `primarydock/` folder and execute
 the following command:

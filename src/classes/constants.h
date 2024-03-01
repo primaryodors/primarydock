@@ -85,6 +85,8 @@
 #define speed_limit 0.666
 #define warn_orphan_atoms 0
 
+#define enable_json 1
+
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
 #define pi_HT_dkytw 0.002657
@@ -93,7 +95,7 @@
 #define USE_VOXEL_ARRAY false
 
 #define ATOM_NOT_OF_AMINO_ACID 0x907aa
-#define NOT_ATOM_RECORD 0xb1207e19
+#define NOT_ATOM_RECORD 0xbeb71de
 
 #define _MAX_NUM_FORCES 65536
 

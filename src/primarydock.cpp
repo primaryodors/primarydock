@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <string>
 #include <regex>
@@ -9,11 +10,17 @@
 #include <sstream>
 #include <algorithm>
 #include <unistd.h>
+#if enable_json
+#include <nlohmann/json.hpp>
+#endif
 #include "classes/dynamic.h"
 #include "classes/group.h"
 #include "classes/protein.h"
 #include "classes/scoring.h"
 
+#if enable_json
+using json = nlohmann::json;
+#endif
 using namespace std;
 
 struct AcvBndRot
@@ -2061,8 +2068,13 @@ int main(int argc, char** argv)
 
     if (!CEN_buf.length())
     {
+        #if enable_json
+        std::ifstream f("data/binding_pocket.json");
+        json bsdata = json::parse(f);
+        #else
         cout << "Error: no binding pocket center defined." << endl;
         return 0xbadb19d;
+        #endif
     }
 
     strcpy(buffer, CEN_buf.c_str());

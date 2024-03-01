@@ -7,9 +7,9 @@ IF NOT EXISTS ../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmp
 LET @xlat45 = [0,0,0]
 LET &vrot6 = 0
 LET @xlat6 = [0,0,0]
-LET &tilt6a = 0
-LET &tilt6b = 0
-LET &tilt6c = 0
+LET &tilt6a = -10
+LET &tilt6b = -5
+LET &tilt6c = -6
 LET &tilt5 = 0
 LET &mov5 = 0
 LET &mov5x = 0

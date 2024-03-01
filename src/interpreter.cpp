@@ -1619,11 +1619,11 @@ int main(int argc, char** argv)
                     strcpy(psz, script_lines[n].c_str());
                     if (!strcmp(psz, buffer1))
                     {
-                        delete psz;
+                        delete[] psz;
                         program_counter = n+1;
                         goto _found_goto_target;
                     }
-                    delete psz;
+                    delete[] psz;
                 }
                 raise_error( (std::string)"Label not found: \"" + (std::string)buffer1 + (std::string)"\"");
                 return 0x51974c5;
@@ -2086,6 +2086,7 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "LET"))
             {
+                char* psz_orig;
                 if (!words[1]) raise_error("No parameters given for LET.");
                 n = find_var_index(words[1], &words[1]);
                 if (n<0)
@@ -2207,6 +2208,7 @@ int main(int argc, char** argv)
                 case SV_STRING:
 
                     psz = interpret_single_string(words[3]);
+                    psz_orig = psz;
 
                     l = m = 0;
                     if (words[4] && !strcmp(words[4], "FROM"))
@@ -2247,13 +2249,11 @@ int main(int argc, char** argv)
                     }
                     else
                     {
-                        psz -= m;
-                        delete psz;
+                        delete psz_orig;
                         raise_error( (std::string)"Unimplemented operator " + (std::string)words[2] + (std::string)" for string assignment.");
                         return 0x51974c5;		// If you use your imagination, that says "syntax".
                     }
-                    psz -= m;
-                    delete psz;
+                    delete psz_orig;
                     break;
 
                 default:

@@ -40,7 +40,7 @@ foreach ($lines1 as $ln)
 
 foreach ($lines2 as $ln)
 {
-    if (substr($ln, 0, 7) == "REMARK ") $remarks[] = $ln;
+    if (substr($ln, 0, 10) == "REMARK   1") $remarks[] = $ln;
     else if (substr($ln, 0, 5) == "ATOM ")
     {
         $resno = intval(substr($ln, 22, 4));

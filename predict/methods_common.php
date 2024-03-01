@@ -891,7 +891,7 @@ heredoc;
                 $node = intval($coldiv[1]);
                 continue;
             }
-            else if ($coldiv[0] == 'BENERG' || $coldiv[0] == 'vdWRPL')
+            else if ($coldiv[0] == 'BENERG' || $coldiv[0] == 'MC' || $coldiv[0] == 'vdWRPL')
             {
                 $mode = $coldiv[0];
                 continue;

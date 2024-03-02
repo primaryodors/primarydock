@@ -4,62 +4,63 @@ LOAD "pdbs/OR51/OR51E2.upright.pdb"                 # Must precede ligand defini
 # Configurable variables.
 LET $ligand = "sdf/propionic_acid.sdf"
 # Got these from evolving the 51e2_evolvable.pepd script.
-LET @xlat1 = [2.912866,0.079108,1.955003]
-LET @xlat2 = [1.858137,-1.234285,0.679229]
-LET @xlat3 = [7.324854,-1.714526,0.149893]
-LET @xlat4 = [0.771621,1.401442,1.547436]
-LET @xlat5 = [1.500567,3.58035,5.047547]
-LET @xlat6 = [3.570124,2.727301,-0.752387]
-LET @xlat7 = [-1.637306,-1.32083,1.712622]
-LET &xrot1 = -4.225662
-LET &zrot1 = -1.263465
-LET &yrot1 = 0.23839
-LET &xrot2 = -2.377341
-LET &zrot2 = 1.163039
-LET &yrot2 = -3.433425
-LET &xrot3 = 0.83579
-LET &zrot3 = 1.719794
-LET &yrot3 = 1.269813
-LET &xrot4 = -1.250154
-LET &zrot4 = -0.812703
-LET &yrot4 = 3.837554
-LET &xrot5 = -1.009549
-LET &zrot5 = 2.943884
-LET &yrot5 = 8.153739
-LET &xrot6 = 9.925592
-LET &zrot6 = 5.322859
-LET &yrot6 = -10.164023
-LET &xrot7 = 5.191008
-LET &zrot7 = -4.864013
-LET &yrot7 = -0.199977
-LET &xebend1 = -2.232698
-LET &xcbend1 = -3.864424
-LET &zebend1 = -1.578051
-LET &zcbend1 = -2.931137
-LET &xebend2 = -3.674318
-LET &xcbend2 = 2.120939
-LET &zebend2 = -0.318082
-LET &zcbend2 = -0.772496
-LET &xebend3 = -3.618541
-LET &xcbend3 = -0.114933
-LET &zebend3 = -0.754389
-LET &zcbend3 = 3.122243
-LET &xebend4 = -1.531443
-LET &xcbend4 = -1.367192
-LET &zebend4 = 2.41726
-LET &zcbend4 = 1.632869
-LET &xebend5 = -4.976968
-LET &xcbend5 = 6.786164
-LET &zebend5 = -0.672024
-LET &zcbend5 = 1.062197
-LET &xebend6 = -2.865591
-LET &xcbend6 = 2.698545
-LET &zebend6 = -2.499837
-LET &zcbend6 = 1.659952
-LET &xebend7 = 1.370532
-LET &xcbend7 = 1.757485
-LET &zebend7 = 3.422518
-LET &zcbend7 = 0.036879
+LET &bend45 = 42.962312
+LET @xlat1 = [2.239945,2.439374,-0.661813]
+LET @xlat2 = [2.939843,-1.471337,3.721989]
+LET @xlat3 = [7.601929,-1.229858,1.001026]
+LET @xlat4 = [3.281855,2.555465,3.588057]
+LET @xlat5 = [-0.90954,5.853711,5.16557]
+LET @xlat6 = [6.366359,7.878994,3.670469]
+LET @xlat7 = [0.84818,-2.742542,1.355484]
+LET &xrot1 = -2.583224
+LET &zrot1 = -1.891219
+LET &yrot1 = 2.31634
+LET &xrot2 = -3.560941
+LET &zrot2 = 2.366101
+LET &yrot2 = -4.637127
+LET &xrot3 = -0.378797
+LET &zrot3 = 2.181212
+LET &yrot3 = 2.429939
+LET &xrot4 = -1.660653
+LET &zrot4 = -1.109139
+LET &yrot4 = 3.434899
+LET &xrot5 = -2.147913
+LET &zrot5 = 4.208035
+LET &yrot5 = 13.229345
+LET &xrot6 = 12.487967
+LET &zrot6 = 2.551171
+LET &yrot6 = -18.010387
+LET &xrot7 = 2.553948
+LET &zrot7 = -6.662444
+LET &yrot7 = -1.45767
+LET &xebend1 = -3.165349
+LET &xcbend1 = -6.15209
+LET &zebend1 = -2.495985
+LET &zcbend1 = 0.793071
+LET &xebend2 = -2.623237
+LET &xcbend2 = 3.175618
+LET &zebend2 = -2.76163
+LET &zcbend2 = -0.707426
+LET &xebend3 = -2.802802
+LET &xcbend3 = -2.074213
+LET &zebend3 = -1.001786
+LET &zcbend3 = 4.077759
+LET &xebend4 = -0.603908
+LET &xcbend4 = -1.507192
+LET &zebend4 = 2.326171
+LET &zcbend4 = 3.367926
+LET &xebend5 = -4.299975
+LET &xcbend5 = 6.016264
+LET &zebend5 = -2.129737
+LET &zcbend5 = 1.322657
+LET &xebend6 = -5.691928
+LET &xcbend6 = -2.258082
+LET &zebend6 = -3.48062
+LET &zcbend6 = 2.762199
+LET &xebend7 = -1.977098
+LET &xcbend7 = -9.042221
+LET &zebend7 = 1.458755
+LET &zcbend7 = -1.247747
 
 # Internal variables.
 LET $usrmesg = "Evolutions may be or become very slow; this is normal and expected."
@@ -103,6 +104,9 @@ IF &xcbend4 THEN ROTATE [1,0,0] &xcbend4 %4.50 %4.39 %4.50
 IF &zebend4 THEN ROTATE [0,0,1] &zebend4 %4.50 %4.50 %4.64
 IF &zcbend4 THEN ROTATE [0,0,1] &zcbend4 %4.50 %4.39 %4.50
 
+LET @axis45 = @45.54 - @45.52
+IF &bend45 THEN ROTATE @axis45 &bend45 %45.52 %45.52 %45.54
+
 IF &xlat5 THEN MOVEREL %5.38 %5.68 &xlat5
 IF &xrot5 THEN ROTATE [1,0,0] &xrot5 %5.50 %5.38 %5.68
 IF &yrot5 THEN ROTATE [0,1,0] &yrot5 %5.50 %5.38 %5.68
@@ -125,10 +129,12 @@ IF &xlat7 THEN MOVEREL %7.31 %7.56 &xlat7
 IF &xrot7 THEN ROTATE [1,0,0] &xrot7 %7.49 %7.31 %7.56
 IF &yrot7 THEN ROTATE [0,1,0] &yrot7 %7.49 %7.31 %7.56
 IF &zrot7 THEN ROTATE [0,0,1] &zrot7 %7.49 %7.31 %7.56
-IF &xebend7 THEN ROTATE [1,0,0] &xebend5 %7.49 %7.31 %7.49
-IF &xcbend7 THEN ROTATE [1,0,0] &xcbend5 %7.49 %7.49 %7.56
-IF &zebend7 THEN ROTATE [0,0,1] &zebend5 %7.49 %7.31 %7.49
-IF &zcbend7 THEN ROTATE [0,0,1] &zcbend5 %7.49 %7.49 %7.56
+IF &xebend7 THEN ROTATE [1,0,0] &xebend7 %7.49 %7.31 %7.49
+IF &xcbend7 THEN ROTATE [1,0,0] &xcbend7 %7.49 %7.49 %7.56
+IF &zebend7 THEN ROTATE [0,0,1] &zebend7 %7.49 %7.31 %7.49
+IF &zcbend7 THEN ROTATE [0,0,1] &zcbend7 %7.49 %7.49 %7.56
+
+IF $6.59 = "R" THEN ATOMTO %6.59 "CZ" @4.61
 
 INTC &intc
 ECHO "Total clashes: " &intc ", worst between " ~

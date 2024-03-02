@@ -93,9 +93,9 @@ function runpepd($values, $save = false)
                 }
                 else if ($vartyp == "@")
                 {
-                    if (isset($values["$vartyp.x"]) && isset($values["$vartyp.y"]) && isset($values["$vartyp.z"]))
+                    if (isset($values["$varname.x"]) && isset($values["$varname.y"]) && isset($values["$varname.z"]))
                     {
-                        $words[3] = "[{$values['$vartyp.x']},{$values['$vartyp.y']},{$values['$vartyp.z']}]";
+                        $words[3] = "[{$values["$varname.x"]},{$values["$varname.y"]},{$values["$varname.z"]}]";
                         $ln = implode(" ", $words);
                     }
                 }

@@ -121,6 +121,7 @@ function runpepd($values, $save = false)
         $output = [];
         exec("bin/pepteditor $pepdname", $output);
     }
+    foreach ($output as $ln) if (false!==stripos($ln, "cannot")) echo "Warning: $ln\n";
     return $output;
 }
 

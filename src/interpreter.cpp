@@ -359,6 +359,12 @@ float interpret_single_float(const char* param)
     int n;
     Point pt;
 
+    if (param[0] == '%')
+    {
+        int resno = interpret_special_resno(param+1);
+        if (resno) return resno;
+    }
+
     if ((param[0] >= '0' && param[0] <= '9')
             ||
             param[0] == '-'

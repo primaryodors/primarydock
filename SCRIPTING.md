@@ -43,6 +43,11 @@ But note that e.g. `LET @foo = %motif + 2` will not work. The arithmetic must co
 
 Casting a Cartesian back to float or integer obtains the magnitude of the Cartesian, equal to sqrt(x^2 + y^2 + z^2).
 
+Casting with an aritmetic operator works slightly counterintuitively since the l-value and r-value are each cast to the destination data type
+before the aritmetic is performed. For example, to get the distance between two points, one might be tempted to write `LET &r = @a - @b`,
+but this will actually obtain the difference in magnitudes of the two points. To get the distance, you can first subtract the points directly
+to a temporary Cartesian variable `LET @r = @a - @b` then take the magnitude of the temporary variable with `LET &r = @r`.
+
 The command line arguments are made available to the script as $arg1, $arg2, etc. Normally, $arg1 will be the .pepd script filename.
 
 

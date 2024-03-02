@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include <regex>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -358,6 +359,12 @@ float interpret_single_float(const char* param)
 {
     int n;
     Point pt;
+
+    if (param[0] == '%')
+    {
+        int resno = interpret_special_resno(param+1);
+        if (resno) return resno;
+    }
 
     if ((param[0] >= '0' && param[0] <= '9')
             ||
@@ -739,6 +746,33 @@ int main(int argc, char** argv)
             if (0)
             {
                 ;
+            }
+            else if (!strcmp(words[0], "A100"))
+            {
+                try
+                {
+                    f = working->calculate_A100();
+                    if (words[1] && words[1][0] != '~')
+                    {
+                        Star s;
+                        s.f = f;
+                        set_variable(words[1], s);
+                    }
+                    else
+                    {
+                        cout << f;
+                        if (!words[1] || words[1][0] != '~') cout << endl;
+                    }
+                }
+                catch (...)
+                {
+                    if (words[1] && words[1][0] != '~')
+                    {
+                        Star s;
+                        s.f = 0;
+                        set_variable(words[1], s);
+                    }
+                }
             }
             else if (!strcmp(words[0], "ALIGN"))
             {
@@ -1448,6 +1482,65 @@ int main(int argc, char** argv)
                     }
                 }
             } // DISULF
+
+            else if (!strcmp(words[0], "DOCK"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters for DOCK.");
+                if (!words[2]) raise_error("Insufficient parameters for DOCK.");
+
+                std::string pdcmd = "bin/primarydock";
+                words[1] = interpret_single_string(words[1]);
+                if (!file_exists(words[1])) raise_error("DOCK param 1 must be a valid PDB file and must exist.");
+                pdcmd += (std::string)" --prot \"" + (std::string)words[1] + (std::string)"\"";
+                words[2] = interpret_single_string(words[2]);
+                if (!file_exists(words[2])) raise_error("DOCK param 2 must be a valid SDF file and must exist.");
+                pdcmd += (std::string)" --lig \"" + (std::string)words[2] + (std::string)"\"";
+
+                if (words[3])
+                {
+                    f = interpret_single_float(words[3]);
+                    if (f) pdcmd += (std::string)" --elim " + std::to_string(f);
+                }
+
+                if (words[4])
+                {
+                    l = interpret_single_int(words[4]);
+                    if (l) pdcmd += (std::string)" --pose " + std::to_string(l);
+                }
+
+                char buffer[1024];
+                // cout << pdcmd << endl;
+                FILE* fpcmd = popen(pdcmd.c_str(), "r");
+                if (!fpcmd) raise_error("Unknown error attempting to run PrimaryDock.");
+                bool benerg_active = false;
+                f = 0;
+                l = 0;
+                std::regex rgx_benerg("BENERG:"), rgx_ttl("Total: -?[0-9]*[.][0-9]*"), rgx_poses("[0-9]+ pose[(]s[)] found[.]");
+                while (fgets(buffer, 1020, fpcmd) != NULL)
+                {
+                    if (std::regex_search(buffer, rgx_benerg)) benerg_active = true;
+                    else if (benerg_active && !f && std::regex_search(buffer, rgx_ttl))
+                    {
+                        char* ttl = strchr(buffer, ':');
+                        f = atof(ttl+1);
+                    }
+                    else if (std::regex_search(buffer, rgx_poses)) l = atoi(buffer);
+                }
+                pclose(fpcmd);
+
+                Star s;
+                if (words[3] && words[3][0] == '&')
+                {
+                    s.f = f;
+                    set_variable(words[3], s);
+                }
+
+                if (words[4] && words[4][0] == '%')
+                {
+                    s.n = l;
+                    set_variable(words[4], s);
+                }
+            } // DOCK
 
             else if (!strcmp(words[0], "DOWNLOAD"))
             {

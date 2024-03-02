@@ -1,8 +1,9 @@
 <?php
 chdir(__DIR__);
 require_once("../data/protutils.php");
+require_once("../data/odorutils.php");
 
-$mutation_rate = 0.1;
+$mutation_rate = 0.25;
 
 if (!file_exists("../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb"))
 {
@@ -31,7 +32,7 @@ function frand($min, $max)
 
 function runpepd($values, $save = false)
 {
-    global $tne, $argv, $prots;
+    global $tne, $argv, $prots, $odors, $pairs, $orid, $usrmesgd;
     $pepd = [];
     foreach ($tne as $ln)
     {
@@ -51,6 +52,31 @@ function runpepd($values, $save = false)
                 $ln = "LOAD tmp/$orid.screpl.pdb";
             else
                 $ln = "SCREPL \"pdbs/$fam/$orid.upright.pdb\"\nSAVE tmp/$orid.screpl.pdb";
+        }
+        else if (substr($ln, 0, 16) == "LET \$usrmesg = \"")
+        {
+            $quot = strpos($ln, '"');
+            $usrmesg = str_replace('"', '', substr($ln, $quot));
+            if (!$usrmesgd) echo "Message to user: $usrmesg\n";
+            $usrmesgd = true;
+        }
+        else if (substr($ln, 0, 14) == "LET \$ligand = ")
+        {
+            if (!$pairs) $pairs = array_values(all_empirical_pairs_for_receptor($orid));
+            if (!$pairs || !count($pairs)
+                || @$pairs[0]["adjusted_curve_top"] < 0
+                || (!@$pairs[0]["adjusted_curve_top"] && !$pairs[0]["ec50"]))
+            {
+                if (@$argv[2]) $ligand = $argv[2];
+                else die("No agonists for $orid.\n");
+            }
+            else
+            {
+                $ligand = $odors[$pairs[0]['oid']]['full_name'];
+            }
+
+            $ligfn = ensure_sdf_exists($ligand);
+            $ln = "LET \$ligand = \"$ligfn\"";
         }
         else if (substr($ln, 0, 4) == "LET ")
         {
@@ -150,11 +176,13 @@ function score_result($result)
 
 chdir(__DIR__);
 chdir("..");
-$tne = explode("\n", file_get_contents((@$argv[1] && file_exists($argv[1])) ? $argv[1] : "predict/5k1_templated_evolvable.pepd"));
+$tne = explode("\n", file_get_contents((@$argv[1] && file_exists($argv[1])) ? $argv[1] : "predict/evolvable_activation.pepd"));
 
 $evparams = [];
 $evtypes = [];
 $varsearch = false;
+$pairs = false;
+$usrmesgd = false;
 foreach ($tne as $ln)
 {
     if (trim($ln) == "# Configurable variables.") $varsearch = true;
@@ -197,6 +225,8 @@ foreach ($tne as $ln)
         }
     }
 }
+
+if (!count($evparams)) die("Error: parameters not delineated.\n");
 
 for ($generation=1; $generation<=1000000; $generation++)
 {

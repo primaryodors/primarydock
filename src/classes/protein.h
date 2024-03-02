@@ -112,7 +112,7 @@ public:
     int get_metals_count();
     AminoAcid* get_residue(int resno);
     AminoAcid* get_residue(BallesterosWeinstein bw);
-    AminoAcid* get_residue_bw(int helixno, int bwno);
+    AminoAcid* get_residue_bw(int helixno, int bwno, bool throw_if_error = true);
     AminoAcid* get_residue_bw(const char* bwno);
     BallesterosWeinstein get_bw_from_resno(int resno);
     Region get_region(std::string name);
@@ -167,6 +167,8 @@ public:
     void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
     void set_conditional_basicities();
 
+    float calculate_A100();             // from Ibrahim et al. 2019. http://dx.doi.org/10.1021/acs.jcim.9b00604
+
     // Motion functions
     void upright();
     void move_piece(int start_res, int end_res, Point new_center);
@@ -215,6 +217,7 @@ public:
     AminoAcid *stop1, *stop2;
     Atom *stop1a, *stop2a;
     int last_saved_atom_number = 0;
+    int res_found_for_A100 = 0;                         // indicates confidence of last A100 result.
 
 protected:
     Atom** ca = nullptr;

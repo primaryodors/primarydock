@@ -232,10 +232,11 @@ AminoAcid* Protein::get_residue_bw(const char* bwno)
     return get_residue_bw(atoi(buffer), atoi(dot+1));
 }
 
-AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
+AminoAcid* Protein::get_residue_bw(int hxno, int bwno, bool tie)
 {
     if (!Ballesteros_Weinstein[3])
     {
+        if (!tie) return nullptr;
         cout << "Call to get_residue_bw() on a protein with no BW numbers set." << endl;
         throw -1;
     }
@@ -243,6 +244,7 @@ AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
     int bw50 = get_bw50(hxno);
     if (bw50 < 1)
     {
+        if (!tie) return nullptr;
         cout << "BW number not found: " << hxno << ".50." << endl;
         throw -1;
     }
@@ -4473,4 +4475,80 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
     }
 
     return num_applied;
+}
+
+// From Ibrahim et al, (2019). http://dx.doi.org/10.1021/acs.jcim.9b00604
+float Protein::calculate_A100()
+{
+    float result = 0, f;
+    res_found_for_A100 = 0;
+
+    AminoAcid* aa1x53 = get_residue_bw(1, 53, false); if (aa1x53) res_found_for_A100++;
+    AminoAcid* aa2x50 = get_residue_bw(2, 50, false); if (aa2x50) res_found_for_A100++;
+    AminoAcid* aa3x37 = get_residue_bw(3, 37, false); if (aa3x37) res_found_for_A100++;
+    AminoAcid* aa3x42 = get_residue_bw(3, 42, false); if (aa3x42) res_found_for_A100++;
+    AminoAcid* aa4x42 = get_residue_bw(4, 42, false); if (aa4x42) res_found_for_A100++;
+    AminoAcid* aa5x66 = get_residue_bw(5, 66, false); if (aa5x66) res_found_for_A100++;
+    AminoAcid* aa6x34 = get_residue_bw(6, 34, false); if (aa6x34) res_found_for_A100++;
+    AminoAcid* aa6x58 = get_residue_bw(6, 58, false); if (aa6x58) res_found_for_A100++;
+    AminoAcid* aa7x35 = get_residue_bw(7, 35, false); if (aa7x35) res_found_for_A100++;
+    AminoAcid* aa7x55 = get_residue_bw(7, 55, false); if (aa7x55) res_found_for_A100++;
+
+    if (!res_found_for_A100)
+    {
+        cout << "Cannot calculate A100; no Ballesteros-Weinstein residues in protein." << endl;
+        throw 0xbadbeb7;
+    }
+    else if (res_found_for_A100 < 10)
+    {
+        cout << "Cannot calculate A100; protein is missing one or more necessary residues." << endl;
+        throw 0xbadbeb7;
+    }
+
+    const float coeff1 = -14.43, coeff2 = -7.62, coeff3 = 9.11, coeff4 = -6.32, coeff5 = -5.22;
+    const float adjustment = 278.88;
+    const float abssumcoeff = fabs(coeff1) + fabs(coeff2) + fabs(coeff3) + fabs(coeff4) + fabs(coeff5);
+
+    if (aa1x53 && aa7x55)
+    {
+        f = aa1x53->get_CA_location().get_3d_distance(aa7x55->get_CA_location());
+        #if _dbg_A100
+        cout << "1.53~7.55 distance: " << f << endl;
+        #endif
+        result += adjustment * fabs(coeff1) / abssumcoeff + coeff1 * f;
+    }
+    if (aa2x50 && aa3x37)
+    {
+        f = aa2x50->get_CA_location().get_3d_distance(aa3x37->get_CA_location());
+        #if _dbg_A100
+        cout << "2.50~3.37 distance: " << f << endl;
+        #endif
+        result += adjustment * fabs(coeff2) / abssumcoeff + coeff2 * f;
+    }
+    if (aa3x42 && aa4x42)
+    {
+        f = aa3x42->get_CA_location().get_3d_distance(aa4x42->get_CA_location());
+        #if _dbg_A100
+        cout << "3.42~4.42 distance: " << f << endl;
+        #endif
+        result += adjustment * fabs(coeff3) / abssumcoeff + coeff3 * f;
+    }
+    if (aa5x66 && aa6x34)
+    {
+        f = aa5x66->get_CA_location().get_3d_distance(aa6x34->get_CA_location());
+        #if _dbg_A100
+        cout << "5.66~6.34 distance: " << f << endl;
+        #endif
+        result += adjustment * fabs(coeff4) / abssumcoeff + coeff4 * f;
+    }
+    if (aa6x58 && aa7x35)
+    {
+        f = aa6x58->get_CA_location().get_3d_distance(aa7x35->get_CA_location());
+        #if _dbg_A100
+        cout << "6.58~7.35 distance: " << f << endl;
+        #endif
+        result += adjustment * fabs(coeff5) / abssumcoeff + coeff5 * f;
+    }
+
+    return result;
 }

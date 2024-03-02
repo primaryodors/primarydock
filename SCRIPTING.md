@@ -292,6 +292,29 @@ Note that for `DISULF` to work, the two sulfur atoms must already be moved into 
 will be made to flex bonds to bring the sulfurs into proximity, and if the sulfurs are not already bound to hydrogens, the command will fail.
 
 
+# DOCK
+Example:
+```
+DOCK pdbs/OR51/OR51E2.upright.pdb sdf/propionic_acid.sdf &output_energy
+
+LET &e = -0.1       # energy limit in
+LET %poses = 10     # max poses
+DOCK $pdb_pathname $sdf_pathname &e %poses
+ECHO "Found " %poses ", best energy = " &e
+```
+
+Performs a call to the PrimaryDock executable using default parameters. The first argument must be a PDB file of a protein, and the second
+argument must be an SDF of a ligand. The binding site will be chosen, based on the protein name, from the `data/binding_pocket.json` file.
+
+If the third argument already exists, it will set the energy limit for poses. Either way, the third argument is also an optional output
+variable which receives the total binding energy for the most favorable pose.
+
+If the fourth argument already exists, its value will become the maximum number of output poses. Either way, the fourth argument is also an
+optional output variable which receives the number of poses found, which might be zero.
+
+By default, an output .dock file is generated in the `output/` folder and named `{receptor}-{ligand}.dock`.
+
+
 # DOWNLOAD
 Example:
 ```

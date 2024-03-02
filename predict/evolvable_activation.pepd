@@ -1,0 +1,148 @@
+
+LOAD "pdbs/OR51/OR51E2.upright.pdb"                 # Must precede ligand definition.
+
+# Configurable variables.
+LET $ligand = "sdf/propionic_acid.sdf"
+LET @xlat1 = [0,0,0]
+LET @xlat2 = [0,0,0]
+LET @xlat3 = [0,0,0]
+LET @xlat4 = [0,0,0]
+LET @xlat5 = [0,0,0]
+LET @xlat6 = [0,0,0]
+LET @xlat7 = [0,0,0]
+LET &xrot1 = 0
+LET &zrot1 = 0
+LET &yrot1 = 0
+LET &xrot2 = 0
+LET &zrot2 = 0
+LET &yrot2 = 0
+LET &xrot3 = 0
+LET &zrot3 = 0
+LET &yrot3 = 0
+LET &xrot4 = 0
+LET &zrot4 = 0
+LET &yrot4 = 0
+LET &xrot5 = 0
+LET &zrot5 = 0
+LET &yrot5 = 0
+LET &xrot6 = 0
+LET &zrot6 = 0
+LET &yrot6 = 0
+LET &xrot7 = 0
+LET &zrot7 = 0
+LET &yrot7 = 0
+LET &xebend1 = 0
+LET &xcbend1 = 0
+LET &zebend1 = 0
+LET &zcbend1 = 0
+LET &xebend2 = 0
+LET &xcbend2 = 0
+LET &zebend2 = 0
+LET &zcbend2 = 0
+LET &xebend3 = 0
+LET &xcbend3 = 0
+LET &zebend3 = 0
+LET &zcbend3 = 0
+LET &xebend4 = 0
+LET &xcbend4 = 0
+LET &zebend4 = 0
+LET &zcbend4 = 0
+LET &xebend5 = 0
+LET &xcbend5 = 0
+LET &zebend5 = 0
+LET &zcbend5 = 0
+LET &xebend6 = 0
+LET &xcbend6 = 0
+LET &zebend6 = 0
+LET &zcbend6 = 0
+LET &xebend7 = 0
+LET &xcbend7 = 0
+LET &zebend7 = 0
+LET &zcbend7 = 0
+
+# Internal variables.
+LET $usrmesg = "If the evolutions suddenly get much slower, they're working."
+
+# Perform motions.
+IF &xlat1 THEN MOVEREL %1.28 %1.58 &xlat1
+IF &xrot1 THEN ROTATE [1,0,0] &xrot1 %1.50 %1.28 %1.58
+IF &yrot1 THEN ROTATE [0,1,0] &yrot1 %1.50 %1.28 %1.58
+IF &zrot1 THEN ROTATE [0,0,1] &zrot1 %1.50 %1.28 %1.58
+IF &xebend1 THEN ROTATE [1,0,0] &xebend1 %1.50 %1.28 %1.50
+IF &xcbend1 THEN ROTATE [1,0,0] &xcbend1 %1.50 %1.50 %1.58
+IF &zebend1 THEN ROTATE [0,0,1] &zebend1 %1.50 %1.28 %1.50
+IF &zcbend1 THEN ROTATE [0,0,1] &zcbend1 %1.50 %1.50 %1.58
+
+IF &xlat2 THEN MOVEREL %2.38 %2.67 &xlat2
+IF &xrot2 THEN ROTATE [1,0,0] &xrot2 %2.50 %2.38 %2.67
+IF &yrot2 THEN ROTATE [0,1,0] &yrot2 %2.50 %2.38 %2.67
+IF &zrot2 THEN ROTATE [0,0,1] &zrot2 %2.50 %2.38 %2.67
+IF &xebend2 THEN ROTATE [1,0,0] &xebend2 %2.50 %2.50 %2.67
+IF &xcbend2 THEN ROTATE [1,0,0] &xcbend2 %2.50 %2.38 %2.50
+IF &zebend2 THEN ROTATE [0,0,1] &zebend2 %2.50 %2.50 %2.67
+IF &zcbend2 THEN ROTATE [0,0,1] &zcbend2 %2.50 %2.38 %2.50
+
+IF &xlat3 THEN MOVEREL %3.21 %3.56 &xlat3
+IF &xrot3 THEN ROTATE [1,0,0] &xrot3 %3.50 %3.21 %3.56
+IF &yrot3 THEN ROTATE [0,1,0] &yrot3 %3.50 %3.21 %3.56
+IF &zrot3 THEN ROTATE [0,0,1] &zrot3 %3.50 %3.21 %3.56
+IF &xebend3 THEN ROTATE [1,0,0] &xebend3 %3.50 %3.21 %3.50
+IF &xcbend3 THEN ROTATE [1,0,0] &xcbend3 %3.50 %3.50 %3.56
+IF &zebend3 THEN ROTATE [0,0,1] &zebend3 %3.50 %3.21 %3.50
+IF &zcbend3 THEN ROTATE [0,0,1] &zcbend3 %3.50 %3.50 %3.56
+
+IF &xlat4 THEN MOVEREL %4.39 %4.64 &xlat4
+IF &xrot4 THEN ROTATE [1,0,0] &xrot4 %4.50 %4.39 %4.64
+IF &yrot4 THEN ROTATE [0,1,0] &yrot4 %4.50 %4.39 %4.64
+IF &zrot4 THEN ROTATE [0,0,1] &zrot4 %4.50 %4.39 %4.64
+IF &xebend4 THEN ROTATE [1,0,0] &xebend4 %4.50 %4.50 %4.64
+IF &xcbend4 THEN ROTATE [1,0,0] &xcbend4 %4.50 %4.39 %4.50
+IF &zebend4 THEN ROTATE [0,0,1] &zebend4 %4.50 %4.50 %4.64
+IF &zcbend4 THEN ROTATE [0,0,1] &zcbend4 %4.50 %4.39 %4.50
+
+IF &xlat5 THEN MOVEREL %5.38 %5.68 &xlat5
+IF &xrot5 THEN ROTATE [1,0,0] &xrot5 %5.50 %5.38 %5.68
+IF &yrot5 THEN ROTATE [0,1,0] &yrot5 %5.50 %5.38 %5.68
+IF &zrot5 THEN ROTATE [0,0,1] &zrot5 %5.50 %5.38 %5.68
+IF &xebend5 THEN ROTATE [1,0,0] &xebend5 %5.50 %5.38 %5.50
+IF &xcbend5 THEN ROTATE [1,0,0] &xcbend5 %5.50 %5.50 %5.68
+IF &zebend5 THEN ROTATE [0,0,1] &zebend5 %5.50 %5.38 %5.50
+IF &zcbend5 THEN ROTATE [0,0,1] &zcbend5 %5.50 %5.50 %5.68
+
+IF &xlat6 THEN MOVEREL %6.28 %6.59 &xlat6
+IF &xrot6 THEN ROTATE [1,0,0] &xrot6 %6.48 %6.28 %6.59
+IF &yrot6 THEN ROTATE [0,1,0] &yrot6 %6.48 %6.28 %6.59
+IF &zrot6 THEN ROTATE [0,0,1] &zrot6 %6.48 %6.28 %6.59
+IF &xebend6 THEN ROTATE [1,0,0] &xebend6 %6.49 %6.49 %6.59
+IF &xcbend6 THEN ROTATE [1,0,0] &xcbend6 %6.49 %6.39 %6.49
+IF &zebend6 THEN ROTATE [0,0,1] &zebend6 %6.49 %6.49 %6.59
+IF &zcbend6 THEN ROTATE [0,0,1] &zcbend6 %6.49 %6.39 %6.49
+
+IF &xlat7 THEN MOVEREL %7.31 %7.56 &xlat7
+IF &xrot7 THEN ROTATE [1,0,0] &xrot7 %7.49 %7.31 %7.56
+IF &yrot7 THEN ROTATE [0,1,0] &yrot7 %7.49 %7.31 %7.56
+IF &zrot7 THEN ROTATE [0,0,1] &zrot7 %7.49 %7.31 %7.56
+IF &xebend7 THEN ROTATE [1,0,0] &xebend5 %7.49 %7.31 %7.49
+IF &xcbend7 THEN ROTATE [1,0,0] &xcbend5 %7.49 %7.49 %7.56
+IF &zebend7 THEN ROTATE [0,0,1] &zebend5 %7.49 %7.31 %7.49
+IF &zcbend7 THEN ROTATE [0,0,1] &zcbend5 %7.49 %7.49 %7.56
+
+INTC &intc
+ECHO "Total clashes: " &intc ", worst between " ~
+WORST ~
+ECHO ", should be less than 20000."
+
+MEASURE %3.25 %45.50 &disulf
+ECHO "3-45 disulfide bond: " &disulf ", should be between 4.6 and 6."
+
+A100 &a100             # It is up to the user, or the calling script, to check for any messages about missing residues.
+ECHO "A100: " &a100 ", should be more than 40."
+
+SAVE "tmp/OR51E2.result.pdb"
+IF &intc >= 100000 OR &disulf > 6 OR &a100 < 40 THEN EXIT
+
+LET $tmppdb = "tmp/temp.pdb"
+IF 1 THEN SAVE $tmppdb
+LET %poses = 1
+DOCK $tmppdb $ligand &energy %poses
+ECHO "Dock energy: " &energy ", should be less than -4."

@@ -224,6 +224,7 @@ function all_empirical_pairs_for_receptor($protein, $return_1dim = false, $agoni
 					$array[$oid] = $acv[$protein];
 					if (isset($array[$oid]['adjusted_curve_top'])) $array[$oid]['top_ref'] = $ref;
 					if (isset($array[$oid]['ec50'])) $array[$oid]['ec50_ref'] = $ref;
+					$array[$oid]['oid'] = $oid;
 				}
 				else
 				{
@@ -236,8 +237,7 @@ function all_empirical_pairs_for_receptor($protein, $return_1dim = false, $agoni
 					{
 						$array[$oid]['ec50'] = $acv[$protein]['ec50'];
 						$array[$oid]['ec50_ref'] = $ref;
-					}
-					
+					}					
 				}
 
 				$value = 0.0;
@@ -346,7 +346,7 @@ function ensure_sdf_exists($ligname)
 		}
 	}
 	chdir($pwd);
-	return;	
+	return $sdfname;	
 }
 
 function get_at_wt($element)

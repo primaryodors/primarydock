@@ -248,7 +248,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             res_clash_dir[resno] = res_clash_dir[resno].add(clashdir);
         }
 
-        // lb -= (reaches_spheroid[i]->total_eclipses() - reaches_spheroid[i]->initial_eclipses);
+        lb -= (reaches_spheroid[i]->total_eclipses() - reaches_spheroid[i]->initial_eclipses);
 
         #if _dbg_51e2_ionic
         if (resno == 262)

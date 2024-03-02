@@ -1,3 +1,4 @@
+#include "classes/constants.h"
 #include <cstring>
 #include <iostream>
 #include <fstream>
@@ -1860,7 +1861,7 @@ int main(int argc, char** argv)
 
     time_t began = time(NULL);
 
-    strcpy(configfname, "primarydock.config");
+    strcpy(configfname, "");
 
     smcmd = false;
     for (i=1; i<argc; i++)
@@ -1883,15 +1884,24 @@ int main(int argc, char** argv)
         }
     }
 
-    FILE* pf = fopen(configfname, "r");
-    if (!pf)
+    FILE* pf;
+    if (configset)
     {
-        cout << "Config file not found: " << configfname << ", exiting." << endl;
-        return 0xbadf12e;
-    }
+        pf = fopen(configfname, "r");
+        if (!pf)
+        {
+            cout << "Config file not found: " << configfname << ", exiting." << endl;
+            return 0xbadf12e;
+        }
 
-    read_config_file(pf);
-    fclose(pf);
+        read_config_file(pf);
+        fclose(pf);
+    }
+    else
+    {
+        progressbar = true;
+        strcpy(outfname, "output/\%p-\%l.dock");
+    }
 
     for (i=1; i<argc; i++)
     {
@@ -1975,6 +1985,20 @@ int main(int argc, char** argv)
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
     #endif
+
+    float A100 = 0;
+    bool is_active = false, is_inactive = false;
+    try
+    {
+        A100 = protein->calculate_A100();
+        if (A100 >= 40) is_active = true;
+        else if (A100 < 20) is_inactive = true;
+        // cout << "A100 score: " << A100 << " from " << protein->res_found_for_A100 << "/10 matching residues." << endl;
+    }
+    catch (...)
+    {
+        ;
+    }
 
     Pose tmp_pdb_residue[poses+1][protein->get_end_resno()+1];
     Pose tmp_pdb_waters[poses+1][omaxh2o+1];
@@ -2071,6 +2095,69 @@ int main(int argc, char** argv)
         #if enable_json
         std::ifstream f("data/binding_pocket.json");
         json bsdata = json::parse(f);
+
+        bool matched = false;
+        int mlength = 0;
+        json mnode;
+        json::iterator ji;
+        for (auto jnode = bsdata.begin(); jnode != bsdata.end(); ++jnode)
+        {
+            if (!jnode.value().contains("pocket"))
+            {
+                if (is_active && !jnode.value().contains("active_pocket")) continue;
+                if (is_inactive && !jnode.value().contains("inactive_pocket")) continue;
+                if (!is_active && !is_inactive) continue;
+            }
+
+            bool matching = false;
+            std::string lstr = jnode.key();
+            char jorid[lstr.length()+2];
+            strcpy(jorid, lstr.c_str());
+            char* asterisk = strchr(jorid, '*');
+
+            if (!strcmp(jorid, protid))
+            {
+                matching = true;
+                break;
+            }
+
+            if (asterisk)
+            {
+                *asterisk = 0;
+                for (i=0; jorid[i]; i++)
+                {
+                    if (jorid[i] != protid[i]) break;
+                }
+                if (!jorid[i]) matching = true;
+            }
+
+            if (!matching)
+            {
+                std::regex rex(jorid);
+                if (std::regex_search(protid, rex)) matching = true;
+            }
+
+            if (matching)
+            {
+                if (strlen(jorid) > mlength)
+                {
+                    mlength = strlen(jorid);
+                    mnode = jnode.value();
+                    matched = true;
+                }
+            }
+        }
+
+        if (!matched)
+        {
+            cout << "Protein not found in data/binding_pocket.json. Please double check or supply binding residues with the CEN argument." << endl;
+            return 0xbadb19d;
+        }
+        if (is_active && mnode.contains("active_pocket")) CEN_buf = (std::string)"CEN RES " + (std::string)mnode["active_pocket"];
+        else if (is_inactive && mnode.contains("inactive_pocket")) CEN_buf = (std::string)"CEN RES " + (std::string)mnode["inactive_pocket"];
+        else CEN_buf = (std::string)"CEN RES " + (std::string)mnode["pocket"];
+        cout << CEN_buf << endl;
+
         #else
         cout << "Error: no binding pocket center defined." << endl;
         return 0xbadb19d;
@@ -3515,8 +3602,9 @@ _exitposes:
             }
             protein->load_pdb(pf);
             fclose(pf);
+            apply_protein_specific_settings(protein);
             FILE* pf = fopen(outfname, "ab");
-            fprintf(pf, "\nOriginal PDB:\n");
+            fprintf(pf, "\nDocked PDB:\n");
             protein->save_pdb(pf);
             fclose(pf);
             cout << "PDB appended to output file." << endl;

@@ -3783,7 +3783,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
             fgets(buffer, 1022, pf);
             if (strlen(buffer))			// TODO: Change this to employ a regex.
             {
-                fclose(pf);
+                pclose(pf);
                 std::string sdfdat = "";
 
                 // Temporarily reuse buffer as the obabel command.
@@ -3800,7 +3800,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
 
                     if (lno == 2) sdfgen_aboutline = buffer;
                 }
-                fclose(pf);
+                pclose(pf);
 
                 int result = from_sdf(sdfdat.c_str());
                 return (result > 0);

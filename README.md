@@ -24,11 +24,12 @@ the PrimaryOdors website.
 # Requirements
 The following packages are required by PrimaryDock:
 
-`g++`
-`php7` or later
-`openbabel`
-`nlohmann-json3-dev`
-
+- `g++`
+- `php7` or later
+- `php-curl`
+- `php-gd` 
+- `openbabel`
+- `nlohmann-json3-dev`
 
 # Usage
 

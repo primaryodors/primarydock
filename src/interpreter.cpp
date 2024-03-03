@@ -2744,6 +2744,11 @@ int main(int argc, char** argv)
                 // TODO: Option to include ligand in motion.
             }	// MOVEREL
 
+            else if (!strcmp(words[0], "NOP"))
+            {
+                ;   // Do nothing.
+            }	// NOP
+
             else if (!strcmp(words[0], "PTALIGN"))
             {
                 Point point, align, center;

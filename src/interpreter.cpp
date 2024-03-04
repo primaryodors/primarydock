@@ -2436,6 +2436,7 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "LOAD") || !strcmp(words[0], "OPEN"))
             {
+                Star s;
                 if (!words[1]) raise_error("Insufficient parameters given for LOAD.");
                 psz = interpret_single_string(words[1]);
 				n = 0;
@@ -2472,6 +2473,9 @@ int main(int argc, char** argv)
                 l = working->load_pdb(pf, n, chain);
                 if (!l) raise_error("No residues loaded.");
                 working->set_name_from_pdb_name(words[1]);
+                s.psz = new char[256];
+                strcpy(s.psz, working->get_name().c_str());
+                set_variable("$prot", s);
                 if (include_ligand) ligand.from_pdb(pf, true);
 
                 fclose(pf);
@@ -3166,6 +3170,7 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "STRAND") || !strcmp(words[0], "CHAIN"))
             {
+                Star s;
                 if (!words[1]) raise_error("Insufficient parameters given for STRAND.");
                 if (words[2])
                 {
@@ -3184,6 +3189,10 @@ int main(int argc, char** argv)
                     working = strands[chain];
                     g_chain = chain+65;
                 }
+
+                s.psz = new char[256];
+                strcpy(s.psz, working->get_name().c_str());
+                set_variable("$prot", s);
             }   // STRAND
 
             else if (!strcmp(words[0], "STRLEN"))

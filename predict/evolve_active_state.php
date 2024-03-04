@@ -2,8 +2,13 @@
 chdir(__DIR__);
 require_once("../data/protutils.php");
 require_once("../data/odorutils.php");
+chdir(__DIR__);
+require_once("statistics.php");
 
-$mutation_rate = 0.25;
+$mutation_rate = 0.5;
+$mutation_limit = 2.5;
+$mutation_exponent = 3;
+$mutation_precis = 4;
 
 if (!file_exists("../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb"))
 {
@@ -242,7 +247,7 @@ for ($generation=1; $generation<=1000000; $generation++)
             foreach (array_keys($evparams) as $param)
             {
                 $value = rand(0,1) ? $secondbest[$param] : $best[$param];
-                if (frand(0,1) <= $mutation_rate) $value += frand(-1, 1);
+                if (frand(0,1) <= $mutation_rate) $value += round($mutation_limit * sgn(frand(-1, 1)) * pow(frand(0,1), $mutation_exponent), $mutation_precis);
                 $population[$i][$param] = $value;
             }
         }
@@ -253,7 +258,7 @@ for ($generation=1; $generation<=1000000; $generation++)
         {
             foreach ($evparams as $param => $value)
             {
-                if (frand(0,1) <= $mutation_rate) $value += frand(-1, 1);
+                if (frand(0,1) <= $mutation_rate) $value += round($mutation_limit * sgn(frand(-1, 1)) * pow(frand(0,1), $mutation_exponent), $mutation_precis);
                 $population[$i][$param] = $value;
             }
         }

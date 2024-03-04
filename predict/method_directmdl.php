@@ -36,10 +36,11 @@ function make_prediction($data)
     {
         $ascore = max(-50, min(0, floatval(@$data['a_BindingEnergy'])));
         $iscore = max(-50, min(0, floatval(@$data['i_BindingEnergy'])));
-        $ascore345 = floatval(@$data['a_BindingEnergy.3'])
-            + floatval(@$data['a_BindingEnergy.4'])
-            + floatval(@$data['a_BindingEnergy.45'])
-            + floatval(@$data['a_BindingEnergy.5']);
+        $ascore345 = min(floatval(@$data['a_BindingEnergy.3'])
+            , floatval(@$data['a_BindingEnergy.4'])
+            , floatval(@$data['a_BindingEnergy.45'])
+            , floatval(@$data['a_BindingEnergy.5'])
+            );
         $ascore6 = floatval(@$data['a_BindingEnergy.6']);
 
         $ascore_combined = $ascore345 * $ascore6 / floatval(@$data['a_BindingEnergy']);

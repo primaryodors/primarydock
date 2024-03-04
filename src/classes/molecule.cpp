@@ -681,12 +681,14 @@ float Molecule::total_eclipses()
             {
                 if (!bbt[k]) continue;
                 if (!bbt[k]->btom) continue;
+                if (bbt[k]->btom->get_Z() > 1) continue;
                 if (bbt[k]->btom == atoms[i]) continue;
                 for (l=0; l<n; l++)
                 {
                     if (l == j) continue;
                     if (!abt[l]) continue;
                     if (!abt[l]->btom) continue;
+                    if (abt[l]->btom->get_Z() > 1) continue;
                     float theta = find_angle_along_vector(bbt[k]->btom->get_location(), abt[l]->btom->get_location(), atoms[i]->get_location(), axis);
                     if (theta >= -hexagonal && theta <= hexagonal)
                     {

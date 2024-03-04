@@ -43,7 +43,7 @@ function make_prediction($data)
             );
         $ascore6 = floatval(@$data['a_BindingEnergy.6']);
 
-        $ascore_combined = $ascore345 * $ascore6 / floatval(@$data['a_BindingEnergy']);
+        $ascore_combined = 100.0 * $ascore345 * $ascore6 / floatval(@$data['a_BindingEnergy']);
         
         $aposes = intval(@$data["a_POSES"]);
 

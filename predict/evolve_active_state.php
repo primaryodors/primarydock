@@ -127,6 +127,14 @@ function runpepd($values, $save = false)
         exec("bin/pepteditor $pepdname", $output);
     }
     foreach ($output as $ln) if (false!==stripos($ln, "cannot")) echo "Warning: $ln\n";
+
+    if ($save)
+    {
+        $fp = fopen("tmp/best.out", "w");
+        fwrite($fp, implode("\n", $output));
+        fclose($fp);
+    }
+
     return $output;
 }
 

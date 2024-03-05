@@ -20,7 +20,7 @@ chdir(__DIR__);
 $flex = 1;                      // Flexion (0 or 1).
 $pose = 15;
 $iter = 30;
-$elim = 0;                      // Energy limit for poses.
+$elim = -2;                     // Energy limit for poses.
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
 
 prepare_outputs();
@@ -43,7 +43,7 @@ function make_prediction($data)
             );
         $ascore6 = floatval(@$data['a_BindingEnergy.6']);
 
-        $ascore_combined = 100.0 * $ascore345 * $ascore6 / floatval(@$data['a_BindingEnergy']);
+        $ascore_combined = 10.0 * $ascore345 * $ascore6 / floatval(@$data['a_BindingEnergy']);
         
         $aposes = intval(@$data["a_POSES"]);
 

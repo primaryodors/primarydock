@@ -303,7 +303,7 @@ for ($generation=1; $generation<=1000000; $generation++)
     }
     echo "\n";
 
-    echo "Best score: $best_score\n";
+    echo date("Y-m-d H:i:s")." best score: $best_score\n";
     runpepd($best, true);
 }
 

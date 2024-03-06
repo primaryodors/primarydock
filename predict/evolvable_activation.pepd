@@ -135,6 +135,16 @@ IF &zcbend7 THEN ROTATE [0,0,1] &zcbend7 %7.49 %7.49 %7.56
 
 IF $6.59 = "R" THEN ATOMTO %6.59 "CZ" @4.61
 
+DELETE 1 %1.31
+DELETE %1.59 %2.37
+DELETE %2.68 %3.20
+DELETE %3.57 %4.38
+DELETE %4.65 %45.49
+DELETE %45.57 %5.37
+DELETE %5.69 %6.27
+DELETE %6.60 %7.30
+DELETE %7.57 9999
+
 INTC &intc
 ECHO "Total clashes: " &intc ", worst between " ~
 WORST ~

@@ -7,6 +7,7 @@ LET @xlat1 = [0,0,0]
 LET @xlat2 = [0,0,0]
 LET @xlat3 = [0,0,0]
 LET @xlat4 = [0,0,0]
+LET @xlat45 = [0,0,0]
 LET @xlat5 = [0,0,0]
 LET @xlat6 = [0,0,0]
 LET @xlat7 = [0,0,0]
@@ -61,10 +62,12 @@ LET &zebend7 = 0
 LET &zcbend7 = 0
 
 # Internal variables.
-LET $usrmesg = "Evolving a set of parameters to try to turn the AF OR5K1 model into the Nicoli et al 1015 model."
+LET $usrmesg = "Evolutions may be or become very slow; this is normal and expected."
+MEASURE %5.62 %6.34 &r56tail
+LET &r56lim = &r56tail * 1.15
 
 # Perform motions.
-IF &xlat1 THEN MOVEREL %1.28 %1.58 &xlat1
+IF @xlat1 THEN MOVEREL %1.28 %1.58 @xlat1
 IF &xrot1 THEN ROTATE [1,0,0] &xrot1 %1.50 %1.28 %1.58
 IF &yrot1 THEN ROTATE [0,1,0] &yrot1 %1.50 %1.28 %1.58
 IF &zrot1 THEN ROTATE [0,0,1] &zrot1 %1.50 %1.28 %1.58
@@ -73,7 +76,7 @@ IF &xcbend1 THEN ROTATE [1,0,0] &xcbend1 %1.50 %1.50 %1.58
 IF &zebend1 THEN ROTATE [0,0,1] &zebend1 %1.50 %1.28 %1.50
 IF &zcbend1 THEN ROTATE [0,0,1] &zcbend1 %1.50 %1.50 %1.58
 
-IF &xlat2 THEN MOVEREL %2.38 %2.67 &xlat2
+IF @xlat2 THEN MOVEREL %2.38 %2.67 @xlat2
 IF &xrot2 THEN ROTATE [1,0,0] &xrot2 %2.50 %2.38 %2.67
 IF &yrot2 THEN ROTATE [0,1,0] &yrot2 %2.50 %2.38 %2.67
 IF &zrot2 THEN ROTATE [0,0,1] &zrot2 %2.50 %2.38 %2.67
@@ -82,7 +85,7 @@ IF &xcbend2 THEN ROTATE [1,0,0] &xcbend2 %2.50 %2.38 %2.50
 IF &zebend2 THEN ROTATE [0,0,1] &zebend2 %2.50 %2.50 %2.67
 IF &zcbend2 THEN ROTATE [0,0,1] &zcbend2 %2.50 %2.38 %2.50
 
-IF &xlat3 THEN MOVEREL %3.21 %3.56 &xlat3
+IF @xlat3 THEN MOVEREL %3.21 %3.56 @xlat3
 IF &xrot3 THEN ROTATE [1,0,0] &xrot3 %3.50 %3.21 %3.56
 IF &yrot3 THEN ROTATE [0,1,0] &yrot3 %3.50 %3.21 %3.56
 IF &zrot3 THEN ROTATE [0,0,1] &zrot3 %3.50 %3.21 %3.56
@@ -91,7 +94,8 @@ IF &xcbend3 THEN ROTATE [1,0,0] &xcbend3 %3.50 %3.50 %3.56
 IF &zebend3 THEN ROTATE [0,0,1] &zebend3 %3.50 %3.21 %3.50
 IF &zcbend3 THEN ROTATE [0,0,1] &zcbend3 %3.50 %3.50 %3.56
 
-IF &xlat4 THEN MOVEREL %4.39 %4.64 &xlat4
+IF @xlat45 THEN MOVEREL %45.50 %45.56 @xlat45
+IF @xlat4 THEN MOVEREL %4.39 %4.64 @xlat4
 IF &xrot4 THEN ROTATE [1,0,0] &xrot4 %4.50 %4.39 %4.64
 IF &yrot4 THEN ROTATE [0,1,0] &yrot4 %4.50 %4.39 %4.64
 IF &zrot4 THEN ROTATE [0,0,1] &zrot4 %4.50 %4.39 %4.64
@@ -103,7 +107,7 @@ IF &zcbend4 THEN ROTATE [0,0,1] &zcbend4 %4.50 %4.39 %4.50
 LET @axis45 = @45.54 - @45.52
 IF &bend45 THEN ROTATE @axis45 &bend45 %45.52 %45.52 %45.54
 
-IF &xlat5 THEN MOVEREL %5.38 %5.68 &xlat5
+IF @xlat5 THEN MOVEREL %5.38 %5.68 @xlat5
 IF &xrot5 THEN ROTATE [1,0,0] &xrot5 %5.50 %5.38 %5.68
 IF &yrot5 THEN ROTATE [0,1,0] &yrot5 %5.50 %5.38 %5.68
 IF &zrot5 THEN ROTATE [0,0,1] &zrot5 %5.50 %5.38 %5.68
@@ -112,7 +116,7 @@ IF &xcbend5 THEN ROTATE [1,0,0] &xcbend5 %5.50 %5.50 %5.68
 IF &zebend5 THEN ROTATE [0,0,1] &zebend5 %5.50 %5.38 %5.50
 IF &zcbend5 THEN ROTATE [0,0,1] &zcbend5 %5.50 %5.50 %5.68
 
-IF &xlat6 THEN MOVEREL %6.28 %6.59 &xlat6
+IF @xlat6 THEN MOVEREL %6.28 %6.59 @xlat6
 IF &xrot6 THEN ROTATE [1,0,0] &xrot6 %6.48 %6.28 %6.59
 IF &yrot6 THEN ROTATE [0,1,0] &yrot6 %6.48 %6.28 %6.59
 IF &zrot6 THEN ROTATE [0,0,1] &zrot6 %6.48 %6.28 %6.59
@@ -121,14 +125,14 @@ IF &xcbend6 THEN ROTATE [1,0,0] &xcbend6 %6.49 %6.39 %6.49
 IF &zebend6 THEN ROTATE [0,0,1] &zebend6 %6.49 %6.49 %6.59
 IF &zcbend6 THEN ROTATE [0,0,1] &zcbend6 %6.49 %6.39 %6.49
 
-IF &xlat7 THEN MOVEREL %7.31 %7.56 &xlat7
+IF @xlat7 THEN MOVEREL %7.31 %7.56 @xlat7
 IF &xrot7 THEN ROTATE [1,0,0] &xrot7 %7.49 %7.31 %7.56
 IF &yrot7 THEN ROTATE [0,1,0] &yrot7 %7.49 %7.31 %7.56
 IF &zrot7 THEN ROTATE [0,0,1] &zrot7 %7.49 %7.31 %7.56
-IF &xebend7 THEN ROTATE [1,0,0] &xebend5 %7.49 %7.31 %7.49
-IF &xcbend7 THEN ROTATE [1,0,0] &xcbend5 %7.49 %7.49 %7.56
-IF &zebend7 THEN ROTATE [0,0,1] &zebend5 %7.49 %7.31 %7.49
-IF &zcbend7 THEN ROTATE [0,0,1] &zcbend5 %7.49 %7.49 %7.56
+IF &xebend7 THEN ROTATE [1,0,0] &xebend7 %7.49 %7.31 %7.49
+IF &xcbend7 THEN ROTATE [1,0,0] &xcbend7 %7.49 %7.49 %7.56
+IF &zebend7 THEN ROTATE [0,0,1] &zebend7 %7.49 %7.31 %7.49
+IF &zcbend7 THEN ROTATE [0,0,1] &zcbend7 %7.49 %7.49 %7.56
 
 BWCENTER
 OPEN "../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb" A B

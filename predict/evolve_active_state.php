@@ -5,7 +5,7 @@ require_once("../data/odorutils.php");
 chdir(__DIR__);
 require_once("statistics.php");
 
-$mutation_rate = 0.5;
+$mutation_rate = 0.1;
 $mutation_limit = 2.5;
 $mutation_exponent = 3;
 $mutation_precis = 4;

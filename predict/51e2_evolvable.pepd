@@ -2,7 +2,7 @@
 LOAD "pdbs/OR51/OR51E2.upright.pdb"
 
 # Configurable variables.
-LET &bend45 = 0
+LET &bend45 = 40
 LET @xlat1 = [0,0,0]
 LET @xlat2 = [0,0,0]
 LET @xlat3 = [0,0,0]

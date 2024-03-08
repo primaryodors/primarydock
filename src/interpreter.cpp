@@ -461,12 +461,17 @@ Point interpret_single_point(const char* param, Point old_value = Point(0,0,0))
         }
     }
 
-    if (param[0] >= '0' && param[0] <= '9')
+    if (param[0] >= '0' && param[0] <= '9' && !strchr(param, '.'))
     {
         aa = working->get_residue(atoi(param));
         if (aa)
         {
             pt = aa->get_CA_location();
+            return pt;
+        }
+        else
+        {
+            pt.x = pt.y = pt.z = 0;
             return pt;
         }
     }
@@ -480,6 +485,7 @@ Point interpret_single_point(const char* param, Point old_value = Point(0,0,0))
         pt.x = script_var[n].value.n;
         aa = working->get_residue(script_var[n].value.n);
         if (aa) pt = aa->get_CA_location();
+        else pt.x = pt.y = pt.z = 0;
         return pt;
 
     case '&':

@@ -119,9 +119,9 @@ IF &xrot6 THEN ROTATE [1,0,0] &xrot6 %6.48 %6.28 %6.59
 IF &yrot6 THEN ROTATE [0,1,0] &yrot6 %6.48 %6.28 %6.59
 IF &zrot6 THEN ROTATE [0,0,1] &zrot6 %6.48 %6.28 %6.59
 IF &xebend6 THEN ROTATE [1,0,0] &xebend6 %6.49 %6.49 %6.59
-IF &xcbend6 THEN ROTATE [1,0,0] &xcbend6 %6.49 %6.39 %6.49
+IF &xcbend6 THEN ROTATE [1,0,0] &xcbend6 %6.49 %6.28 %6.49
 IF &zebend6 THEN ROTATE [0,0,1] &zebend6 %6.49 %6.49 %6.59
-IF &zcbend6 THEN ROTATE [0,0,1] &zcbend6 %6.49 %6.39 %6.49
+IF &zcbend6 THEN ROTATE [0,0,1] &zcbend6 %6.49 %6.28 %6.49
 
 IF @xlat7 THEN MOVEREL %7.31 %7.56 @xlat7
 IF &xrot7 THEN ROTATE [1,0,0] &xrot7 %7.49 %7.31 %7.56
@@ -138,16 +138,29 @@ STRAND B
 UPRIGHT B
 BWCENTER
 
+STRAND A
+DELETE 1 %1.26
+DELETE %1.59 %2.37
+DELETE %2.68 %3.20
+DELETE %3.57 %4.38
+DELETE %4.65 %45.49
+DELETE %45.57 %5.37
+DELETE %5.69 %6.27
+DELETE %6.60 %7.30
+DELETE %7.57 9999
+
 LET &divergence = 0
 LET %i = %1.28
 _loop:
 STRAND A
 LET @a = %i
+IF 0.0001 > @a GOTO _continue
 STRAND B
 LET @b = %i
 LET @r = @a - @b
 LET &r = @r
 LET &divergence += &r
+_continue:
 LET %i ++
 IF %i <= %7.56 THEN GOTO _loop
 

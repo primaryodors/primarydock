@@ -305,6 +305,7 @@ for ($generation=1; $generation<=1000000; $generation++)
     echo "\n";
 
     echo date("Y-m-d H:i:s")." best score: $best_score\n";
+    if ($best_score < $prev_best) continue;
     runpepd($best, true);
 
     if (($best_score - $prev_best) < ($best_score*0.01)) $mutation_rate *= 0.707;

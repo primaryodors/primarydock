@@ -2,7 +2,7 @@
 LOAD "pdbs/OR5/OR5K1.upright.pdb"
 
 # Configurable variables.
-LET &bend45 = 0
+LET &bend45 = 40
 LET @xlat1 = [0,0,0]
 LET @xlat2 = [0,0,0]
 LET @xlat3 = [0,0,0]
@@ -62,9 +62,7 @@ LET &zebend7 = 0
 LET &zcbend7 = 0
 
 # Internal variables.
-LET $usrmesg = "Evolutions may be or become very slow; this is normal and expected."
-MEASURE %5.62 %6.34 &r56tail
-LET &r56lim = &r56tail * 1.15
+LET $usrmesg = "Evolving a set of parameters to try to turn the AF OR5K1 model into the Nicoli et al model."
 
 # Perform motions.
 IF @xlat1 THEN MOVEREL %1.28 %1.58 @xlat1
@@ -94,7 +92,6 @@ IF &xcbend3 THEN ROTATE [1,0,0] &xcbend3 %3.50 %3.50 %3.56
 IF &zebend3 THEN ROTATE [0,0,1] &zebend3 %3.50 %3.21 %3.50
 IF &zcbend3 THEN ROTATE [0,0,1] &zcbend3 %3.50 %3.50 %3.56
 
-IF @xlat45 THEN MOVEREL %45.50 %45.56 @xlat45
 IF @xlat4 THEN MOVEREL %4.39 %4.64 @xlat4
 IF &xrot4 THEN ROTATE [1,0,0] &xrot4 %4.50 %4.39 %4.64
 IF &yrot4 THEN ROTATE [0,1,0] &yrot4 %4.50 %4.39 %4.64
@@ -104,6 +101,7 @@ IF &xcbend4 THEN ROTATE [1,0,0] &xcbend4 %4.50 %4.39 %4.50
 IF &zebend4 THEN ROTATE [0,0,1] &zebend4 %4.50 %4.50 %4.64
 IF &zcbend4 THEN ROTATE [0,0,1] &zcbend4 %4.50 %4.39 %4.50
 
+IF @xlat45 THEN MOVEREL %45.50 %45.56 @xlat45
 LET @axis45 = @45.54 - @45.52
 IF &bend45 THEN ROTATE @axis45 &bend45 %45.52 %45.52 %45.54
 
@@ -121,18 +119,18 @@ IF &xrot6 THEN ROTATE [1,0,0] &xrot6 %6.48 %6.28 %6.59
 IF &yrot6 THEN ROTATE [0,1,0] &yrot6 %6.48 %6.28 %6.59
 IF &zrot6 THEN ROTATE [0,0,1] &zrot6 %6.48 %6.28 %6.59
 IF &xebend6 THEN ROTATE [1,0,0] &xebend6 %6.49 %6.49 %6.59
-IF &xcbend6 THEN ROTATE [1,0,0] &xcbend6 %6.49 %6.39 %6.49
+IF &xcbend6 THEN ROTATE [1,0,0] &xcbend6 %6.49 %6.28 %6.49
 IF &zebend6 THEN ROTATE [0,0,1] &zebend6 %6.49 %6.49 %6.59
-IF &zcbend6 THEN ROTATE [0,0,1] &zcbend6 %6.49 %6.39 %6.49
+IF &zcbend6 THEN ROTATE [0,0,1] &zcbend6 %6.49 %6.28 %6.49
 
 IF @xlat7 THEN MOVEREL %7.31 %7.56 @xlat7
 IF &xrot7 THEN ROTATE [1,0,0] &xrot7 %7.49 %7.31 %7.56
 IF &yrot7 THEN ROTATE [0,1,0] &yrot7 %7.49 %7.31 %7.56
 IF &zrot7 THEN ROTATE [0,0,1] &zrot7 %7.49 %7.31 %7.56
-IF &xebend7 THEN ROTATE [1,0,0] &xebend7 %7.49 %7.31 %7.49
-IF &xcbend7 THEN ROTATE [1,0,0] &xcbend7 %7.49 %7.49 %7.56
-IF &zebend7 THEN ROTATE [0,0,1] &zebend7 %7.49 %7.31 %7.49
-IF &zcbend7 THEN ROTATE [0,0,1] &zcbend7 %7.49 %7.49 %7.56
+IF &xebend7 THEN ROTATE [1,0,0] &xebend5 %7.49 %7.31 %7.49
+IF &xcbend7 THEN ROTATE [1,0,0] &xcbend5 %7.49 %7.49 %7.56
+IF &zebend7 THEN ROTATE [0,0,1] &zebend5 %7.49 %7.31 %7.49
+IF &zcbend7 THEN ROTATE [0,0,1] &zcbend5 %7.49 %7.49 %7.56
 
 BWCENTER
 OPEN "../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb" A B
@@ -141,16 +139,29 @@ STRAND B
 UPRIGHT B
 BWCENTER
 
+STRAND A
+DELETE 1 %1.26
+DELETE %1.59 %2.37
+DELETE %2.68 %3.20
+DELETE %3.57 %4.38
+DELETE %4.65 %45.49
+DELETE %45.57 %5.37
+DELETE %5.69 %6.27
+DELETE %6.60 %7.30
+DELETE %7.57 9999
+
 LET &divergence = 0
 LET %i = %1.28
 _loop:
 STRAND A
 LET @a = %i
+IF 0.0001 > @a GOTO _continue
 STRAND B
 LET @b = %i
 LET @r = @a - @b
 LET &r = @r
 LET &divergence += &r
+_continue:
 LET %i ++
 IF %i <= %7.56 THEN GOTO _loop
 

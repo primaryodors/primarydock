@@ -5,7 +5,7 @@ require_once("../data/odorutils.php");
 chdir(__DIR__);
 require_once("statistics.php");
 
-$mutation_rate = 0.1;
+$mutation_rate = 0.5;
 $mutation_limit = 2.5;
 $mutation_exponent = 3;
 $mutation_precis = 4;
@@ -242,6 +242,7 @@ foreach ($tne as $ln)
 
 if (!count($evparams)) die("Error: parameters not delineated.\n");
 
+$prev_best = -1e18;
 for ($generation=1; $generation<=1000000; $generation++)
 {
     echo "Beginning generation $generation...\n";
@@ -305,5 +306,9 @@ for ($generation=1; $generation<=1000000; $generation++)
 
     echo date("Y-m-d H:i:s")." best score: $best_score\n";
     runpepd($best, true);
+
+    if ($best_score == $prev_best) $mutation_rate *= 0.707;
+
+    $prev_best = $best_score;
 }
 

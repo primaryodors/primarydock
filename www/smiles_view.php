@@ -128,7 +128,7 @@ var color_scheme = NGL.ColormakerRegistry.addScheme(function (params)
             case 'Be': return 0x1e4cff;
             case 'B': return 0x774422;
         	case 'N': return 0x0033FF;
-        	case 'O': return 0xFF2222;
+        	case 'O': return <?php echo @$_REQUEST["caelum"] ? "0x00CCFF" : "0xFF2222"; ?>;
             case 'F': return 0xddff66;
 			case 'Ne': return 0xff4022;
         	case 'Na': return 0xffcc00;
@@ -173,7 +173,7 @@ var color_scheme = NGL.ColormakerRegistry.addScheme(function (params)
             case 'Sn': return 0x908d85;
             case 'Sb': return 0xd38d65;
             case 'Te': return 0xa3142d;
-        	case 'I': return 0x990033;
+        	case 'I': return 0x990066;
             case 'Xe': return 0x7a95ff;
             case 'Cs': return 0x3467fb;
             case 'Ba': return 0x95e104;

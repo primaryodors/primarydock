@@ -127,10 +127,10 @@ IF @xlat7 THEN MOVEREL %7.31 %7.56 @xlat7
 IF &xrot7 THEN ROTATE [1,0,0] &xrot7 %7.49 %7.31 %7.56
 IF &yrot7 THEN ROTATE [0,1,0] &yrot7 %7.49 %7.31 %7.56
 IF &zrot7 THEN ROTATE [0,0,1] &zrot7 %7.49 %7.31 %7.56
-IF &xebend7 THEN ROTATE [1,0,0] &xebend5 %7.49 %7.31 %7.49
-IF &xcbend7 THEN ROTATE [1,0,0] &xcbend5 %7.49 %7.49 %7.56
-IF &zebend7 THEN ROTATE [0,0,1] &zebend5 %7.49 %7.31 %7.49
-IF &zcbend7 THEN ROTATE [0,0,1] &zcbend5 %7.49 %7.49 %7.56
+IF &xebend7 THEN ROTATE [1,0,0] &xebend7 %7.49 %7.31 %7.49
+IF &xcbend7 THEN ROTATE [1,0,0] &xcbend7 %7.49 %7.49 %7.56
+IF &zebend7 THEN ROTATE [0,0,1] &zebend7 %7.49 %7.31 %7.49
+IF &zcbend7 THEN ROTATE [0,0,1] &zcbend7 %7.49 %7.49 %7.56
 
 BWCENTER
 OPEN "pdbs/OR51/OR51E2.8f76.pdb" A B

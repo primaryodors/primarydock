@@ -28,11 +28,11 @@ LET &zrot5 = 0
 LET &yrot5 = 0
 LET &xrot6 = 0
 LET &zrot6 = 0
-LET &yrot6 = -20
+LET &yrot6 = 0
 LET &xrot7 = 0
 LET &zrot7 = 0
-LET &yrot7 = 120
-LET &wind742 = 25
+LET &yrot7 = 0
+LET &wind742 = 0
 LET &xebend1 = 0
 LET &xcbend1 = 0
 LET &zebend1 = 0
@@ -57,9 +57,9 @@ LET &xebend6 = 0
 LET &xcbend6 = 0
 LET &zebend6 = 0
 LET &zcbend6 = 0
-LET &xebend7 = 15
+LET &xebend7 = 0
 LET &xcbend7 = 0
-LET &zebend7 = -40
+LET &zebend7 = 0
 LET &zcbend7 = 0
 
 # Internal variables.

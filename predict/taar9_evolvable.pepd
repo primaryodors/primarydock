@@ -63,7 +63,7 @@ LET &zebend7 = -40
 LET &zcbend7 = 0
 
 # Internal variables.
-LET $usrmesg = "Evolving a set of parameters to try to turn the AF OR5K1 model into the Nicoli et al model."
+LET $usrmesg = "Evolving a set of parameters to try to turn the AF TAAR9 model into the cryo-EM mTAAR9 model."
 
 # Perform motions.
 IF @xlat1 THEN MOVEREL %1.28 %1.58 @xlat1

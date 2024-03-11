@@ -32,6 +32,7 @@ LET &yrot6 = -20
 LET &xrot7 = 0
 LET &zrot7 = 0
 LET &yrot7 = 120
+LET &wind742 = 25
 LET &xebend1 = 0
 LET &xcbend1 = 0
 LET &zebend1 = 0
@@ -56,9 +57,9 @@ LET &xebend6 = 0
 LET &xcbend6 = 0
 LET &zebend6 = 0
 LET &zcbend6 = 0
-LET &xebend7 = 0
+LET &xebend7 = 15
 LET &xcbend7 = 0
-LET &zebend7 = 0
+LET &zebend7 = -40
 LET &zcbend7 = 0
 
 # Internal variables.
@@ -124,6 +125,7 @@ IF &zebend6 THEN ROTATE [0,0,1] &zebend6 %6.49 %6.49 %6.59
 IF &zcbend6 THEN ROTATE [0,0,1] &zcbend6 %6.49 %6.28 %6.49
 
 IF @xlat7 THEN MOVEREL %7.31 %7.56 @xlat7
+IF &wind742 THEN WIND %7.40 %7.42 &wind742
 IF &xrot7 THEN ROTATE [1,0,0] &xrot7 %7.49 %7.31 %7.56
 IF &yrot7 THEN ROTATE [0,1,0] &yrot7 %7.49 %7.31 %7.56
 IF &zrot7 THEN ROTATE [0,0,1] &zrot7 %7.49 %7.31 %7.56

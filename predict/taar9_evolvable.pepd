@@ -1,5 +1,5 @@
 
-LOAD "pdbs/OR51/OR51E2.upright.pdb"
+LOAD "pdbs/TAAR/TAAR9.upright.pdb"
 
 # Configurable variables.
 LET &bend45 = 40
@@ -28,10 +28,11 @@ LET &zrot5 = 0
 LET &yrot5 = 0
 LET &xrot6 = 0
 LET &zrot6 = 0
-LET &yrot6 = 0
+LET &yrot6 = -20
 LET &xrot7 = 0
 LET &zrot7 = 0
-LET &yrot7 = 0
+LET &yrot7 = 120
+LET &wind742 = 25
 LET &xebend1 = 0
 LET &xcbend1 = 0
 LET &zebend1 = 0
@@ -56,13 +57,13 @@ LET &xebend6 = 0
 LET &xcbend6 = 0
 LET &zebend6 = 0
 LET &zcbend6 = 0
-LET &xebend7 = 0
+LET &xebend7 = 15
 LET &xcbend7 = 0
-LET &zebend7 = 0
+LET &zebend7 = -40
 LET &zcbend7 = 0
 
 # Internal variables.
-LET $usrmesg = "Evolving a set of parameters to try to turn the AF OR51E2 model into the 8F76 model."
+LET $usrmesg = "Evolving a set of parameters to try to turn the AF OR5K1 model into the Nicoli et al model."
 
 # Perform motions.
 IF @xlat1 THEN MOVEREL %1.28 %1.58 @xlat1
@@ -134,7 +135,8 @@ IF &zebend7 THEN ROTATE [0,0,1] &zebend7 %7.49 %7.31 %7.49
 IF &zcbend7 THEN ROTATE [0,0,1] &zcbend7 %7.49 %7.49 %7.56
 
 BWCENTER
-OPEN "pdbs/OR51/OR51E2.8f76.pdb" A B
+OPEN "pdbs/mTAAR9.bound.pdb" A B
+BWCOPY A B
 STRAND B
 UPRIGHT B
 BWCENTER

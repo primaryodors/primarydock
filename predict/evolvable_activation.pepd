@@ -168,6 +168,7 @@ SAVE "tmp/OR51E2.result.pdb"
 LET $tmppdb = "tmp/" + $prot
 LET $tmppdb += ".pdb"
 IF 1 THEN SAVE $tmppdb
+LET &energy = 1000000
 LET %poses = 1
 DOCK $tmppdb $ligand &energy %poses
 ECHO "Dock energy: " &energy ", should be less than -4."

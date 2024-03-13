@@ -5,10 +5,13 @@ require_once("../data/odorutils.php");
 chdir(__DIR__);
 require_once("statistics.php");
 
-$mutation_rate = 0.333;
-$mutation_limit = 2.5;
+$mutation_rate = 0.333;             // How often mutations occur. 1 = every param of every individual in every generation.
+$mutation_limit = 2.5;              // Maximum mutation amount.
 $mutation_exponent = 3;
 $mutation_precis = 4;
+$reintroduction_rate = 0.01;        // How often known evolved parameters are reintroduced to the gene pool.
+
+$evolved_params = [];
 
 if (!file_exists("../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb"))
 {
@@ -28,6 +31,60 @@ if (!file_exists("../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_I
     echo "git clone https://github.com/dipizio/OR5K1_binding_site.git\n";
     echo "Make sure to uncompress the two .zip files.\n";
     exit;
+}
+
+function read_evolved_params()
+{
+    global $evolved_params;
+
+    $files =
+    [
+        "OR5K1" => "predict/5k1_evolved_params.pepd",
+        "OR51E2" => "predict/51e2_evolved_params.pepd",
+        "TAAR9" => "predict/taar9_evolved_params.pepd",
+    ];
+
+    chdir(__DIR__);
+    chdir("..");
+    foreach ($files as $rcpid => $fname)
+    {
+        $lines = explode("\n", file_get_contents($fname));
+        foreach ($lines as $ln)
+        {
+            if (substr($ln, 0, 4) == "LET ")
+            {
+                $words = explode(" ", $ln);
+                if ($words[2] != "=") continue;
+                $varname = $words[1];
+                $vartyp = substr($varname, 0, 1);
+                $varname = substr($varname, 1);
+        
+                switch ($vartyp)
+                {
+                    case "$":
+                    continue 2;
+        
+                    case "&":
+                    $evolved_params[$rcpid][$varname] = floatval($words[3]);
+                    break;
+        
+                    case "%":
+                    $evolved_params[$rcpid][$varname] = intval($words[3]);
+                    break;
+        
+                    case "@":
+                    $xyz = explode(",",str_replace("[", "", str_replace("]", "", $words[3])));
+                    $evolved_params[$rcpid]["$varname.x"] = floatval($xyz[0]);
+                    $evolved_params[$rcpid]["$varname.y"] = floatval($xyz[1]);
+                    $evolved_params[$rcpid]["$varname.z"] = floatval($xyz[2]);
+                    break;
+        
+                    default:
+                    continue 2;
+                }
+            }
+        }
+    }
 }
 
 function frand($min, $max)
@@ -192,6 +249,8 @@ chdir(__DIR__);
 chdir("..");
 $tne = explode("\n", file_get_contents((@$argv[1] && file_exists($argv[1])) ? $argv[1] : "predict/evolvable_activation.pepd"));
 
+read_evolved_params();
+
 $evparams = [];
 $evtypes = [];
 $varsearch = false;
@@ -255,7 +314,12 @@ for ($generation=1; $generation<=1000000; $generation++)
         {
             foreach (array_keys($evparams) as $param)
             {
-                $value = rand(0,1) ? $secondbest[$param] : $best[$param];
+                if (frand(0,1) <= $reintroduction_rate)
+                {
+                    $parent = array_values($evolved_params)[rand(0, count($evolved_params)-1)];
+                    $value = @$parent[$param] ?: 0;
+                }
+                else $value = rand(0,1) ? $secondbest[$param] : $best[$param];
                 if (frand(0,1) <= $mutation_rate) $value += round($mutation_limit * sgn(frand(-1, 1)) * pow(frand(0,1), $mutation_exponent), $mutation_precis);
                 $population[$i][$param] = $value;
             }
@@ -267,6 +331,11 @@ for ($generation=1; $generation<=1000000; $generation++)
         {
             foreach ($evparams as $param => $value)
             {
+                if (!$value)
+                {
+                    $parent = array_values($evolved_params)[rand(0, count($evolved_params)-1)];
+                    $value = @$parent[$param] ?: 0;
+                }
                 if (frand(0,1) <= $mutation_rate) $value += round($mutation_limit * sgn(frand(-1, 1)) * pow(frand(0,1), $mutation_exponent), $mutation_precis);
                 $population[$i][$param] = $value;
             }

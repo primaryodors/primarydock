@@ -232,13 +232,29 @@ function score_result($result)
 
             if ($shouldbe1 && $is)
             {
+                // echo "$ln; ";
                 if ($shouldbe0)
                 {
                     if ($score >= $shouldbe0 && $score <= $shouldbe1)
-                        $score += $mult * (0.5+0.5*cos((($is-$shouldbe0) / ($shouldbe1-$shouldbe0) - 0.5)*6.28));
-                    else $score -= $mult * (min(abs($shouldbe0 - $score), abs($score - $shouldbe1)) / ($shouldbe1-$shouldbe0));
+                    {
+                        $f = $mult * (0.5+0.5*cos((($is-$shouldbe0) / ($shouldbe1-$shouldbe0) - 0.5)*6.28));
+                        // echo "$mult * (0.5+0.5*cos((($is-$shouldbe0) / ($shouldbe1-$shouldbe0) - 0.5)*6.28)) = $f";
+                        $score += $f;
+                    }
+                    else
+                    {
+                        $f = -$mult * (min(abs($shouldbe0 - $score), abs($score - $shouldbe1)) / ($shouldbe1-$shouldbe0));
+                        // echo "-$mult * (min(abs($shouldbe0 - $score), abs($score - $shouldbe1)) / ($shouldbe1-$shouldbe0)) = $f";
+                        $score += $f;
+                    }
                 }
-                else $score += $mult * (($shouldbe1-$is) / $shouldbe1);
+                else
+                {
+                    $f = $mult * (($shouldbe1-$is) / abs($shouldbe1));
+                    // echo "$mult * (($shouldbe1-$is) / abs($shouldbe1)) = $f";
+                    $score += $f;
+                }
+                // echo "\n\n";
             }
         }
     }

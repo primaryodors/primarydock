@@ -2154,7 +2154,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
         	case 'N': return caelum ? (atom.isBackbone() ? 0x000066 : 0x0033FF) : (born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0033FF));
         	case 'O': return caelum ? (atom.isBackbone() ? 0x006666 : 0x00CCFF) : (born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000));
-        	case 'P': return caelum ? 0xa22e93 : 0xff77c6;
+        	case 'P': return caelum ? 0xa22e93 : (born ? 0xff77c6 : 0xffaa33);
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xad7e33;
         	case 'Te': return 0x7c3756;
@@ -2262,7 +2262,7 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
 
         	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0033FF);
         	case 'O': return caelum ? (atom.isBackbone() ? 0x006666 : 0x00CCFF) : (born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222));
-        	case 'P': return caelum ? 0xa22e93 : 0xff77c6;
+        	case 'P': return caelum ? 0xa22e93 : (born ? 0xff77c6 : 0xffaa33);
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xad7e33;
         	case 'Te': return 0x7c3756;
@@ -2325,7 +2325,7 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'C': return ltbkg ? 0x333741 : 0xa7ada4;
         	case 'N': return born ? 0xFF3300 : 0x5555FF;
         	case 'O': return caelum ? 0x00CCFF : (born ? 0x0099FF : 0xFF2222);
-			case 'P': return caelum ? 0xa22e93 : 0xff77c6;
+			case 'P': return caelum ? 0xa22e93 : (born ? 0xff77c6 : 0xffaa33);
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xad7e33;
         	case 'Te': return 0x7c3756;

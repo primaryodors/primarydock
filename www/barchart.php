@@ -24,13 +24,6 @@ $bkcol_taar[0] += 10;
 
 $bklum = lum($bkcolor[0], $bkcolor[1], $bkcolor[2]);
 
-$odor = find_odorant(@$_REQUEST['o']);
-if (!$odor)
-{
-    header("Location: odorants.php");
-    exit;
-}
-
 $mode = 'e';            // Empirical.
 if (isset($_REQUEST["m"])) $mode = $_REQUEST["m"];
 
@@ -38,49 +31,64 @@ $t = [];
 $e = [];
 $p = [];
 
-switch ($mode)
+$caption = "";
+foreach ($_REQUEST as $arg => $argv)
 {
-    case 'e':
-    foreach ($odor['activity'] as $ref => $acv)
+    if (preg_match("/^o[0-9]*$/", $arg))
     {
-        foreach ($acv as $rcpid => $a)
+        $odor = find_odorant($argv);
+        $caption .= (strlen($caption) ? ", " : "").$odor["full_name"];
+        if (!$odor)
         {
-            $act = @$a['adjusted_curve_top'] ?: false;
-            if (!isset($t[$rcpid])) $t[$rcpid] = $act;
-            else
-            {
-                if ($t[$rcpid] < $act) $t[$rcpid] = $act;
-            }
+            header("Location: odorants.php");
+            exit;
+        }
 
-            $ec50 = @$a['ec50'] ?: 0;
-            if (!isset($e[$rcpid])) $e[$rcpid] = $ec50;
-            else
+        switch ($mode)
+        {
+            case 'e':
+            foreach ($odor['activity'] as $ref => $acv)
             {
-                if ($ec50)
+                foreach ($acv as $rcpid => $a)
                 {
-                    if (!$e[$rcpid] || $ec50 < $e[$rcpid]) $e[$rcpid] = $ec50;
+                    $act = floatval(@$a['adjusted_curve_top']) ?: false;
+                    if (!isset($t[$rcpid])) $t[$rcpid] = $act;
+                    else
+                    {
+                        if ($t[$rcpid] < $act) $t[$rcpid] = $act;
+                    }
+
+                    $ec50 = @$a['ec50'] ?: 0;
+                    if (!isset($e[$rcpid])) $e[$rcpid] = $ec50;
+                    else
+                    {
+                        if ($ec50)
+                        {
+                            if (!$e[$rcpid] || $ec50 < $e[$rcpid]) $e[$rcpid] = $ec50;
+                        }
+                    }
                 }
             }
+            break;
+
+            case 'p':
+            $predictions = [];
+            chdir(__DIR__);
+            $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
+            $odorname_under = str_replace(' ', '_', $odor["full_name"]);
+            foreach ($dock_results as $protid => $dr)
+            {
+                if (isset($dr[$odorname_under]))
+                {
+                    $p[$protid] = floatval($dr[$odorname_under]["DockScore"]);
+                }
+            }
+            break;
+
+            default:
+            die("Unsupported mode $mode.\n");
         }
     }
-    break;
-
-    case 'p':
-    $predictions = [];
-    chdir(__DIR__);
-    $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
-    $odorname_under = str_replace(' ', '_', $odor["full_name"]);
-    foreach ($dock_results as $protid => $dr)
-    {
-        if (isset($dr[$odorname_under]))
-        {
-            $p[$protid] = floatval($dr[$odorname_under]["DockScore"]);
-        }
-    }
-    break;
-
-    default:
-    die("Unsupported mode $mode.\n");
 }
 
 $res = 3;
@@ -330,7 +338,7 @@ foreach (array_values($bytree) as $x => $orid)
     if (false!==$dyp) imagefilledrectangle($im, $dx+2,$base2, $dx+$res-1,$dy=$dyp, $azure);
     
     if ($dy < $h/7) $dy = $h/7;
-    if ($dy < $h/1.4) $texts[] = [$dx, $dy-5, $orid];
+    if ($dy < $h/1.4) $texts[] = [$dx, $dy-2, $orid];
     
     imagefilledrectangle($im, $dx,$base, $dx+$res-1,$base+$bsht, $bcol);
 
@@ -349,14 +357,15 @@ if (!file_exists($fontfile = "assets/Montserrat.ttf"))
 }
 
 
-$x = 53*$res;
-$x1 = $x + 10*strlen($odor['full_name']);
+// if (isset($_REQUEST['caption'])) $caption = $_REQUEST['caption'];        // Uncomment at your own risk.
+$x = 20*$res;
+$x1 = $x + 10*strlen($caption);
 
 foreach ($texts as $txt)
 {   
-    imagettftext($im, 9, 35, $txt[0], $txt[1], $pink, $fontfile, $txt[2]);
+    imagettftext($im, 8, 60, $txt[0], $txt[1], $pink, $fontfile, $txt[2]);
 
-    if ($txt[0] >= $x && $txt[0] <= $x1) $x = $txt[0] + 50;
+    if ($txt[1] < 50 && $txt[0] >= $x && $txt[0] <= $x1) $x = $txt[0] + 50;
 }
 
 if ((!count($t) || !max($t)) && (!count($e) || !min($e)) && !count($p))
@@ -365,7 +374,7 @@ if ((!count($t) || !max($t)) && (!count($e) || !min($e)) && !count($p))
 }
 
 // Odorant Name
-imagestring($im, 5, $x, 2, $odor['full_name'], $blue);
+if (!isset($_REQUEST['nc'])) imagestring($im, 5, $x, 2, $caption, $blue);
 
 header('Content-Type: image/png');
 header('Content-Disposition: inline; filename="barchart.png"');

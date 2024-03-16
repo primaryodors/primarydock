@@ -203,6 +203,7 @@ function score_result($result)
         if (false!==strpos($ln, " should be "))
         {
             $words = explode(" ", $ln);
+            $sign = 0;
             $shouldbe0 = 0;
             $shouldbe1 = 0;
             $is = 0;
@@ -222,11 +223,25 @@ function score_result($result)
                 {
                     $shouldbe0 = 0;
                     $shouldbe1 = floatval($words[$i+2]);
+                    $sign = -1;
                 }
                 else if ($w == "<")
                 {
                     $shouldbe0 = 0;
                     $shouldbe1 = floatval($words[$i+1]);
+                    $sign = -1;
+                }
+                else if ($w == "more" && $words[$i+1] == "than")
+                {
+                    $shouldbe0 = 0;
+                    $shouldbe1 = floatval($words[$i+2]);
+                    $sign = 1;
+                }
+                else if ($w == ">")
+                {
+                    $shouldbe0 = 0;
+                    $shouldbe1 = floatval($words[$i+1]);
+                    $sign = 1;
                 }
             }
 
@@ -250,8 +265,8 @@ function score_result($result)
                 }
                 else
                 {
-                    $f = $mult * (($shouldbe1-$is) / abs($shouldbe1));
-                    // echo "$mult * (($shouldbe1-$is) / abs($shouldbe1)) = $f";
+                    if ($sign < 1) $f = $mult * (($shouldbe1-$is) / abs($shouldbe1));
+                    else $f = $mult * (-($shouldbe1-$is) / abs($shouldbe1));
                     $score += $f;
                 }
                 // echo "\n\n";

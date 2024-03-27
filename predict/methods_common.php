@@ -671,6 +671,8 @@ heredoc;
         }
         else $iso = "";
 
+        $outbb = ($search == 'BB') ? "OUTBBP 1" : "";
+
         $configf = <<<heredoc
 
 PROT $pdbfname
@@ -688,6 +690,7 @@ $flxr
 EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
+$outbb
 POSE $pose
 ELIM $elim
 $flex_constraints

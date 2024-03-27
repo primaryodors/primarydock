@@ -20,7 +20,7 @@ chdir(__DIR__);
 $flex = 1;                      // Flexion (0 or 1).
 $pose = 15;
 $iter = 30;
-$elim = -2;                     // Energy limit for poses.
+$elim = 1e5;                     // Energy limit for poses.
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
 
 prepare_outputs();

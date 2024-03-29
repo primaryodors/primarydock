@@ -7236,8 +7236,8 @@
     },
     "2cb1e8f9df11e35e3246d7a9b343ee78":
     {
-        "full_name": "caramel furanone",
-        "name2": "sotolone",
+        "full_name": "sotolone",
+        "name2": "caramel furanone",
         "smiles": "CC1C(=C(C(=O)O1)O)C",
         "isomers":
         {
@@ -18298,7 +18298,7 @@
         "full_name": "1,1,6-trimethyl-1,2-dihydronaphthalene",
         "aroma":
         {
-            "https://en.wikipedia.org/wiki/1,1,6-Trimethyl-1,2-dihydronaphthalene":
+            "https:\/\/en.wikipedia.org\/wiki\/1,1,6-Trimethyl-1,2-dihydronaphthalene":
             [
                 "petrol"
             ]
@@ -18314,7 +18314,8 @@
                 }
             }
         },
-        "smiles": "CC1=CC2=C(C=C1)C(CC=C2)(C)C"
+        "smiles": "CC1=CC2=C(C=C1)C(CC=C2)(C)C",
+        "oid": "7c319a314c48d85bd3de7f2ed621340f"
     },
     "7c39c04478b0ebb73a21dbb28ed2cd7a":
     {
@@ -19548,6 +19549,24 @@
             ]
         },
         "oid": "8491ff7449c0079506fd40c1267e06d8"
+    },
+    "84b8d231072be64af30fafaa47b88732":
+    {
+        "full_name": "nympheal",
+        "smiles": "Cc1cc(CC(C)C)ccc1CCC=O",
+        "aroma":
+        {
+            "https:\/\/www.givaudan.com\/fragrance-beauty\/eindex\/nympheal":
+            [
+                "floral",
+                "cyclamen",
+                "muguet",
+                "green",
+                "watery",
+                "linden_blossom",
+                "creamy"
+            ]
+        }
     },
     "853853d1fa9f2eff2e3141817aff7748":
     {

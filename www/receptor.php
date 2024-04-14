@@ -684,6 +684,28 @@ echo "</p>";*/
         $links[] = "<a href=\"https://www.genecards.org/cgi-bin/carddisp.pl?gene=$rcpid\" target=\"_top\">GeneCards</a>";
     }
 
+    if (isset($receptor['ordb']))
+    {
+        if (is_array($receptor['ordb']))
+        {
+            $i=1;
+            $str="";
+            foreach ($receptor['ordb'] as $ordb)
+            {
+                $ordb = intval($ordb);
+                if ($i==1) $str = "<a href=\"https://ordb.biotech.ttu.edu/ORDB/data/$ordb\" target=\"_top\">ORDB</a>";
+                else $str .= " <a href=\"https://ordb.biotech.ttu.edu/ORDB/data/$ordb\" target=\"_top\">$i</a>";
+                $i++;
+            }
+            $links[] = $str;
+        }
+        else
+        {
+            $ordb = intval($receptor['ordb']);
+            $links[] = "<a href=\"https://ordb.biotech.ttu.edu/ORDB/data/$ordb\" target=\"_top\">ORDB</a>";
+        }
+    }
+
     if (count($links)) echo implode(" | ", $links);
     ?>
 

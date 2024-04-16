@@ -99,3 +99,16 @@ To enable the web app:
   then you may have to configure your hosting to point one of your registered domains or subfolders to the `primarydock/www` folder.
 
 If you get a 403 Forbidden error, please make sure that every containing folder of the `primarydock/www` folder has public execute access.
+
+
+# Adding Data
+
+To add a new receptor protein to the PrimaryDock database, there is a series of steps and utilities that facilitate this process:
+
+- Add the protein to `data/receptor.json`. It must have an "id": and a "sequence":, and should also have a "uniprot_id":.
+- Add the ID and sequence to `data/sequences_aligned.txt`, in alphanumeric order with related proteins, and manually align the sequence with dashes.
+- In a command line, run `php -f data/sequence_update.php` and then `php -f data/btree.php`.
+- Next, run `php -f www/getpdbs.php` and look out for lines similar to `Wrote pdbs/***/*****.upright.pdb.` in the output.
+- Create a new branch if necessary and `git add -f` each of the upright.pdb files from the getpdbs output.
+- Check in the new and updated files and create a pull request.
+

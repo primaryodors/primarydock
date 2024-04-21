@@ -211,6 +211,22 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     {
         if (!reaches_spheroid[i]) continue;
         if (!protein->aa_ptr_in_range(reaches_spheroid[i])) continue;
+
+        Atom* rsa = reaches_spheroid[i]->get_nearest_atom(ligand->get_barycenter());
+        if (!rsa) continue;
+        if (rsa->is_backbone) continue;
+        Atom* la = ligand->get_nearest_atom(rsa->get_location());
+        if (!la) continue;
+        rsa = ligand->get_nearest_atom(la->get_location());
+        if (!rsa) continue;
+        la = ligand->get_nearest_atom(rsa->get_location());
+        if (!la) continue;
+        rsa = ligand->get_nearest_atom(la->get_location());
+        if (!rsa) continue;
+        if (rsa->is_backbone) continue;
+        float r = la->distance_to(rsa);
+        if (r > _INTERA_R_CUTOFF) continue;
+
         reaches_spheroid[i]->clear_atom_binding_energies();
         int resno = reaches_spheroid[i]->get_residue_no();
 
@@ -232,7 +248,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             res_clash_dir[resno] = res_clash_dir[resno].add(clashdir);
         }
 
-        lb -= fmax(reaches_spheroid[i]->total_eclipses() - reaches_spheroid[i]->initial_eclipses, 0);
+        // lb -= (reaches_spheroid[i]->total_eclipses() - reaches_spheroid[i]->initial_eclipses);
 
         #if _dbg_51e2_ionic
         if (resno == 262)

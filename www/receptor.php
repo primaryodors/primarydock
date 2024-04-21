@@ -473,10 +473,12 @@ else
             if ($bold) $lets .= "<b style=\"color: $col;\">";
         }
     }
-    if ($lets) echo "$nums\n$lets\n\n";
+    if ($lets) echo "$nums\n$lets\n";
 
     ?>
     </pre>
+
+    <p><a href="#" onclick="navigator.clipboard.writeText('<?php echo $seq; ?>');">Copy Sequence</a></p>
 
     <?php
 

@@ -506,23 +506,17 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                     if (r > rr) continue;
                 }
 
-                Atom* ia = residues[i]->get_nearest_atom(residues[j]->get_CA_location());
-                Atom* ja = residues[j]->get_nearest_atom(ia->get_location());
-                r = ia->distance_to(ja);
-                if (r > ia->get_vdW_radius() + ja->get_vdW_radius()) continue;
-
                 if (abs(resno2-resno) <= 1) continue;
-                if (resno2 >= sr && resno2 <= er) continue;
 
                 float f = residues[i]->get_intermol_clashes(residues[j]);
                 result += f;
+                // if (f > 1e4) cout << *residues[i] << " ! " << *residues[j] << ": " << f << endl;
                 SCoord dpos = residues[j]->get_CA_location().subtract(residues[i]->get_CA_location());
                 dpos.r = f;
                 clashttl = clashttl.add(dpos);
-                float limit = unconnected_residue_mindist + sqrt(residues[i]->get_reach()) + sqrt(residues[j]->get_reach());
-                f = fmax(limit - dpos.r, 0);
                 if (f > clash_worst)
                 {
+                    // cout << *residues[i] << " ! " << *residues[j] << " are the worst: " << f << endl;
                     clash_worst = f;
                     stop1 = residues[i];
                     stop2 = residues[j];

@@ -2796,16 +2796,21 @@ function load_remote_sdf(sdfurl)
 		},
 		success: function(result)
 		{
-			$('#posey').show();
-			$('#posey')[0].innerText = result.split("\n")[0];
-			var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
+		    if (result.length < 100 && result.indexOf('not found') >= 0)
+		    {
+		        alert('Please make sure openbabel is installed and the compound\'s SMILES string is correct.');
+		        return;
+		    }
+		    $('#posey').show();
+		    $('#posey')[0].innerText = result.split("\n")[0];
+		    var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
 		    stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
 		    {
-				var reptype = spcfill ? "spacefill" : (hydrogens ? "ball+stick" : "licorice");
+		        var reptype = spcfill ? "spacefill" : (hydrogens ? "ball+stick" : "licorice");
 		        var rparam =
-				{
+		        {
 		        	multipleBond: true,
-					colorScheme: PODefSchemeHilite,
+				colorScheme: PODefSchemeHilite,
 		        	metalness: mtl_bs,
 		        }
 				if (!hydrogens) rparam.sele = "* and not hydrogen";

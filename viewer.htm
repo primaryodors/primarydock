@@ -2799,6 +2799,7 @@ function load_remote_sdf(sdfurl)
 		    if (result.length < 100 && result.indexOf('not found') >= 0)
 		    {
 		        alert('Please make sure openbabel is installed and the compound\'s SMILES string is correct.');
+			$('#pleasewait')[0].innerText = 'Failed to load molecule.';
 		        return;
 		    }
 		    $('#posey').show();

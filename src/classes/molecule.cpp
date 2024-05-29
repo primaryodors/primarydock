@@ -1782,7 +1782,7 @@ void Molecule::identify_acidbase()
     }
 }
 
-Bond** Molecule::get_rotatable_bonds()
+Bond** Molecule::get_rotatable_bonds(bool icf)
 {
     if (noAtoms(atoms)) return 0;
     if (mol_typ == MOLTYP_AMINOACID)
@@ -1819,12 +1819,16 @@ Bond** Molecule::get_rotatable_bonds()
 
                 int fa = lb[j]->atom->get_family(),
                     fb = lb[j]->btom->get_family();
-                
-                // 2 years of development and still no ring rotations.
+
                 if (lb[j]->atom->in_same_ring_as(lb[j]->btom))
                 {
+                    #if _ALLOW_FLEX_RINGS
+                    lb[j]->can_flip = (lb[j]->cardinality == 1);
+                    lb[j]->can_rotate = false;
+                    #else
                     lb[j]->can_rotate = lb[j]->can_flip = false;
                     continue;
+                    #endif
                 }
 
                 // Generally, a single bond from a pi atom to an amino group cannot rotate.
@@ -1854,7 +1858,7 @@ Bond** Molecule::get_rotatable_bonds()
                         &&
                         lb[j]->atom < lb[j]->btom
                         &&
-                        (lb[j]->can_rotate || lb[j]->can_flip)
+                        (lb[j]->can_rotate || (icf && lb[j]->can_flip))
                    )
                 {
                     btemp[bonds++] = lb[j];
@@ -1909,7 +1913,7 @@ Bond** Molecule::get_rotatable_bonds()
                    )
                     lb[j]->can_rotate = false;
 
-                if (lb[j]->can_rotate
+                if ((lb[j]->can_rotate || (icf && lb[j]->can_flip))
                         &&
                         lb[j]->atom && lb[j]->btom
                         &&
@@ -3563,10 +3567,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 #endif
 
                 float self_clash = max(1.25*a->base_internal_clashes, clash_limit_per_aa);
-                Bond** bb = a->get_rotatable_bonds();
+                Bond** bb = a->get_rotatable_bonds(true);
                 if (bb)
                 {
-                    int q;
+                    int q, rang=0;
                     for (q=0; bb[q]; q++)
                     {
                         if (!bb[q]->count_moves_with_btom()) continue;
@@ -3635,7 +3639,14 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
                             }
 
-                            bb[q]->rotate(theta, false);
+                            Ring* isra = bb[q]->atom->in_same_ring_as(bb[q]->btom);
+                            if (isra)
+                            {
+                                if (rang) continue;
+                                isra->flip_atom(bb[q]->atom);
+                                rang++;
+                            }
+                            else bb[q]->rotate(theta, false);
 
                             if (a->agroups.size() && group_realign)
                             {
@@ -3693,6 +3704,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 if (tryenerg < benerg) pre_realign.restore_state(a);
             }
             #endif
+
+            if (!a->is_residue()) a->evolve_structure(100);
         }       // for i
 
         #if allow_iter_cb

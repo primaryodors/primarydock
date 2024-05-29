@@ -82,6 +82,7 @@ int main(int argc, char** argv)
         cout << "Flipped " << a->name << " " << (theta*fiftyseven) << "deg." << endl;
     }
 
+    m.evolve_structure(500);
     m.minimize_internal_clashes();
 
     fp = fopen(filename.c_str(), "w");

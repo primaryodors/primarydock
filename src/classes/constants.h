@@ -74,7 +74,7 @@
 #define _ATOM_Z_LIMIT 200
 
 #define _def_atc 100
-#define _ALLOW_FLEX_RINGS 0
+#define _ALLOW_FLEX_RINGS 1
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)

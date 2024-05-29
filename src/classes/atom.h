@@ -235,7 +235,7 @@ public:
     Ring** get_rings();
     bool is_in_ring(Ring* ring);
     Ring* closest_arom_ring_to(Point target);
-    bool in_same_ring_as(Atom* b);
+    Ring* in_same_ring_as(Atom* b);
     void aromatize()
     {
         geometry=3;

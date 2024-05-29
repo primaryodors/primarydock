@@ -2351,15 +2351,15 @@ Ring** Atom::get_rings()
     return retval;
 }
 
-bool Atom::in_same_ring_as(Atom* b)
+Ring* Atom::in_same_ring_as(Atom* b)
 {
-    if (!member_of) return false;
+    if (!member_of) return nullptr;
 
     int i;
     for (i=0; member_of[i]; i++)
-        if (b->is_in_ring(member_of[i])) return true;
+        if (b->is_in_ring(member_of[i])) return member_of[i];
 
-    return false;
+    return nullptr;
 }
 
 bool Atom::is_in_ring(Ring* ring)
@@ -2622,7 +2622,6 @@ void Ring::fill_with_atoms(Atom** from_atoms)
         }
     }
 
-    #if !_ALLOW_FLEX_RINGS
     for (i=0; i < atcount; i++)
     {
         if (i)
@@ -2630,12 +2629,22 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             Bond* b = atoms[i]->get_bond_between(atoms[i-1]);
             if (b)
             {
+                #if _ALLOW_FLEX_RINGS
+                b->can_flip = b->can_rotate;
+                b->can_rotate = false;
+                #else
                 b->can_rotate = b->can_flip = false;
+                #endif
             }
             b = atoms[i-1]->get_bond_between(atoms[i]);
             if (b)
             {
+                #if _ALLOW_FLEX_RINGS
+                b->can_flip = b->can_rotate;
+                b->can_rotate = false;
+                #else
                 b->can_rotate = b->can_flip = false;
+                #endif
             }
         }
         else
@@ -2643,16 +2652,25 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             Bond* b = atoms[i]->get_bond_between(atoms[atcount-1]);
             if (b)
             {
+                #if _ALLOW_FLEX_RINGS
+                b->can_flip = b->can_rotate;
+                b->can_rotate = false;
+                #else
                 b->can_rotate = b->can_flip = false;
+                #endif
             }
             b = atoms[atcount-1]->get_bond_between(atoms[i]);
             if (b)
             {
+                #if _ALLOW_FLEX_RINGS
+                b->can_flip = b->can_rotate;
+                b->can_rotate = false;
+                #else
                 b->can_rotate = b->can_flip = false;
+                #endif
             }
         }
     }
-    #endif
 
     atoms[atcount] = nullptr;
 }

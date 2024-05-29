@@ -30,6 +30,10 @@ int main(int argc, char** argv)
     }
 
     m.hydrogenate();
+    srand(time(nullptr));
+    cout << "Evolving structure; this may take some time..." << endl << flush;
+    float anomaly = m.evolve_structure(2000);
+    cout << "Post-evolution per-atom anomaly: " << anomaly << endl;
 
     cout << "# Internal clashes: " << m.get_internal_clashes() << " cu.A." << endl;
 

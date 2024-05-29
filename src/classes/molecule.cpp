@@ -250,7 +250,7 @@ void Molecule::delete_all_atoms()
 
 void Molecule::reset_conformer_momenta()
 {
-    srand (time(nullptr));
+    srand(time(nullptr));
 
     lmx = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmy = _def_lin_momentum * sgn(0.5-(rand()&1));
@@ -4862,62 +4862,12 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 
     // Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
     lv.origin = bloc;
-    lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, card);
-    float thstep = fiftyseventh*5;
-    float besttheta = 0, bestphi = 0, bestscore = -1e9;
-    for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)
-    {
-        float phstep = M_PI/(20.0*(sin(lv.theta) + 1));
-        for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
-        {
-            // At many points along the sphere, evaluate the goodness-of-fit as a function of:
-            // Success in conforming to btom's geometry;
-            // Success in avoiding clashes with atoms not bonded to self or btom;
-            // Success in maintaining optimal binding distances to own bonded atoms.
-            // Later, we'll test edge cases where bond strain distorts the usual angles.
-            float score = 0;
-
-            score -= _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
-
-            // Avoid clashes with strangers.
-            for (j=0; atoms[j]; j++)
-            {
-                if (j == i) continue;
-                if (atoms[j]->is_bonded_to(atoms[i])) continue;
-
-                float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
-                score -= _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
-            }
-
-            // Seek optimal bond radii.
-            for (j=1; b[j]; j++)
-            {
-                if (!b[j]->btom) continue;
-                float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
-                float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
-
-                score -= _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
-            }
-
-            if (score > bestscore)
-            {
-                besttheta = lv.theta;
-                bestphi = lv.phi;
-                bestscore = score;
-            }
-        }
-    }
-
-    if (best_lv)
-    {
-        best_lv->origin = lv.origin;
-        best_lv->r = lv.r;
-        best_lv->theta = besttheta;
-        best_lv->phi = bestphi;
-    }
+    float optimal_radius = InteratomicForce::covalent_bond_radius(atoms[i], btom, card);
 
     lv = (SCoord)atoms[i]->get_location().subtract(bloc);
     lv.origin = bloc;
+
+    error += _SANOM_BOND_RADIUS_WEIGHT * (fabs(optimal_radius-lv.r)/optimal_radius);
 
     error += _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
 
@@ -4939,7 +4889,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
         error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
     }
 
-    return error+bestscore;
+    return error;
 }
 
 
@@ -5058,7 +5008,87 @@ bool Molecule::is_thiol()
     return false;
 }
 
+float Molecule::evolve_structure(int gens, float mr, int ps)
+{
+    if (!atoms) return 0;
+    int ac = get_atom_count();
 
+    Point parents[2][ac];
+    Point population[ps][ac];
+    float anomalies[ps];
+    int i, j, gen;
+
+    for (i=0; i<ac; i++)
+    {
+        parents[0][i] = parents[1][i] = atoms[i]->get_location();
+    }
+
+    int ibest, i2best;          // Indices of best and second-best anomalies.
+    float fbest, f2best;        // Values of best and second-best anomalies.
+
+    // Main loop
+    for (gen=1; gen<=gens; gen++)
+    {
+        ibest = i2best = -1;
+
+        for (i=0; i<ps; i++)
+        {
+            for (j=0; j<ac; j++)
+            {
+                switch (i)
+                {
+                    case 0:
+                    case 1:
+                    population[i][j] = parents[i][j];
+                    break;
+
+                    default:
+                    int which_parent = rand() & 0x1;
+                    population[i][j].x = parents[which_parent][j].x;
+                    if (frand(0, 1) < mr) population[i][j].x += frand(-_evolution_atom_displacement, _evolution_atom_displacement);
+                    population[i][j].y = parents[which_parent][j].y;
+                    if (frand(0, 1) < mr) population[i][j].y += frand(-_evolution_atom_displacement, _evolution_atom_displacement);
+                    population[i][j].z = parents[which_parent][j].z;
+                    if (frand(0, 1) < mr) population[i][j].z += frand(-_evolution_atom_displacement, _evolution_atom_displacement);
+                }
+
+                atoms[j]->move(population[i][j]);
+            }
+
+            float anomaly = 0;
+            for (j=0; j<ac; j++)
+            {
+                anomaly += get_atom_error(j, nullptr);
+            }
+            anomalies[i] = anomaly;
+
+            if (ibest < 0 || anomaly < fbest)
+            {
+                i2best = ibest;
+                f2best = fbest;
+                ibest = i;
+                fbest = anomaly;
+            }
+            else if (i2best < 0 || anomaly < f2best)
+            {
+                i2best = i;
+                f2best = anomaly;
+            }
+        }
+
+        for (i=0; i<ac; i++)
+        {
+            parents[0][i] = population[ibest][i];
+            parents[1][i] = population[i2best][i];
+        }
+
+        #if _dbg_molstruct_evolutions
+        cout << fbest << endl << flush;
+        #endif
+    }
+
+    return fbest / get_atom_count();
+}
 
 
 

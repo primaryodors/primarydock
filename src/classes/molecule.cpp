@@ -466,6 +466,8 @@ void Molecule::hydrogenate(bool steric_only)
         }
         if (!db && steric_only) continue;
 
+        if (bcardsum && atoms[i]->get_Z() == 1) continue;
+
         //cout << " minus existing bonds " << bcardsum ;
 
         bcardsum -= atoms[i]->get_charge();
@@ -4862,6 +4864,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 
     // Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
     lv.origin = bloc;
+    if (atoms[i]->get_Z() == 1 || btom->get_Z() == 1) card = 1;
     float optimal_radius = InteratomicForce::covalent_bond_radius(atoms[i], btom, card);
 
     lv = (SCoord)atoms[i]->get_location().subtract(bloc);

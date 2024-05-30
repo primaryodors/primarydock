@@ -449,7 +449,9 @@ void Molecule::hydrogenate(bool steric_only)
         float valence = atoms[i]->get_valence();
         if (valence > 4) valence = 8 - valence;
 
-        // cout << atoms[i]->name << " has valence " << valence << endl;
+        #if _dbg_hydrogenate
+        cout << atoms[i]->name << " has valence " << valence << endl;
+        #endif
 
         float bcardsum = 0;
 
@@ -467,12 +469,17 @@ void Molecule::hydrogenate(bool steric_only)
         if (!db && steric_only) continue;
 
         if (bcardsum && atoms[i]->get_Z() == 1) continue;
+        bcardsum = ceil(bcardsum);
 
-        //cout << " minus existing bonds " << bcardsum ;
+        #if _dbg_hydrogenate
+        cout << " minus existing bonds " << bcardsum;
+        #endif
 
         bcardsum -= atoms[i]->get_charge();
 
-        //cout << " given charge makes " << bcardsum << endl;
+        #if _dbg_hydrogenate
+        cout << " given charge makes " << bcardsum << endl;
+        #endif
 
         int fam = atoms[i]->get_family();
         if (fam == PNICTOGEN || fam == CHALCOGEN)
@@ -488,7 +495,9 @@ void Molecule::hydrogenate(bool steric_only)
             char hname[5];
             sprintf(hname, "H%d", atcount+1);
             Atom* H = add_atom("H", hname, atoms[i], 1);
-            //cout << "Adding " << hname << " to " << atoms[i]->name << " whose valence is " << valence << " and has " << bcardsum << " bonds already." << endl;
+            #if _dbg_hydrogenate
+            cout << "Adding " << hname << " to " << atoms[i]->name << " whose valence is " << valence << " and has " << bcardsum << " bonds already." << endl;
+            #endif
 
             /*atoms[i]->clear_geometry_cache();
             SCoord v = atoms[i]->get_next_free_geometry(1);

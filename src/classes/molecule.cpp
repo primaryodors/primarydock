@@ -4858,7 +4858,7 @@ bool Molecule::in_same_ring(Atom* a, Atom* b)
     return false;
 }
 
-float Molecule::get_atom_error(int i, LocatedVector* best_lv)
+float Molecule::get_atom_error(int i, LocatedVector* best_lv, bool hemi)
 {
     int j;
     float error = 0;
@@ -4896,6 +4896,64 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 
     error += pow(_SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]), 2);
 
+    float thstep = fiftyseventh*5;
+    float besttheta = 0, bestphi = 0, bestscore = 0;
+    if (hemi)
+    {
+        bestscore = -1e9;
+        lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, card);
+        for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)
+        {
+            float phstep = M_PI/(20.0*(sin(lv.theta) + 1));
+            for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
+            {
+                // At many points along the sphere, evaluate the goodness-of-fit as a function of:
+                // Success in conforming to btom's geometry;
+                // Success in avoiding clashes with atoms not bonded to self or btom;
+                // Success in maintaining optimal binding distances to own bonded atoms.
+                // Later, we'll test edge cases where bond strain distorts the usual angles.
+                float score = 0;
+
+                score -= _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
+
+                // Avoid clashes with strangers.
+                for (j=0; atoms[j]; j++)
+                {
+                    if (j == i) continue;
+                    if (atoms[j]->is_bonded_to(atoms[i])) continue;
+
+                    float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
+                    score -= _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
+                }
+
+                // Seek optimal bond radii.
+                for (j=1; b[j]; j++)
+                {
+                    if (!b[j]->btom) continue;
+                    float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+                    float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
+
+                    score -= _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
+                }
+
+                if (score > bestscore)
+                {
+                    besttheta = lv.theta;
+                    bestphi = lv.phi;
+                    bestscore = score;
+                }
+            }
+        }
+
+        if (best_lv)
+        {
+            best_lv->origin = lv.origin;
+            best_lv->r = lv.r;
+            best_lv->theta = besttheta;
+            best_lv->phi = bestphi;
+        }
+    }
+
     for (j=0; atoms[j]; j++)
     {
         if (j == i) continue;
@@ -4914,7 +4972,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
         error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
     }
 
-    return error;
+    return fmax(0, error+bestscore);
 }
 
 

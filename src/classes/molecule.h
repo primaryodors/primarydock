@@ -128,7 +128,7 @@ public:
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
     float distance_to(Molecule* other_mol);
     std::vector<Atom*> longest_dimension();
-    float evolve_structure(int generations = 1000, float mutation_rate = 0.3, int pop_size = 20);
+    float evolve_structure(int generations = 100, float mutation_rate = 0.3, int pop_size = 20);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -280,7 +280,7 @@ protected:
     void recenter_ring(int ringid, Point new_ring_cen);
     void rotate_ring(int ringid, Rotation rot);
     bool in_same_ring(Atom* a, Atom* b);
-    float get_atom_error(int atom_idx, LocatedVector* best_lv);
+    float get_atom_error(int atom_idx, LocatedVector* best_lv, bool hemispherical = false);
     float intermol_bind_for_multimol_dock(Molecule* othermol, bool allow_clash);
 
     void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);

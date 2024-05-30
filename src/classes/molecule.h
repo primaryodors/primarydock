@@ -128,7 +128,7 @@ public:
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
     float distance_to(Molecule* other_mol);
     std::vector<Atom*> longest_dimension();
-    float evolve_structure(int generations = 1000, float mutation_rate = 0.3, int pop_size = 20);
+    float evolve_structure(int generations = 30000, float mutation_rate = _default_mutation_rate, int pop_size = _default_population_size);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);

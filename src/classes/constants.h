@@ -50,11 +50,14 @@
 
 
 #define _SANOM_BOND_RADIUS_WEIGHT 50.0
-#define _SANOM_BOND_ANGLE_WEIGHT 25.0
-#define _SANOM_CLASHES_WEIGHT 5.0
+#define _SANOM_BOND_ANGLE_WEIGHT 10.0
+#define _SANOM_CLASHES_WEIGHT 10.0
 #define _SANOM_BOND_RAD_WEIGHT 30.0
 
-#define _evolution_atom_displacement 0.03
+#define _evolution_atom_displacement 0.1
+#define _default_mutation_rate 0.1
+#define _default_population_size 30
+#define _evolution_aromatic_rigidity 50
 
 #define ALKMETAL 1
 #define ALKEARTH 2

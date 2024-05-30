@@ -4894,7 +4894,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 
     error += _SANOM_BOND_RADIUS_WEIGHT * (fabs(optimal_radius-lv.r)/optimal_radius);
 
-    error += _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
+    error += pow(_SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]), 2);
 
     for (j=0; atoms[j]; j++)
     {
@@ -5041,7 +5041,8 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
     Point parents[2][ac];
     Point population[ps][ac];
     float anomalies[ps];
-    int i, j, gen;
+    int i, j, l, n, gen;
+    float r, optimal;
 
     for (i=0; i<ac; i++)
     {
@@ -5060,6 +5061,9 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
         {
             for (j=0; j<ac; j++)
             {
+                float atom_displacement = _evolution_atom_displacement;
+                if (atoms[j]->is_pi()) atom_displacement /= _evolution_aromatic_rigidity;
+
                 switch (i)
                 {
                     case 0:
@@ -5070,11 +5074,41 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
                     default:
                     int which_parent = rand() & 0x1;
                     population[i][j].x = parents[which_parent][j].x;
-                    if (frand(0, 1) < mr) population[i][j].x += frand(-_evolution_atom_displacement, _evolution_atom_displacement);
+                    if (frand(0, 1) < mr) population[i][j].x += frand(-atom_displacement, atom_displacement);
                     population[i][j].y = parents[which_parent][j].y;
-                    if (frand(0, 1) < mr) population[i][j].y += frand(-_evolution_atom_displacement, _evolution_atom_displacement);
+                    if (frand(0, 1) < mr) population[i][j].y += frand(-atom_displacement, atom_displacement);
                     population[i][j].z = parents[which_parent][j].z;
-                    if (frand(0, 1) < mr) population[i][j].z += frand(-_evolution_atom_displacement, _evolution_atom_displacement);
+                    if (frand(0, 1) < mr) population[i][j].z += frand(-atom_displacement, atom_displacement);
+                }
+
+                Bond* b0 = atoms[j]->get_bond_by_idx(0);
+                if (b0)
+                {
+                    Atom* aparent = b0->btom;
+                    if (aparent)
+                    {
+                        /*n = aparent->get_geometry();
+                        for (l=0; l<n; l++)
+                        {
+                            Bond* bs = aparent->get_bond_by_idx(l);
+                            if (!bs) continue;
+                            Atom* asibling = bs->btom;
+                            if (asibling == atoms[j]) break;            // Limit to "older" siblings otherwise all atoms will become pinned in place.
+                            r = asibling->get_location().get_3d_distance(population[i][j]);
+                            optimal = asibling->get_vdW_radius()+atoms[j]->get_vdW_radius() - global_clash_allowance;
+                            if (r < optimal)
+                            {
+                                SCoord bump = population[i][j].subtract(asibling->get_location());
+                                bump.r = fmin(r-optimal, _evolution_atom_displacement);
+                                population[i][j] = population[i][j].add(bump);
+                            }
+                        }*/
+
+                        optimal = InteratomicForce::covalent_bond_radius(atoms[j], aparent, b0->cardinality);
+                        SCoord v = population[i][j].subtract(aparent->get_location());
+                        v.r = optimal;
+                        population[i][j] = aparent->get_location().add(v);
+                    }
                 }
 
                 atoms[j]->move(population[i][j]);

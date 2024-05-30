@@ -1351,7 +1351,15 @@ int Molecule::identify_rings()
 
     if (!rings) return 0;
 
-    for (ringcount = 0; rings[ringcount]; ringcount++);
+    for (ringcount = 0; rings[ringcount]; ringcount++)
+    {
+        // cout << "Ring number " << ringcount << ": coplanar? " << rings[ringcount]->is_coplanar() << ", conjugated? " << rings[ringcount]->is_conjugated() << endl;
+        if (rings[ringcount]->is_coplanar() && rings[ringcount]->is_conjugated())
+        {
+            rings[ringcount]->aromatize();
+            // cout << "Aromatized." << endl;
+        }
+    }
     return ringcount;
 }
 
@@ -3857,6 +3865,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
     cout << "# Structural anomaly = " << anomaly << endl;
     hydrogenate(false);
     identify_conjugations();
+    identify_rings();
 
     return retval;
 }
@@ -5091,6 +5100,39 @@ bool Molecule::is_thiol()
     return false;
 }
 
+float Molecule::get_atom_bond_length_anomaly(Atom* a, Atom* ignore)
+{
+    if (!atoms) return 0;
+    if (!a) return 0;
+
+    Bond* thesebonds[16];
+    a->fetch_bonds(thesebonds);
+    if (!thesebonds) return 0;
+    int i;
+    float anomaly = 0;
+
+    int geometry = a->get_geometry();
+    for (i=0; i<geometry; i++)
+    {
+        if (!thesebonds[i]) continue;
+        if (thesebonds[i]->btom)
+        {
+            if (thesebonds[i]->btom == ignore) continue;
+            float optimal = InteratomicForce::covalent_bond_radius(a, thesebonds[i]->btom, thesebonds[i]->cardinality);
+            float r = a->distance_to(thesebonds[i]->btom);
+            anomaly += pow(1.0+fabs(r-optimal)/optimal, 4)-1;
+
+            #if _dbg_molstruct_evolution_bond_lengths
+            if (fabs(r-optimal) > 0.01) cout << "Atoms " << a->name << " and " << thesebonds[i]->btom->name
+                << ", cardinality = " << thesebonds[i]->cardinality
+                << " should be " << optimal << "Å apart, but they're " << r << endl;
+            #endif
+        }
+    }
+
+    return anomaly;
+}
+
 float Molecule::evolve_structure(int gens, float mr, int ps)
 {
     if (!atoms) return 0;
@@ -5137,35 +5179,21 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
                     if (frand(0, 1) < mr) population[i][j].y += frand(-atom_displacement, atom_displacement);
                     population[i][j].z = parents[which_parent][j].z;
                     if (frand(0, 1) < mr) population[i][j].z += frand(-atom_displacement, atom_displacement);
-                }
 
-                Bond* b0 = atoms[j]->get_bond_by_idx(0);
-                if (b0)
-                {
-                    Atom* aparent = b0->btom;
-                    if (aparent)
+                    if (frand(0,1) < 0.81)
                     {
-                        /*n = aparent->get_geometry();
-                        for (l=0; l<n; l++)
+                        Bond* b0 = atoms[j]->get_bond_by_idx(0);
+                        if (b0)
                         {
-                            Bond* bs = aparent->get_bond_by_idx(l);
-                            if (!bs) continue;
-                            Atom* asibling = bs->btom;
-                            if (asibling == atoms[j]) break;            // Limit to "older" siblings otherwise all atoms will become pinned in place.
-                            r = asibling->get_location().get_3d_distance(population[i][j]);
-                            optimal = asibling->get_vdW_radius()+atoms[j]->get_vdW_radius() - global_clash_allowance;
-                            if (r < optimal)
+                            Atom* aparent = b0->btom;
+                            if (aparent)
                             {
-                                SCoord bump = population[i][j].subtract(asibling->get_location());
-                                bump.r = fmin(r-optimal, _evolution_atom_displacement);
-                                population[i][j] = population[i][j].add(bump);
+                                optimal = InteratomicForce::covalent_bond_radius(atoms[j], aparent, b0->cardinality);
+                                SCoord v = population[i][j].subtract(aparent->get_location());
+                                v.r = optimal;
+                                population[i][j] = aparent->get_location().add(v);
                             }
-                        }*/
-
-                        optimal = InteratomicForce::covalent_bond_radius(atoms[j], aparent, b0->cardinality);
-                        SCoord v = population[i][j].subtract(aparent->get_location());
-                        v.r = optimal;
-                        population[i][j] = aparent->get_location().add(v);
+                        }
                     }
                 }
 
@@ -5175,7 +5203,17 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
             float anomaly = 0;
             for (j=0; j<ac; j++)
             {
-                anomaly += get_atom_error(j, nullptr);
+                // anomaly += get_atom_error(j, nullptr, false);
+                Bond* b0 = atoms[j]->get_bond_by_idx(0);
+                if (!b0) continue;
+
+                Atom* aparent = b0->btom;
+                if (!aparent) continue;
+
+                anomaly += get_atom_bond_length_anomaly(aparent, atoms[j]);
+
+                SCoord v = atoms[j]->get_location().subtract(aparent->get_location());
+                anomaly += aparent->get_bond_angle_anomaly(v, atoms[j]);
             }
             anomalies[i] = anomaly;
 
@@ -5200,7 +5238,7 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
         }
 
         #if _dbg_molstruct_evolutions
-        cout << fbest << endl << flush;
+        cout << ibest << ':' << fbest << ' ' << i2best << ':' << f2best << endl << flush;
         #endif
     }
 

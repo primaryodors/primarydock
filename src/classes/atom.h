@@ -111,6 +111,7 @@ public:
     bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
     Atom* traverse_ring(Atom* from, Atom* away_from = nullptr);     // If away_from is null, traverse in either direction.
     float flip_atom(Atom* which_atom);
+    void aromatize();
 
 protected:
     Atom* atoms[256];
@@ -245,15 +246,18 @@ public:
             int i;
             for (i=0; i<geometry; i++)
             {
-                if (bonded_to[i].cardinality > 1
-                        ||
-                        (	bonded_to[i].cardinality == 1
-                            && bonded_to[i].btom->get_Z() > 1
-                            && bonded_to[i].btom->get_bonded_atoms_count() < 4
-                        )
-                   )
+                if (bonded_to[i].btom && in_same_ring_as(bonded_to[i].btom))
                 {
-                    bonded_to[i].cardinality = 1.5;
+                    if (bonded_to[i].cardinality > 1
+                            ||
+                            (	bonded_to[i].cardinality == 1
+                                && bonded_to[i].btom->get_Z() > 1
+                                && bonded_to[i].btom->get_bonded_atoms_count() < 4
+                            )
+                    )
+                    {
+                        bonded_to[i].cardinality = 1.5;
+                    }
                 }
             }
         }
@@ -275,7 +279,7 @@ public:
     SCoord* get_basic_geometry();
     SCoord* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);
     float get_geometric_bond_angle();
-    float get_bond_angle_anomaly(SCoord v, Atom* ignore);	// Assume v is centered on current atom.
+    float get_bond_angle_anomaly(SCoord v, Atom* ignore = nullptr);	// Assume v is centered on current atom.
     float distance_to(Atom* btom)
     {
         if (!btom) return -1;

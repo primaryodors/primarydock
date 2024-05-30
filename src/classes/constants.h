@@ -54,10 +54,11 @@
 #define _SANOM_CLASHES_WEIGHT 10.0
 #define _SANOM_BOND_RAD_WEIGHT 30.0
 
-#define _evolution_atom_displacement 0.1
-#define _default_mutation_rate 0.1
-#define _default_population_size 30
+#define _evolution_atom_displacement 1.0
+#define _default_mutation_rate 0.05
+#define _default_population_size 80
 #define _evolution_aromatic_rigidity 50
+#define _evolution_default_generations 5000
 
 #define ALKMETAL 1
 #define ALKEARTH 2
@@ -386,6 +387,7 @@
 #define _dbg_mol_flexion 0
 #define _dbg_mol_frames 0
 #define _dbg_molstruct_evolutions 0
+#define _dbg_molstruct_evolution_bond_lengths 0
 #define _dbg_multiflex 0
 #define _dbg_null_flexions 0
 #define _dbg_path_search 0

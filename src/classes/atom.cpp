@@ -1605,6 +1605,12 @@ Atom* Ring::traverse_ring(Atom* f, Atom* af)
     return nullptr;
 }
 
+void Ring::aromatize()
+{
+    int i;
+    for (i=0; atoms[i]; i++) atoms[i]->aromatize();
+}
+
 float Ring::flip_atom(Atom* wa)
 {
     if (type == UNKNOWN) determine_type();
@@ -1866,8 +1872,10 @@ float Atom::get_bond_angle_anomaly(SCoord v, Atom* ignore)
     //cout << " -=- " << lga*fiftyseven << " | ";
     for (i=0; i<geometry; i++)
     {
-        if (bonded_to[i].btom && bonded_to[i].btom != ignore)
+        if (bonded_to[i].btom)
         {
+            if (bonded_to[i].btom == ignore) continue;
+
             //cout << bonded_to[i].btom->location << " - " << location;
             SCoord vb = bonded_to[i].btom->location.subtract(location);
             //cout << " = " << (Point)vb << endl;

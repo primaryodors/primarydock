@@ -5112,6 +5112,11 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
         #endif
     }
 
+    for (i=0; i<ac; i++)
+    {
+        atoms[i]->move(population[ibest][i]);
+    }
+
     return fbest / get_atom_count();
 }
 

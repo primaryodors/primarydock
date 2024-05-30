@@ -8,7 +8,7 @@
 
 using namespace std;
 
-#define _use_generational_algorithm 0
+#define _use_generational_algorithm 1
 
 int main(int argc, char** argv)
 {

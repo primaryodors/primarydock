@@ -3333,6 +3333,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         for (i=0; i<n; i++)
         {
             Molecule* a = mm[i];
+            bool flipped_rings = false;
 
             #if _dbg_asunder_atoms
             if (!a->check_Greek_continuity()) throw 0xbadc0de;
@@ -3662,6 +3663,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 if (rang) continue;
                                 isra->flip_atom(bb[q]->atom);
                                 rang++;
+                                flipped_rings = true;
                             }
                             else bb[q]->rotate(theta, false);
 
@@ -3722,7 +3724,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             }
             #endif
 
-            if (!a->is_residue()) a->evolve_structure(100);
+            if (!a->is_residue() && flipped_rings) a->evolve_structure(100);
         }       // for i
 
         #if allow_iter_cb

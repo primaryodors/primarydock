@@ -907,6 +907,7 @@ int Molecule::from_sdf(char const* sdf_dat)
 
     identify_conjugations();
     identify_rings();
+    identify_cages();
     identify_acidbase();
     return added;
 }
@@ -1353,11 +1354,16 @@ int Molecule::identify_rings()
 
     for (ringcount = 0; rings[ringcount]; ringcount++)
     {
-        // cout << "Ring number " << ringcount << ": coplanar? " << rings[ringcount]->is_coplanar() << ", conjugated? " << rings[ringcount]->is_conjugated() << endl;
+        #if _dbg_identify_rings
+        cout << "Ring number " << ringcount << *rings[ringcount] << ": coplanar? " << rings[ringcount]->is_coplanar() << ", conjugated? " << rings[ringcount]->is_conjugated() << endl;
+        #endif
+
         if (rings[ringcount]->is_coplanar() && rings[ringcount]->is_conjugated())
         {
             rings[ringcount]->aromatize();
-            // cout << "Aromatized." << endl;
+            #if _dbg_identify_rings
+            cout << "Aromatized." << endl;
+            #endif
         }
     }
     return ringcount;
@@ -1840,7 +1846,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                 if (lb[j]->atom->in_same_ring_as(lb[j]->btom))
                 {
                     #if _ALLOW_FLEX_RINGS
-                    lb[j]->can_flip = (lb[j]->cardinality == 1);
+                    lb[j]->can_flip = !lb[j]->caged && (lb[j]->cardinality == 1);
                     lb[j]->can_rotate = false;
                     #else
                     lb[j]->can_rotate = lb[j]->can_flip = false;
@@ -1858,7 +1864,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                     if ((fa == CHALCOGEN || fb == CHALCOGEN)
                         && fa != fb
                         && lb[j]->btom->get_bonded_atoms_count() > 1
-                        ) lb[j]->can_flip = true;
+                        ) lb[j]->can_flip = !lb[j]->caged;
                 }
 
                 // If atoms a and b are pi, and a-b cannot rotate, then a-b can flip.
@@ -1868,7 +1874,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                     && !(lb[j]->atom->in_same_ring_as(lb[j]->btom))
                     )
                 {
-                    lb[j]->can_flip = true;
+                    lb[j]->can_flip = !lb[j]->caged;
                 }
 
                 if (lb[j]->btom
@@ -2077,7 +2083,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                         if (lb->atom->is_pi() && lb->btom && lb->btom->is_pi())
                         {
                             lb->can_rotate = false;
-                            lb->can_flip = true;
+                            lb->can_flip = !lb->caged;
                             lb->flip_angle = M_PI;
                         }
 
@@ -3653,7 +3659,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                             if (!bb[q]->can_rotate)
                             {
-                                bb[q]->can_flip = true;
+                                bb[q]->can_flip = !bb[q]->caged;
                                 if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
                             }
 
@@ -3868,6 +3874,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
     hydrogenate(false);
     identify_conjugations();
     identify_rings();
+    identify_cages();
 
     return retval;
 }
@@ -4077,7 +4084,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 		lb->flip_angle = M_PI;
                 		lb = EZatom1[l]->get_bond_between(EZatom0[l]);
                 		if (lb)
-                		{	lb->can_flip = true;
+                		{	lb->can_flip = !lb->caged;
                 			lb->flip_angle = M_PI;
                 		}
                 	}
@@ -5100,6 +5107,62 @@ bool Molecule::is_thiol()
     }
 
     return false;
+}
+
+void Molecule::identify_cages()
+{
+    if (!rings) return;
+
+    int i, j, l, n;
+    for (i=0; rings[i]; i++)
+    {
+        Atom** ra = rings[i]->get_atoms();
+        if (!ra) continue;
+        for (j=0; ra[j]; j++)
+        {
+            for (l=j+1; ra[l]; l++)
+            {
+                Ring* other = ra[j]->in_same_ring_as(ra[l], rings[i]);
+
+                #if _dbg_identify_rings
+                if (other) cout << ra[j]->name << " in same ring as " << ra[l]->name << ": " << *other << endl;
+                else cout << ra[j]->name << " -/- " << ra[l]->name << endl;
+                #endif
+
+                if (other)
+                {
+                    // Any bond between the two atoms cannot flip.
+                    Bond* b = ra[j]->get_bond_between(ra[l]);
+                    if (b)
+                    {
+                        b->can_rotate = b->can_flip = false;
+                        b = ra[l]->get_bond_between(ra[j]);
+                        if (b) b->can_rotate = b->can_flip = false;
+
+                        #if _dbg_identify_rings
+                        cout << *b << " cannot flip." << endl;
+                        #endif
+                    }
+                    else
+                    {
+                        // If no bond between atoms, all bonds in both rings cannot flip.
+                        Bond** bb = rings[i]->get_bonds();
+                        if (bb) for (n=0; bb[n]; n++) bb[n]->can_rotate = bb[n]->can_flip = !(bb[n]->caged = true);
+                        delete[] bb;
+                        bb = other->get_bonds();
+                        if (bb) for (n=0; bb[n]; n++) bb[n]->can_rotate = bb[n]->can_flip = !(bb[n]->caged = true);
+                        delete[] bb;
+
+                        #if _dbg_identify_rings
+                        cout << *rings[i] << " immobilized." << endl;
+                        cout << *other << " immobilized." << endl;
+                        #endif
+                    }
+                }
+            }
+        }
+        delete[] ra;
+    }
 }
 
 float Molecule::get_atom_bond_length_anomaly(Atom* a, Atom* ignore)

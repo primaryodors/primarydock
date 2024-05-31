@@ -658,6 +658,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
 
     identify_acidbase();
     identify_rings();
+    identify_cages();
     identify_conjugations();
 
     if (rings && !aa_defs[idx].aarings)

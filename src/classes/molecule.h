@@ -171,6 +171,7 @@ public:
     SCoord get_ring_normal(int ringid);
     Atom** get_ring_atoms(int ringid);
     int get_ring_num_atoms(int ringid);
+    void identify_cages();
 
     // Interaction functions.
     float get_internal_clashes();

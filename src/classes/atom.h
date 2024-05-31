@@ -44,6 +44,7 @@ public:
     float cardinality=0;			// aromatic bonds = 1.5.
     bool can_rotate=false;
     bool can_flip=false;
+    bool caged=false;
     float flip_angle=0;				// signed.
     float angular_momentum=0;
     float total_rotations=0;
@@ -101,6 +102,7 @@ public:
     }
     Atom* get_atom(int index);
     Atom** get_atoms() const;
+    Bond** get_bonds();
     int get_overlap_count(Ring* ringb);
     RING_TYPE get_type();
     Point get_center();
@@ -236,7 +238,7 @@ public:
     Ring** get_rings();
     bool is_in_ring(Ring* ring);
     Ring* closest_arom_ring_to(Point target);
-    Ring* in_same_ring_as(Atom* b);
+    Ring* in_same_ring_as(Atom* b, Ring* ignore = nullptr);
     void aromatize()
     {
         geometry=3;

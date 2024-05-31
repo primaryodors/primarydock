@@ -374,6 +374,7 @@
 #define _dbg_Huckel 0
 #define _dbg_hxrax 0
 #define _dbg_hydrogenate 0
+#define _dbg_identify_rings 0
 #define _dbg_imidazole_check 0
 #define _dbg_improvements_only_rule 0
 #define _dbg_interatomic_forces 0

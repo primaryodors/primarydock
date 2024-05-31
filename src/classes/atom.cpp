@@ -2359,13 +2359,16 @@ Ring** Atom::get_rings()
     return retval;
 }
 
-Ring* Atom::in_same_ring_as(Atom* b)
+Ring* Atom::in_same_ring_as(Atom* b, Ring* ignore)
 {
     if (!member_of) return nullptr;
 
     int i;
     for (i=0; member_of[i]; i++)
+    {
+        if (member_of[i] == ignore) continue;
         if (b->is_in_ring(member_of[i])) return member_of[i];
+    }
 
     return nullptr;
 }
@@ -2713,6 +2716,27 @@ Atom** Ring::get_atoms() const
     }
     retval[atcount] = nullptr;
 
+    return retval;
+}
+
+Bond** Ring::get_bonds()
+{
+    if (!atcount) return nullptr;
+    Bond** retval = new Bond*[atcount*2+8];
+
+    int i, j, l=0;
+    for (i=0; i<atcount; i++)
+    {
+        j = i+1;
+        if (j >= atcount) j = 0;
+
+        Bond* b = atoms[i]->get_bond_between(atoms[j]);
+        if (b) retval[l++] = b;
+        b = atoms[j]->get_bond_between(atoms[i]);
+        if (b) retval[l++] = b;
+    }
+
+    retval[l] = nullptr;
     return retval;
 }
 

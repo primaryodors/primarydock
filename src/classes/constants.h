@@ -348,6 +348,9 @@
 // For auditing binding energies between individual atoms:
 #define _peratom_audit 0
 
+// A short-term feature that can be used to fix the bond reciprocity problem and then turned off to improve performance.
+#define bond_reciprocity_fix 1
+
 // Should normally be false or zero:
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0

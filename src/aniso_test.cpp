@@ -128,14 +128,14 @@ int main(int argc, char** argv)
     {
         for (i=0; bb[i]; i++)
         {
-            if (!bb[i]->btom) break;
-            Point pt = bb[i]->btom->get_location();
+            if (!bb[i]->atom2) break;
+            Point pt = bb[i]->atom2->get_location();
             pt = pt.subtract(aloc);
             pt.scale(1);
             pt = pt.add(aloc);
             pt.weight = 1;
             bblocs[i] = pt;
-            // cout << bb[i]->btom->name << endl;
+            // cout << bb[i]->atom2->name << endl;
         }
 
         // cout << i << " points for average." << endl;

@@ -39,8 +39,8 @@ class Atom;
 class Bond
 {
 public:
-    Atom* atom = 0;
-    Atom* btom = 0;
+    Atom* atom1 = 0;
+    Atom* atom2 = 0;
     float cardinality=0;			// aromatic bonds = 1.5.
     bool can_rotate=false;
     bool can_flip=false;
@@ -64,19 +64,19 @@ public:
     Point ring_rotate(float angle_radians, Atom* stop_at);
     void clear_moves_with_cache()
     {
-        moves_with_btom = 0;
+        moves_with_atom2 = 0;
     }
-    void fetch_moves_with_btom(Atom** result);
-    int count_moves_with_btom();
+    void fetch_moves_with_atom2(Atom** result);
+    int count_moves_with_atom2();
     int count_heavy_moves_with_atom();
-    int count_heavy_moves_with_btom();
+    int count_heavy_moves_with_atom2();
     Bond* get_reversed();
-    void swing(SCoord newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.
+    void swing(SCoord newdir);		// Rotate atom2, and all its moves_with atoms, about atom so that the bond points to newdir.
 
 protected:
     void fill_moves_with_cache();
     void enforce_moves_with_uniqueness();
-    Atom** moves_with_btom = 0;
+    Atom** moves_with_atom2 = 0;
     Bond* reversed = nullptr;
 };
 
@@ -201,12 +201,12 @@ public:
     int get_count_pi_bonds();
     float get_sum_pi_bonds();
 
-    bool bond_to(Atom* btom, float cardinality);
-    void unbond(Atom* btom);
+    bool bond_to(Atom* atom2, float cardinality);
+    void unbond(Atom* atom2);
     void unbond_all();
     void consolidate_bonds();
 
-    float is_bonded_to(Atom* btom);			// If yes, return the cardinality.
+    float is_bonded_to(Atom* atom2);			// If yes, return the cardinality.
     Atom* is_bonded_to(const char* element);
     Atom* is_bonded_to(const char* element, const int cardinality);
     Atom* is_bonded_to(const int family);
@@ -216,15 +216,15 @@ public:
     int num_bonded_to(const char* element);
     int num_bonded_to_in_ring(const char* element, Ring* member_of);
 
-    bool shares_bonded_with(Atom* btom);
+    bool shares_bonded_with(Atom* atom2);
     bool check_Greek_continuity();
     Atom* get_heaviest_bonded_atom_that_isnt(Atom* excluded);
 
-    Bond* get_bond_between(Atom* btom);
+    Bond* get_bond_between(Atom* atom2);
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
     Bond* get_bond_closest_to(Point target);
-    int get_idx_bond_between(Atom* btom);
+    int get_idx_bond_between(Atom* atom2);
 
     float hydrophilicity_rule();
 
@@ -248,13 +248,13 @@ public:
             int i;
             for (i=0; i<geometry; i++)
             {
-                if (bonded_to[i].btom && in_same_ring_as(bonded_to[i].btom))
+                if (bonded_to[i].atom2 && in_same_ring_as(bonded_to[i].atom2))
                 {
                     if (bonded_to[i].cardinality > 1
                             ||
                             (	bonded_to[i].cardinality == 1
-                                && bonded_to[i].btom->get_Z() > 1
-                                && bonded_to[i].btom->get_bonded_atoms_count() < 4
+                                && bonded_to[i].atom2->get_Z() > 1
+                                && bonded_to[i].atom2->get_bonded_atoms_count() < 4
                             )
                     )
                     {
@@ -282,12 +282,12 @@ public:
     SCoord* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);
     float get_geometric_bond_angle();
     float get_bond_angle_anomaly(SCoord v, Atom* ignore = nullptr);	// Assume v is centered on current atom.
-    float distance_to(Atom* btom)
+    float distance_to(Atom* atom2)
     {
-        if (!btom) return -1;
-        else return location.get_3d_distance(&btom->location);
+        if (!atom2) return -1;
+        else return location.get_3d_distance(&atom2->location);
     };
-    float similarity_to(Atom* btom);
+    float similarity_to(Atom* atom2);
     SCoord get_next_free_geometry(float lcard);
     int get_idx_next_free_geometry();
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
@@ -325,7 +325,7 @@ public:
     bool is_backbone=false;			// "
     char* name;						// "
     bool used = false;      		// Required for certain algorithms such as Molecule::identify_rings().
-    int mirror_geo=-1;				// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
+    int mirror_geo=-1;				// If >= 0, mirror the geometry of the atom2 of bonded_to[mirror_geo].
     bool flip_mirror=false;			// If true, do trans rather than cis bond conformation.
     bool dnh=false;					// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
     bool EZ_flip = false;

@@ -153,14 +153,14 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
             strcpy(atoms[i]->aa3let, aa_defs[idx]._3let);
             atom_isheavy[i] = (atoms[i]->get_Z() != 1);
 
-            // If the atom is hydrogen, its Greek will be the same as its bond[0]->btom. Otherwise, it will be one more.
+            // If the atom is hydrogen, its Greek will be the same as its bond[0]->atom2. Otherwise, it will be one more.
             Bond* b0 = atoms[i]->get_bond_by_idx(0);
-            if (!b0 || !b0->btom)
+            if (!b0 || !b0->atom2)
             {
                 cout << "Error in definition for " << aa_defs[idx].name << "." << endl;
                 throw 0xbadac1d;
             }
-            j = atom_idx_from_ptr(b0->btom);
+            j = atom_idx_from_ptr(b0->atom2);
             if (j < 0)
             {
                 cout << "Error in definition for " << aa_defs[idx].name << "." << endl;
@@ -182,12 +182,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                     atoms[i]->fetch_bonds(ab);
                     for (j=0; ab[j]; j++)
                     {
-                        if (ab[j]->btom
+                        if (ab[j]->atom2
                                 &&
-                                ab[j]->btom->get_family() == TETREL
+                                ab[j]->atom2->get_family() == TETREL
                            )
                         {
-                            O = ab[j]->btom->is_bonded_to(CHALCOGEN, 2);
+                            O = ab[j]->atom2->is_bonded_to(CHALCOGEN, 2);
                             if (O)
                             {
                                 CA = atoms[i];
@@ -201,7 +201,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                                     numgrk[atom_Greek[k]]++;
                                 }
 
-                                C = ab[j]->btom;
+                                C = ab[j]->atom2;
                                 C->name = new char[5];
                                 strcpy(C->name, "C");
                                 C->is_backbone = true;
@@ -227,11 +227,11 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                                     int n;
                                     for (n=0; ab[n]; n++)
                                     {
-                                        if (ab[n]->btom && ab[n]->btom->get_Z() == 1)
+                                        if (ab[n]->atom2 && ab[n]->atom2->get_Z() == 1)
                                         {
                                             if (!l)
                                             {
-                                                HN = ab[n]->btom;
+                                                HN = ab[n]->atom2;
                                                 HN->name = new char[5];
                                                 strcpy(HN->name, "HN");
                                                 HN->is_backbone = true;
@@ -273,9 +273,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                 for (j=0; j<ag; j++)
                 {
                     if (!ab[j]) continue;
-                    if (ab[j]->btom)
+                    if (ab[j]->atom2)
                     {
-                        k = atom_idx_from_ptr(ab[j]->btom);
+                        k = atom_idx_from_ptr(ab[j]->atom2);
                         if (k >= 0 && !atom_Greek[k])
                         {
                             atom_Greek[k] = atom_Greek[i]+1;
@@ -298,10 +298,10 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                     for (j=0; j<ag; j++)
                     {
                          if (!ab[j]) continue;
-                        if (ab[j]->btom)
+                        if (ab[j]->atom2)
                         {
-                            // cout << atoms[i]->name << " is bonded to " << ab[j]->btom->name << name << endl;
-                            k = atom_idx_from_ptr(ab[j]->btom);
+                            // cout << atoms[i]->name << " is bonded to " << ab[j]->atom2->name << name << endl;
+                            k = atom_idx_from_ptr(ab[j]->atom2);
                             // cout << "Greek is " << atom_Greek[i] << " vs. bonded Greek " << atom_Greek[k] << endl;
                             if (atom_isheavy[k] && atom_Greek[k] > 0)
                             {
@@ -567,17 +567,17 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
             for (j=0; j<bg; j++)
             {
                 if (!bb[j]) break;
-                if (bb[j]->btom && bb[j]->btom < bb[j]->atom)
+                if (bb[j]->atom2 && bb[j]->atom2 < bb[j]->atom1)
                 {
                     aabd[n] = new AABondDef();
-                    strcpy(aabd[n]->aname, bb[j]->atom->name);
-                    strcpy(aabd[n]->bname, bb[j]->btom->name);
-                    aabd[n]->Za = bb[j]->atom->get_Z();
-                    aabd[n]->Zb = bb[j]->btom->get_Z();
+                    strcpy(aabd[n]->aname, bb[j]->atom1->name);
+                    strcpy(aabd[n]->bname, bb[j]->atom2->name);
+                    aabd[n]->Za = bb[j]->atom1->get_Z();
+                    aabd[n]->Zb = bb[j]->atom2->get_Z();
                     aabd[n]->cardinality = bb[j]->cardinality;
-                    aabd[n]->acharge = bb[j]->atom->get_charge();
+                    aabd[n]->acharge = bb[j]->atom1->get_charge();
 
-                    if (!strcmp(bb[j]->atom->name, "OH") && !strcmp(bb[j]->btom->name, "CZ"))
+                    if (!strcmp(bb[j]->atom1->name, "OH") && !strcmp(bb[j]->atom2->name, "CZ"))
                     {
                         aabd[n]->can_rotate = false;
                         aabd[n]->can_flip = true;
@@ -586,49 +586,49 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                     aabd[n]->can_rotate =
                         (	aabd[n]->cardinality <= 1.1
                             &&
-                            (	!bb[j]->atom->is_pi() || !bb[j]->btom->is_pi()	)
+                            (	!bb[j]->atom1->is_pi() || !bb[j]->atom2->is_pi()	)
                             &&
-                            (	!bb[j]->atom->is_pi()
+                            (	!bb[j]->atom1->is_pi()
                                 ||
-                                (   bb[j]->btom->get_family() != PNICTOGEN
+                                (   bb[j]->atom2->get_family() != PNICTOGEN
                                     &&
-                                    bb[j]->btom->get_family() != CHALCOGEN
+                                    bb[j]->atom2->get_family() != CHALCOGEN
                                 )
                                 ||
-                                bb[j]->btom->is_bonded_to_pi(TETREL, false)
+                                bb[j]->atom2->is_bonded_to_pi(TETREL, false)
                             )
                             &&
-                            (	!bb[j]->btom->is_pi()
+                            (	!bb[j]->atom2->is_pi()
                                 ||
-                                (   bb[j]->atom->get_family() != PNICTOGEN
+                                (   bb[j]->atom1->get_family() != PNICTOGEN
                                     &&
-                                    bb[j]->atom->get_family() != CHALCOGEN
+                                    bb[j]->atom1->get_family() != CHALCOGEN
                                 )
                                 ||
-                                bb[j]->atom->is_bonded_to_pi(TETREL, false)
+                                bb[j]->atom1->is_bonded_to_pi(TETREL, false)
                             )
                             &&
-                            (	bb[j]->atom->get_family() != PNICTOGEN || !bb[j]->btom->is_pi()	)
+                            (	bb[j]->atom1->get_family() != PNICTOGEN || !bb[j]->atom2->is_pi()	)
                         );
                     aabd[n]->can_flip =
                         (	aabd[n]->cardinality <= 1.1
                             &&
-                            (	!bb[j]->atom->is_pi() || !bb[j]->btom->is_pi()	)
+                            (	!bb[j]->atom1->is_pi() || !bb[j]->atom2->is_pi()	)
                             &&
                             (	(
-                                    bb[j]->atom->is_pi()
+                                    bb[j]->atom1->is_pi()
                                     &&
-                                    (   bb[j]->btom->get_family() == PNICTOGEN || bb[j]->btom->get_family() == CHALCOGEN    )
+                                    (   bb[j]->atom2->get_family() == PNICTOGEN || bb[j]->atom2->get_family() == CHALCOGEN    )
                                     &&
-                                    !bb[j]->btom->is_bonded_to_pi(TETREL, false)
+                                    !bb[j]->atom2->is_bonded_to_pi(TETREL, false)
                                 )
                                 ||
                                 (
-                                    bb[j]->btom->is_pi()
+                                    bb[j]->atom2->is_pi()
                                     &&
-                                    (   bb[j]->atom->get_family() == PNICTOGEN || bb[j]->atom->get_family() == CHALCOGEN    )
+                                    (   bb[j]->atom1->get_family() == PNICTOGEN || bb[j]->atom1->get_family() == CHALCOGEN    )
                                     &&
-                                    !bb[j]->atom->is_bonded_to_pi(TETREL, false)
+                                    !bb[j]->atom1->is_bonded_to_pi(TETREL, false)
                                 )
                             )
                         );
@@ -1225,16 +1225,16 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                 }
 
 
-                                Atom* btom = get_atom(aab->bname);
-                                if (btom)
+                                Atom* atom2 = get_atom(aab->bname);
+                                if (atom2)
                                 {
-                                    a->bond_to(btom, aab->cardinality);
+                                    a->bond_to(atom2, aab->cardinality);
                                     if (aab->cardinality == 1 && !aab->can_rotate)
                                     {
-                                        Bond* b = a->get_bond_between(btom);
+                                        Bond* b = a->get_bond_between(atom2);
                                         if (b) b->can_rotate = false;
                                         // if (b) b->can_flip = aab->can_flip;
-                                        b = btom->get_bond_between(a);
+                                        b = atom2->get_bond_between(a);
                                         if (b) b->can_rotate = false;
                                         // if (b) b->can_flip = aab->can_flip;
                                     }
@@ -1243,15 +1243,15 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                             }
                             else if (!strcmp(aab->bname, a->name))
                             {
-                                Atom* btom = get_atom(aab->aname);
-                                if (btom && !btom->is_bonded_to(a))
+                                Atom* atom2 = get_atom(aab->aname);
+                                if (atom2 && !atom2->is_bonded_to(a))
                                 {
-                                    a->bond_to(btom, aab->cardinality);
+                                    a->bond_to(atom2, aab->cardinality);
                                     if (aab->cardinality == 1 && !aab->can_rotate)
                                     {
-                                        Bond* b = a->get_bond_between(btom);
+                                        Bond* b = a->get_bond_between(atom2);
                                         if (b) b->can_rotate = false;
-                                        b = btom->get_bond_between(a);
+                                        b = atom2->get_bond_between(a);
                                         if (b) b->can_rotate = false;
                                     }
                                     found_aabond = true;
@@ -1980,7 +1980,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                 if (fabs(atoms[j]->get_charge()) > 0.2) continue;
 
                 Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
-                if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
+                if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->atom2;
                 if (!a) continue;
 
                 if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
@@ -1997,7 +1997,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     if (r >= cond_bas_hbond_distance_threshold) continue;
                     if (atoms[j]->get_Z() == 1)
                     {
-                        Atom* b = atoms[j]->get_bond_by_idx(0)->btom;
+                        Atom* b = atoms[j]->get_bond_by_idx(0)->atom2;
                         if (!b) continue;
                         r = atoms[j]->distance_to(b);
                         if (r >= 1.333) continue;
@@ -2341,9 +2341,9 @@ float AminoAcid::hydrophilicity() const
             for (j=0; j<atoms[i]->get_geometry(); j++)
             {
                 Bond* b = atoms[i]->get_bond_by_idx(j);
-                if (b && b->btom)
+                if (b && b->atom2)
                 {
-                    fam = b->btom->get_family();
+                    fam = b->atom2->get_family();
                     break;
                 }
             }
@@ -2473,7 +2473,7 @@ void AminoAcid::hydrogenate(bool steric_only)
         if (!bt) continue;
         bb = bt[0];
         if (!bb) continue;
-        heavy = bb->btom;
+        heavy = bb->atom2;
         if (!heavy) continue;
 
         atoms[i]->residue = heavy->residue;
@@ -2547,7 +2547,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                 if (bt)
                 {
                     bb = bt[0];
-                    if (bb && bb->btom == cursor)
+                    if (bb && bb->atom2 == cursor)
                         atomtmp[l++] = atoms[i];
                 }
             }
@@ -2577,7 +2577,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                                 if (bt)
                                 {
                                     bb = bt[0];
-                                    if (bb && bb->btom == cursor)
+                                    if (bb && bb->atom2 == cursor)
                                         atomtmp[l++] = atoms[k];
                                 }
                             }
@@ -2604,7 +2604,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                 if (bt)
                 {
                     bb = bt[0];
-                    if (bb && bb->btom == cursor)
+                    if (bb && bb->atom2 == cursor)
                         atomtmp[l++] = atoms[i];
                 }
             }
@@ -2725,9 +2725,9 @@ Atom* AminoAcid::previous_residue_C()
     if (!n) return NULL;
     for (i=0; i<n; i++)
     {
-        Atom* btom = N->get_bond_by_idx(i)->btom;
-        if (!btom) continue;
-        if (btom->residue == N->residue-1) return btom;
+        Atom* atom2 = N->get_bond_by_idx(i)->atom2;
+        if (!atom2) continue;
+        if (atom2->residue == N->residue-1) return atom2;
     }
     return NULL;
 }
@@ -2740,9 +2740,9 @@ Atom* AminoAcid::next_residue_N()
     if (!n) return NULL;
     for (i=0; i<n; i++)
     {
-        Atom* btom = C->get_bond_by_idx(i)->btom;
-        if (!btom) continue;
-        if (btom->residue == C->residue+1) return btom;
+        Atom* atom2 = C->get_bond_by_idx(i)->atom2;
+        if (!atom2) continue;
+        if (atom2->residue == C->residue+1) return atom2;
     }
     return NULL;
 }
@@ -2763,7 +2763,7 @@ Atom* AminoAcid::HN_or_substitute()
 
         for (i=0; i<g; i++)
         {
-            if (bb[i]->btom && strcmp(bb[i]->btom->name, "CA")) return bb[i]->btom;
+            if (bb[i]->atom2 && strcmp(bb[i]->atom2->name, "CA")) return bb[i]->atom2;
         }
     }
     return retval;
@@ -2839,10 +2839,10 @@ LocRotation* AminoAcid::flatten()
     if (!n) return retval;
     for (i=0; i<n; i++)
     {
-        Atom* btom = prevC->get_bond_by_idx(i)->btom;
-        if (!btom) continue;
-        if (!strcmp(btom->name, "CA")) prevCA = btom;
-        if (!strcmp(btom->name, "O" )) prevO = btom;
+        Atom* atom2 = prevC->get_bond_by_idx(i)->atom2;
+        if (!atom2) continue;
+        if (!strcmp(atom2->name, "CA")) prevCA = atom2;
+        if (!strcmp(atom2->name, "O" )) prevO = atom2;
     }
     Atom* localN  = get_atom("N");
     if (!localN) return retval;
@@ -3093,7 +3093,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     if (aadef && aadef->proline_like) return retval;
 
     // Get the location of the previous C, and the location of the local C.
-    Atom *atom, *btom;
+    Atom *atom, *atom2;
 
     angle = M_PI+angle;
 
@@ -3101,42 +3101,42 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     {
     case N_asc:
         atom = get_atom("N");
-        btom = get_atom("CA");
+        atom2 = get_atom("CA");
         break;
 
     case CA_asc:
         atom = get_atom("CA");
-        btom = get_atom("C");
+        atom2 = get_atom("C");
         break;
 
     case CA_desc:
         atom = get_atom("CA");
-        btom = get_atom("N");
+        atom2 = get_atom("N");
         break;
 
     case C_desc:
         atom = get_atom("C");
-        btom = get_atom("CA");
+        atom2 = get_atom("CA");
         break;
 
     default:
         cout << "Bad direction for " << *this << "; cannot rotate backbone." << endl;
         return retval;
     }
-    if (!atom || !btom)
+    if (!atom || !atom2)
     {
         cout << "Not found axial atom for " << *this << "; cannot rotate backbone." << endl;
         return retval;
     }
-    Bond* b = atom->get_bond_between(btom);
+    Bond* b = atom->get_bond_between(atom2);
     if (!b)
     {
-        atom->bond_to(btom, 1);
-        b = atom->get_bond_between(btom);
+        atom->bond_to(atom2, 1);
+        b = atom->get_bond_between(atom2);
     }
     if (!b)
     {
-        cout << "No bond between " << *this << ":" << atom->name << "-" << btom->name << "; cannot rotate backbone." << endl;
+        cout << "No bond between " << *this << ":" << atom->name << "-" << atom2->name << "; cannot rotate backbone." << endl;
         return retval;
     }
     if (!m_mcoord) b->can_rotate = true;
@@ -3148,13 +3148,13 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     case N_asc:
     case CA_desc:
         atom = HN_or_substitute();
-        btom = get_atom("C");
+        atom2 = get_atom("C");
         break;
 
     case CA_asc:
     case C_desc:
         atom = get_atom("N");
-        btom = get_atom("O");
+        atom2 = get_atom("O");
         break;
 
     default:
@@ -3167,7 +3167,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     float theta, step = 3, oldstep = 360;
     float bestrad=0, bestr;
 
-    if (!atom || !btom)
+    if (!atom || !atom2)
     {
         cout << "Not found reference atom for " << *this << "; cannot rotate backbone." << endl;
         return retval;
@@ -3175,14 +3175,14 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
 
     while (step > 0.01)
     {
-        bestr = atom->get_location().get_3d_distance(btom->get_location()) * 1000;
+        bestr = atom->get_location().get_3d_distance(atom2->get_location()) * 1000;
         for (theta=bestrad-oldstep; theta<bestrad+oldstep; theta+=step)
         {
             b->rotate(fiftyseventh*step, true);
-            float r = atom->get_location().get_3d_distance(btom->get_location());
+            float r = atom->get_location().get_3d_distance(atom2->get_location());
             #if 0
-            /*if (dir == N_asc)*/ cout << b->atom->name << "-" << b->btom->name << " rotation " << theta << ": "
-                << atom->name << "-" << btom->name << " distance = " << r << endl << flush;
+            /*if (dir == N_asc)*/ cout << b->atom->name << "-" << b->atom2->name << " rotation " << theta << ": "
+                << atom->name << "-" << atom2->name << " distance = " << r << endl << flush;
             #endif
             if (r < bestr)
             {
@@ -3210,7 +3210,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
 
 LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
 {
-    Atom *rotcen, *btom;
+    Atom *rotcen, *atom2;
     LocatedVector retval;
     Point rel, bloc;
     char aname[5], bname[5];
@@ -3261,22 +3261,22 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
         return retval;
     }
     retval.origin = rotcen->get_location();
-    btom = get_atom(bname);
-    if (!btom)
+    atom2 = get_atom(bname);
+    if (!atom2)
     {
         // cout << get_3letter() << residue_no << ":" << bname << "not found; cannot rotate backbone." << endl;
         return retval;
     }
 
-    Bond* b = rotcen->get_bond_between(btom);
+    Bond* b = rotcen->get_bond_between(atom2);
     if (!b) // || !b->can_rotate)
     {
-        // cout << "Non-rotatable bond " << *this << ":" << rotcen->name << "-" << btom->name << "; cannot rotate backbone." << endl;
+        // cout << "Non-rotatable bond " << *this << ":" << rotcen->name << "-" << atom2->name << "; cannot rotate backbone." << endl;
         retval.r = 0;		// Fail condition.
         return retval;
     }
 
-    rel = btom->get_location().subtract(retval.origin);
+    rel = atom2->get_location().subtract(retval.origin);
     SCoord v(rel);
     retval.phi = v.phi;
     retval.theta = v.theta;
@@ -3285,23 +3285,23 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     // Rotate the local atoms that would be affected.
     if (direction == C_desc)
     {
-        btom = get_atom("N");
-        if (btom) btom->move(rotate3D(btom->get_location(), retval.origin, retval, angle));
+        atom2 = get_atom("N");
+        if (atom2) atom2->move(rotate3D(atom2->get_location(), retval.origin, retval, angle));
     }
     if (direction == CA_desc || direction == C_desc)
     {
-        btom = HN_or_substitute();
-        if (btom) btom->move(rotate3D(btom->get_location(), retval.origin, retval, angle));
+        atom2 = HN_or_substitute();
+        if (atom2) atom2->move(rotate3D(atom2->get_location(), retval.origin, retval, angle));
     }
     if (direction == N_asc)
     {
-        btom = get_atom("C");
-        if (btom) btom->move(rotate3D(btom->get_location(), retval.origin, retval, angle));
+        atom2 = get_atom("C");
+        if (atom2) atom2->move(rotate3D(atom2->get_location(), retval.origin, retval, angle));
     }
     if (direction == N_asc || direction == CA_asc || direction == C_desc)
     {
-        btom = get_atom("O");
-        if (btom) btom->move(rotate3D(btom->get_location(), retval.origin, retval, angle));
+        atom2 = get_atom("O");
+        if (atom2) atom2->move(rotate3D(atom2->get_location(), retval.origin, retval, angle));
     }
 
     // Include side chain atoms.

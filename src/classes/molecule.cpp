@@ -4380,9 +4380,12 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
     normal = compute_normal(&A, &B, &C);
     while (!normal.r)
     {
-    	C.x = frand(-1, 1);
-    	C.y = frand(-1, 1);
-    	C.z = frand(-1, 1);
+    	B.x = frand(-0.01, 0.01);
+    	B.y = frand(-0.01, 0.01);
+    	B.z = frand(-0.01, 0.01);
+    	C.x = frand(-0.01, 0.01);
+    	C.y = frand(-0.01, 0.01);
+    	C.z = frand(-0.01, 0.01);
     	normal = compute_normal(&A, &B, &C);
     }
 

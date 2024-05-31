@@ -128,6 +128,8 @@ public:
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
     float distance_to(Molecule* other_mol);
     std::vector<Atom*> longest_dimension();
+    float get_atom_bond_length_anomaly(Atom* atom, Atom* ignore = nullptr);
+    float evolve_structure(int generations = _evolution_default_generations, float mutation_rate = _default_mutation_rate, int pop_size = _default_population_size);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -151,7 +153,7 @@ public:
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
 
     // Bond functions.
-    Bond** get_rotatable_bonds();
+    Bond** get_rotatable_bonds(bool include_can_flip = true);
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
@@ -169,6 +171,7 @@ public:
     SCoord get_ring_normal(int ringid);
     Atom** get_ring_atoms(int ringid);
     int get_ring_num_atoms(int ringid);
+    void identify_cages();
 
     // Interaction functions.
     float get_internal_clashes();
@@ -279,7 +282,7 @@ protected:
     void recenter_ring(int ringid, Point new_ring_cen);
     void rotate_ring(int ringid, Rotation rot);
     bool in_same_ring(Atom* a, Atom* b);
-    float get_atom_error(int atom_idx, LocatedVector* best_lv);
+    float get_atom_error(int atom_idx, LocatedVector* best_lv, bool hemispherical = true);
     float intermol_bind_for_multimol_dock(Molecule* othermol, bool allow_clash);
 
     void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);

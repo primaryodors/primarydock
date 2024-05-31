@@ -409,6 +409,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     if (!n) return retval;
 
     mol->identify_rings();
+    mol->identify_cages();
 
     if (!predef_grp.size())
     {

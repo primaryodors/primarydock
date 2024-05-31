@@ -1605,6 +1605,12 @@ Atom* Ring::traverse_ring(Atom* f, Atom* af)
     return nullptr;
 }
 
+void Ring::aromatize()
+{
+    int i;
+    for (i=0; atoms[i]; i++) atoms[i]->aromatize();
+}
+
 float Ring::flip_atom(Atom* wa)
 {
     if (type == UNKNOWN) determine_type();
@@ -1866,8 +1872,10 @@ float Atom::get_bond_angle_anomaly(SCoord v, Atom* ignore)
     //cout << " -=- " << lga*fiftyseven << " | ";
     for (i=0; i<geometry; i++)
     {
-        if (bonded_to[i].btom && bonded_to[i].btom != ignore)
+        if (bonded_to[i].btom)
         {
+            if (bonded_to[i].btom == ignore) continue;
+
             //cout << bonded_to[i].btom->location << " - " << location;
             SCoord vb = bonded_to[i].btom->location.subtract(location);
             //cout << " = " << (Point)vb << endl;
@@ -2351,15 +2359,18 @@ Ring** Atom::get_rings()
     return retval;
 }
 
-bool Atom::in_same_ring_as(Atom* b)
+Ring* Atom::in_same_ring_as(Atom* b, Ring* ignore)
 {
-    if (!member_of) return false;
+    if (!member_of) return nullptr;
 
     int i;
     for (i=0; member_of[i]; i++)
-        if (b->is_in_ring(member_of[i])) return true;
+    {
+        if (member_of[i] == ignore) continue;
+        if (b->is_in_ring(member_of[i])) return member_of[i];
+    }
 
-    return false;
+    return nullptr;
 }
 
 bool Atom::is_in_ring(Ring* ring)
@@ -2622,7 +2633,6 @@ void Ring::fill_with_atoms(Atom** from_atoms)
         }
     }
 
-    #if !_ALLOW_FLEX_RINGS
     for (i=0; i < atcount; i++)
     {
         if (i)
@@ -2630,12 +2640,22 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             Bond* b = atoms[i]->get_bond_between(atoms[i-1]);
             if (b)
             {
+                #if _ALLOW_FLEX_RINGS
+                b->can_flip = b->can_rotate;
+                b->can_rotate = false;
+                #else
                 b->can_rotate = b->can_flip = false;
+                #endif
             }
             b = atoms[i-1]->get_bond_between(atoms[i]);
             if (b)
             {
+                #if _ALLOW_FLEX_RINGS
+                b->can_flip = b->can_rotate;
+                b->can_rotate = false;
+                #else
                 b->can_rotate = b->can_flip = false;
+                #endif
             }
         }
         else
@@ -2643,16 +2663,25 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             Bond* b = atoms[i]->get_bond_between(atoms[atcount-1]);
             if (b)
             {
+                #if _ALLOW_FLEX_RINGS
+                b->can_flip = b->can_rotate;
+                b->can_rotate = false;
+                #else
                 b->can_rotate = b->can_flip = false;
+                #endif
             }
             b = atoms[atcount-1]->get_bond_between(atoms[i]);
             if (b)
             {
+                #if _ALLOW_FLEX_RINGS
+                b->can_flip = b->can_rotate;
+                b->can_rotate = false;
+                #else
                 b->can_rotate = b->can_flip = false;
+                #endif
             }
         }
     }
-    #endif
 
     atoms[atcount] = nullptr;
 }
@@ -2687,6 +2716,27 @@ Atom** Ring::get_atoms() const
     }
     retval[atcount] = nullptr;
 
+    return retval;
+}
+
+Bond** Ring::get_bonds()
+{
+    if (!atcount) return nullptr;
+    Bond** retval = new Bond*[atcount*2+8];
+
+    int i, j, l=0;
+    for (i=0; i<atcount; i++)
+    {
+        j = i+1;
+        if (j >= atcount) j = 0;
+
+        Bond* b = atoms[i]->get_bond_between(atoms[j]);
+        if (b) retval[l++] = b;
+        b = atoms[j]->get_bond_between(atoms[i]);
+        if (b) retval[l++] = b;
+    }
+
+    retval[l] = nullptr;
     return retval;
 }
 

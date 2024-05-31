@@ -44,6 +44,7 @@ public:
     float cardinality=0;			// aromatic bonds = 1.5.
     bool can_rotate=false;
     bool can_flip=false;
+    bool caged=false;
     float flip_angle=0;				// signed.
     float angular_momentum=0;
     float total_rotations=0;
@@ -101,6 +102,7 @@ public:
     }
     Atom* get_atom(int index);
     Atom** get_atoms() const;
+    Bond** get_bonds();
     int get_overlap_count(Ring* ringb);
     RING_TYPE get_type();
     Point get_center();
@@ -111,6 +113,7 @@ public:
     bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
     Atom* traverse_ring(Atom* from, Atom* away_from = nullptr);     // If away_from is null, traverse in either direction.
     float flip_atom(Atom* which_atom);
+    void aromatize();
 
 protected:
     Atom* atoms[256];
@@ -235,7 +238,7 @@ public:
     Ring** get_rings();
     bool is_in_ring(Ring* ring);
     Ring* closest_arom_ring_to(Point target);
-    bool in_same_ring_as(Atom* b);
+    Ring* in_same_ring_as(Atom* b, Ring* ignore = nullptr);
     void aromatize()
     {
         geometry=3;
@@ -245,15 +248,18 @@ public:
             int i;
             for (i=0; i<geometry; i++)
             {
-                if (bonded_to[i].cardinality > 1
-                        ||
-                        (	bonded_to[i].cardinality == 1
-                            && bonded_to[i].btom->get_Z() > 1
-                            && bonded_to[i].btom->get_bonded_atoms_count() < 4
-                        )
-                   )
+                if (bonded_to[i].btom && in_same_ring_as(bonded_to[i].btom))
                 {
-                    bonded_to[i].cardinality = 1.5;
+                    if (bonded_to[i].cardinality > 1
+                            ||
+                            (	bonded_to[i].cardinality == 1
+                                && bonded_to[i].btom->get_Z() > 1
+                                && bonded_to[i].btom->get_bonded_atoms_count() < 4
+                            )
+                    )
+                    {
+                        bonded_to[i].cardinality = 1.5;
+                    }
                 }
             }
         }
@@ -275,7 +281,7 @@ public:
     SCoord* get_basic_geometry();
     SCoord* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);
     float get_geometric_bond_angle();
-    float get_bond_angle_anomaly(SCoord v, Atom* ignore);	// Assume v is centered on current atom.
+    float get_bond_angle_anomaly(SCoord v, Atom* ignore = nullptr);	// Assume v is centered on current atom.
     float distance_to(Atom* btom)
     {
         if (!btom) return -1;

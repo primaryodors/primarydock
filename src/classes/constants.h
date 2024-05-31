@@ -49,9 +49,16 @@
 #endif
 
 
-#define _SANOM_BOND_ANGLE_WEIGHT 25.0
-#define _SANOM_CLASHES_WEIGHT 5.0
+#define _SANOM_BOND_RADIUS_WEIGHT 50.0
+#define _SANOM_BOND_ANGLE_WEIGHT 10.0
+#define _SANOM_CLASHES_WEIGHT 10.0
 #define _SANOM_BOND_RAD_WEIGHT 30.0
+
+#define _evolution_atom_displacement 1.0
+#define _default_mutation_rate 0.05
+#define _default_population_size 80
+#define _evolution_aromatic_rigidity 50
+#define _evolution_default_generations 5000
 
 #define ALKMETAL 1
 #define ALKEARTH 2
@@ -71,7 +78,7 @@
 #define _ATOM_Z_LIMIT 200
 
 #define _def_atc 100
-#define _ALLOW_FLEX_RINGS 0
+#define _ALLOW_FLEX_RINGS 1
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
@@ -366,6 +373,8 @@
 #define _dbg_homology 0
 #define _dbg_Huckel 0
 #define _dbg_hxrax 0
+#define _dbg_hydrogenate 0
+#define _dbg_identify_rings 0
 #define _dbg_imidazole_check 0
 #define _dbg_improvements_only_rule 0
 #define _dbg_interatomic_forces 0
@@ -378,6 +387,8 @@
 #define _DBG_MOLBB 0
 #define _dbg_mol_flexion 0
 #define _dbg_mol_frames 0
+#define _dbg_molstruct_evolutions 0
+#define _dbg_molstruct_evolution_bond_lengths 0
 #define _dbg_multiflex 0
 #define _dbg_null_flexions 0
 #define _dbg_path_search 0

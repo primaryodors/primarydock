@@ -8,6 +8,8 @@
 
 using namespace std;
 
+#define _use_generational_algorithm 1
+
 int main(int argc, char** argv)
 {
     Molecule m("Test");
@@ -30,6 +32,14 @@ int main(int argc, char** argv)
     }
 
     m.hydrogenate();
+    srand(time(nullptr));
+
+    #if _use_generational_algorithm
+    m.minimize_internal_clashes();
+    cout << "# Evolving structure; this may take some time..." << endl << flush;
+    float anomaly = m.evolve_structure();
+    cout << "# Post-evolution per-atom anomaly: " << anomaly << endl;
+    #endif
 
     cout << "# Internal clashes: " << m.get_internal_clashes() << " cu.A." << endl;
 

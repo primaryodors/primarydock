@@ -81,7 +81,7 @@ public:
     int count_heavy_moves_with_atom();
     int count_heavy_moves_with_atom2();
     Bond* get_reversed();
-    void swing(SCoord newdir);		// Rotate atom2, and all its moves_with atoms, about atom so that the bond points to newdir.
+    void swing(SCoord newdir);		// Rotate atom2, and all its moves_with atoms, about atom1 so that the bond points to newdir.
 
 protected:
     Atom* atom1 = nullptr;

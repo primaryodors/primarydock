@@ -348,6 +348,9 @@
 // For auditing binding energies between individual atoms:
 #define _peratom_audit 0
 
+// A short-term feature that can be used in case the bond reciprocity problem recurs. See issue #423.
+#define bond_reciprocity_fix 0
+
 // Should normally be false or zero:
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
@@ -405,6 +408,7 @@
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0
 #define _DBG_TUMBLE_SPHERES 0
+#define _dbg_unreciprocated_bonds 0
 #define _dbg_worst_energy 0
 #define _debug_active_bond_rot 0
 #define debug_stop_after_tumble_sphere 0

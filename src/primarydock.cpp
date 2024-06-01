@@ -21,8 +21,8 @@ struct AcvBndRot
     int resno;
     std::string aname;
     std::string bname;
-    Atom* atom = nullptr;
-    Atom* btom = nullptr;
+    Atom* atom1 = nullptr;
+    Atom* atom2 = nullptr;
     Bond* bond = nullptr;
     float theta;
 };
@@ -454,7 +454,7 @@ void iteration_callback(int iter, Molecule** mols)
 
     int ac = ligand->get_atom_count();
     float bbest = 0;
-    Atom *atom, *btom;
+    Atom *atom1, *atom2;
 
     float progress = (float)iter / iters;
     // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;
@@ -607,9 +607,9 @@ void iteration_callback(int iter, Molecule** mols)
     {
         if (ligand->get_atom(i)->strongest_bind_energy > bbest)
         {
-            atom = ligand->get_atom(i);
-            bbest = atom->strongest_bind_energy;
-            btom = atom->strongest_bind_atom;
+            atom1 = ligand->get_atom(i);
+            bbest = atom1->strongest_bind_energy;
+            atom2 = atom1->strongest_bind_atom;
         }
     }
 
@@ -1420,17 +1420,17 @@ void prepare_acv_bond_rots()
     {
         for (i=0; i<active_bond_rots.size(); i++)
         {
-            active_bond_rots[i].atom = protein->get_atom(active_bond_rots[i].resno, active_bond_rots[i].aname.c_str());
-            active_bond_rots[i].btom = protein->get_atom(active_bond_rots[i].resno, active_bond_rots[i].bname.c_str());
+            active_bond_rots[i].atom1 = protein->get_atom(active_bond_rots[i].resno, active_bond_rots[i].aname.c_str());
+            active_bond_rots[i].atom2 = protein->get_atom(active_bond_rots[i].resno, active_bond_rots[i].bname.c_str());
 
-            if (!active_bond_rots[i].atom) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].aname
+            if (!active_bond_rots[i].atom1) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].aname
                 << " not found in protein!" << endl;
-            if (!active_bond_rots[i].btom) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].bname
+            if (!active_bond_rots[i].atom2) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].bname
                 << " not found in protein!" << endl;
 
-            if (active_bond_rots[i].atom && active_bond_rots[i].btom)
+            if (active_bond_rots[i].atom1 && active_bond_rots[i].atom2)
             {
-                active_bond_rots[i].bond = active_bond_rots[i].atom->get_bond_between(active_bond_rots[i].btom);
+                active_bond_rots[i].bond = active_bond_rots[i].atom1->get_bond_between(active_bond_rots[i].atom2);
                 #if _debug_active_bond_rot
                 active_bond_rots[i].bond->echo_on_rotate = true;
                 #endif

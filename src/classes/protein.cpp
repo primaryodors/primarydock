@@ -392,12 +392,12 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
     {
         for (i=0; i<connections.size(); i++)
         {
-            if (!connections[i]->atom || !connections[i]->btom) continue;
+            if (!connections[i]->get_atom1() || !connections[i]->get_atom2()) continue;
 
             fprintf(os, "CONECT ");
             int a, b;
-            a = connections[i]->atom->pdbidx;
-            b = connections[i]->btom->pdbidx;
+            a = connections[i]->get_atom1()->pdbidx;
+            b = connections[i]->get_atom2()->pdbidx;
 
             if (a < 1000) fprintf(os, " ");
             if (a <  100) fprintf(os, " ");
@@ -921,12 +921,12 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
             residues[i]->clear_cache();
             residues[i]->establish_internal_clash_baseline();
 
-            Atom *atom = residues[i]->get_atom("N"), *btom;
+            Atom *atom = residues[i]->get_atom("N"), *atom2;
             AminoAcid* prev = get_residue(residues[i]->get_residue_no()-1);
             if (prev)
             {
-                btom = prev->get_atom("C");
-                if (atom && btom) atom->bond_to(btom, 1.5);
+                atom2 = prev->get_atom("C");
+                if (atom && atom2) atom->bond_to(atom2, 1.5);
             }
 
             if (!aaptrmin.n || residues[i] < aaptrmin.paa) aaptrmin.paa = residues[i];
@@ -1594,7 +1594,7 @@ Molecule* Protein::metals_as_molecule()
                 {
                     Bond* b = metals[i]->get_bond_by_idx(k++);
                     if (!b) break;
-                    b->btom = mca;
+                    b->set_atom2(mca);
                     b->cardinality = 0.5;
                     // cout << metals[i]->name << " coordinates to " << *caa << ":" << mca->name << endl;
                 }
@@ -2579,7 +2579,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
                             }   // for n
 
                             /*cout << iter << " " << *aa << ":"
-                            	 << bb[l]->atom->name << "-" << bb[l]->btom->name
+                            	 << bb[l]->atom->name << "-" << bb[l]->get_atom2()->name
                             	 << " " << rad*fiftyseven << "deg, r=" << r
                             	 << ", clash=" << clashes << endl;*/
 
@@ -2636,7 +2636,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
                             }   // for n
 
                             /*cout << iter << " " << *aa << ":"
-                            	 << bb[l]->atom->name << "-" << bb[l]->btom->name
+                            	 << bb[l]->atom->name << "-" << bb[l]->get_atom2()->name
                             	 << " " << rad*fiftyseven << "deg, r=" << r
                             	 << ", clash=" << clashes << endl;*/
 

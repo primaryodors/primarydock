@@ -212,44 +212,44 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
             for (j=0; j<bn; j++)
             {
                 if (!b[j]) continue;
-                if (!b[j]->btom) continue;
-                if (b[j]->btom->used)
+                if (!b[j]->get_atom2()) continue;
+                if (b[j]->get_atom2()->used)
                 {
                     #if _dbg_moieties
-                    cout << "Skipping " << b[j]->btom->name << " as 'used'..." << endl;
+                    cout << "Skipping " << b[j]->get_atom2()->name << " as 'used'..." << endl;
                     #endif
                     continue;
                 }
                 bool used = false;
-                for (l=0; l<atoms_used; l++) if (out_matches[l] == b[j]->btom)
+                for (l=0; l<atoms_used; l++) if (out_matches[l] == b[j]->get_atom2())
                 {
                     #if _dbg_moieties
-                    cout << "Skipping " << b[j]->btom->name << " already matched..." << endl;
+                    cout << "Skipping " << b[j]->get_atom2()->name << " already matched..." << endl;
                     #endif
                     used = true;
                 }
-                for (l=0; l<num_duds; l++) if (dud_atoms[l] == b[j]->btom)
+                for (l=0; l<num_duds; l++) if (dud_atoms[l] == b[j]->get_atom2())
                 {
                     #if _dbg_moieties
-                    cout << "Skipping " << b[j]->btom->name << " as a 'dud'..." << endl;
+                    cout << "Skipping " << b[j]->get_atom2()->name << " as a 'dud'..." << endl;
                     #endif
                     used = true;
                 }
                 if (used) continue;
                 #if _dbg_moieties
-                cout << "Trying " << *cursor[parens] << "~" << *(b[j]->btom) << " for " << buffer << "..." << endl;
+                cout << "Trying " << *cursor[parens] << "~" << *(b[j]->get_atom2()) << " for " << buffer << "..." << endl;
                 #endif
-                if (atom_matches_string(b[j]->btom, buffer))
+                if (atom_matches_string(b[j]->get_atom2(), buffer))
                 {
                     if (card)
                     {
-                        Bond* between = cursor[parens]->get_bond_between(b[j]->btom);
+                        Bond* between = cursor[parens]->get_bond_between(b[j]->get_atom2());
                         int lcard = between->cardinality;
                         if (between->cardinality > 1 && between->cardinality < 2 && card >= 1 && card <= 2) lcard = card;
                         if (lcard != card)
                         {
                             #if _dbg_moieties
-                            cout << "Skipping " << b[j]->btom->name << " for bond cardinality..." << endl;
+                            cout << "Skipping " << b[j]->get_atom2()->name << " for bond cardinality..." << endl;
                             #endif
                             continue;
                         }
@@ -257,15 +257,15 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                     }
                     found = true;
                     #if _dbg_moieties
-                    cout << "Matched " << b[j]->btom->name << endl;
+                    cout << "Matched " << b[j]->get_atom2()->name << endl;
                     #endif
-                    cursor[parens] = b[j]->btom;
-                    out_matches[atoms_used++] = b[j]->btom;
-                    b[j]->btom->used = true;
+                    cursor[parens] = b[j]->get_atom2();
+                    out_matches[atoms_used++] = b[j]->get_atom2();
+                    b[j]->get_atom2()->used = true;
                     break;
                 }
                 #if _dbg_moieties
-                cout << b[j]->btom->name << " did not match " << buffer << "." << endl;
+                cout << b[j]->get_atom2()->name << " did not match " << buffer << "." << endl;
                 #endif
             }
             if (!found)

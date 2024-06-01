@@ -376,7 +376,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
             {
                 for (i=0; bb[i]; i++)
                 {
-                    if (bb[i]->btom != a && bb[i]->can_rotate)
+                    if (bb[i]->get_atom2() != a && bb[i]->can_rotate)
                     {
                         brot = bb[i];
                         H = a;
@@ -398,7 +398,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
             {
                 for (i=0; bb[i]; i++)
                 {
-                    if (bb[i]->btom != b && bb[i]->can_rotate)
+                    if (bb[i]->get_atom2() != b && bb[i]->can_rotate)
                     {
                         brot = bb[i];
                         H = b;
@@ -625,13 +625,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (aheavy->get_Z() == 1)
     {
         Bond* ab = a->get_bond_by_idx(0);
-        if (ab->btom && ab->btom->get_Z() > 1) aheavy = ab->btom;
+        if (ab->get_atom2() && ab->get_atom2()->get_Z() > 1) aheavy = ab->get_atom2();
     }
     Atom* bheavy = b;
     if (bheavy->get_Z() == 1)
     {
         Bond* bb = b->get_bond_by_idx(0);
-        if (bb->btom && bb->btom->get_Z() > 1) bheavy = bb->btom;
+        if (bb->get_atom2() && bb->get_atom2()->get_Z() > 1) bheavy = bb->get_atom2();
     }
     float rheavy = aheavy->distance_to(bheavy);
     float l_heavy_atom_mindist = aheavy->get_vdW_radius() + bheavy->get_vdW_radius();
@@ -667,31 +667,31 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (a->get_Z() == 1)
         {
             Bond* prb = a->get_bond_by_idx(0);
-            if (prb && prb->btom)
+            if (prb && prb->get_atom2())
             {
-                float prtheta = find_3d_angle(b->get_location(), prb->btom->get_location(), a->get_location());
+                float prtheta = find_3d_angle(b->get_location(), prb->get_atom2()->get_location(), a->get_location());
                 pr *= 0.5 + 0.5 * cos(prtheta);
             }
         }
         else
         {
             Bond* sb = a->get_bond_closest_to(b->get_location());
-            if (sb && sb->btom && sb->btom->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+            if (sb && sb->get_atom2() && sb->get_atom2()->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
         if (b->get_Z() == 1)
         {
             Bond* prb = b->get_bond_by_idx(0);
-            if (prb && prb->btom)
+            if (prb && prb->get_atom2())
             {
-                float prtheta = find_3d_angle(a->get_location(), prb->btom->get_location(), b->get_location());
+                float prtheta = find_3d_angle(a->get_location(), prb->get_atom2()->get_location(), b->get_location());
                 pr *= 0.5 + 0.5 * cos(prtheta);
             }
         }
         else
         {
             Bond* sb = b->get_bond_closest_to(a->get_location());
-            if (sb && sb->btom && sb->btom->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+            if (sb && sb->get_atom2() && sb->get_atom2()->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
         kJmol -= pr;
@@ -925,14 +925,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             {
                 avec[j] = ageo[j];
                 Bond* jb = a->get_bond_by_idx(j);
-                if (jb && jb->btom) avec[j].r = 0;
+                if (jb && jb->get_atom2()) avec[j].r = 0;
             }
 
             for (j=0; j<bg; j++)
             {
                 bvec[j] = bgeo[j];
                 Bond* jb = b->get_bond_by_idx(j);
-                if (jb && jb->btom) bvec[j].r = 0;
+                if (jb && jb->get_atom2()) bvec[j].r = 0;
             }
 
             #if _dbg_259
@@ -942,7 +942,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 {
                     cout << a->name << " vertex " << j;
                     Bond* b259 = a->get_bond_by_idx(j);
-                    if (b259 && b259->btom) cout << " occupied by " << b259->btom->name;
+                    if (b259 && b259->get_atom2()) cout << " occupied by " << b259->get_atom2()->name;
                     else cout << " vacant";
 
                     float th259 = find_3d_angle(aloc.add(ageo[j]), bloc, aloc);

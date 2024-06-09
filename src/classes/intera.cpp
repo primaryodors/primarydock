@@ -11,6 +11,7 @@
 using namespace std;
 
 float total_binding_by_type[_INTER_TYPES_LIMIT];
+float total_clashes;
 float minimum_searching_aniso = 0;
 InteratomicForce* lif = nullptr;
 SCoord missed_connection(0,0,0);
@@ -1539,6 +1540,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
     float atheta, btheta;
     SCoord rel = myloc.subtract(ref->location);
 
+    Atom* heavy = get_heavy_atom(), *rheavy = ref->get_heavy_atom();
     float apol = is_polar(), bpol = ref->is_polar();
     // TODO: ring center when polar-pi.
 
@@ -1548,7 +1550,6 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
     for (i=0; ifs[i]; i++)
     {
         intera_type typ = ifs[i]->get_type();
-        if (typ == ionic) done_ionic = true;
         if (typ == covalent) continue;
 
         // Distance
@@ -1583,6 +1584,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
 
         // Anisotropy
         float dpa, dpb, dp = ifs[i]->get_dp();
+        if (!dp && typ != ionic) dp = 2;
         if (dp)
         {
             dpa = dpb = dp;
@@ -1636,14 +1638,24 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
         }
         if (typ == ionic && get_charge() && ref->get_charge())
         {
-            float chg = get_heavy_atom()->get_charge();
-            float refchg = ref->get_heavy_atom()->get_charge();
-            if (!chg) chg = get_heavy_atom()->is_conjugated_to_charge();
-            if (!refchg) chg = ref->get_heavy_atom()->is_conjugated_to_charge();
+            float chg = heavy->get_charge();
+            float refchg = rheavy->get_charge();
+            if (!chg)
+            {
+                chg = heavy->is_conjugated_to_charge();
+                std::vector<Atom*> sva = heavy->get_conjugated_atoms();
+                chg /= sva.size();
+            }
+            if (!refchg)
+            {
+                refchg = rheavy->is_conjugated_to_charge();
+                std::vector<Atom*> sva = rheavy->get_conjugated_atoms();
+                refchg /= sva.size();
+            }
             eff *= chg * -refchg;
-            energy -= eff;
-            break;
+            done_ionic = true;
         }
+        if (typ == pi || typ == polarpi) eff /= 64;
 
         if (isnan(eff))
         {
@@ -1657,7 +1669,6 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
 
         int k = (typ - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] -= eff;
-
 
         #if _peratom_audit
         if (interauditing && energy)
@@ -1708,16 +1719,30 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
             interaudit.push_back(str);
         }
         #endif
+
+        if (done_ionic) break;
     }
 
     if (!done_ionic)
     {
-        float chg = get_heavy_atom()->get_charge();
-        float refchg = ref->get_heavy_atom()->get_charge();
-        if (!chg) chg = get_heavy_atom()->is_conjugated_to_charge();
-        if (!refchg) chg = ref->get_heavy_atom()->is_conjugated_to_charge();
+        float chg = heavy->get_charge();
+        float refchg = rheavy->get_charge();
+        if (!chg)
+        {
+            chg = heavy->is_conjugated_to_charge();
+            std::vector<Atom*> sva = heavy->get_conjugated_atoms();
+            chg /= sva.size();
+        }
+        if (!refchg)
+        {
+            refchg = rheavy->is_conjugated_to_charge();
+            std::vector<Atom*> sva = rheavy->get_conjugated_atoms();
+            refchg /= sva.size();
+        }
         if (chg && refchg)
         {
+            min_r *= 0.58;
+            if (min_r < 0.7) min_r = 0.7;
             float c = chg * refchg;
             float r1 = rel.r / min_r;
             if (r1 < 1) c *= pow(r1, 4);
@@ -1746,7 +1771,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
     if (min_r < 0.7) min_r = 0.7;
     if (rel.r < min_r)
     {
-        float eff = fmax(0,InteratomicForce::Lennard_Jones(ref, this, min_r+global_clash_allowance));
+        float eff = fmax(0,InteratomicForce::Lennard_Jones(ref, this, min_r));
         #if _peratom_audit
         if (interauditing)
         {
@@ -1761,6 +1786,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
         }
         #endif
         energy += eff;
+        total_clashes += eff;
     }
 
     return energy;

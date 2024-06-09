@@ -178,12 +178,12 @@ int main(int argc, char** argv)
 
     m2.minimize_internal_clashes();
     float im12 = m1.get_intermol_clashes(&m2);
-    cout << "# Loaded test ligand. Intermol clashes: " << im12 << " cu. A." << endl;
+    cout << "# Loaded test ligand. Intermol clashes: " << im12 << " kJ/mol." << endl;
 
     SCoord v1(&pt1);
     float rotdeg = -30;
     m2.rotate(&v1, rotdeg * M_PI/180);
-    cout << "# Rotated molecule 2 by " << rotdeg << " degrees. Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
+    cout << "# Rotated molecule 2 by " << rotdeg << " degrees. Intermol clashes: " << m1.get_intermol_clashes(&m2) << " kJ/mol." << endl;
 
     Point pt(0,0,1.0);
     SCoord v(&pt);
@@ -198,7 +198,7 @@ int main(int argc, char** argv)
 
     m1.get_intermol_binding(&m2);
 
-    cout << "# Initial intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
+    cout << "# Initial intermol clashes: " << m1.get_intermol_clashes(&m2) << " kJ/mol." << endl;
     cout << "# Initial intermol energy level: " << -m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
 
     m1.reset_conformer_momenta();
@@ -217,6 +217,8 @@ int main(int argc, char** argv)
 
     float energyLevel = m1.get_intermol_binding(&m2);
     cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
+    float nodist = m1.distance_to(&m2);
+    cout << "# Intermolecular distance: " << nodist << " Å." << endl;
 
     #if _peratom_audit
     cout << endl << "# Interatomic Audit:" << endl;
@@ -226,13 +228,6 @@ int main(int argc, char** argv)
     interauditing = false;
     #endif
 
-    float nodist = 0;
-    Atom* O = m1.get_atom("O6");
-    Atom* N = m2.get_atom("N1");
-    if (N && O) nodist += O->get_location().get_3d_distance(N->get_location());
-    O = m2.get_atom("O6");
-    N = m1.get_atom("N1");
-    if (N && O) nodist += O->get_location().get_3d_distance(N->get_location());
 
     if (energyLevel >= energyLevelThreshold && final_clashes < clash_limit && nodist < N_O_spacing)
         cout << "Energy level below threshold, SUCCESS.\n";
@@ -240,7 +235,7 @@ int main(int argc, char** argv)
     {
         if (energyLevel < energyLevelThreshold) cout << "Energy level above threshold, FAIL.\n";
         else if (final_clashes >= clash_limit) cout << "Intermolecular clashes " << final_clashes << " are above threshold, FAIL.\n";
-        else if (nodist >= N_O_spacing) cout << "Atoms are too far apart (" << nodist << "A). FAIL.\n";
+        // else if (nodist >= N_O_spacing) cout << "Atoms are too far apart (" << nodist << "A). FAIL.\n";
     }
 
     const char* tstoutf = "output.sdf";

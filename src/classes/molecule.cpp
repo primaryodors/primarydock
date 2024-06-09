@@ -2331,6 +2331,11 @@ float Molecule::get_intermol_clashes(Molecule* ligand)
 
 float Molecule::get_intermol_clashes(Molecule** ligands)
 {
+    #if atom_object_forces
+    total_clashes = 0;
+    get_intermol_binding(ligands);
+    return total_clashes;
+    #else
     int i, j, l;
     float r;
     Atom* a, *b;
@@ -2382,6 +2387,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
     }
 
     return clash; //*_kJmol_cuA;
+    #endif
 }
 
 float Molecule::total_intermol_clashes(Molecule** ligands)

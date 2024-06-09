@@ -90,6 +90,8 @@ Se      H	   coval	1	  1.488
 
 # Make sure to list ionic bonds before hydrogen bonds, because the former supersedes the latter.
 NH      O      ionic    0.5   1.53       30           1.6?
+Na      F      ionic    0.5   2.31      911       
+Na      Cl     ionic    0.5   2.79      788
 
 NH      N      hbond    0.5   1.6?       13           3.5
 NH      O      hbond    0.5   1.66        8           1.6
@@ -143,13 +145,13 @@ CI      C=N    hbond    0.5   3.078      15.
 CI      C-S    hbond    0.5   3.4        18.
 
 
-CH      C      pi       0.25  3.87        8.			5
-NH		C	   pi 		0.25  3.87		  8.			5
-C       C      pi       0.25  3.87       12.0			5
-C       N      pi       0.25  3.87       11.0			5
-C       O      pi       0.25  3.87       11.0			5
-C       P      pi       0.25  5.3        11.8			5
-C       S      pi       0.25  5.3        11.8			5
+CH      C      pi       0.25  3.87        7.			5
+NH		C	   pi 		0.25  3.87		  7.			5
+C       C      pi       0.25  3.87       11.3			5
+C       N      pi       0.25  3.87       10.0			5
+C       O      pi       0.25  3.87       10.0			5
+C       P      pi       0.25  5.3        10.8			5
+C       S      pi       0.25  5.3        10.8			5
 C       Li     plpi     0.25  0.76       26.5			3
 C       Na     plpi     0.25  1.02       18.83			3
 C       K      plpi     0.25  1.38       13.25			3

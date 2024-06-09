@@ -355,6 +355,8 @@
 // A short-term feature that can be used in case the bond reciprocity problem recurs. See issue #423.
 #define bond_reciprocity_fix 0
 
+#define _zealous_nan_checking 0
+
 // Should normally be false or zero:
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
@@ -411,6 +413,7 @@
 #define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0
+#define _dbg_trap_nans 0
 #define _DBG_TUMBLE_SPHERES 0
 #define _dbg_unreciprocated_bonds 0
 #define _dbg_worst_energy 0

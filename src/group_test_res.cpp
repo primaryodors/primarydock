@@ -75,7 +75,7 @@ int main(int argc, char** argv)
         {
             target = target.add(pocket[l]);
         }
-        target.scale(target.magnitude()/n);
+        target.multiply(1.0/n);
     }
     else
     {

@@ -39,6 +39,8 @@ class Atom;
 class Bond
 {
 public:
+    Atom* atom1 = nullptr;
+    Atom* atom2 = nullptr;
     float cardinality=0;			// aromatic bonds = 1.5.
     bool can_rotate=false;
     bool can_flip=false;
@@ -84,8 +86,6 @@ public:
     void swing(SCoord newdir);		// Rotate atom2, and all its moves_with atoms, about atom1 so that the bond points to newdir.
 
 protected:
-    Atom* atom1 = nullptr;
-    Atom* atom2 = nullptr;
     void fill_moves_with_cache();
     void enforce_moves_with_uniqueness();
     Atom** moves_with_atom2 = 0;
@@ -261,13 +261,13 @@ public:
             int i;
             for (i=0; i<geometry; i++)
             {
-                if (bonded_to[i].get_atom2() && in_same_ring_as(bonded_to[i].get_atom2()))
+                if (bonded_to[i].atom2 && in_same_ring_as(bonded_to[i].atom2))
                 {
                     if (bonded_to[i].cardinality > 1
                             ||
                             (	bonded_to[i].cardinality == 1
-                                && bonded_to[i].get_atom2()->get_Z() > 1
-                                && bonded_to[i].get_atom2()->get_bonded_atoms_count() < 4
+                                && bonded_to[i].atom2->get_Z() > 1
+                                && bonded_to[i].atom2->get_bonded_atoms_count() < 4
                             )
                     )
                     {
@@ -298,7 +298,7 @@ public:
     float distance_to(Atom* atom2)
     {
         if (!atom2) return -1;
-        else return location.get_3d_distance(&atom2->location);
+        else return location.get_3d_distance(atom2->location);
     };
     float similarity_to(Atom* atom2);
     SCoord get_next_free_geometry(float lcard);

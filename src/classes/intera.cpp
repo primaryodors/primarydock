@@ -377,7 +377,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
             {
                 for (i=0; bb[i]; i++)
                 {
-                    if (bb[i]->get_atom2() != a && bb[i]->can_rotate)
+                    if (bb[i]->atom2 != a && bb[i]->can_rotate)
                     {
                         brot = bb[i];
                         H = a;
@@ -399,7 +399,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
             {
                 for (i=0; bb[i]; i++)
                 {
-                    if (bb[i]->get_atom2() != b && bb[i]->can_rotate)
+                    if (bb[i]->atom2 != b && bb[i]->can_rotate)
                     {
                         brot = bb[i];
                         H = b;
@@ -626,13 +626,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (aheavy->get_Z() == 1)
     {
         Bond* ab = a->get_bond_by_idx(0);
-        if (ab->get_atom2() && ab->get_atom2()->get_Z() > 1) aheavy = ab->get_atom2();
+        if (ab->atom2 && ab->atom2->get_Z() > 1) aheavy = ab->atom2;
     }
     Atom* bheavy = b;
     if (bheavy->get_Z() == 1)
     {
         Bond* bb = b->get_bond_by_idx(0);
-        if (bb->get_atom2() && bb->get_atom2()->get_Z() > 1) bheavy = bb->get_atom2();
+        if (bb->atom2 && bb->atom2->get_Z() > 1) bheavy = bb->atom2;
     }
     float rheavy = aheavy->distance_to(bheavy);
     float l_heavy_atom_mindist = aheavy->get_vdW_radius() + bheavy->get_vdW_radius();
@@ -645,12 +645,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     #if _ALLOW_PROTONATE_PNICTOGENS
 
     // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
-    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !aheavy->is_amide() && !isnan(aheavy->pK))
+    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !aheavy->is_amide() && !pdisnanf(aheavy->pK))
     {
         achg = protonation(aheavy->pK) * fabs(bchg) / pow(fabs(r-1.5)+1, 2);
     }
 
-    if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !bheavy->is_amide() && !isnan(bheavy->pK))
+    if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !bheavy->is_amide() && !pdisnanf(bheavy->pK))
     {
         bchg = protonation(bheavy->pK) * fabs(achg) / pow(fabs(r-1.5)+1, 2);
     }
@@ -668,31 +668,31 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (a->get_Z() == 1)
         {
             Bond* prb = a->get_bond_by_idx(0);
-            if (prb && prb->get_atom2())
+            if (prb && prb->atom2)
             {
-                float prtheta = find_3d_angle(b->get_location(), prb->get_atom2()->get_location(), a->get_location());
+                float prtheta = find_3d_angle(b->get_location(), prb->atom2->get_location(), a->get_location());
                 pr *= 0.5 + 0.5 * cos(prtheta);
             }
         }
         else
         {
             Bond* sb = a->get_bond_closest_to(b->get_location());
-            if (sb && sb->get_atom2() && sb->get_atom2()->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+            if (sb && sb->atom2 && sb->atom2->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
         if (b->get_Z() == 1)
         {
             Bond* prb = b->get_bond_by_idx(0);
-            if (prb && prb->get_atom2())
+            if (prb && prb->atom2)
             {
-                float prtheta = find_3d_angle(a->get_location(), prb->get_atom2()->get_location(), b->get_location());
+                float prtheta = find_3d_angle(a->get_location(), prb->atom2->get_location(), b->get_location());
                 pr *= 0.5 + 0.5 * cos(prtheta);
             }
         }
         else
         {
             Bond* sb = b->get_bond_closest_to(a->get_location());
-            if (sb && sb->get_atom2() && sb->get_atom2()->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+            if (sb && sb->atom2 && sb->atom2->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
         kJmol -= pr;
@@ -952,14 +952,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             {
                 avec[j] = ageo[j];
                 Bond* jb = a->get_bond_by_idx(j);
-                if (jb && jb->get_atom2()) avec[j].r = 0;
+                if (jb && jb->atom2) avec[j].r = 0;
             }
 
             for (j=0; j<bg; j++)
             {
                 bvec[j] = bgeo[j];
                 Bond* jb = b->get_bond_by_idx(j);
-                if (jb && jb->get_atom2()) bvec[j].r = 0;
+                if (jb && jb->atom2) bvec[j].r = 0;
             }
 
             #if _dbg_259
@@ -969,7 +969,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 {
                     cout << a->name << " vertex " << j;
                     Bond* b259 = a->get_bond_by_idx(j);
-                    if (b259 && b259->get_atom2()) cout << " occupied by " << b259->get_atom2()->name;
+                    if (b259 && b259->atom2) cout << " occupied by " << b259->atom2->name;
                     else cout << " vacant";
 
                     float th259 = find_3d_angle(aloc.add(ageo[j]), bloc, aloc);
@@ -1046,7 +1046,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         continue;
                     }
                     float contrib = pow(fmax(0,cos(atheta)), dpa);
-                    if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
+                    if (!pdisnanf(contrib) && !isinf(contrib)) asum += contrib;
 
                     #if _dbg_interatomic_forces
                     if (debug_criteria) cout << a->name << " anisotropic angle " << (atheta*fiftyseven)
@@ -1073,7 +1073,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         continue;
                     }
                     float contrib = pow(fmax(0,cos(btheta)), dpb);
-                    if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
+                    if (!pdisnanf(contrib) && !isinf(contrib)) bsum += contrib;
 
                     #if _dbg_interatomic_forces
                     if (debug_criteria) cout << b->name << " anisotropic angle " << (btheta*fiftyseven)
@@ -1574,7 +1574,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
         }
         #endif
 
-        if (isnan(eff))
+        if (pdisnanf(eff))
         {
             #if _peratom_audit_nans
             if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " distance created a nan result." << endl;
@@ -1614,7 +1614,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
             rel.r = r;
             eff *= pow(fmax(0,cos(atheta)), dpa) * pow(fmax(0,cos(btheta)), dpb);
 
-            if (isnan(eff))
+            if (pdisnanf(eff))
             {
                 #if _peratom_audit_nans
                 if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " anisotropy created a nan result ("
@@ -1657,7 +1657,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
         }
         if (typ == pi || typ == polarpi) eff /= 64;
 
-        if (isnan(eff))
+        if (pdisnanf(eff))
         {
             #if _peratom_audit_nans
             if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " metals and ions created a nan result." << endl;

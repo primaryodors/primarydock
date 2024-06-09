@@ -40,7 +40,7 @@ int main(int argc, char** argv)
             {
                 for (j=0; b[j]; j++)
                 {
-                    cout << b[j]->get_atom1()->name << " - " << b[j]->get_atom2()->name << endl;
+                    cout << b[j]->get_atom1()->name << " - " << b[j]->atom2->name << endl;
                 }
             }
             cout << endl;
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
                 {
                     Atom* baa[bb[i]->count_moves_with_atom2()+1];
                     bb[i]->fetch_moves_with_atom2(baa);
-                    cout << bb[i]->get_atom1()->name << "-" << bb[i]->get_atom2()->name << " can rotate, bringing ";
+                    cout << bb[i]->get_atom1()->name << "-" << bb[i]->atom2->name << " can rotate, bringing ";
 
                     for (j=0; baa[j]; j++)
                     {

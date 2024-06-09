@@ -37,11 +37,37 @@ struct Point
         return subtract(pt);
     }
     Point negate();
-    float get_3d_distance(const Point reference)
+
+    inline float get_3d_distance(const Point reference)
     {
-        return get_3d_distance(&reference);
+        float dx = x - reference.x,
+            dy = y - reference.y,
+            dz = z - reference.z;
+
+        #if _zealous_nan_checking
+        if (pdisnanf(dx)) dx = 0;
+        if (pdisnanf(dy)) dy = 0;
+        if (pdisnanf(dz)) dz = 0;
+        #endif
+
+        return sqrt(dx*dx + dy*dy + dz*dz);
     }
-    float get_3d_distance(const Point* reference);
+
+    inline float get_3d_distance(const Point* reference)
+    {
+        float dx = x - reference->x,
+            dy = y - reference->y,
+            dz = z - reference->z;
+
+        #if _zealous_nan_checking
+        if (pdisnanf(dx)) dx = 0;
+        if (pdisnanf(dy)) dy = 0;
+        if (pdisnanf(dz)) dz = 0;
+        #endif
+
+        return sqrt(dx*dx + dy*dy + dz*dz);
+    }
+
     float get_distance_to_line(const Point a, const Point b);         // Where a and b are the termini of the line.
     Point multiply_3d_distance(const Point* reference, float r_mult);
     bool pt_in_bounding_box(const Point* corner1, const Point* corner2);
@@ -160,6 +186,18 @@ class LocationProbability
     protected:
     int index_from_coord(Point pt);
 };
+
+inline bool pdisnan(int x)
+{
+    return x != x;
+}
+inline bool pdisnanf(float x)
+{
+    #if _dbg_trap_nans
+    if (x != x) throw 0xbad9a9;
+    #endif
+    return x != x;
+}
 
 Point average_of_points(Point* points, int count);
 

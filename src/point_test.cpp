@@ -12,7 +12,7 @@ int main (int argc, char** argv)
 
     Point pt1(1,1,1);
     Point pt2 = pt1.negate();
-    cout << "Points pt1 and pt2 are " << pt1.get_3d_distance(&pt2) << " Angstroms apart.\n";
+    cout << "Points pt1 and pt2 are " << pt1.get_3d_distance(pt2) << " Angstroms apart.\n";
 
     Point pt0;
     Point pt3 = pt.multiply_3d_distance(&pt0, 0.1);
@@ -40,7 +40,7 @@ int main (int argc, char** argv)
          << ", phi=" << v.phi * 180.0 / M_PI
          << ".\n";
 
-    cout << "Point pt6 from SCoord v is " << (0.01 * round(pt6.get_3d_distance(&pt5)*100)) << " Angstroms from pt5.\n";
+    cout << "Point pt6 from SCoord v is " << (0.01 * round(pt6.get_3d_distance(pt5)*100)) << " Angstroms from pt5.\n";
 
     Point ptrot8, ptref(pt5.x + 0, pt5.y + 0, pt5.z + 1);
 

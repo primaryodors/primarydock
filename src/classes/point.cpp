@@ -46,9 +46,11 @@ Point Point::subtract(const Point subtracted)
     retval.y = y - subtracted.y;
     retval.z = z - subtracted.z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    #if _zealous_nan_checking
+    if (pdisnanf(retval.x)) retval.x = 0;
+    if (pdisnanf(retval.y)) retval.y = 0;
+    if (pdisnanf(retval.z)) retval.z = 0;
+    #endif
 
     return retval;
 }
@@ -60,9 +62,11 @@ Point Point::subtract(const Point* subtracted)
     retval.y = y - subtracted->y;
     retval.z = z - subtracted->z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    #if _zealous_nan_checking
+    if (pdisnanf(retval.x)) retval.x = 0;
+    if (pdisnanf(retval.y)) retval.y = 0;
+    if (pdisnanf(retval.z)) retval.z = 0;
+    #endif
 
     return retval;
 }
@@ -74,24 +78,13 @@ Point Point::negate()
     retval.y = -y;
     retval.z = -z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    #if _zealous_nan_checking
+    if (pdisnanf(retval.x)) retval.x = 0;
+    if (pdisnanf(retval.y)) retval.y = 0;
+    if (pdisnanf(retval.z)) retval.z = 0;
+    #endif
 
     return retval;
-}
-
-float Point::get_3d_distance(const Point* reference)
-{
-    float dx = x - reference->x,
-          dy = y - reference->y,
-          dz = z - reference->z;
-
-    if (isnan(dx)) dx = 0;
-    if (isnan(dy)) dy = 0;
-    if (isnan(dz)) dz = 0;
-
-    return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
 std::string Point::printable() const
@@ -284,11 +277,15 @@ float find_3d_angle(Point* A, Point* B, Point* source)
     if (param < -1) param = -1;
     if (param >  1) param =  1;
     float retval = acos(param);
-    if (isnan(retval))
+
+    #if _zealous_nan_checking
+    if (pdisnanf(retval))
     {
         cout << "P12 " << P12 << " P13 " << P13 << " P23 " << P23 << endl;
         throw 0xbad9a9;
     }
+    #endif
+
     return retval;
 }
 
@@ -402,7 +399,7 @@ Rotation align_points_3d(Point* point, Point* align, Point* center)
         lan.scale(1);
 
         Rotation rot;
-        if (lpt.get_3d_distance(&lan) < 0.01)
+        if (lpt.get_3d_distance(lan) < 0.01)
         {
             rot.v = n;
             rot.a = 0;
@@ -455,7 +452,9 @@ Rotation* align_2points_3d(Point* point1, Point* align1, Point* point2, Point* a
 
     // float theta = find_3d_angle(&point2a, align2, center);
     float theta = find_angle_along_vector(&point2a, align2, center, &v);
-    if (isnan(theta)) cout << point2a.printable() << ", " << align2->printable() << ", " << center->printable() << endl;
+    #if _zealous_nan_checking
+    if (pdisnanf(theta)) cout << point2a.printable() << ", " << align2->printable() << ", " << center->printable() << endl;
+    #endif
 
     Point plus  = rotate3D(&point2a, center, &v,  theta);
     Point minus = rotate3D(&point2a, center, &v, -theta);

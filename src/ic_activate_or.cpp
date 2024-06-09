@@ -526,7 +526,7 @@ int main(int argc, char** argv)
         Point p7 = aa7x53->get_atom_location("OH");
         float r57;
         pt_tmp = p5.add(p7);
-        pt_tmp.scale(pt_tmp.magnitude()/2);
+        pt_tmp.multiply(0.5);
         water57.recenter(pt_tmp);
         water57.movability = MOV_NORECEN;
 
@@ -569,7 +569,7 @@ int main(int argc, char** argv)
             p5 = aa5x58->get_atom_location("OH");
             p7 = aa7x53->get_atom_location("OH");
             pt_tmp = p5.add(p7);
-            pt_tmp.scale(pt_tmp.magnitude()/2);
+            pt_tmp.multiply(0.5);
             water57.recenter(pt_tmp);
             // water57.movability = MOV_NORECEN;
             Molecule::conform_molecules(mols, 10);
@@ -596,7 +596,7 @@ int main(int argc, char** argv)
             p5 = aa5x58->get_atom_location("OH");
             p7 = aa7x53->get_atom_location("OH");
             pt_tmp = p5.add(p7);
-            pt_tmp.scale(pt_tmp.magnitude()/2);
+            pt_tmp.multiply(0.5);
             water57.recenter(pt_tmp);
             //water57.movability = MOV_NORECEN;
             Molecule::conform_molecules(mols, 10);
@@ -625,7 +625,7 @@ int main(int argc, char** argv)
             p5 = aa5x58->get_atom_location("OH");
             p7 = aa7x53->get_atom_location("OH");
             pt_tmp = p5.add(p7);
-            pt_tmp.scale(pt_tmp.magnitude()/2);
+            pt_tmp.multiply(0.5);
             water57.recenter(pt_tmp);
             // water57.movability = MOV_NORECEN;
             Molecule::conform_molecules(mols, 10);
@@ -1049,7 +1049,7 @@ int main(int argc, char** argv)
         Molecule m("Acid");
         m.from_smiles("[Cl-]");
         Point pt = aa4x61->get_CA_location().add(aa6x59->get_CA_location()); //.add(aa4x60->get_CA_location());
-        pt.scale(pt.magnitude()/2);
+        pt.multiply(0.5);
         m.move(pt);
         m.movability = MOV_PINNED;
 

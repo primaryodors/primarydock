@@ -2585,24 +2585,26 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
     int i;
     for (i=0; i<geometry; i++)
     {
-        if (bonded_to[i].get_atom2()
+        Atom* ba2 = bonded_to[i].get_atom2();
+        if (ba2
             &&
-            bonded_to[i].get_atom2() != c
+            ba2 != c
             &&
-            bonded_to[i].get_atom2() != bir
+            ba2 != bir
             &&
-            bonded_to[i].get_atom2()->is_pi()
+            ba2->is_pi()
         )
         {
-            float f = bonded_to[i].get_atom2()->origchg;
+            float f = ba2->origchg;
             if (f)
             {
                 bir->recursion_counter = 0;
+                if (bir->family == TETREL && ba2->family != TETREL) return 0;
                 return f;
             }
 
             // DANGER: RECURSION.
-            f = bonded_to[i].get_atom2()->is_conjugated_to_charge(bir, this);
+            f = ba2->is_conjugated_to_charge(bir, this);
             if (f)
             {
                 bir->recursion_counter = 0;

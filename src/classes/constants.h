@@ -123,6 +123,9 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
+#define atom_object_forces 1
+#define charge_attraction 60.0
+
 // Warning - increasing these constants significantly above the original 35.0, 60.0 values
 // will cause docking fails in the unit tests.
 #define polar_repulsion 10.0
@@ -347,6 +350,7 @@
 
 // For auditing binding energies between individual atoms:
 #define _peratom_audit 0
+#define _peratom_audit_nans 0
 
 // A short-term feature that can be used in case the bond reciprocity problem recurs. See issue #423.
 #define bond_reciprocity_fix 0

@@ -135,15 +135,30 @@ struct LocRotation : public Rotation
 
 class Atom;
 
-struct Tug
+class LocationProbability
 {
-    SCoord vec;
-    Rotation rot;
+    protected:
+    int edge_size = 0;
+    float cell_size = 1;
+    float* probabilities = nullptr;
+    float uncertainty = 1e9;
+    Point center = Point(0,0,0);
 
-    Tug() { ; }
-    Tug(Atom* atom, Point molcen, SCoord pull);
+    public:
+    LocationProbability();
+    LocationProbability(Point pt);              // Creates a probability of 100% at that exact point.
+    LocationProbability(float cell_size, float spatial_extent);
+    ~LocationProbability();
 
-    Tug add(Tug t);
+    float get_cell_size() { return cell_size; }
+    float get_extent() { return cell_size * 0.5 * edge_size; }
+    float probability_at(Point pt);
+    void set_probability(Point pt, float new_prob);
+    void resample(float new_cell_size);
+    LocationProbability compound(Atom* less_uncertain, Atom* more_uncertain);
+
+    protected:
+    int index_from_coord(Point pt);
 };
 
 Point average_of_points(Point* points, int count);

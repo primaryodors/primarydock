@@ -243,6 +243,7 @@ public:
     bool is_conjugated_to(Atom* a, Atom* break_if_reach = nullptr, Atom* caller = nullptr);
     float is_conjugated_to_charge(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
     std::vector<Atom*> get_conjugated_atoms(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
+    Atom* get_heavy_atom();
 
     // Ring membership.
     int num_rings();
@@ -314,7 +315,9 @@ public:
         chirality_unspecified = false;
     }
 
+    float get_anisotropic_angle(SCoord incident_angle, intera_type type = vdW, Atom* ignore = nullptr);
     void print_bond_angles();                   // For unit tests.
+    float interatomic_energy(Atom* reference, InteratomicForce** forces, LocationProbability* ref_loc_prob = 0, Point* candidate_location = 0);
 
     // Static fuctions.
     static int Z_from_esym(const char* elem_sym);

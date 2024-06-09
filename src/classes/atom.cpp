@@ -1410,6 +1410,69 @@ void Atom::print_bond_angles()
     }
 }
 
+float Atom::get_anisotropic_angle(SCoord ia, intera_type typ, Atom* ig)
+{
+    if (!bonded_to) return 0;
+
+    int i;
+    float theta = M_PI * 2;
+    Point source = location.add(ia);
+
+    for (i=0; i<valence; i++)
+    {
+        Atom* bonded = bonded_to[i].get_atom2();
+        if (!bonded) continue;
+
+        float iat = find_3d_angle(source, bonded->location, location);
+        if (iat < theta) theta = iat;
+    }
+
+    if (is_pi() && (typ == pi || typ == polarpi || typ == vdW)) theta = fabs(theta - square);
+    else switch (geometry)
+    {
+        case 1:
+        case 2:
+        theta = fabs(theta - M_PI);
+        break;
+
+        case 4:
+        theta = fabs(theta - tetrahedral);
+        break;
+
+        case 3:
+        theta = fabs(theta - triangular);
+        break;
+
+        case 6:
+        theta = fabs(theta - square);
+        break;
+
+        case 5:
+        theta = fmin(fabs(theta - triangular), fabs(theta - square));
+        break;
+
+        default:
+        theta = 0;
+    }
+
+    return theta;
+}
+
+Atom* Atom::get_heavy_atom()
+{
+    if (Z > 1) return this;
+    int i;
+    for (i=0; i<valence; i++)
+    {
+        Atom* bonded = bonded_to[i].get_atom2();
+        if (!bonded) continue;
+
+        if (bonded->Z > 1) return bonded;
+    }
+
+    return this;
+}
+
 bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
 {
     last_fail = bf_unknown;

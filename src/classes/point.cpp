@@ -586,32 +586,6 @@ Rotation Rotation::add(Rotation* rot)
     return align_points_3d(&pt, &pt1, &cen);
 }
 
-Tug Tug::add(Tug t)
-{
-    Tug retval;
-    retval.vec = vec.add(t.vec);
-    retval.rot = rot.add(t.rot);
-    return retval;
-}
-
-std::ostream& operator<<(std::ostream& os, const Point& p)
-{
-    os << p.printable();
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const SCoord& v)
-{
-    os << v.printable();
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const Rotation& r)
-{
-    os << "[" << (r.v.theta/M_PI*180) << "°, " << (r.v.phi/M_PI*180) << "°, " << (r.a/M_PI*180) << "°]";
-    return os;
-}
-
 LocRotation::LocRotation()
 {
     ;
@@ -649,6 +623,65 @@ bool Point::fits_inside(Point c)
     return true;
 }
 
+LocationProbability::LocationProbability()
+{
+    edge_size = 5;
+    int i, n = edge_size*edge_size*(edge_size+1);
+    probabilities = new float[n];
+    for (i=0; i<n; i++) probabilities[i] = 0;
+}
+
+LocationProbability::LocationProbability(Point pt)
+{
+    edge_size = 1;
+    cell_size = 0.0005;
+    probabilities = new float[1];
+    probabilities[0] = 1;
+    uncertainty = cell_size/2;
+    center = pt;
+}
+
+LocationProbability::LocationProbability(float cs, float spe)
+{
+    cell_size = cs;
+    edge_size = ceil(spe*2 / cs);
+    int i, n = edge_size*edge_size*(edge_size+1);
+    probabilities = new float[n];
+    for (i=0; i<n; i++) probabilities[i] = 0;
+}
+
+LocationProbability::~LocationProbability()
+{
+    if (probabilities) delete[] probabilities;
+}
+
+float LocationProbability::probability_at(Point pt)
+{
+    int i = index_from_coord(pt);
+    if (i < 0) return 0;
+    return probabilities[i];
+}
+
+void LocationProbability::set_probability(Point pt, float np)
+{
+    int i = index_from_coord(pt);
+    if (i < 0) return;
+    probabilities[i] = np;
+}
+
+int LocationProbability::index_from_coord(Point pt)
+{
+    Point p = pt.subtract(center);
+    p.scale(p.magnitude() / cell_size);
+
+    float offset = 0.5 * edge_size;
+    int x = p.x + offset, y = p.y + offset, z = p.z + offset;
+
+    int halfedge = offset;
+    if (abs(x) >= halfedge || abs(y) >= halfedge || abs(z) >= halfedge) return -1;
+
+    return x + edge_size*y + edge_size*edge_size*z;
+}
 
 
 
@@ -658,3 +691,23 @@ bool Point::fits_inside(Point c)
 
 
 
+
+
+
+std::ostream& operator<<(std::ostream& os, const Point& p)
+{
+    os << p.printable();
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const SCoord& v)
+{
+    os << v.printable();
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Rotation& r)
+{
+    os << "[" << (r.v.theta/M_PI*180) << "°, " << (r.v.phi/M_PI*180) << "°, " << (r.a/M_PI*180) << "°]";
+    return os;
+}

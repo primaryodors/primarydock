@@ -603,7 +603,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     fetch_applicable(a, b, forces);
 
     int i, j, k;
-    float kJmol = 0;
+    float kJmol = 0, partial;
 
     float r = a->distance_to(b);
     float avdW = a->get_vdW_radius(), bvdW = b->get_vdW_radius();
@@ -730,6 +730,32 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     float atheta, btheta;
 
+    #if atom_object_forces
+    partial = a->interatomic_energy(b, forces);
+
+    #if active_persistence
+    if (partial < 0)
+    {
+        if (a->residue && !b->residue)
+        {
+            partial *= residue_binding_multiplier(a->residue);
+            #if _DBG_RESBMULT
+            if (residue_binding_multiplier(a->residue) > 1) std::cout << *a << "..." << *b << " partial " << partial << " multiplied." << endl;
+            #endif
+        }
+        else if (!a->residue && b->residue)
+        {
+            partial *= residue_binding_multiplier(b->residue);
+            #if _DBG_RESBMULT
+            if (residue_binding_multiplier(a->residue) > 1) std::cout << *a << "..." << *b << " partial " << partial << " multiplied." << endl;
+            #endif
+        }
+    }
+    #endif
+
+    kJmol -= partial;
+
+    #else
     for (i=0; forces[i]; i++)
     {
         if (forces[i]->type == ionic)
@@ -753,7 +779,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (forces[i]->type == covalent) continue;
         
-        float partial, rdecayed;
+        float rdecayed;
         float asum=0, bsum=0, aniso=1;
         bool stacked_pi_rings = false;
 
@@ -1277,10 +1303,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             break;
         }
     }
+    #endif
 
     if (rbind < 0.7) rbind = 0.7;
 
 _canstill_clash:
+
+    #if !atom_object_forces
     float sigma;
     float local_clash_allowance = global_clash_allowance;
 
@@ -1322,12 +1351,13 @@ _canstill_clash:
             str += (std::string)a->name + (std::string)"-";
             if (b->residue) str += (std::string)b->aa3let + to_string(b->residue) + (std::string)":";
             str += (std::string)b->name + (std::string)" ";
-            str += (std::string)"clash " + to_string(clash);
+            str += (std::string)"clash " + to_string(-clash);
 
             interaudit.push_back(str);
         }
         #endif
     }
+    #endif
 
     _finished_clashing:
     return kJmol;
@@ -1499,6 +1529,241 @@ std::ostream& operator<<(std::ostream& os, const InteratomicForce& f)
     return os;
 }
 
+float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbability* rlp, Point* cl)
+{
+    Point myloc = cl ? *cl : location;
+    float energy = 0;
+    if (!ifs) return energy;
+    if (!ref) return energy;
+    float min_r = vdW_rad + ref->vdW_rad - global_clash_allowance;
+    float atheta, btheta;
+    SCoord rel = myloc.subtract(ref->location);
 
+    float apol = is_polar(), bpol = ref->is_polar();
+    // TODO: ring center when polar-pi.
+
+    if (!ifs[0]) return energy;
+    int i;
+    bool done_ionic = false;
+    for (i=0; ifs[i]; i++)
+    {
+        intera_type typ = ifs[i]->get_type();
+        if (typ == ionic) done_ionic = true;
+        if (typ == covalent) continue;
+
+        // Distance
+        float eff, ifsr = ifs[i]->get_distance();
+        if (!ifsr) continue;
+        if (ifsr < min_r) min_r = ifsr;
+        
+        float r = rel.r;
+        float r1 = r / ifsr;
+        if (r1 < 1) eff = pow(r1, 4);
+        else eff = 1.0 / pow(r1, typ == vdW ? 6 : 2);
+
+        eff *= ifs[i]->get_kJmol();
+
+        #if summed_missed_connections
+        if (r1 > 1)
+        {
+            SCoord mc = rel;
+            mc.r = r - ifsr;
+            missed_connection = missed_connection.add(mc);
+            mc_bpotential += ifs[i]->get_kJmol();
+        }
+        #endif
+
+        if (isnan(eff))
+        {
+            #if _peratom_audit_nans
+            if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " distance created a nan result." << endl;
+            #endif
+            continue;
+        }
+
+        // Anisotropy
+        float dpa, dpb, dp = ifs[i]->get_dp();
+        if (dp)
+        {
+            dpa = dpb = dp;
+
+            if (typ == ionic || typ == hbond || typ == mcoord)
+            {
+                if (apol < 0 && bpol >= 0)
+                {
+                    dpa = dp;
+                    dpb = (typ == hbond) ? 3 : 1;
+                }
+                else if (bpol < 0 && apol >= 0)
+                {
+                    dpb = dp;
+                    dpa = (typ == hbond) ? 3 : 1;
+                }
+            }
+
+            // Hydrogens have very low directional propensities.
+            // https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7325729/bin/NIHMS1601788-supplement-1.pdf
+            if (Z == 1) dpa = 0.75;
+            if (ref->Z == 1) dpb = 0.75;
+
+            btheta = ref->get_anisotropic_angle(rel, typ);
+            rel.r *= -1;
+            atheta = get_anisotropic_angle(rel, typ);
+            rel.r = r;
+            eff *= pow(fmax(0,cos(atheta)), dpa) * pow(fmax(0,cos(btheta)), dpb);
+
+            if (isnan(eff))
+            {
+                #if _peratom_audit_nans
+                if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " anisotropy created a nan result ("
+                    << atheta * fiftyseven << ", " << btheta * fiftyseven
+                    << ")." << endl;
+                #endif
+                continue;
+            }
+        }
+
+        // Metal coordination and charge multiplication
+
+        if (typ == mcoord)
+        {
+            eff *= InteratomicForce::metal_compatibility(this, ref);
+        }
+        if (typ == polarpi || typ == mcoord)
+        {
+            if (is_metal()) eff *= get_charge();
+            if (ref->is_metal()) eff *= ref->get_charge();
+        }
+        if (typ == ionic && get_charge() && ref->get_charge())
+        {
+            float chg = get_heavy_atom()->get_charge();
+            float refchg = ref->get_heavy_atom()->get_charge();
+            if (!chg) chg = get_heavy_atom()->is_conjugated_to_charge();
+            if (!refchg) chg = ref->get_heavy_atom()->is_conjugated_to_charge();
+            eff *= chg * -refchg;
+            energy -= eff;
+            break;
+        }
+
+        if (isnan(eff))
+        {
+            #if _peratom_audit_nans
+            if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " metals and ions created a nan result." << endl;
+            #endif
+            continue;
+        }
+
+        energy -= eff;
+
+        int k = (typ - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] -= eff;
+
+
+        #if _peratom_audit
+        if (interauditing && energy)
+        {
+            std::string str;
+            if (residue) str += (std::string)aa3let + to_string(residue) + (std::string)":";
+            str += (std::string)name + (std::string)"-";
+            if (ref->residue) str += (std::string)ref->aa3let + to_string(ref->residue) + (std::string)":";
+            str += (std::string)ref->name + (std::string)" ";
+            switch (typ)
+            {
+                case covalent:
+                str += (std::string)"cov";
+                break;
+
+                case ionic:
+                str += (std::string)"ion";
+                break;
+
+                case hbond:
+                str += (std::string)"hb";
+                break;
+
+                case pi:
+                str += (std::string)"pi";
+                break;
+
+                case polarpi:
+                str += (std::string)"ppi";
+                break;
+
+                case mcoord:
+                str += (std::string)"mtl";
+                break;
+
+                case vdW:
+                str += (std::string)"vdw";
+                break;
+
+                default:
+                str += (std::string)"unk";
+            }
+
+            str += (std::string)" " + to_string(-eff) + (std::string)" (" + to_string(energy) + (std::string)")";
+
+            str += (std::string)" theta: " + to_string(atheta*fiftyseven) + (std::string)", " + to_string(btheta*fiftyseven);
+
+            interaudit.push_back(str);
+        }
+        #endif
+    }
+
+    if (!done_ionic)
+    {
+        float chg = get_heavy_atom()->get_charge();
+        float refchg = ref->get_heavy_atom()->get_charge();
+        if (!chg) chg = get_heavy_atom()->is_conjugated_to_charge();
+        if (!refchg) chg = ref->get_heavy_atom()->is_conjugated_to_charge();
+        if (chg && refchg)
+        {
+            float c = chg * refchg;
+            float r1 = rel.r / min_r;
+            if (r1 < 1) c *= pow(r1, 4);
+            else c /= pow(r1, 2);
+
+            // No anisotropy on ionic bonds. Well, except maybe for metals? %@$& I don't know.
+
+            c *= (c>0 ? charge_repulsion : charge_attraction);
+            energy += c;
+            #if _peratom_audit
+            if (interauditing)
+            {
+                std::string str;
+                if (residue) str += (std::string)aa3let + to_string(residue) + (std::string)":";
+                str += (std::string)name + (std::string)"-";
+                if (ref->residue) str += (std::string)ref->aa3let + to_string(ref->residue) + (std::string)":";
+                str += (std::string)ref->name + (std::string)" ";
+                str += (std::string)"ionic " + to_string(c);
+
+                interaudit.push_back(str);
+            }
+            #endif
+        }
+    }
+
+    if (min_r < 0.7) min_r = 0.7;
+    if (rel.r < min_r)
+    {
+        float eff = fmax(0,InteratomicForce::Lennard_Jones(ref, this, min_r+global_clash_allowance));
+        #if _peratom_audit
+        if (interauditing)
+        {
+            std::string str;
+            if (residue) str += (std::string)aa3let + to_string(residue) + (std::string)":";
+            str += (std::string)name + (std::string)" x ";
+            if (ref->residue) str += (std::string)ref->aa3let + to_string(ref->residue) + (std::string)":";
+            str += (std::string)ref->name + (std::string)" ";
+            str += (std::string)"clash " + to_string(eff);
+
+            interaudit.push_back(str);
+        }
+        #endif
+        energy += eff;
+    }
+
+    return energy;
+}
 
 

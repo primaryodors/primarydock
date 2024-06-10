@@ -2600,6 +2600,14 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
             {
                 bir->recursion_counter = 0;
                 if (bir->family == TETREL && ba2->family != TETREL) return 0;
+                if (f > 0)
+                {
+                    int nbt = ba2->num_bonded_to("H");
+                    if (nbt)
+                    {
+                        f /= nbt;
+                    }
+                }
                 return f;
             }
 

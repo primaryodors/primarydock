@@ -1638,8 +1638,12 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
         }
         if (typ == ionic && get_charge() && ref->get_charge())
         {
-            float chg = heavy->get_charge();
-            float refchg = rheavy->get_charge();
+            float chg = heavy->get_charge() / max(1, heavy->num_bonded_to("H"));
+            float refchg = rheavy->get_charge() / max(1, rheavy->num_bonded_to("H"));
+
+            if (chg > 0 && family == PNICTOGEN && num_bonded_to("H")) chg = 0;
+            if (refchg > 0 && ref->family == PNICTOGEN && ref->num_bonded_to("H")) refchg = 0;
+
             if (!chg)
             {
                 chg = heavy->is_conjugated_to_charge();
@@ -1668,7 +1672,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
         energy -= eff;
 
         int k = (typ - covalent) % _INTER_TYPES_LIMIT;
-        total_binding_by_type[k] -= eff;
+        total_binding_by_type[k] += eff;
 
         #if _peratom_audit
         if (interauditing && energy)
@@ -1725,8 +1729,8 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
 
     if (!done_ionic)
     {
-        float chg = heavy->get_charge();
-        float refchg = rheavy->get_charge();
+        float chg = heavy->get_charge() / max(1, heavy->num_bonded_to("H"));
+        float refchg = rheavy->get_charge() / max(1, rheavy->num_bonded_to("H"));
         if (!chg)
         {
             chg = heavy->is_conjugated_to_charge();
@@ -1739,6 +1743,10 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
             std::vector<Atom*> sva = rheavy->get_conjugated_atoms();
             refchg /= sva.size();
         }
+
+        if (chg > 0 && family == PNICTOGEN && num_bonded_to("H")) chg = 0;
+        if (refchg > 0 && ref->family == PNICTOGEN && ref->num_bonded_to("H")) refchg = 0;
+
         if (chg && refchg)
         {
             min_r *= 0.58;
@@ -1765,6 +1773,8 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
                 interaudit.push_back(str);
             }
             #endif
+            int k = (ionic - covalent) % _INTER_TYPES_LIMIT;
+            total_binding_by_type[k] += c;
         }
     }
 

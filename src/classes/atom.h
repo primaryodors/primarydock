@@ -362,6 +362,7 @@ protected:
     int valence=0;
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
     bool geometry_dirty = true;
+    int pi_status = -1;
     int origgeo=0;
     SCoord* geov=0;
     float at_wt = 0;
@@ -372,6 +373,7 @@ protected:
     float charge = 0;					// can be partial.
     float origchg = 0;
     float max_localized_charge = 0;     // for conjugated charged systems.
+    float conj2chg_cache = Avogadro;
     float acidbase = 0;					// charge potential; negative = acid / positive = basic.
     float polarity = 0;					// maximum potential relative to -OH...H-.
     bool polar_calcd = false;

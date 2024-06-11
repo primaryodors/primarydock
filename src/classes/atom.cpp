@@ -1086,6 +1086,7 @@ bool Atom::is_metal()
 
 bool Atom::is_pi()
 {
+    if (pi_status >= 0) return (pi_status == 1);
     if (!bonded_to) return false;
 
     int i, n;
@@ -1097,7 +1098,11 @@ bool Atom::is_pi()
             if (bonded_to[i].atom2) n++;
         }
 
-        if (n > 3) return false;
+        if (n > 3)
+        {
+            pi_status = 0;
+            return false;
+        }
     }
 
     if (Z == 1)
@@ -1105,13 +1110,23 @@ bool Atom::is_pi()
         if (bonded_to[0].atom2 && bonded_to[0].atom2->Z > 1) return bonded_to[0].atom2->is_pi();
     }
 
-    if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return true;
-    if (family == CHALCOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(PNICTOGEN)) return true;
+    if ((family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) ||
+        (family == CHALCOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(PNICTOGEN)))
+    {
+        pi_status = 1;
+        return true;
+    }
 
     for (i=0; i<valence; i++)
     {
-        if (bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2) return true;
+        if (bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2)
+        {
+            pi_status = 1;
+            return true;
+        }
     }
+
+    pi_status = 0;
     return false;
 }
 
@@ -2575,6 +2590,7 @@ Ring* Atom::closest_arom_ring_to(Point target)
 float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
 {
     if (!this) return 0;
+    if (conj2chg_cache < 1e9) return conj2chg_cache;
     if (!is_pi()) return 0;
     if (this == bir) return 0;
     if (!bir) bir = this;
@@ -2599,7 +2615,11 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
             if (f)
             {
                 bir->recursion_counter = 0;
-                if (bir->family == TETREL && ba2->family != TETREL) return 0;
+                if (bir->family == TETREL && ba2->family != TETREL)
+                {
+                    conj2chg_cache = 0;
+                    return 0;
+                }
                 if (f > 0)
                 {
                     int nbt = ba2->num_bonded_to("H");
@@ -2608,6 +2628,7 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
                         f /= nbt;
                     }
                 }
+                conj2chg_cache = f;
                 return f;
             }
 
@@ -2616,6 +2637,7 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
             if (f)
             {
                 bir->recursion_counter = 0;
+                conj2chg_cache = f;
                 return f;
             }
         }
@@ -2624,6 +2646,7 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
     if (bir == this) recursion_counter = 0;
     else bir->recursion_counter--;
 
+    conj2chg_cache = 0;
     return 0;
 }
 

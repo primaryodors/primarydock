@@ -451,26 +451,26 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
     }
     #endif
 
-    bool a_matches_Za = true;
-    if (look[i]->Za != any_element) a_matches_Za = (look[i]->Za == Za);
-    bool b_matches_Zb = true;
-    if (look[i]->Zb != any_element) b_matches_Zb = (look[i]->Zb == Zb);
-
-    bool a_matches_bZa = true;
-    if (look[i]->bZa)
-    {
-        if (look[i]->aritybZa) a_matches_bZa = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa), look[i]->aritybZa);
-        else a_matches_bZa = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa));
-    }
-    bool b_matches_bZb = true;
-    if (look[i]->bZb)
-    {
-        if (look[i]->aritybZb) b_matches_bZb = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb);
-        else b_matches_bZb = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb));
-    }
-
     for (i=0; look[i]; i++)
     {
+        bool a_matches_Za = true;
+        if (look[i]->Za != any_element) a_matches_Za = (look[i]->Za == Za);
+        bool b_matches_Zb = true;
+        if (look[i]->Zb != any_element) b_matches_Zb = (look[i]->Zb == Zb);
+
+        bool a_matches_bZa = true;
+        if (look[i]->bZa)
+        {
+            if (look[i]->aritybZa) a_matches_bZa = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa), look[i]->aritybZa);
+            else a_matches_bZa = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa));
+        }
+        bool b_matches_bZb = true;
+        if (look[i]->bZb)
+        {
+            if (look[i]->aritybZb) b_matches_bZb = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb);
+            else b_matches_bZb = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb));
+        }
+
         if (a_matches_Za && a_matches_bZa && b_matches_Zb && b_matches_bZb)
         {
             switch (look[i]->type)

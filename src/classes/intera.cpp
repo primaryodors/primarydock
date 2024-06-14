@@ -1566,7 +1566,7 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
     if (!ifs) return energy;
     if (!ref) return energy;
     float min_r = vdW_rad + ref->vdW_rad - global_clash_allowance;
-    float atheta, btheta;
+    float anis1, anis2;
     SCoord rel = myloc.subtract(ref->location);
 
     Atom* heavy = get_heavy_atom(), *rheavy = ref->get_heavy_atom();
@@ -1637,11 +1637,11 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
             if (Z == 1) dpa = 0.75;
             if (ref->Z == 1) dpb = 0.75;
 
-            btheta = ref->get_anisotropic_angle(rel, typ);
+            anis2 = ref->get_anisotropic_multipler(rel, typ);
             rel.r *= -1;
-            atheta = get_anisotropic_angle(rel, typ);
+            anis1 = get_anisotropic_multipler(rel, typ);
             rel.r = r;
-            eff *= pow(fmax(0,cos(atheta)), dpa) * pow(fmax(0,cos(btheta)), dpb);
+            eff *= pow(fmax(0,anis1), dpa) * pow(fmax(0,anis2), dpb);
 
             if (pdisnanf(eff))
             {

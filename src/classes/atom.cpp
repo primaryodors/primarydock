@@ -1425,52 +1425,70 @@ void Atom::print_bond_angles()
     }
 }
 
-float Atom::get_anisotropic_angle(SCoord ia, intera_type typ, Atom* ig)
+float Atom::get_anisotropic_multipler(SCoord ia, intera_type typ, Atom* ig)
 {
     if (!bonded_to) return 0;
 
     int i;
     float theta = M_PI * 2;
-    Point source = location.add(ia);
+    Atom* geoa = this;
+    SCoord twistv;
+    float twista = 0;
+    float result = 1;
 
-    for (i=0; i<valence; i++)
+    if (bonded_to[0].atom2 && bonded_to[0].cardinality == 2 && !bonded_to[1].atom2 && !bonded_to[2].atom2 && !bonded_to[3].atom2)
     {
-        Atom* bonded = bonded_to[i].atom2;
+        geoa = bonded_to[0].atom2;
+        twistv = location.subtract(geoa->location);
+        twista = square;
+    }
+
+    Point rel = geoa->location.add(ia);
+
+    for (i=0; i<geoa->valence; i++)
+    {
+        Atom* bonded = geoa->bonded_to[i].atom2;
         if (!bonded) continue;
+        if (bonded == this) continue;
 
-        float iat = find_3d_angle(source, bonded->location, location);
-        if (iat < theta) theta = iat;
+        Point locb = bonded->location;
+        if (twista) locb = rotate3D(locb, location, twistv, twista);
+
+        theta = find_3d_angle(rel, locb, geoa->location);
+        // if (Z>1) cout << (theta*fiftyseven) << " ";
+
+        if (is_pi() && (typ == pi || typ == polarpi)) theta = fabs(theta - square);
+        else switch (geometry)
+        {
+            case 1:
+            case 2:
+            theta = fabs(theta - M_PI);
+            break;
+
+            case 4:
+            theta = fabs(theta - tetrahedral);
+            break;
+
+            case 3:
+            theta = fabs(theta - triangular);
+            break;
+
+            case 6:
+            theta = fabs(theta - square);
+            break;
+
+            case 5:
+            theta = fmin(fabs(theta - triangular), fabs(theta - square));
+            break;
+
+            default:
+            theta = 0;
+        }
+
+        result *= cos(theta);
     }
 
-    if (is_pi() && (typ == pi || typ == polarpi || typ == vdW)) theta = fabs(theta - square);
-    else switch (geometry)
-    {
-        case 1:
-        case 2:
-        theta = fabs(theta - M_PI);
-        break;
-
-        case 4:
-        theta = fabs(theta - tetrahedral);
-        break;
-
-        case 3:
-        theta = fabs(theta - triangular);
-        break;
-
-        case 6:
-        theta = fabs(theta - square);
-        break;
-
-        case 5:
-        theta = fmin(fabs(theta - triangular), fabs(theta - square));
-        break;
-
-        default:
-        theta = 0;
-    }
-
-    return theta;
+    return result;
 }
 
 Atom* Atom::get_heavy_atom()

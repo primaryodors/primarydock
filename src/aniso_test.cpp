@@ -84,7 +84,7 @@ int main(int argc, char** argv)
     Atom oxy(pz == 1 ? "O" : "C");
     probe.bond_to(&oxy, 1);
 
-    Atom* aarr[4];;
+    Atom* aarr[4];
     aarr[0] = &probe;
     aarr[1] = &oxy;
     aarr[2] = NULL;

@@ -1637,9 +1637,9 @@ float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbab
             if (Z == 1) dpa = 0.75;
             if (ref->Z == 1) dpb = 0.75;
 
-            anis2 = ref->get_anisotropic_multipler(rel, typ);
+            anis2 = ref->get_anisotropic_multiplier(rel, typ);
             rel.r *= -1;
-            anis1 = get_anisotropic_multipler(rel, typ);
+            anis1 = get_anisotropic_multiplier(rel, typ);
             rel.r = r;
             eff *= pow(fmax(0,anis1), dpa) * pow(fmax(0,anis2), dpb);
 

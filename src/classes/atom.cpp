@@ -1425,7 +1425,7 @@ void Atom::print_bond_angles()
     }
 }
 
-float Atom::get_anisotropic_multipler(SCoord ia, intera_type typ, Atom* ig)
+float Atom::get_anisotropic_multiplier(SCoord ia, intera_type typ, Atom* ig)
 {
     if (!bonded_to) return 0;
 
@@ -1435,6 +1435,9 @@ float Atom::get_anisotropic_multipler(SCoord ia, intera_type typ, Atom* ig)
     SCoord twistv;
     float twista = 0;
     float result = 1;
+    SCoord* v = nullptr;
+    
+    if (geometry == 3) v = get_geometry_aligned_to_bonds();
 
     if (bonded_to[0].atom2 && bonded_to[0].cardinality == 2 && !bonded_to[1].atom2 && !bonded_to[2].atom2 && !bonded_to[3].atom2)
     {
@@ -1444,6 +1447,7 @@ float Atom::get_anisotropic_multipler(SCoord ia, intera_type typ, Atom* ig)
     }
 
     Point rel = geoa->location.add(ia);
+    // if (Z>1) cout << geometry << " ";
 
     for (i=0; i<geoa->valence; i++)
     {
@@ -1455,7 +1459,7 @@ float Atom::get_anisotropic_multipler(SCoord ia, intera_type typ, Atom* ig)
         if (twista) locb = rotate3D(locb, location, twistv, twista);
 
         theta = find_3d_angle(rel, locb, geoa->location);
-        // if (Z>1) cout << (theta*fiftyseven) << " ";
+        // if (Z>1) cout << typ << " ";
 
         if (is_pi() && (typ == pi || typ == polarpi)) theta = fabs(theta - square);
         else switch (geometry)
@@ -1471,6 +1475,7 @@ float Atom::get_anisotropic_multipler(SCoord ia, intera_type typ, Atom* ig)
 
             case 3:
             theta = fabs(theta - triangular);
+            result *= cos(are_points_planar(ia, v[0], v[1], v[2])/4);
             break;
 
             case 6:

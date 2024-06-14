@@ -315,7 +315,7 @@ public:
         chirality_unspecified = false;
     }
 
-    float get_anisotropic_multipler(SCoord incident_angle, intera_type type = vdW, Atom* ignore = nullptr);
+    float get_anisotropic_multiplier(SCoord incident_angle, intera_type type = vdW, Atom* ignore = nullptr);
     void print_bond_angles();                   // For unit tests.
     float interatomic_energy(Atom* reference, InteratomicForce** forces, LocationProbability* ref_loc_prob = 0, Point* candidate_location = 0);
 

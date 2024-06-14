@@ -103,7 +103,10 @@ int main(int argc, char** argv)
     float strongest = 0;
     for (x=0; ifs[x]; x++)
     {
-        cout << ifs[x]->get_type() << endl;
+        #if _dbg_forces_applicable
+        cout << *ifs[x] << endl;
+        #endif
+
         if (ifs[x]->get_kJmol() > strongest)
         {
             hb = ifs[x];

@@ -92,7 +92,9 @@ void InteratomicForce::read_all_forces()
                 )
                 {
                     append_by_Z(all_forces[ifcount]->Za, all_forces[ifcount]->Zb, all_forces[ifcount]);
-                    append_by_Z(all_forces[ifcount]->Zb, all_forces[ifcount]->Za, all_forces[ifcount]);
+                    if (all_forces[ifcount]->Za != all_forces[ifcount]->Zb
+                        || all_forces[ifcount]->bZa != all_forces[ifcount]->bZb)
+                        append_by_Z(all_forces[ifcount]->Zb, all_forces[ifcount]->Za, all_forces[ifcount]);
                 }
 
                 if (all_forces[ifcount]->Za == any_element
@@ -103,7 +105,9 @@ void InteratomicForce::read_all_forces()
                     for (i=1; i<36; i++)
                     {
                         append_by_Z(i, all_forces[ifcount]->Zb, all_forces[ifcount]);
-                        append_by_Z(all_forces[ifcount]->Zb, i, all_forces[ifcount]);
+                        if (all_forces[ifcount]->Za != all_forces[ifcount]->Zb
+                            || all_forces[ifcount]->bZa != all_forces[ifcount]->bZb)
+                            append_by_Z(all_forces[ifcount]->Zb, i, all_forces[ifcount]);
                     }
                 }
 
@@ -115,7 +119,9 @@ void InteratomicForce::read_all_forces()
                     for (i=1; i<36; i++)
                     {
                         append_by_Z(i, all_forces[ifcount]->Za, all_forces[ifcount]);
-                        append_by_Z(all_forces[ifcount]->Za, i, all_forces[ifcount]);
+                        if (all_forces[ifcount]->Za != all_forces[ifcount]->Zb
+                            || all_forces[ifcount]->bZa != all_forces[ifcount]->bZb)
+                            append_by_Z(all_forces[ifcount]->Za, i, all_forces[ifcount]);
                     }
                 }
 
@@ -127,6 +133,26 @@ void InteratomicForce::read_all_forces()
         }
         fclose(pf);
         reading_forces = false;
+
+        #if _dbg_forces_by_Z
+        int j, l;
+        for (i=1; i<36; i++)
+        {
+            for (j=1; j<36; j++)
+            {
+                if (forces_by_Z[i][j])
+                {
+                    InteratomicForce** iff = forces_by_Z[i][j];
+                    cout << Atom::esym_from_Z(i) << "..." << Atom::esym_from_Z(j) << endl;
+                    for (l=0; iff[l] && l < 24; l++)
+                    {
+                        cout << "\t" << *iff[l] << endl;
+                    }
+                    cout << endl;
+                }
+            }
+        }
+        #endif
 
         all_forces[ifcount] = 0;
         read_forces_dat = true;
@@ -467,8 +493,8 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
         bool b_matches_bZb = true;
         if (look[i]->bZb)
         {
-            if (look[i]->aritybZb) b_matches_bZb = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb);
-            else b_matches_bZb = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb));
+            if (look[i]->aritybZb) b_matches_bZb = b->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb);
+            else b_matches_bZb = b->is_bonded_to(Atom::esym_from_Z(look[i]->bZb));
         }
 
         if (a_matches_Za && a_matches_bZa && b_matches_Zb && b_matches_bZb)

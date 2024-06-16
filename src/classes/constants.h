@@ -352,9 +352,6 @@
 #define _peratom_audit 0
 #define _peratom_audit_nans 0
 
-// A short-term feature that can be used in case the bond reciprocity problem recurs. See issue #423.
-#define bond_reciprocity_fix 0
-
 #define _zealous_nan_checking 0
 
 // Should normally be false or zero:

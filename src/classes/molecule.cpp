@@ -828,6 +828,15 @@ int Molecule::has_hbond_acceptors()
     return result;
 }
 
+void Molecule::afterload()
+{
+    delete_atom_caches();
+    identify_conjugations();
+    identify_rings();
+    identify_cages();
+    identify_acidbase();
+}
+
 int Molecule::from_sdf(char const* sdf_dat)
 {
     if (!sdf_dat) return 0;
@@ -905,10 +914,7 @@ int Molecule::from_sdf(char const* sdf_dat)
     atoms[atcount] = 0;
     if (words) delete[] words;
 
-    identify_conjugations();
-    identify_rings();
-    identify_cages();
-    identify_acidbase();
+    afterload();    
     return added;
 }
 
@@ -1063,8 +1069,18 @@ int Molecule::from_pdb(FILE* is, bool het_only)
         delete words;
     }
 
-    identify_conjugations();
+    afterload();
     return added;
+}
+
+void Molecule::delete_atom_caches()
+{
+    if (!atoms) return;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        atoms[i]->unsave_pi_status();
+    }
 }
 
 int Molecule::get_bond_count(bool unidirectional) const
@@ -1203,7 +1219,7 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
 
         for (j=0; j<ac; j++)
         {
-            if (latoms[j] == lbonds[i]->get_atom1()) laidx = j+1;
+            if (latoms[j] == lbonds[i]->atom1) laidx = j+1;
             if (latoms[j] == lbonds[i]->atom2) lbidx = j+1;
         }
 
@@ -1814,8 +1830,8 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
         Star s;
         s.pmol = this;
         if (!rotatable_bonds) rotatable_bonds = s.paa->get_rotatable_bonds();
-        else if (rotatable_bonds[0] && rotatable_bonds[1] && rotatable_bonds[0]->get_atom1() == rotatable_bonds[1]->get_atom1()) rotatable_bonds = s.paa->get_rotatable_bonds();
-        else if (rotatable_bonds[0] && abs(rotatable_bonds[0]->get_atom1() - rotatable_bonds[0]->atom2) >= 524288) rotatable_bonds = s.paa->get_rotatable_bonds();
+        else if (rotatable_bonds[0] && rotatable_bonds[1] && rotatable_bonds[0]->atom1 == rotatable_bonds[1]->atom1) rotatable_bonds = s.paa->get_rotatable_bonds();
+        else if (rotatable_bonds[0] && abs(rotatable_bonds[0]->atom1 - rotatable_bonds[0]->atom2) >= 524288) rotatable_bonds = s.paa->get_rotatable_bonds();
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
@@ -1832,18 +1848,18 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
             int g = atoms[i]->get_geometry();
             for (j=0; j<g && lb[j]; j++)
             {
-                if (!lb[j]->get_atom1() || !lb[j]->atom2) continue;
+                if (!lb[j]->atom1 || !lb[j]->atom2) continue;
 
-                if (lb[j]->cardinality > 1 && (!lb[j]->get_atom1()->is_pi() || !lb[j]->atom2->is_pi()) && lb[j]->cardinality < 3)
+                if (lb[j]->cardinality > 1 && (!lb[j]->atom1->is_pi() || !lb[j]->atom2->is_pi()) && lb[j]->cardinality < 3)
                     lb[j]->cardinality = 1;
 
-                bool pia = lb[j]->get_atom1()->is_pi(),
+                bool pia = lb[j]->atom1->is_pi(),
                      pib = lb[j]->atom2->is_pi();
 
-                int fa = lb[j]->get_atom1()->get_family(),
+                int fa = lb[j]->atom1->get_family(),
                     fb = lb[j]->atom2->get_family();
 
-                if (lb[j]->get_atom1()->in_same_ring_as(lb[j]->atom2))
+                if (lb[j]->atom1->in_same_ring_as(lb[j]->atom2))
                 {
                     #if _ALLOW_FLEX_RINGS
                     lb[j]->can_flip = !lb[j]->caged && (lb[j]->cardinality == 1);
@@ -1871,7 +1887,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                 if (!lb[j]->can_rotate
                     && lb[j]->atom2->is_bonded_to(CHALCOGEN)
                     && fa != CHALCOGEN
-                    && !(lb[j]->get_atom1()->in_same_ring_as(lb[j]->atom2))
+                    && !(lb[j]->atom1->in_same_ring_as(lb[j]->atom2))
                     )
                 {
                     lb[j]->can_flip = !lb[j]->caged;
@@ -1879,7 +1895,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
 
                 if (lb[j]->atom2
                         &&
-                        lb[j]->get_atom1() < lb[j]->atom2
+                        lb[j]->atom1 < lb[j]->atom2
                         &&
                         (lb[j]->can_rotate || (icf && lb[j]->can_flip))
                    )
@@ -1899,10 +1915,10 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
             {
                 // Generally, a single bond between pi atoms cannot rotate.
                 // Same if pi atom bonded to a pnictogen or chalcogen without a single bond to other atoms.
-                if (lb[j]->get_atom1() && lb[j]->atom2
+                if (lb[j]->atom1 && lb[j]->atom2
                     &&  (
                             (
-                                lb[j]->get_atom1()->is_pi() &&
+                                lb[j]->atom1->is_pi() &&
                                 (   lb[j]->atom2->is_pi()
                                     ||
                                     (   
@@ -1919,15 +1935,15 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                             ||
                             (
                                 lb[j]->atom2->is_pi() &&
-                                (   lb[j]->get_atom1()->is_pi()
+                                (   lb[j]->atom1->is_pi()
                                     ||
                                     (   
-                                        !lb[j]->get_atom1()->is_bonded_to_pi(TETREL, false)
+                                        !lb[j]->atom1->is_bonded_to_pi(TETREL, false)
                                         &&
                                         (
-                                            lb[j]->get_atom1()->get_family() == PNICTOGEN
+                                            lb[j]->atom1->get_family() == PNICTOGEN
                                             ||
-                                            lb[j]->get_atom1()->get_family() == CHALCOGEN
+                                            lb[j]->atom1->get_family() == CHALCOGEN
                                         )
                                     )
                                 )
@@ -1938,13 +1954,13 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
 
                 if ((lb[j]->can_rotate || (icf && lb[j]->can_flip))
                         &&
-                        lb[j]->get_atom1() && lb[j]->atom2
+                        lb[j]->atom1 && lb[j]->atom2
                         &&
-                        (!lb[j]->get_atom1()->is_backbone || !strcmp(lb[j]->get_atom1()->name, "CA"))
+                        (!lb[j]->atom1->is_backbone || !strcmp(lb[j]->atom1->name, "CA"))
                         &&
                         !lb[j]->atom2->is_backbone
                         &&
-                        greek_from_aname(lb[j]->get_atom1()->name) == (greek_from_aname(lb[j]->atom2->name)-1)
+                        greek_from_aname(lb[j]->atom1->name) == (greek_from_aname(lb[j]->atom2->name)-1)
                         &&
                         lb[j]->atom2->get_Z() > 1
                    )
@@ -2080,7 +2096,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                     {
                         // cout << (name ? name : "(no name)") << ":" << *(lb) << endl;
                         // Generally, a single bond between pi atoms cannot rotate.
-                        if (lb->get_atom1()->is_pi() && lb->atom2 && lb->atom2->is_pi())
+                        if (lb->atom1->is_pi() && lb->atom2 && lb->atom2->is_pi())
                         {
                             lb->can_rotate = false;
                             lb->can_flip = !lb->caged;
@@ -2129,13 +2145,13 @@ Bond** AminoAcid::get_rotatable_bonds()
             if (!lb[j]) break;
             if (lb[j]->can_rotate
                     &&
-                    lb[j]->get_atom1() && lb[j]->atom2
+                    lb[j]->atom1 && lb[j]->atom2
                     &&
-                    (!lb[j]->get_atom1()->is_backbone || !strcmp(lb[j]->get_atom1()->name, "CA"))
+                    (!lb[j]->atom1->is_backbone || !strcmp(lb[j]->atom1->name, "CA"))
                     &&
                     !lb[j]->atom2->is_backbone
                     &&
-                    greek_from_aname(lb[j]->get_atom1()->name) == (greek_from_aname(lb[j]->atom2->name)-1)
+                    greek_from_aname(lb[j]->atom1->name) == (greek_from_aname(lb[j]->atom2->name)-1)
                     &&
                     lb[j]->atom2->get_Z() > 1
                )
@@ -2187,7 +2203,7 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
         for (j=0; j<g; j++)
         {
             if (!lb[j]) break;
-            if (lb[j]->get_atom1() < lb[j]->atom2
+            if (lb[j]->atom1 < lb[j]->atom2
                     ||
                     !unidirectional
                )
@@ -3065,8 +3081,8 @@ float Molecule::get_springy_bond_satisfaction()
     int i;
     for (i=0; i<springy_bondct; i++)
     {
-        if (!springy_bonds[i].get_atom1() || !springy_bonds[i].atom2 || !springy_bonds[i].optimal_radius) continue;
-        float r = springy_bonds[i].get_atom1()->get_location().get_3d_distance(springy_bonds[i].atom2->get_location());
+        if (!springy_bonds[i].atom1 || !springy_bonds[i].atom2 || !springy_bonds[i].optimal_radius) continue;
+        float r = springy_bonds[i].atom1->get_location().get_3d_distance(springy_bonds[i].atom2->get_location());
         r /= springy_bonds[i].optimal_radius;
         if (r < 1) retval += r;
         else retval += 1.0/(r*r);
@@ -3604,8 +3620,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     for (q=0; bb[q]; q++)
                     {
                         if (!bb[q]->count_moves_with_atom2()) continue;
-                        if (!bb[q]->get_atom1() || !bb[q]->atom2) continue;         // Sanity check, otherwise we're sure to get random foolish segfaults.
-                        if (bb[q]->get_atom1()->is_backbone && strcmp(bb[q]->get_atom1()->name, "CA")) continue;
+                        if (!bb[q]->atom1 || !bb[q]->atom2) continue;         // Sanity check, otherwise we're sure to get random foolish segfaults.
+                        if (bb[q]->atom1->is_backbone && strcmp(bb[q]->atom1->name, "CA")) continue;
                         if (bb[q]->atom2->is_backbone) continue;
                         float theta;
                         int heavy_atoms = bb[q]->count_heavy_moves_with_atom2();
@@ -3669,11 +3685,11 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
                             }
 
-                            Ring* isra = bb[q]->get_atom1()->in_same_ring_as(bb[q]->atom2);
+                            Ring* isra = bb[q]->atom1->in_same_ring_as(bb[q]->atom2);
                             if (isra)
                             {
                                 if (rang) continue;
-                                isra->flip_atom(bb[q]->get_atom1());
+                                isra->flip_atom(bb[q]->atom1);
                                 rang++;
                                 flipped_rings = true;
                             }
@@ -3878,10 +3894,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
     float anomaly = correct_structure();
     cout << "# Structural anomaly = " << anomaly << endl;
     hydrogenate(false);
-    identify_conjugations();
-    identify_rings();
-    identify_cages();
-
+    afterload();
     return retval;
 }
 
@@ -4334,7 +4347,6 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     }
     atoms[atcount]=0;
 
-    identify_conjugations();
     return true;
 }
 
@@ -4524,12 +4536,12 @@ float Molecule::close_loop(Atom** path, float lcard)
     {
         for (i=0; rotables[i]; i++)
         {
-            float rr = rotables[i]->get_atom1()->get_location().get_3d_distance(rotables[i]->atom2->get_location());
+            float rr = rotables[i]->atom1->get_location().get_3d_distance(rotables[i]->atom2->get_location());
 
             if (fabs(rr-bond_length) > 0.01)
             {
-                Point aloc = rotables[i]->get_atom1()->get_location();
-                Point bloc = rotables[i]->get_atom1()->get_location();
+                Point aloc = rotables[i]->atom1->get_location();
+                Point bloc = rotables[i]->atom1->get_location();
 
                 bloc = bloc.subtract(aloc);
                 bloc.scale(bond_length);

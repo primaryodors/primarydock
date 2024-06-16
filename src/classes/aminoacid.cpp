@@ -567,17 +567,17 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
             for (j=0; j<bg; j++)
             {
                 if (!bb[j]) break;
-                if (bb[j]->atom2 && bb[j]->atom2 < bb[j]->get_atom1())
+                if (bb[j]->atom2 && bb[j]->atom2 < bb[j]->atom1)
                 {
                     aabd[n] = new AABondDef();
-                    strcpy(aabd[n]->aname, bb[j]->get_atom1()->name);
+                    strcpy(aabd[n]->aname, bb[j]->atom1->name);
                     strcpy(aabd[n]->bname, bb[j]->atom2->name);
-                    aabd[n]->Za = bb[j]->get_atom1()->get_Z();
+                    aabd[n]->Za = bb[j]->atom1->get_Z();
                     aabd[n]->Zb = bb[j]->atom2->get_Z();
                     aabd[n]->cardinality = bb[j]->cardinality;
-                    aabd[n]->acharge = bb[j]->get_atom1()->get_charge();
+                    aabd[n]->acharge = bb[j]->atom1->get_charge();
 
-                    if (!strcmp(bb[j]->get_atom1()->name, "OH") && !strcmp(bb[j]->atom2->name, "CZ"))
+                    if (!strcmp(bb[j]->atom1->name, "OH") && !strcmp(bb[j]->atom2->name, "CZ"))
                     {
                         aabd[n]->can_rotate = false;
                         aabd[n]->can_flip = true;
@@ -586,9 +586,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                     aabd[n]->can_rotate =
                         (	aabd[n]->cardinality <= 1.1
                             &&
-                            (	!bb[j]->get_atom1()->is_pi() || !bb[j]->atom2->is_pi()	)
+                            (	!bb[j]->atom1->is_pi() || !bb[j]->atom2->is_pi()	)
                             &&
-                            (	!bb[j]->get_atom1()->is_pi()
+                            (	!bb[j]->atom1->is_pi()
                                 ||
                                 (   bb[j]->atom2->get_family() != PNICTOGEN
                                     &&
@@ -600,23 +600,23 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                             &&
                             (	!bb[j]->atom2->is_pi()
                                 ||
-                                (   bb[j]->get_atom1()->get_family() != PNICTOGEN
+                                (   bb[j]->atom1->get_family() != PNICTOGEN
                                     &&
-                                    bb[j]->get_atom1()->get_family() != CHALCOGEN
+                                    bb[j]->atom1->get_family() != CHALCOGEN
                                 )
                                 ||
-                                bb[j]->get_atom1()->is_bonded_to_pi(TETREL, false)
+                                bb[j]->atom1->is_bonded_to_pi(TETREL, false)
                             )
                             &&
-                            (	bb[j]->get_atom1()->get_family() != PNICTOGEN || !bb[j]->atom2->is_pi()	)
+                            (	bb[j]->atom1->get_family() != PNICTOGEN || !bb[j]->atom2->is_pi()	)
                         );
                     aabd[n]->can_flip =
                         (	aabd[n]->cardinality <= 1.1
                             &&
-                            (	!bb[j]->get_atom1()->is_pi() || !bb[j]->atom2->is_pi()	)
+                            (	!bb[j]->atom1->is_pi() || !bb[j]->atom2->is_pi()	)
                             &&
                             (	(
-                                    bb[j]->get_atom1()->is_pi()
+                                    bb[j]->atom1->is_pi()
                                     &&
                                     (   bb[j]->atom2->get_family() == PNICTOGEN || bb[j]->atom2->get_family() == CHALCOGEN    )
                                     &&
@@ -626,9 +626,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                                 (
                                     bb[j]->atom2->is_pi()
                                     &&
-                                    (   bb[j]->get_atom1()->get_family() == PNICTOGEN || bb[j]->get_atom1()->get_family() == CHALCOGEN    )
+                                    (   bb[j]->atom1->get_family() == PNICTOGEN || bb[j]->atom1->get_family() == CHALCOGEN    )
                                     &&
-                                    !bb[j]->get_atom1()->is_bonded_to_pi(TETREL, false)
+                                    !bb[j]->atom1->is_bonded_to_pi(TETREL, false)
                                 )
                             )
                         );

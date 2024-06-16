@@ -60,18 +60,6 @@ public:
     Bond(Atom* a, Atom* b, int card);
     ~Bond();
 
-    #if bond_reciprocity_fix
-    Atom* get_atom1();
-    Atom* get_atom2();
-    void set_atom1(Atom* a);
-    void set_atom2(Atom* a);
-    #else
-    inline Atom* get_atom1() { return atom1; }
-    inline Atom* get_atom2() { return atom2; }
-    inline void set_atom1(Atom* a) { atom1 = a; }
-    inline void set_atom2(Atom* a) { atom2 = a; }
-    #endif
-
     bool rotate(float angle_radians, bool allow_backbone = false, bool skip_inverse_check = false);
     Point ring_rotate(float angle_radians, Atom* stop_at);
     void clear_moves_with_cache()
@@ -190,6 +178,7 @@ public:
     bool is_metal();
     int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
     bool is_pi();
+    void unsave_pi_status() { pi_status = -1; }
     bool is_amide();
     bool is_aldehyde();
 

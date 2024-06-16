@@ -392,11 +392,11 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
     {
         for (i=0; i<connections.size(); i++)
         {
-            if (!connections[i]->get_atom1() || !connections[i]->atom2) continue;
+            if (!connections[i]->atom1 || !connections[i]->atom2) continue;
 
             fprintf(os, "CONECT ");
             int a, b;
-            a = connections[i]->get_atom1()->pdbidx;
+            a = connections[i]->atom1->pdbidx;
             b = connections[i]->atom2->pdbidx;
 
             if (a < 1000) fprintf(os, " ");
@@ -1594,7 +1594,7 @@ Molecule* Protein::metals_as_molecule()
                 {
                     Bond* b = metals[i]->get_bond_by_idx(k++);
                     if (!b) break;
-                    b->set_atom2(mca);
+                    b->atom2 = mca;
                     b->cardinality = 0.5;
                     // cout << metals[i]->name << " coordinates to " << *caa << ":" << mca->name << endl;
                 }

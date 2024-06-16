@@ -219,7 +219,7 @@ Atom::Atom(const char* elem_sym)
 
     bonded_to = new Bond[abs(geometry)+4];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].set_atom2(nullptr);
+    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -239,7 +239,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
 
     bonded_to = new Bond[abs(geometry)+4];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].set_atom2(nullptr);
+    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -260,7 +260,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
 
     bonded_to = new Bond[abs(geometry)];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].set_atom2(nullptr);
+    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -331,7 +331,7 @@ Atom::Atom(FILE* is)
 
                     figure_out_valence();
                     bonded_to = new Bond[abs(geometry)];
-                    for (i=0; i<geometry; i++) bonded_to[i].set_atom2(nullptr);
+                    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
 
                     Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
                     location = aloc;
@@ -415,7 +415,7 @@ void Atom::unbond(Atom* atom2)
                     bonded_to[i].atom2->unbond(this);		// RECURSION!
                     bonded_to[i].atom2->reciprocity = false;
                 }
-                bonded_to[i].set_atom2(nullptr);
+                bonded_to[i].atom2 = nullptr;
                 bonded_to[i].cardinality=0;
                 bonded_to[i].can_rotate=0;
             }
@@ -434,7 +434,7 @@ void Atom::unbond_all()
             bonded_to[i].atom2->unbond(this);		// Potential for recursion!
             bonded_to[i].atom2->reciprocity = false;
 
-            bonded_to[i].set_atom2(nullptr);
+            bonded_to[i].atom2 = nullptr;
             bonded_to[i].cardinality=0;
             bonded_to[i].can_rotate=0;
         }
@@ -652,9 +652,9 @@ void Atom::fetch_bonds(Bond** result)
 
         for (i=0; i<geometry; i++)
         {
-            if (abs((__int64_t)(this) - (__int64_t)bonded_to[i].get_atom1()) > memsanity) break;
-            if (!bonded_to[i].get_atom1()) continue;
-            if (!bonded_to[i].get_atom1()->Z) continue;
+            if (abs((__int64_t)(this) - (__int64_t)bonded_to[i].atom1) > memsanity) break;
+            if (!bonded_to[i].atom1) continue;
+            if (!bonded_to[i].atom1->Z) continue;
             result[i] = &bonded_to[i];
         }
         result[i] = nullptr;
@@ -904,8 +904,8 @@ bool Atom::bond_to(Atom* latom2, float lcard)
     {
         if (!bonded_to[i].atom2)
         {
-            bonded_to[i].set_atom1(this);
-            bonded_to[i].set_atom2(latom2);
+            bonded_to[i].atom1 = this;
+            bonded_to[i].atom2 = latom2;
             bonded_to[i].cardinality = lcard;
             bonded_to[i].can_rotate = (lcard == 1
                                        && Z != 1
@@ -2413,67 +2413,6 @@ int Bond::count_heavy_moves_with_atom2()
     return j;
 }
 
-#if bond_reciprocity_fix
-Atom* Bond::get_atom1()
-{
-    if (reversed)
-    {
-        if (reversed->atom2 != atom1)
-        {
-            #if _dbg_unreciprocated_bonds
-            throw 0x20240531;
-            #endif
-
-            if (abs(static_cast<int>((uint64_t)reversed->atom2 - (uint64_t)atom2)) < abs(static_cast<int>((uint64_t)atom1 - (uint64_t)atom2)))
-            {
-                atom1 = reversed->atom2;
-            }
-            else
-            {
-                reversed->atom2 = atom1;
-            }
-        }
-    }
-    return atom1;
-}
-
-Atom* Bond::get_atom2()
-{
-    if (reversed)
-    {
-        if (reversed->atom1 != atom2)
-        {
-            #if _dbg_unreciprocated_bonds
-            throw 0x20240531;
-            #endif
-
-            if (abs(static_cast<int>((uint64_t)reversed->atom1 - (uint64_t)atom1)) < abs(static_cast<int>((uint64_t)atom2 - (uint64_t)atom1)))
-            {
-                atom2 = reversed->atom1;
-            }
-            else
-            {
-                reversed->atom1 = atom2;
-            }
-        }
-    }
-    return atom2;
-}
-
-void Bond::set_atom1(Atom* a)
-{
-    atom1 = a;
-    if (reversed) reversed->atom2 = a;
-}
-
-void Bond::set_atom2(Atom* a)
-{
-    atom2 = a;
-    if (reversed) reversed->atom1 = a;
-}
-
-#endif
-
 Bond* Bond::get_reversed()
 {
     if (!atom1 || !atom2) return 0;
@@ -3235,7 +3174,7 @@ std::ostream& operator<<(std::ostream& os, const Atom& a)
 std::ostream& operator<<(std::ostream& os, const Bond& b)
 {
     Bond lb = b;
-    os << lb.get_atom1()->name;
+    os << lb.atom1->name;
     os << cardinality_printable(b.cardinality);
     os << lb.atom2->name;
 

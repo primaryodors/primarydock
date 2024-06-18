@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstring>
 #include <sys/stat.h>
-#include "classes/group.h"
+#include "../classes/group.h"
 
 using namespace std;
 

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <cstring>
-#include "classes/molecule.h"
+#include "../classes/molecule.h"
 
 using namespace std;
 

@@ -9079,7 +9079,15 @@
             {
                 "OR2M3":
                 {
+                    "type": "na",
                     "adjusted_curve_top": "0"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.jafc.4c01515":
+            {
+                "OR11A1":
+                {
+                    "type": "na"
                 }
             }
         },
@@ -9247,6 +9255,28 @@
             }
         },
         "oid": "3c9839dffd2a11e183c08ccf2bbb6c76"
+    },
+    "3d0e63c97def943bad9874b25671aefd":
+    {
+        "full_name": "4-vinyl phenol",
+        "smiles": "C=Cc1ccc(O)cc1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "chemical","phenolic","medicinal","sweet","musty","meaty"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.jafc.4c01515":
+            {
+                "OR11A1":
+                {
+                    "type": "na"
+                }
+            }
+        }
     },
     "3d2edb2ff61fc2f6be9e53f0177dee35":
     {
@@ -22572,7 +22602,8 @@
     "9867cdf9a838cc8fbb484f332c37fb3d":
     {
         "full_name": "ethyl acetate",
-        "smiles": "CC(=O)OCC"
+        "smiles": "CC(=O)OCC",
+        "oid": "9867cdf9a838cc8fbb484f332c37fb3d"
     },
     "98b53a93656cbe9cb4888249ea47875a":
     {
@@ -30184,6 +30215,15 @@
                     "type": "vsa",
                     "ec50": "-9"
                 }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.jafc.4c01515":
+            {
+                "OR11A1":
+                {
+                    "type": "wa",
+                    "ec50": "-4.9948",
+                    "adjusted_curve_top": "1.1"
+                }
             }
         },
         "oid": "d2a8c5bd54f5a8d35653227ca8fdabfe"
@@ -31174,6 +31214,15 @@
                     "ec50": "-6",
                     "adjusted_curve_top": "10.000000037253"
                 }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.jafc.4c01515":
+            {
+                "OR11A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.5533",
+                    "adjusted_curve_top": "10"
+                }
             }
         },
         "oid": "d786a94526354eb20a50bca99de832e0"
@@ -31473,6 +31522,22 @@
             }
         },
         "oid": "d82d3cadd9f8d27abb43aafd3e3e5530"
+    },
+    "d88a78f15fd260de17c144e73dbbfa5e":
+    {
+        "full_name": "ethyl valerate",
+        "smiles": "CCOC(=O)CCCC",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.jafc.4c01515":
+            {
+                "OR11A1":
+                {
+                    "type": "na"
+                }
+            }
+        },
+        "oid": "d88a78f15fd260de17c144e73dbbfa5e"
     },
     "d89587b807d7d412d9c620bd7626e809":
     {
@@ -33694,6 +33759,7 @@
     {
         "full_name": "eucalyptol",
         "name1": "cineole",
+        "name2": "1,8-cineole",
         "smiles": "O2C1(CCC(CC1)C2(C)C)C",
         "aroma":
         {
@@ -33730,6 +33796,13 @@
             "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
             {
                 "OR2W3":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.jafc.4c01515":
+            {
+                "OR11A1":
                 {
                     "type": "na"
                 }

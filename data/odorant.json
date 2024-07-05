@@ -30136,8 +30136,7 @@
                 "OR11A1":
                 {
                     "type": "vsa",
-                    "ec50": "-3.98",
-                    "adjusted_curve_top": "10.000000298023"
+                    "ec50": "-3.98"
                 },
                 "OR1A1":
                 {
@@ -31527,6 +31526,13 @@
     {
         "full_name": "ethyl valerate",
         "smiles": "CCOC(=O)CCCC",
+        "aroma":
+        {
+            "http://www.thegoodscentscompany.com":
+            [
+                "sweet", "fruity", "acidic", "pineapple", "apple", "green", "berry", "tropical"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1021\/acs.jafc.4c01515":

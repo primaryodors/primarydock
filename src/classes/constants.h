@@ -8,6 +8,7 @@
 #define triangular (M_PI/1.5)
 #define square (M_PI/2)
 #define hexagonal (M_PI/3)
+#define circle M_PI*2
 
 #define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 1.0
@@ -397,7 +398,7 @@
 #define _dbg_path_search 0
 #define _dbg_point_avg 0
 #define _dbg_polsat 0
-#define _dbg_priority_hbond 1
+#define _dbg_priority_hbond 0
 #define _dbg_repack 0
 #define _DBG_RESBMULT 0
 #define _dbg_residue_poses 0

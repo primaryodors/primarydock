@@ -1862,9 +1862,9 @@ void attempt_priority_hbond()
 
             // Measure the distance between atoms and move the ligand to optimize that distance.
             SCoord scooch = aaa->get_location().subtract(la->get_location());
-            if (scooch.r > 2.5)
+            if (scooch.r > 2.0)
             {
-                scooch.r -= 2.5;
+                scooch.r -= 2.0;
                 ligand->move(scooch);
 
                 #if _dbg_priority_hbond
@@ -1876,7 +1876,27 @@ void attempt_priority_hbond()
 
             // TODO: Pin the ligand so it can only rotate about the hbond atom.
 
-            // TODO: Rotate the ligand about the hbond in order to minimize the intermolecular energy.
+            // Rotate the ligand about the hbond in order to minimize the intermolecular energy.
+            SCoord v = la->get_location().subtract(aaa->get_location());
+            lv = v;
+            lv.origin = aaa->get_location();
+            float theta = 0, th, step = M_PI/50, clash;
+            AminoAcid* reaches[256];
+            protein->get_residues_can_clash_ligand(reaches, ligand, ligand->get_barycenter(), Point(5,5,5), nullptr);
+            for (th=0; th<circle; th += step)
+            {
+                float c = ligand->get_intermol_clashes((Molecule**)reaches);
+
+                if (!th || c < clash)
+                {
+                    clash = c;
+                    theta = th;
+                }
+
+                ligand->rotate(lv, step);
+            }
+
+            ligand->rotate(lv, theta);
 
             #if _dbg_priority_hbond
             cout << endl;

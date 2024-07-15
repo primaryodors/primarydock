@@ -95,6 +95,7 @@ public:
     void identify_acidbase();				// called within every load.
     bool from_smiles(char const * smilesstr, bool use_parser = true);
     void clear_cache();
+    void afterload();
 
     // Getters.
     const char* get_name() const
@@ -144,6 +145,7 @@ public:
     int count_atoms_by_element(const char* esym);
     Point get_atom_location(const char* aname);
     int atom_idx_from_ptr(Atom* a);
+    void delete_atom_caches();
     void delete_atom(Atom* a);
     void delete_all_atoms();
     int get_heavy_atom_count();
@@ -214,6 +216,9 @@ public:
     void remove_mandatory_connection(Molecule* rmvmol);
     void zero_mandatory_connection_cache();
     void delete_mandatory_connections();
+
+    // Probability voxel functions
+    float assemble_voxelized();
 
     // Debug stuff.
     #if debug_break_on_move

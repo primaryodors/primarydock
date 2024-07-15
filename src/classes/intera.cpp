@@ -11,6 +11,7 @@
 using namespace std;
 
 float total_binding_by_type[_INTER_TYPES_LIMIT];
+float total_clashes;
 float minimum_searching_aniso = 0;
 InteratomicForce* lif = nullptr;
 SCoord missed_connection(0,0,0);
@@ -24,6 +25,23 @@ bool interauditing = false;
 void InteratomicForce::append_by_Z(int Za, int Zb, InteratomicForce* iff)
 {
     int i;
+    InteratomicForce* liff = iff;
+
+    if (Za != Zb && iff->Za == Zb && iff->Zb == Za)
+    {
+        liff = new InteratomicForce();
+        liff->Za = iff->Zb;
+        liff->bZa = iff->bZb;
+        liff->Zb = iff->Za;
+        liff->bZb = iff->bZa;
+        liff->arity = iff->arity;
+        liff->aritybZa = iff->aritybZb;
+        liff->aritybZb = iff->aritybZa;
+        liff->dirprop = iff->dirprop;
+        liff->distance = iff->distance;
+        liff->kJ_mol = iff->kJ_mol;
+        liff->type = iff->type;
+    }
 
     if (!forces_by_Z[Za][Zb])
     {
@@ -36,7 +54,7 @@ void InteratomicForce::append_by_Z(int Za, int Zb, InteratomicForce* iff)
     {
         if (!forces_by_Z[Za][Zb][i])
         {
-            forces_by_Z[Za][Zb][i] = iff;
+            forces_by_Z[Za][Zb][i] = liff;
             // if (all_forces[ifcount]->type == mcoord) cout << all_forces[ifcount]->Za << " " << all_forces[ifcount]->Zb << " " << i << " " << all_forces[ifcount]->type << endl;
             break;
         }
@@ -74,7 +92,9 @@ void InteratomicForce::read_all_forces()
                 )
                 {
                     append_by_Z(all_forces[ifcount]->Za, all_forces[ifcount]->Zb, all_forces[ifcount]);
-                    append_by_Z(all_forces[ifcount]->Zb, all_forces[ifcount]->Za, all_forces[ifcount]);
+                    if (all_forces[ifcount]->Za != all_forces[ifcount]->Zb
+                        || all_forces[ifcount]->bZa != all_forces[ifcount]->bZb)
+                        append_by_Z(all_forces[ifcount]->Zb, all_forces[ifcount]->Za, all_forces[ifcount]);
                 }
 
                 if (all_forces[ifcount]->Za == any_element
@@ -85,7 +105,9 @@ void InteratomicForce::read_all_forces()
                     for (i=1; i<36; i++)
                     {
                         append_by_Z(i, all_forces[ifcount]->Zb, all_forces[ifcount]);
-                        append_by_Z(all_forces[ifcount]->Zb, i, all_forces[ifcount]);
+                        if (all_forces[ifcount]->Za != all_forces[ifcount]->Zb
+                            || all_forces[ifcount]->bZa != all_forces[ifcount]->bZb)
+                            append_by_Z(all_forces[ifcount]->Zb, i, all_forces[ifcount]);
                     }
                 }
 
@@ -97,7 +119,9 @@ void InteratomicForce::read_all_forces()
                     for (i=1; i<36; i++)
                     {
                         append_by_Z(i, all_forces[ifcount]->Za, all_forces[ifcount]);
-                        append_by_Z(all_forces[ifcount]->Za, i, all_forces[ifcount]);
+                        if (all_forces[ifcount]->Za != all_forces[ifcount]->Zb
+                            || all_forces[ifcount]->bZa != all_forces[ifcount]->bZb)
+                            append_by_Z(all_forces[ifcount]->Za, i, all_forces[ifcount]);
                     }
                 }
 
@@ -109,6 +133,26 @@ void InteratomicForce::read_all_forces()
         }
         fclose(pf);
         reading_forces = false;
+
+        #if _dbg_forces_by_Z
+        int j, l;
+        for (i=1; i<36; i++)
+        {
+            for (j=1; j<36; j++)
+            {
+                if (forces_by_Z[i][j])
+                {
+                    InteratomicForce** iff = forces_by_Z[i][j];
+                    cout << Atom::esym_from_Z(i) << "..." << Atom::esym_from_Z(j) << endl;
+                    for (l=0; iff[l] && l < 24; l++)
+                    {
+                        cout << "\t" << *iff[l] << endl;
+                    }
+                    cout << endl;
+                }
+            }
+        }
+        #endif
 
         all_forces[ifcount] = 0;
         read_forces_dat = true;
@@ -320,7 +364,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
     cout << "Getting forces between " << a->name << " and " << b->name << "..." << endl;
     #endif
 
-    InteratomicForce** look = all_forces;
+    InteratomicForce** look = nullptr;
     int Za = a->get_Z();
     int Zb = b->get_Z();
 
@@ -331,6 +375,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
             look = forces_by_Z[Za][Zb];
         }
     }
+    else look = all_forces;
 
     retval[0] = nullptr;
     int i, j=0;
@@ -362,6 +407,8 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
     }
     retval[j] = nullptr;
 
+    if (!look) return;
+
     #if allow_auto_hydroxy
     Atom *H = nullptr, *O = nullptr;
     Bond *brot = nullptr;
@@ -376,7 +423,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
             {
                 for (i=0; bb[i]; i++)
                 {
-                    if (bb[i]->get_atom2() != a && bb[i]->can_rotate)
+                    if (bb[i]->atom2 != a && bb[i]->can_rotate)
                     {
                         brot = bb[i];
                         H = a;
@@ -398,7 +445,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
             {
                 for (i=0; bb[i]; i++)
                 {
-                    if (bb[i]->get_atom2() != b && bb[i]->can_rotate)
+                    if (bb[i]->atom2 != b && bb[i]->can_rotate)
                     {
                         brot = bb[i];
                         H = b;
@@ -432,44 +479,25 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
 
     for (i=0; look[i]; i++)
     {
-        if (	(	(look[i]->Za == Za || look[i]->Za == any_element)
-                    &&
-                    (	!look[i]->bZa
-                        ||
-                        (!look[i]->aritybZa && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa)))
-                        ||
-                        ( look[i]->aritybZa && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa), look[i]->aritybZa))
-                    )
-                    &&
-                    (look[i]->Zb == Zb || look[i]->Zb == any_element)
-                    &&
-                    (	!look[i]->bZb
-                        ||
-                        (!look[i]->aritybZb && b->is_bonded_to(Atom::esym_from_Z(look[i]->bZb)))
-                        ||
-                        ( look[i]->aritybZb && b->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb))
-                    )
-             )
-                ||
-                (	(look[i]->Zb == Za || look[i]->Zb == any_element)
-                    &&
-                    (	!look[i]->bZb
-                        ||
-                        (!look[i]->aritybZb && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb)))
-                        ||
-                        ( look[i]->aritybZb && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb))
-                    )
-                    &&
-                    (look[i]->Za == Zb || look[i]->Za == any_element)
-                    &&
-                    (	!look[i]->bZa
-                        ||
-                        (!look[i]->aritybZa && b->is_bonded_to(Atom::esym_from_Z(look[i]->bZa)))
-                        ||
-                        ( look[i]->aritybZa && b->is_bonded_to(Atom::esym_from_Z(look[i]->bZa), look[i]->aritybZa))
-                    )
-                )
-           )
+        bool a_matches_Za = true;
+        if (look[i]->Za != any_element) a_matches_Za = (look[i]->Za == Za);
+        bool b_matches_Zb = true;
+        if (look[i]->Zb != any_element) b_matches_Zb = (look[i]->Zb == Zb);
+
+        bool a_matches_bZa = true;
+        if (look[i]->bZa)
+        {
+            if (look[i]->aritybZa) a_matches_bZa = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa), look[i]->aritybZa);
+            else a_matches_bZa = a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa));
+        }
+        bool b_matches_bZb = true;
+        if (look[i]->bZb)
+        {
+            if (look[i]->aritybZb) b_matches_bZb = b->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb);
+            else b_matches_bZb = b->is_bonded_to(Atom::esym_from_Z(look[i]->bZb));
+        }
+
+        if (a_matches_Za && a_matches_bZa && b_matches_Zb && b_matches_bZb)
         {
             switch (look[i]->type)
             {
@@ -603,7 +631,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     fetch_applicable(a, b, forces);
 
     int i, j, k;
-    float kJmol = 0;
+    float kJmol = 0, partial;
 
     float r = a->distance_to(b);
     float avdW = a->get_vdW_radius(), bvdW = b->get_vdW_radius();
@@ -625,13 +653,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (aheavy->get_Z() == 1)
     {
         Bond* ab = a->get_bond_by_idx(0);
-        if (ab->get_atom2() && ab->get_atom2()->get_Z() > 1) aheavy = ab->get_atom2();
+        if (ab->atom2 && ab->atom2->get_Z() > 1) aheavy = ab->atom2;
     }
     Atom* bheavy = b;
     if (bheavy->get_Z() == 1)
     {
         Bond* bb = b->get_bond_by_idx(0);
-        if (bb->get_atom2() && bb->get_atom2()->get_Z() > 1) bheavy = bb->get_atom2();
+        if (bb->atom2 && bb->atom2->get_Z() > 1) bheavy = bb->atom2;
     }
     float rheavy = aheavy->distance_to(bheavy);
     float l_heavy_atom_mindist = aheavy->get_vdW_radius() + bheavy->get_vdW_radius();
@@ -644,12 +672,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     #if _ALLOW_PROTONATE_PNICTOGENS
 
     // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
-    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !aheavy->is_amide() && !isnan(aheavy->pK))
+    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !aheavy->is_amide() && !pdisnanf(aheavy->pK))
     {
         achg = protonation(aheavy->pK) * fabs(bchg) / pow(fabs(r-1.5)+1, 2);
     }
 
-    if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !bheavy->is_amide() && !isnan(bheavy->pK))
+    if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !bheavy->is_amide() && !pdisnanf(bheavy->pK))
     {
         bchg = protonation(bheavy->pK) * fabs(achg) / pow(fabs(r-1.5)+1, 2);
     }
@@ -667,31 +695,31 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (a->get_Z() == 1)
         {
             Bond* prb = a->get_bond_by_idx(0);
-            if (prb && prb->get_atom2())
+            if (prb && prb->atom2)
             {
-                float prtheta = find_3d_angle(b->get_location(), prb->get_atom2()->get_location(), a->get_location());
+                float prtheta = find_3d_angle(b->get_location(), prb->atom2->get_location(), a->get_location());
                 pr *= 0.5 + 0.5 * cos(prtheta);
             }
         }
         else
         {
             Bond* sb = a->get_bond_closest_to(b->get_location());
-            if (sb && sb->get_atom2() && sb->get_atom2()->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+            if (sb && sb->atom2 && sb->atom2->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
         if (b->get_Z() == 1)
         {
             Bond* prb = b->get_bond_by_idx(0);
-            if (prb && prb->get_atom2())
+            if (prb && prb->atom2)
             {
-                float prtheta = find_3d_angle(a->get_location(), prb->get_atom2()->get_location(), b->get_location());
+                float prtheta = find_3d_angle(a->get_location(), prb->atom2->get_location(), b->get_location());
                 pr *= 0.5 + 0.5 * cos(prtheta);
             }
         }
         else
         {
             Bond* sb = b->get_bond_closest_to(a->get_location());
-            if (sb && sb->get_atom2() && sb->get_atom2()->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+            if (sb && sb->atom2 && sb->atom2->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
         kJmol -= pr;
@@ -700,11 +728,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     no_polar_repuls:
     ;
 
-    bool atoms_are_bonded = a->is_bonded_to(b);
+    bool atoms_are_bonded = false;
 
     if (a->residue && b->residue && a->is_backbone && b->is_backbone)
         if (abs(a->residue - b->residue) == 1)
             atoms_are_bonded = true;
+
+    if (abs(a->residue - b->residue) <= 1) atoms_are_bonded = a->is_bonded_to(b);
 
     #if _ALLOW_PROTONATE_PNICTOGENS
     if (forces)
@@ -730,6 +760,32 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     float atheta, btheta;
 
+    #if atom_object_forces
+    partial = a->interatomic_energy(b, forces);
+
+    #if active_persistence
+    if (partial < 0)
+    {
+        if (a->residue && !b->residue)
+        {
+            partial *= residue_binding_multiplier(a->residue);
+            #if _DBG_RESBMULT
+            if (residue_binding_multiplier(a->residue) > 1) std::cout << *a << "..." << *b << " partial " << partial << " multiplied." << endl;
+            #endif
+        }
+        else if (!a->residue && b->residue)
+        {
+            partial *= residue_binding_multiplier(b->residue);
+            #if _DBG_RESBMULT
+            if (residue_binding_multiplier(a->residue) > 1) std::cout << *a << "..." << *b << " partial " << partial << " multiplied." << endl;
+            #endif
+        }
+    }
+    #endif
+
+    kJmol -= partial;
+
+    #else
     for (i=0; forces[i]; i++)
     {
         if (forces[i]->type == ionic)
@@ -753,7 +809,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (forces[i]->type == covalent) continue;
         
-        float partial, rdecayed;
+        float rdecayed;
         float asum=0, bsum=0, aniso=1;
         bool stacked_pi_rings = false;
 
@@ -925,14 +981,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             {
                 avec[j] = ageo[j];
                 Bond* jb = a->get_bond_by_idx(j);
-                if (jb && jb->get_atom2()) avec[j].r = 0;
+                if (jb && jb->atom2) avec[j].r = 0;
             }
 
             for (j=0; j<bg; j++)
             {
                 bvec[j] = bgeo[j];
                 Bond* jb = b->get_bond_by_idx(j);
-                if (jb && jb->get_atom2()) bvec[j].r = 0;
+                if (jb && jb->atom2) bvec[j].r = 0;
             }
 
             #if _dbg_259
@@ -942,7 +998,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 {
                     cout << a->name << " vertex " << j;
                     Bond* b259 = a->get_bond_by_idx(j);
-                    if (b259 && b259->get_atom2()) cout << " occupied by " << b259->get_atom2()->name;
+                    if (b259 && b259->atom2) cout << " occupied by " << b259->atom2->name;
                     else cout << " vacant";
 
                     float th259 = find_3d_angle(aloc.add(ageo[j]), bloc, aloc);
@@ -1019,7 +1075,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         continue;
                     }
                     float contrib = pow(fmax(0,cos(atheta)), dpa);
-                    if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
+                    if (!pdisnanf(contrib) && !isinf(contrib)) asum += contrib;
 
                     #if _dbg_interatomic_forces
                     if (debug_criteria) cout << a->name << " anisotropic angle " << (atheta*fiftyseven)
@@ -1046,7 +1102,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         continue;
                     }
                     float contrib = pow(fmax(0,cos(btheta)), dpb);
-                    if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
+                    if (!pdisnanf(contrib) && !isinf(contrib)) bsum += contrib;
 
                     #if _dbg_interatomic_forces
                     if (debug_criteria) cout << b->name << " anisotropic angle " << (btheta*fiftyseven)
@@ -1277,10 +1333,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             break;
         }
     }
+    #endif
 
     if (rbind < 0.7) rbind = 0.7;
 
 _canstill_clash:
+
+    #if !atom_object_forces
     float sigma;
     float local_clash_allowance = global_clash_allowance;
 
@@ -1322,12 +1381,13 @@ _canstill_clash:
             str += (std::string)a->name + (std::string)"-";
             if (b->residue) str += (std::string)b->aa3let + to_string(b->residue) + (std::string)":";
             str += (std::string)b->name + (std::string)" ";
-            str += (std::string)"clash " + to_string(clash);
+            str += (std::string)"clash " + to_string(-clash);
 
             interaudit.push_back(str);
         }
         #endif
     }
+    #endif
 
     _finished_clashing:
     return kJmol;
@@ -1499,6 +1559,276 @@ std::ostream& operator<<(std::ostream& os, const InteratomicForce& f)
     return os;
 }
 
+float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbability* rlp, Point* cl)
+{
+    Point myloc = cl ? *cl : location;
+    float energy = 0;
+    if (!ifs) return energy;
+    if (!ref) return energy;
+    float min_r = vdW_rad + ref->vdW_rad - global_clash_allowance;
+    float anis1, anis2;
+    SCoord rel = myloc.subtract(ref->location);
 
+    Atom* heavy = get_heavy_atom(), *rheavy = ref->get_heavy_atom();
+    float apol = is_polar(), bpol = ref->is_polar();
+    // TODO: ring center when polar-pi.
+
+    if (!ifs[0]) return energy;
+    int i;
+    bool done_ionic = false;
+    for (i=0; ifs[i]; i++)
+    {
+        intera_type typ = ifs[i]->get_type();
+        if (typ == covalent) continue;
+
+        // Distance
+        float eff, ifsr = ifs[i]->get_distance();
+        if (!ifsr) continue;
+        if (ifsr < min_r) min_r = ifsr;
+        
+        float r = rel.r;
+        float r1 = r / ifsr;
+        if (r1 < 1) eff = pow(r1, 4);
+        else eff = 1.0 / pow(r1, typ == vdW ? 6 : 2);
+
+        eff *= ifs[i]->get_kJmol();
+
+        #if summed_missed_connections
+        if (r1 > 1)
+        {
+            SCoord mc = rel;
+            mc.r = r - ifsr;
+            missed_connection = missed_connection.add(mc);
+            mc_bpotential += ifs[i]->get_kJmol();
+        }
+        #endif
+
+        if (pdisnanf(eff))
+        {
+            #if _peratom_audit_nans
+            if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " distance created a nan result." << endl;
+            #endif
+            continue;
+        }
+
+        // Anisotropy
+        float dpa, dpb, dp = ifs[i]->get_dp();
+        if (!dp && typ != ionic) dp = 2;
+        if (dp)
+        {
+            dpa = dpb = dp;
+
+            if (typ == ionic || typ == hbond || typ == mcoord)
+            {
+                if (apol < 0 && bpol >= 0)
+                {
+                    dpa = dp;
+                    dpb = (typ == hbond) ? 3 : 1;
+                }
+                else if (bpol < 0 && apol >= 0)
+                {
+                    dpb = dp;
+                    dpa = (typ == hbond) ? 3 : 1;
+                }
+            }
+
+            // Hydrogens have very low directional propensities.
+            // https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7325729/bin/NIHMS1601788-supplement-1.pdf
+            if (Z == 1) dpa = 0.75;
+            if (ref->Z == 1) dpb = 0.75;
+
+            anis2 = ref->get_anisotropic_multiplier(rel, typ);
+            rel.r *= -1;
+            anis1 = get_anisotropic_multiplier(rel, typ);
+            rel.r = r;
+            eff *= pow(fmax(0,anis1), dpa) * pow(fmax(0,anis2), dpb);
+
+            if (pdisnanf(eff))
+            {
+                #if _peratom_audit_nans
+                if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " anisotropy created a nan result ("
+                    << atheta * fiftyseven << ", " << btheta * fiftyseven
+                    << ")." << endl;
+                #endif
+                continue;
+            }
+        }
+
+        // Metal coordination and charge multiplication
+
+        if (typ == mcoord)
+        {
+            eff *= InteratomicForce::metal_compatibility(this, ref);
+        }
+        if (typ == polarpi || typ == mcoord)
+        {
+            if (is_metal()) eff *= get_charge();
+            if (ref->is_metal()) eff *= ref->get_charge();
+        }
+        if (typ == ionic && get_charge() && ref->get_charge())
+        {
+            float chg = heavy->get_charge() / max(1, heavy->num_bonded_to("H"));
+            float refchg = rheavy->get_charge() / max(1, rheavy->num_bonded_to("H"));
+
+            if (chg > 0 && family == PNICTOGEN && num_bonded_to("H")) chg = 0;
+            if (refchg > 0 && ref->family == PNICTOGEN && ref->num_bonded_to("H")) refchg = 0;
+
+            if (!chg)
+            {
+                chg = heavy->is_conjugated_to_charge();
+                std::vector<Atom*> sva = heavy->get_conjugated_atoms();
+                chg /= sva.size();
+            }
+            if (!refchg)
+            {
+                refchg = rheavy->is_conjugated_to_charge();
+                std::vector<Atom*> sva = rheavy->get_conjugated_atoms();
+                refchg /= sva.size();
+            }
+            eff *= chg * -refchg;
+            done_ionic = true;
+        }
+        if (typ == pi || typ == polarpi) eff /= 64;
+
+        if (pdisnanf(eff))
+        {
+            #if _peratom_audit_nans
+            if (interauditing) cout << name << " ..." << typ << "... " << ref->name << " metals and ions created a nan result." << endl;
+            #endif
+            continue;
+        }
+
+        energy -= eff;
+
+        int k = (typ - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] += eff;
+
+        #if _peratom_audit
+        if (interauditing && energy)
+        {
+            std::string str;
+            if (residue) str += (std::string)aa3let + to_string(residue) + (std::string)":";
+            str += (std::string)name + (std::string)"-";
+            if (ref->residue) str += (std::string)ref->aa3let + to_string(ref->residue) + (std::string)":";
+            str += (std::string)ref->name + (std::string)" ";
+            switch (typ)
+            {
+                case covalent:
+                str += (std::string)"cov";
+                break;
+
+                case ionic:
+                str += (std::string)"ion";
+                break;
+
+                case hbond:
+                str += (std::string)"hb";
+                break;
+
+                case pi:
+                str += (std::string)"pi";
+                break;
+
+                case polarpi:
+                str += (std::string)"ppi";
+                break;
+
+                case mcoord:
+                str += (std::string)"mtl";
+                break;
+
+                case vdW:
+                str += (std::string)"vdw";
+                break;
+
+                default:
+                str += (std::string)"unk";
+            }
+
+            str += (std::string)" " + to_string(-eff) + (std::string)" (" + to_string(energy) + (std::string)")";
+
+            str += (std::string)" theta: " + to_string(atheta*fiftyseven) + (std::string)", " + to_string(btheta*fiftyseven);
+
+            interaudit.push_back(str);
+        }
+        #endif
+
+        if (done_ionic) break;
+    }
+
+    if (!done_ionic)
+    {
+        float chg = heavy->get_charge() / max(1, heavy->num_bonded_to("H"));
+        float refchg = rheavy->get_charge() / max(1, rheavy->num_bonded_to("H"));
+        if (!chg)
+        {
+            chg = heavy->is_conjugated_to_charge();
+            std::vector<Atom*> sva = heavy->get_conjugated_atoms();
+            chg /= sva.size();
+        }
+        if (!refchg)
+        {
+            refchg = rheavy->is_conjugated_to_charge();
+            std::vector<Atom*> sva = rheavy->get_conjugated_atoms();
+            refchg /= sva.size();
+        }
+
+        if (chg > 0 && family == PNICTOGEN && num_bonded_to("H")) chg = 0;
+        if (refchg > 0 && ref->family == PNICTOGEN && ref->num_bonded_to("H")) refchg = 0;
+
+        if (chg && refchg)
+        {
+            min_r *= 0.58;
+            if (min_r < 0.7) min_r = 0.7;
+            float c = chg * refchg;
+            float r1 = rel.r / min_r;
+            if (r1 < 1) c *= pow(r1, 4);
+            else c /= pow(r1, 2);
+
+            // No anisotropy on ionic bonds. Well, except maybe for metals? %@$& I don't know.
+
+            c *= (c>0 ? charge_repulsion : charge_attraction);
+            energy += c;
+            #if _peratom_audit
+            if (interauditing)
+            {
+                std::string str;
+                if (residue) str += (std::string)aa3let + to_string(residue) + (std::string)":";
+                str += (std::string)name + (std::string)"-";
+                if (ref->residue) str += (std::string)ref->aa3let + to_string(ref->residue) + (std::string)":";
+                str += (std::string)ref->name + (std::string)" ";
+                str += (std::string)"ionic " + to_string(c);
+
+                interaudit.push_back(str);
+            }
+            #endif
+            int k = (ionic - covalent) % _INTER_TYPES_LIMIT;
+            total_binding_by_type[k] += c;
+        }
+    }
+
+    if (min_r < 0.7) min_r = 0.7;
+    if (rel.r < min_r)
+    {
+        float eff = fmax(0,InteratomicForce::Lennard_Jones(ref, this, min_r));
+        #if _peratom_audit
+        if (interauditing)
+        {
+            std::string str;
+            if (residue) str += (std::string)aa3let + to_string(residue) + (std::string)":";
+            str += (std::string)name + (std::string)" x ";
+            if (ref->residue) str += (std::string)ref->aa3let + to_string(ref->residue) + (std::string)":";
+            str += (std::string)ref->name + (std::string)" ";
+            str += (std::string)"clash " + to_string(eff);
+
+            interaudit.push_back(str);
+        }
+        #endif
+        energy += eff;
+        total_clashes += eff;
+    }
+
+    return energy;
+}
 
 

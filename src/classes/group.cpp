@@ -465,9 +465,9 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                     matches[l*per_grp+j]->fetch_bonds(bonds);
                     for (m=0; bonds[m]; m++)
                     {
-                        if (!bonds[m]->get_atom2()) continue;
-                        if (bonds[m]->get_atom2()->get_Z() > 1) continue;
-                        k = mol->atom_idx_from_ptr(bonds[m]->get_atom2());
+                        if (!bonds[m]->atom2) continue;
+                        if (bonds[m]->atom2->get_Z() > 1) continue;
+                        k = mol->atom_idx_from_ptr(bonds[m]->atom2);
                         if (dirty[k])
                         {
                             any_dirty = true;
@@ -498,11 +498,11 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                     a->fetch_bonds(bonds);
                     for (m=0; bonds[m]; m++)
                     {
-                        if (!bonds[m]->get_atom2()) continue;
-                        if (bonds[m]->get_atom2()->get_Z() > 1) continue;
-                        k = mol->atom_idx_from_ptr(bonds[m]->get_atom2());
+                        if (!bonds[m]->atom2) continue;
+                        if (bonds[m]->atom2->get_Z() > 1) continue;
+                        k = mol->atom_idx_from_ptr(bonds[m]->atom2);
                         if (dirty[k]) continue;
-                        g->atoms.push_back(bonds[m]->get_atom2());
+                        g->atoms.push_back(bonds[m]->atom2);
                         dirty[k] = true;
                     }
                 }
@@ -583,16 +583,16 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 int h, bbhidx;
                 for (h=0; bb[h]; h++)
                 {
-                    if (bb[h]->get_atom2() && bb[h]->get_atom2()->get_Z() == 1)
+                    if (bb[h]->atom2 && bb[h]->atom2->get_Z() == 1)
                     {
-                        bbhidx = mol->atom_idx_from_ptr(bb[h]->get_atom2());
+                        bbhidx = mol->atom_idx_from_ptr(bb[h]->atom2);
                         if (bbhidx >= 0 && !dirty[bbhidx])
                         {
-                            g->atoms.push_back(bb[h]->get_atom2());
+                            g->atoms.push_back(bb[h]->atom2);
                             dirty[bbhidx] = true;
 
                             #if _dbg_groupsel
-                            cout << "Adding " << bb[h]->get_atom2()->name << "." << endl;
+                            cout << "Adding " << bb[h]->atom2->name << "." << endl;
                             #endif
                         }
                     }
@@ -673,16 +673,16 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                                 int h, bbhidx;
                                 for (h=0; bb[h]; h++)
                                 {
-                                    if (bb[h]->get_atom2() && bb[h]->get_atom2()->get_Z() == 1)
+                                    if (bb[h]->atom2 && bb[h]->atom2->get_Z() == 1)
                                     {
-                                        bbhidx = mol->atom_idx_from_ptr(bb[h]->get_atom2());
+                                        bbhidx = mol->atom_idx_from_ptr(bb[h]->atom2);
                                         if (bbhidx >= 0 && !dirty[bbhidx])
                                         {
-                                            g->atoms.push_back(bb[h]->get_atom2());
+                                            g->atoms.push_back(bb[h]->atom2);
                                             dirty[bbhidx] = true;
 
                                             #if _dbg_groupsel
-                                            cout << "Adding " << bb[h]->get_atom2()->name << "." << endl;
+                                            cout << "Adding " << bb[h]->atom2->name << "." << endl;
                                             #endif
                                         }
                                     }
@@ -837,12 +837,12 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::sha
             g->atoms[l]->fetch_bonds(lbb);
             for (j=0; lbb[j]; j++)
             {
-                if (lbb[j]->get_atom2() && lbb[j]->get_atom2()->get_Z() == 1)
+                if (lbb[j]->atom2 && lbb[j]->atom2->get_Z() == 1)
                 {
-                    g1->atoms.push_back(lbb[j]->get_atom2());
+                    g1->atoms.push_back(lbb[j]->atom2);
 
                     #if _dbg_groupsel
-                    cout << "Adding " << lbb[j]->get_atom2()->name << "..." << endl;
+                    cout << "Adding " << lbb[j]->atom2->name << "..." << endl;
                     #endif
                 }
             }

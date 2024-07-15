@@ -84,7 +84,7 @@ int main(int argc, char** argv)
     Atom oxy(pz == 1 ? "O" : "C");
     probe.bond_to(&oxy, 1);
 
-    Atom* aarr[4];;
+    Atom* aarr[4];
     aarr[0] = &probe;
     aarr[1] = &oxy;
     aarr[2] = NULL;
@@ -103,7 +103,10 @@ int main(int argc, char** argv)
     float strongest = 0;
     for (x=0; ifs[x]; x++)
     {
-        cout << ifs[x]->get_type() << endl;
+        #if _dbg_forces_applicable
+        cout << *ifs[x] << endl;
+        #endif
+
         if (ifs[x]->get_kJmol() > strongest)
         {
             hb = ifs[x];
@@ -128,14 +131,14 @@ int main(int argc, char** argv)
     {
         for (i=0; bb[i]; i++)
         {
-            if (!bb[i]->get_atom2()) break;
-            Point pt = bb[i]->get_atom2()->get_location();
+            if (!bb[i]->atom2) break;
+            Point pt = bb[i]->atom2->get_location();
             pt = pt.subtract(aloc);
             pt.scale(1);
             pt = pt.add(aloc);
             pt.weight = 1;
             bblocs[i] = pt;
-            // cout << bb[i]->get_atom2()->name << endl;
+            // cout << bb[i]->atom2->name << endl;
         }
 
         // cout << i << " points for average." << endl;

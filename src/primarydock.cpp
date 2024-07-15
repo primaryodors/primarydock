@@ -1508,7 +1508,7 @@ void do_tumble_spheres(Point l_pocket_cen)
     cout << "Loneliest point " << loneliest << " is " << loneliest.get_3d_distance(l_pocket_cen) << "A from pocketcen " << l_pocket_cen << "." << endl;
     cout << "Pocket size is " << pocketsize << " vs. ligand bounding box " << ligbbox << endl;
     #endif
-    if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
+    if (pdisnanf(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
 
     #if pocketcen_is_loneliest
     if (1)

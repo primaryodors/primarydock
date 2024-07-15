@@ -124,6 +124,9 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
+#define atom_object_forces 1
+#define charge_attraction 60.0
+
 // Warning - increasing these constants significantly above the original 35.0, 60.0 values
 // will cause docking fails in the unit tests.
 #define polar_repulsion 10.0
@@ -348,9 +351,9 @@
 
 // For auditing binding energies between individual atoms:
 #define _peratom_audit 0
+#define _peratom_audit_nans 0
 
-// A short-term feature that can be used in case the bond reciprocity problem recurs. See issue #423.
-#define bond_reciprocity_fix 0
+#define _zealous_nan_checking 0
 
 // Should normally be false or zero:
 #define _dbg_259 0
@@ -370,6 +373,8 @@
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
+#define _dbg_forces_applicable 1
+#define _dbg_forces_by_Z 0
 #define _dbg_groupsalign 0
 #define _dbg_groupsel 0
 #define _DBG_H2O_TELEPORT 0
@@ -409,6 +414,7 @@
 #define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0
+#define _dbg_trap_nans 0
 #define _DBG_TUMBLE_SPHERES 0
 #define _dbg_unreciprocated_bonds 0
 #define _dbg_worst_energy 0

@@ -46,9 +46,11 @@ Point Point::subtract(const Point subtracted)
     retval.y = y - subtracted.y;
     retval.z = z - subtracted.z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    #if _zealous_nan_checking
+    if (pdisnanf(retval.x)) retval.x = 0;
+    if (pdisnanf(retval.y)) retval.y = 0;
+    if (pdisnanf(retval.z)) retval.z = 0;
+    #endif
 
     return retval;
 }
@@ -60,9 +62,11 @@ Point Point::subtract(const Point* subtracted)
     retval.y = y - subtracted->y;
     retval.z = z - subtracted->z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    #if _zealous_nan_checking
+    if (pdisnanf(retval.x)) retval.x = 0;
+    if (pdisnanf(retval.y)) retval.y = 0;
+    if (pdisnanf(retval.z)) retval.z = 0;
+    #endif
 
     return retval;
 }
@@ -74,24 +78,13 @@ Point Point::negate()
     retval.y = -y;
     retval.z = -z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    #if _zealous_nan_checking
+    if (pdisnanf(retval.x)) retval.x = 0;
+    if (pdisnanf(retval.y)) retval.y = 0;
+    if (pdisnanf(retval.z)) retval.z = 0;
+    #endif
 
     return retval;
-}
-
-float Point::get_3d_distance(const Point* reference)
-{
-    float dx = x - reference->x,
-          dy = y - reference->y,
-          dz = z - reference->z;
-
-    if (isnan(dx)) dx = 0;
-    if (isnan(dy)) dy = 0;
-    if (isnan(dz)) dz = 0;
-
-    return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
 std::string Point::printable() const
@@ -284,11 +277,15 @@ float find_3d_angle(Point* A, Point* B, Point* source)
     if (param < -1) param = -1;
     if (param >  1) param =  1;
     float retval = acos(param);
-    if (isnan(retval))
+
+    #if _zealous_nan_checking
+    if (pdisnanf(retval))
     {
         cout << "P12 " << P12 << " P13 " << P13 << " P23 " << P23 << endl;
         throw 0xbad9a9;
     }
+    #endif
+
     return retval;
 }
 
@@ -402,7 +399,7 @@ Rotation align_points_3d(Point* point, Point* align, Point* center)
         lan.scale(1);
 
         Rotation rot;
-        if (lpt.get_3d_distance(&lan) < 0.01)
+        if (lpt.get_3d_distance(lan) < 0.01)
         {
             rot.v = n;
             rot.a = 0;
@@ -455,7 +452,9 @@ Rotation* align_2points_3d(Point* point1, Point* align1, Point* point2, Point* a
 
     // float theta = find_3d_angle(&point2a, align2, center);
     float theta = find_angle_along_vector(&point2a, align2, center, &v);
-    if (isnan(theta)) cout << point2a.printable() << ", " << align2->printable() << ", " << center->printable() << endl;
+    #if _zealous_nan_checking
+    if (pdisnanf(theta)) cout << point2a.printable() << ", " << align2->printable() << ", " << center->printable() << endl;
+    #endif
 
     Point plus  = rotate3D(&point2a, center, &v,  theta);
     Point minus = rotate3D(&point2a, center, &v, -theta);
@@ -586,32 +585,6 @@ Rotation Rotation::add(Rotation* rot)
     return align_points_3d(&pt, &pt1, &cen);
 }
 
-Tug Tug::add(Tug t)
-{
-    Tug retval;
-    retval.vec = vec.add(t.vec);
-    retval.rot = rot.add(t.rot);
-    return retval;
-}
-
-std::ostream& operator<<(std::ostream& os, const Point& p)
-{
-    os << p.printable();
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const SCoord& v)
-{
-    os << v.printable();
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const Rotation& r)
-{
-    os << "[" << (r.v.theta/M_PI*180) << "°, " << (r.v.phi/M_PI*180) << "°, " << (r.a/M_PI*180) << "°]";
-    return os;
-}
-
 LocRotation::LocRotation()
 {
     ;
@@ -649,6 +622,65 @@ bool Point::fits_inside(Point c)
     return true;
 }
 
+LocationProbability::LocationProbability()
+{
+    edge_size = 5;
+    int i, n = edge_size*edge_size*(edge_size+1);
+    probabilities = new float[n];
+    for (i=0; i<n; i++) probabilities[i] = 0;
+}
+
+LocationProbability::LocationProbability(Point pt)
+{
+    edge_size = 1;
+    cell_size = 0.0005;
+    probabilities = new float[1];
+    probabilities[0] = 1;
+    uncertainty = cell_size/2;
+    center = pt;
+}
+
+LocationProbability::LocationProbability(float cs, float spe)
+{
+    cell_size = cs;
+    edge_size = ceil(spe*2 / cs);
+    int i, n = edge_size*edge_size*(edge_size+1);
+    probabilities = new float[n];
+    for (i=0; i<n; i++) probabilities[i] = 0;
+}
+
+LocationProbability::~LocationProbability()
+{
+    if (probabilities) delete[] probabilities;
+}
+
+float LocationProbability::probability_at(Point pt)
+{
+    int i = index_from_coord(pt);
+    if (i < 0) return 0;
+    return probabilities[i];
+}
+
+void LocationProbability::set_probability(Point pt, float np)
+{
+    int i = index_from_coord(pt);
+    if (i < 0) return;
+    probabilities[i] = np;
+}
+
+int LocationProbability::index_from_coord(Point pt)
+{
+    Point p = pt.subtract(center);
+    p.scale(p.magnitude() / cell_size);
+
+    float offset = 0.5 * edge_size;
+    int x = p.x + offset, y = p.y + offset, z = p.z + offset;
+
+    int halfedge = offset;
+    if (abs(x) >= halfedge || abs(y) >= halfedge || abs(z) >= halfedge) return -1;
+
+    return x + edge_size*y + edge_size*edge_size*z;
+}
 
 
 
@@ -658,3 +690,23 @@ bool Point::fits_inside(Point c)
 
 
 
+
+
+
+std::ostream& operator<<(std::ostream& os, const Point& p)
+{
+    os << p.printable();
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const SCoord& v)
+{
+    os << v.printable();
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Rotation& r)
+{
+    os << "[" << (r.v.theta/M_PI*180) << "°, " << (r.v.phi/M_PI*180) << "°, " << (r.a/M_PI*180) << "°]";
+    return os;
+}

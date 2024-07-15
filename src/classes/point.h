@@ -37,11 +37,37 @@ struct Point
         return subtract(pt);
     }
     Point negate();
-    float get_3d_distance(const Point reference)
+
+    inline float get_3d_distance(const Point reference)
     {
-        return get_3d_distance(&reference);
+        float dx = x - reference.x,
+            dy = y - reference.y,
+            dz = z - reference.z;
+
+        #if _zealous_nan_checking
+        if (pdisnanf(dx)) dx = 0;
+        if (pdisnanf(dy)) dy = 0;
+        if (pdisnanf(dz)) dz = 0;
+        #endif
+
+        return sqrt(dx*dx + dy*dy + dz*dz);
     }
-    float get_3d_distance(const Point* reference);
+
+    inline float get_3d_distance(const Point* reference)
+    {
+        float dx = x - reference->x,
+            dy = y - reference->y,
+            dz = z - reference->z;
+
+        #if _zealous_nan_checking
+        if (pdisnanf(dx)) dx = 0;
+        if (pdisnanf(dy)) dy = 0;
+        if (pdisnanf(dz)) dz = 0;
+        #endif
+
+        return sqrt(dx*dx + dy*dy + dz*dz);
+    }
+
     float get_distance_to_line(const Point a, const Point b);         // Where a and b are the termini of the line.
     Point multiply_3d_distance(const Point* reference, float r_mult);
     bool pt_in_bounding_box(const Point* corner1, const Point* corner2);
@@ -135,16 +161,43 @@ struct LocRotation : public Rotation
 
 class Atom;
 
-struct Tug
+class LocationProbability
 {
-    SCoord vec;
-    Rotation rot;
+    protected:
+    int edge_size = 0;
+    float cell_size = 1;
+    float* probabilities = nullptr;
+    float uncertainty = 1e9;
+    Point center = Point(0,0,0);
 
-    Tug() { ; }
-    Tug(Atom* atom, Point molcen, SCoord pull);
+    public:
+    LocationProbability();
+    LocationProbability(Point pt);              // Creates a probability of 100% at that exact point.
+    LocationProbability(float cell_size, float spatial_extent);
+    ~LocationProbability();
 
-    Tug add(Tug t);
+    float get_cell_size() { return cell_size; }
+    float get_extent() { return cell_size * 0.5 * edge_size; }
+    float probability_at(Point pt);
+    void set_probability(Point pt, float new_prob);
+    void resample(float new_cell_size);
+    LocationProbability compound(Atom* less_uncertain, Atom* more_uncertain);
+
+    protected:
+    int index_from_coord(Point pt);
 };
+
+inline bool pdisnan(int x)
+{
+    return x != x;
+}
+inline bool pdisnanf(float x)
+{
+    #if _dbg_trap_nans
+    if (x != x) throw 0xbad9a9;
+    #endif
+    return x != x;
+}
 
 Point average_of_points(Point* points, int count);
 

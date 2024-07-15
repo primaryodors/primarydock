@@ -39,6 +39,8 @@ class Atom;
 class Bond
 {
 public:
+    Atom* atom1 = nullptr;
+    Atom* atom2 = nullptr;
     float cardinality=0;			// aromatic bonds = 1.5.
     bool can_rotate=false;
     bool can_flip=false;
@@ -58,18 +60,6 @@ public:
     Bond(Atom* a, Atom* b, int card);
     ~Bond();
 
-    #if bond_reciprocity_fix
-    Atom* get_atom1();
-    Atom* get_atom2();
-    void set_atom1(Atom* a);
-    void set_atom2(Atom* a);
-    #else
-    inline Atom* get_atom1() { return atom1; }
-    inline Atom* get_atom2() { return atom2; }
-    inline void set_atom1(Atom* a) { atom1 = a; }
-    inline void set_atom2(Atom* a) { atom2 = a; }
-    #endif
-
     bool rotate(float angle_radians, bool allow_backbone = false, bool skip_inverse_check = false);
     Point ring_rotate(float angle_radians, Atom* stop_at);
     void clear_moves_with_cache()
@@ -84,8 +74,6 @@ public:
     void swing(SCoord newdir);		// Rotate atom2, and all its moves_with atoms, about atom1 so that the bond points to newdir.
 
 protected:
-    Atom* atom1 = nullptr;
-    Atom* atom2 = nullptr;
     void fill_moves_with_cache();
     void enforce_moves_with_uniqueness();
     Atom** moves_with_atom2 = 0;
@@ -190,6 +178,7 @@ public:
     bool is_metal();
     int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
     bool is_pi();
+    void unsave_pi_status() { pi_status = -1; }
     bool is_amide();
     bool is_aldehyde();
 
@@ -243,6 +232,7 @@ public:
     bool is_conjugated_to(Atom* a, Atom* break_if_reach = nullptr, Atom* caller = nullptr);
     float is_conjugated_to_charge(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
     std::vector<Atom*> get_conjugated_atoms(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
+    Atom* get_heavy_atom();
 
     // Ring membership.
     int num_rings();
@@ -260,13 +250,13 @@ public:
             int i;
             for (i=0; i<geometry; i++)
             {
-                if (bonded_to[i].get_atom2() && in_same_ring_as(bonded_to[i].get_atom2()))
+                if (bonded_to[i].atom2 && in_same_ring_as(bonded_to[i].atom2))
                 {
                     if (bonded_to[i].cardinality > 1
                             ||
                             (	bonded_to[i].cardinality == 1
-                                && bonded_to[i].get_atom2()->get_Z() > 1
-                                && bonded_to[i].get_atom2()->get_bonded_atoms_count() < 4
+                                && bonded_to[i].atom2->get_Z() > 1
+                                && bonded_to[i].atom2->get_bonded_atoms_count() < 4
                             )
                     )
                     {
@@ -297,7 +287,7 @@ public:
     float distance_to(Atom* atom2)
     {
         if (!atom2) return -1;
-        else return location.get_3d_distance(&atom2->location);
+        else return location.get_3d_distance(atom2->location);
     };
     float similarity_to(Atom* atom2);
     SCoord get_next_free_geometry(float lcard);
@@ -314,7 +304,9 @@ public:
         chirality_unspecified = false;
     }
 
+    float get_anisotropic_multiplier(SCoord incident_angle, intera_type type = vdW, Atom* ignore = nullptr);
     void print_bond_angles();                   // For unit tests.
+    float interatomic_energy(Atom* reference, InteratomicForce** forces, LocationProbability* ref_loc_prob = 0, Point* candidate_location = 0);
 
     // Static fuctions.
     static int Z_from_esym(const char* elem_sym);
@@ -359,6 +351,7 @@ protected:
     int valence=0;
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
     bool geometry_dirty = true;
+    int pi_status = -1;
     int origgeo=0;
     SCoord* geov=0;
     float at_wt = 0;
@@ -369,6 +362,7 @@ protected:
     float charge = 0;					// can be partial.
     float origchg = 0;
     float max_localized_charge = 0;     // for conjugated charged systems.
+    float conj2chg_cache = Avogadro;
     float acidbase = 0;					// charge potential; negative = acid / positive = basic.
     float polarity = 0;					// maximum potential relative to -OH...H-.
     bool polar_calcd = false;

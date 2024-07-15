@@ -13,7 +13,7 @@
 #define _kJmol_cuA 1.0
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
-#define oxytocin 0.003
+#define default_cavity_stuffing 0.003
 #define _DEFAULT_INTERA_R_CUTOFF 6
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -142,7 +142,7 @@
 
 #define amide_zwitterionic_amount 0.1
 
-#define priority_weight_group 4
+#define priority_weight_group 5
 
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
@@ -182,7 +182,7 @@
 #define active_persistence_threshold 5
 
 #define redo_tumble_spheres_on_activation 0
-#define redo_tumble_spheres_every_node 1
+#define redo_tumble_spheres_every_node 0
 #define soft_dynamics_every_n_iters 20
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
@@ -256,10 +256,10 @@
 // instead of the barycenter, to prevent "letting go" of the strongest binding.
 #define allow_tethered_rotations 1
 
-// Overwrite the user supplied pocket center with the loneliest point as determined by
+// Overwrites the user supplied pocket center with the loneliest point as determined by
 // distances to the nearest residue atoms to the supplied pocket center.
-#define pocketcen_is_loneliest 1
-#define pocketcen_from_reach_atoms 1
+#define pocketcen_is_loneliest 0
+#define pocketcen_from_reach_atoms 0
 
 // Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
 #define default_bestbind 1
@@ -397,6 +397,7 @@
 #define _dbg_path_search 0
 #define _dbg_point_avg 0
 #define _dbg_polsat 0
+#define _dbg_priority_hbond 1
 #define _dbg_repack 0
 #define _DBG_RESBMULT 0
 #define _dbg_residue_poses 0

@@ -18,9 +18,11 @@ using namespace std;
 float conformer_momenta_multiplier = 1;
 float conformer_tumble_multiplier = 1;
 
+float cavity_stuffing = default_cavity_stuffing;
+float clash_fleeing = lmpush;
+
 bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
-bool wet_environment = false;
 
 Molecule *worst_clash_1 = nullptr, *worst_clash_2 = nullptr;
 float worst_mol_clash = 0;
@@ -409,6 +411,18 @@ int Molecule::is_residue()
         if (atoms[i]->residue) return atoms[i]->residue;
     }
     return 0;
+}
+
+int Molecule::get_heavy_atom_count()
+{
+    if (noAtoms(atoms)) return 0;
+    int i, retval=0;
+
+    for (i=0; atoms[i]; i++)
+        if (atoms[i]->get_Z() > 1)
+            retval++;
+    
+    return retval;
 }
 
 int Molecule::get_hydrogen_count()
@@ -2662,10 +2676,11 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
         for (j=0; ifs[j]; j++)
         {
             float partial;
+            intera_type typ = ifs[j]->get_type();
 
-            if (hydro > hydrophilicity_cutoff && ifs[j]->get_type() == vdW) continue;
+            if (hydro > hydrophilicity_cutoff && typ == vdW) continue;
 
-            if (ifs[j]->get_type() == ionic)
+            if (typ == ionic)
             {
                 if (sgn(a->get_charge()) != -sgn(atoms[i]->get_charge())) continue;
                 partial = 60;
@@ -2675,17 +2690,19 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
                 partial = ifs[j]->get_kJmol();
             }
 
-            if (ifs[j]->get_type() == hbond)
+            if (typ == hbond)
             {
                 partial *= fmin(fabs(a->is_polar()), fabs(atoms[i]->is_polar()));
             }
 
-            if (ifs[j]->get_type() == polarpi) partial /= 6;            // Config is for benzene rings.
+            if (typ == pi || typ == polarpi) partial /= 6;            // Config is for benzene rings.
 
-            if (ifs[j]->get_type() == mcoord)
+            if (typ == mcoord)
             {
                 partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + atoms[i]->get_electronegativity()) / 2 - 2.25));
             }
+
+            // if (this->is_residue() == 108 && a->get_family() == PNICTOGEN) cout << this->name << "..." << a->name << " " << *ifs[j] << " = " << partial << endl;
 
             retval += partial;
             n++;
@@ -2863,9 +2880,9 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
                                 ptd.multiply(fmin(fabs(-abind) / 1000, 1));
-                                lmx += lmpush * sgn(ptd.x);
-                                lmy += lmpush * sgn(ptd.y);
-                                lmz += lmpush * sgn(ptd.z);
+                                lmx += clash_fleeing * sgn(ptd.x);
+                                lmy += clash_fleeing * sgn(ptd.y);
+                                lmz += clash_fleeing * sgn(ptd.z);
                             }
                         }
 
@@ -3149,7 +3166,7 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     float rawbind = get_intermol_binding(om, !is_ac);
     float lbind = rawbind * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
-    if (wet_environment) lbind += get_intermol_contact_area(om, true) * oxytocin;
+    lbind += get_intermol_contact_area(om, true) * cavity_stuffing;
 
     if (mandatory_connection && rawbind >= 0)                   // Allow pullaway if mols are clashing.
     {
@@ -3548,7 +3565,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     float theta;
 
                     if (a->movability & MOV_MC_AXIAL && frand(0,1) < 0.2) theta = frand(-M_PI, M_PI);
-                    else theta = frand(-0.5, 0.5)*fiftyseventh*min(20, iter);
+                    else theta = frand(-1, 1)*fiftyseventh*min(20, iter);
 
                     #if _dbg_improvements_only_rule
                     excuse_deterioration = true;

@@ -8,6 +8,7 @@
 class Moiety
 {
     public:
+    float pKa = 7;
     int contained_by(Molecule* mol, Atom** out_matches);
     std::string pattern;
 

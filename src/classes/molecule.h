@@ -146,6 +146,7 @@ public:
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
     void delete_all_atoms();
+    int get_heavy_atom_count();
     int get_hydrogen_count();
     virtual void hydrogenate(bool steric_only = false);
     void clear_atom_binding_energies();
@@ -296,10 +297,11 @@ extern float conformer_momenta_multiplier;
 extern float conformer_tumble_multiplier;
 extern bool allow_ligand_360_tumble;
 extern bool allow_ligand_360_flex;
-extern bool wet_environment;
 extern float _momentum_rad_ceiling;
 extern Molecule *worst_clash_1, *worst_clash_2;
 extern float worst_mol_clash;
+extern float cavity_stuffing;
+extern float clash_fleeing;
 
 #if _dbg_improvements_only_rule
 extern Molecule** check_mols;

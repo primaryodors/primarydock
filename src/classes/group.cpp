@@ -326,7 +326,7 @@ float ResidueGroup::hydrophilicity()
     return result;
 }
 
-float ResidueGroup::group_reach()
+float ResidueGroup::group_reach(bool ap)
 {
     int n = aminos.size();
     if (!n) return 0;
@@ -335,7 +335,9 @@ float ResidueGroup::group_reach()
     float retval = 0;
     for (i=0; i<n; i++)
     {
-        float r = aminos[i]->get_reach();
+        AminoAcid* aa = aminos[i];
+        float r = aa->get_reach();
+        if (aa->is_tyrosine_like() && !ap) r /= 2;
         if (r > retval) retval = r;
     }
 
@@ -421,8 +423,11 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             fgets(buffer, 1022, fp);
             if (buffer[0])
             {
+                char** words = chop_spaced_words(buffer);
+
                 Moiety m;
-                m.pattern = buffer;
+                m.pattern = words[0];
+                if (words[1]) m.pKa = atof(words[1]);
                 predef_grp.push_back(m);
             }
         }
@@ -503,6 +508,21 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 }
 
                 g->remove_duplicates();
+
+                j = g->atoms.size();
+                for (m=0; m<j; m++)
+                {
+                    Atom* a = g->atoms[m];
+                    if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->get_atom1();
+                    if (a->get_family() != TETREL) continue;
+                    a->pK = predef_grp[i].pKa;
+                    k = mol->atom_idx_from_ptr(a);
+                    if (k >= 0) dirty[k] = true;
+                }
+
+                // If the group forms a substantial part of the molecule, ignore it.
+                if (g->heavy_atom_count() > 0.4 * mol->get_heavy_atom_count()) continue;
+
                 retval.push_back(g);
 
                 if (g->atoms.size() > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atoms.size()
@@ -683,6 +703,9 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 #endif
             }
         }
+
+        // If the group forms a substantial part of the molecule, ignore it.
+        if (g->heavy_atom_count() > 0.4 * mol->get_heavy_atom_count()) continue;
 
         bool added = false;
         for (l=0; l < retval.size(); l++)
@@ -1185,6 +1208,10 @@ float GroupPair::get_potential()
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
 
+                    #if _dbg_groupsel
+                    // cout << "Initial partial for " << *a << "..." << *aa << " = " << partial << endl;
+                    #endif
+
                     if (polar_atoms && polar_res && aa->get_charge()) partial *= 1.0 + fabs(aa->get_charge());
 
                     Moiety amide;
@@ -1199,7 +1226,7 @@ float GroupPair::get_potential()
                         cout << "Aldehyde-base potential for " << *a << "..." << *aa << " = " << partial << endl;
                         #endif
                     }
-                    else if (fabs(a->is_polar()) > hydrophilicity_cutoff && amide.contained_by(aa, matches))
+                    else if (fabs(a->is_polar()) > hydrophilicity_cutoff && a->get_family() != PNICTOGEN && amide.contained_by(aa, matches))
                     {
                         partial *= 2;
                         #if _dbg_groupsel
@@ -1303,7 +1330,7 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
                 float ra = retval[l]->ag->get_center().get_3d_distance(ag[i]->get_center());
                 float rs = retval[l]->scg->get_center().get_3d_distance(scg[j]->get_center());
                 float dr = fabs(ra - rs);
-                float deff = fmax(1, dr-scg[j]->group_reach());
+                float deff = fmax(1, dr-scg[j]->group_reach( fabs(ag[i]->get_polarity()) >= hydrophilicity_cutoff ));
                 #if _dbg_groupsel
                 cout << "Group spacing for " << *ag[i] << "-" << *scg[j] << " has delta " << dr << " effectively " << deff << endl;
                 #endif

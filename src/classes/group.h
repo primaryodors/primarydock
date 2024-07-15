@@ -51,7 +51,7 @@ class ResidueGroup
     Point get_center();
     Atom* get_nearest_atom(Point pt);
     float distance_to(Point pt);
-    float group_reach();
+    float group_reach(bool allow_polar = true);
     void conform_to(Molecule* mol);
     float hydrophilicity();
     float pi_stackability();

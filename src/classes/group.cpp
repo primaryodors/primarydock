@@ -513,7 +513,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 for (m=0; m<j; m++)
                 {
                     Atom* a = g->atoms[m];
-                    if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->get_atom1();
+                    if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->atom1;
                     if (a->get_family() != TETREL) continue;
                     a->pK = predef_grp[i].pKa;
                     k = mol->atom_idx_from_ptr(a);

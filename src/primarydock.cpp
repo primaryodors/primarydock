@@ -1817,7 +1817,7 @@ void attempt_priority_hbond()
             {
                 if (aaa->get_Z() == 1)
                 {
-                    Atom* heavy = aaa->get_bond_by_idx(0)->get_atom1();
+                    Atom* heavy = aaa->get_bond_by_idx(0)->atom1;
                     if (heavy->get_family() == CHALCOGEN) aaa = heavy;
                 }
                 else
@@ -1830,7 +1830,7 @@ void attempt_priority_hbond()
             {
                 if (la->get_Z() == 1)
                 {
-                    Atom* heavy = la->get_bond_by_idx(0)->get_atom1();
+                    Atom* heavy = la->get_bond_by_idx(0)->atom1;
                     if (heavy->get_family() == CHALCOGEN) la = heavy;
                     else if (heavy->get_family() == PNICTOGEN && !heavy->get_charge()) la = heavy;
                 }

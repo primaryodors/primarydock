@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
     FILE* fp = fopen(filename.c_str(), "r");
     char buffer[65536];
-    fread(buffer, sizeof(char), 65535, fp);
+    size_t rfw = fread(buffer, sizeof(char), 65535, fp);
     fclose(fp);
 
     Molecule m("TheMolecule");

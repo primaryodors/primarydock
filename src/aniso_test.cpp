@@ -219,7 +219,7 @@ int main(int argc, char** argv)
                             Point pt(&anisgeo[i]);
                             pt.scale(0.4);
                             pt = pt.add(aloc);
-                            char buffer[10];
+                            char buffer[100];
                             sprintf(buffer, "He%d", i);
                             mptemp.add_atom("He", buffer, &pt, NULL, 0);
                         }

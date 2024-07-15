@@ -112,7 +112,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
             char buffer[fsz + 4];
             for (i=0; i<(fsz+4); i++) buffer[i] = 0;
 
-            fread(buffer, 1, fsz, pf);
+            size_t rfw = fread(buffer, 1, fsz, pf);
             fclose(pf);
 
             from_sdf(buffer);
@@ -1037,7 +1037,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
     while (!feof(is))
     {
         lasttell = ftell(is);
-        fgets(buffer, 1003, is);
+        char* rfw = fgets(buffer, 1003, is);
         if (buffer[0] == 'A' &&
             buffer[1] == 'T' &&
             buffer[2] == 'O' &&
@@ -1442,7 +1442,7 @@ void AminoAcid::load_aa_defs()
 
         while (!feof(pf))
         {
-            fgets(buffer, 1011, pf);
+            char* rfw = fgets(buffer, 1011, pf);
             if (buffer[0] != '#' && buffer[0] != '\n')
             {
                 char** words = chop_spaced_words(buffer);
@@ -2505,7 +2505,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                 }
                 if (k == 1) onlyone[j][n] = atoms[i];
                 else onlyone[j][n] = nullptr;
-                char aname[10];
+                char aname[100];
                 if (n) sprintf(aname, "%dH%c%d", k, greek, n);
                 else   sprintf(aname, "H%c%d", greek, k);
                 aname[4] = 0;       // Molecule class imposes a 4-char limit.

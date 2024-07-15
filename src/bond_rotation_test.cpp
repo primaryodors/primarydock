@@ -21,7 +21,7 @@ int main(int argc, char** argv)
             std::string sdfdat = "";
             while (!feof(fp))
             {
-                fgets(buffer, 1022, fp);
+                char* rfw = fgets(buffer, 1022, fp);
                 sdfdat += (std::string)buffer;
             }
             fclose(fp);

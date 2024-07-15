@@ -34,7 +34,7 @@ void Atom::read_elements()
         char buffer[1024];
         while (!feof(pf))
         {
-            fgets(buffer, 1003, pf);
+            char* rfw = fgets(buffer, 1003, pf);
             if (buffer[0] != '#')
             {
                 char** words = chop_spaced_words(buffer);
@@ -80,7 +80,7 @@ void Atom::read_elements()
     else
     {
         char buffer[PATH_MAX];
-        getcwd(buffer, PATH_MAX);
+        char* rfw = getcwd(buffer, PATH_MAX);
         cout << "ERROR elements.dat not found in " << buffer << ".\n";
     }
 }
@@ -273,7 +273,7 @@ Atom::Atom(FILE* is)
 
     while (1)
     {
-        fgets(buffer, 1022, is);
+        char* rfw = fgets(buffer, 1022, is);
         char** words = chop_spaced_words(buffer);
 
         if (words)

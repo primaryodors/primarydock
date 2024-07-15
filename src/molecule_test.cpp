@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        fread(buffer, 1, 65535, pf);
+        size_t rfw = fread(buffer, 1, 65535, pf);
         fclose(pf);
         cout << "Read data.\n";
         nloaded = m1.from_sdf(buffer);
@@ -140,7 +140,7 @@ int main(int argc, char** argv)
     Molecule m2("test");
     /*
     pf = fopen(tstlig, "rb");
-    fread(buffer, 1, 65535, pf);
+    size_t rfw = fread(buffer, 1, 65535, pf);
     fclose(pf);
     m2.from_sdf(buffer);
     */

@@ -1008,7 +1008,7 @@ int Molecule::from_pdb(FILE* is, bool het_only)
 
     while (!feof(is))
     {
-        fgets(buffer, 1003, is);
+        char* rfw = fgets(buffer, 1003, is);
         int charge = 0, offset = (buffer[21] != ' ' && buffer[22] == ' ') ? 1 : 0;
         char** words = chop_spaced_words(buffer);
 
@@ -3861,7 +3861,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
         if (pf)
         {
             char buffer[1024];
-            fgets(buffer, 1022, pf);
+            char* rfw = fgets(buffer, 1022, pf);
             if (strlen(buffer))			// TODO: Change this to employ a regex.
             {
                 fclose(pf);
@@ -3875,7 +3875,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
                 int lno = 0;
                 while (buffer[0] != '$' && !feof(pf))
                 {
-                    fgets(buffer, 1022, pf);
+                    char* rfw = fgets(buffer, 1022, pf);
                     lno++;
                     sdfdat += (std::string)buffer;
 

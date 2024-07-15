@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 
     char buffer[65536];
     FILE* pf = fopen("sdf/benzene.sdf", "rb");
-    fread(buffer, 1, 65535, pf);
+    size_t rfw = fread(buffer, 1, 65535, pf);
     fclose(pf);
     m1.from_sdf(buffer);
     m2.from_sdf(buffer);

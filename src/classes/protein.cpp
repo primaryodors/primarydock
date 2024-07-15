@@ -705,6 +705,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     AminoAcid* prevaa = nullptr;
 
     int i, j, rescount=0;
+    char* rfw;
 
     for (i=0; i<65536; i++) pdba[i] = nullptr;
 
@@ -714,7 +715,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         try
         {
             int told = ftell(is);
-            fgets(buffer, 1003, is);
+            rfw = fgets(buffer, 1003, is);
 
             if (got_atoms &&
                 buffer[0] == 'T' &&
@@ -881,7 +882,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                 break;
 
             case NOT_ATOM_RECORD:
-                fgets(buffer, 1003, is);
+                rfw = fgets(buffer, 1003, is);
                 cout << buffer << endl;
                 if (buffer[0] == 'R' &&
                         buffer[1] == 'E' &&

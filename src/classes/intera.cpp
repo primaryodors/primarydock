@@ -78,7 +78,7 @@ void InteratomicForce::read_all_forces()
         char buffer[1024];
         while (!feof(pf))
         {
-            fgets(buffer, 1011, pf);
+            char* rfw = fgets(buffer, 1011, pf);
             if (buffer[0] != '#' && buffer[0] != '\n')
             {
                 all_forces[ifcount] = new InteratomicForce();

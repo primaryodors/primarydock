@@ -687,7 +687,7 @@ void Protein::set_name_from_pdb_name(const char* pdb_name)
 int Protein::load_pdb(FILE* is, int rno, char chain)
 {
     AminoAcid* restmp[65536];
-    char buffer[1024];
+    char buffer[1024], wkbuf[1280];
     Atom* a;
 
     if (residues) delete[] residues;
@@ -824,6 +824,20 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     if (words[2] && !words[3])
                         name = words[2];
                 }
+            }
+            else if ((buffer[0] == 'T' && buffer[1] == 'I' && buffer[2] == 'T' && buffer[3] == 'L' && buffer[4] == 'E')
+                ||
+                (buffer[0] == 'E' && buffer[1] == 'X' && buffer[2] == 'P' && buffer[3] == 'D' && buffer[4] == 'T' && buffer[5] == 'A')
+                ||
+                (buffer[0] == 'A' && buffer[1] == 'U' && buffer[2] == 'T' && buffer[3] == 'H' && buffer[4] == 'O' && buffer[5] == 'R')
+                ||
+                (buffer[0] == 'R' && buffer[1] == 'E' && buffer[2] == 'V' && buffer[3] == 'D' && buffer[4] == 'A' && buffer[5] == 'T')
+                ||
+                (buffer[0] == 'J' && buffer[1] == 'R' && buffer[2] == 'N' && buffer[3] == 'L')
+                )
+            {
+                sprintf(wkbuf, "REMARK %s", buffer);
+                add_remark(wkbuf);
             }
             else if (buffer[0] == 'C'
                   && buffer[1] == 'O'

@@ -506,7 +506,7 @@ void Molecule::hydrogenate(bool steric_only)
         int h_to_add = round(valence - bcardsum);
         for (j=0; j<h_to_add; j++)
         {
-            char hname[5];
+            char hname[65];
             sprintf(hname, "H%d", atcount+1);
             Atom* H = add_atom("H", hname, atoms[i], 1);
             #if _dbg_hydrogenate

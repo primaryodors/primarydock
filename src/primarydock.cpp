@@ -151,6 +151,10 @@ std::string prealign_residues = "";
 Bond retain_bindings[4];
 std::vector<int> priority_resnos;
 
+Atom* pivotal_hbond_aaa = nullptr;
+Atom* pivotal_hbond_la = nullptr;
+float pivotal_hbond_r = 0;
+
 #if _use_groups
 AtomGroup ligand_groups[3];
 ResidueGroup sc_groups[3];
@@ -397,6 +401,59 @@ void reconnect_bridges()
     freeze_bridged_residues();
 }
 
+void do_pivotal_hbond_rot_and_scoot()
+{
+    // Rotate ligand so atom faces side chain atom.
+    ligand->movability = MOV_ALL;
+    float r = pivotal_hbond_aaa->distance_to(pivotal_hbond_la);
+    Point cen = ligand->get_barycenter();
+    Rotation rot = align_points_3d(pivotal_hbond_la->get_location(), pivotal_hbond_aaa->get_location(), cen);
+    LocatedVector lv = rot.v;
+    lv.origin = cen;
+    ligand->rotate(lv, rot.a);
+
+    #if _dbg_priority_hbond
+    cout << "Rotated ligand " << (rot.a*fiftyseven) << "deg." << endl;
+    cout << "Atoms were " << r << "Å apart, now " << pivotal_hbond_aaa->distance_to(pivotal_hbond_la) << "Å" << endl;
+    #endif
+
+    // Measure the distance between atoms and move the ligand to optimize that distance.
+    SCoord scooch = pivotal_hbond_aaa->get_location().subtract(pivotal_hbond_la->get_location());
+    if (scooch.r > 2.0)
+    {
+        scooch.r -= 2.0;
+        ligand->move(scooch);
+
+        #if _dbg_priority_hbond
+        cout << "Scooched ligand " << scooch.r << "Å." << endl;
+        cout << "Ligand was centered at " << cen << "; now " << ligand->get_barycenter() << endl;
+        cout << "Atoms are now " << pivotal_hbond_aaa->distance_to(pivotal_hbond_la) << "Å apart" << endl;
+        #endif
+    }
+
+    // Rotate the ligand about the hbond in order to minimize the intermolecular energy.
+    SCoord v = pivotal_hbond_la->get_location().subtract(pivotal_hbond_aaa->get_location());
+    lv = v;
+    lv.origin = pivotal_hbond_aaa->get_location();
+    float theta = 0, th, step = M_PI/50, clash;
+    AminoAcid* reaches[256];
+    protein->get_residues_can_clash_ligand(reaches, ligand, ligand->get_barycenter(), Point(5,5,5), nullptr);
+    for (th=0; th<circle; th += step)
+    {
+        float c = ligand->get_intermol_clashes((Molecule**)reaches);
+
+        if (!th || c < clash)
+        {
+            clash = c;
+            theta = th;
+        }
+
+        ligand->rotate(lv, step);
+    }
+
+    ligand->rotate(lv, theta);
+}
+
 Pose iter_best_pose[1000];
 float iter_best_bind;
 void iteration_callback(int iter, Molecule** mols)
@@ -448,6 +505,8 @@ void iteration_callback(int iter, Molecule** mols)
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
     }
     #endif
+
+    if (pivotal_hbond_aaa && pivotal_hbond_la) do_pivotal_hbond_rot_and_scoot();
     
     int i, j, n;
 
@@ -1795,6 +1854,7 @@ void attempt_priority_hbond()
             Atom* la = nullptr;
             for (j=0; j<m; j++)
             {
+                if (frand(0, 1) < 0.29) continue;
                 Atom* a1 = ligand->get_atom(j);
                 if (fabs(a1->is_polar()) >= hydrophilicity_cutoff)
                 {
@@ -1846,57 +1906,12 @@ void attempt_priority_hbond()
             cout << aa->get_name() << ":" << aaa->name << " and ligand:" << la->name << endl;
             #endif
 
-            // Rotate ligand so atom faces side chain atom.
-            ligand->movability = MOV_ALL;
-            r = aaa->distance_to(la);
-            Point cen = ligand->get_barycenter();
-            Rotation rot = align_points_3d(la->get_location(), aaa->get_location(), cen);
-            LocatedVector lv = rot.v;
-            lv.origin = cen;
-            ligand->rotate(lv, rot.a);
+            // Pin the ligand so it can only rotate about the hbond atom.
+            pivotal_hbond_aaa = aaa;
+            pivotal_hbond_la = la;
+            pivotal_hbond_r = 2.0;
 
-            #if _dbg_priority_hbond
-            cout << "Rotated ligand " << (rot.a*fiftyseven) << "deg." << endl;
-            cout << "Atoms were " << r << "Å apart, now " << aaa->distance_to(la) << "Å" << endl;
-            #endif
-
-            // Measure the distance between atoms and move the ligand to optimize that distance.
-            SCoord scooch = aaa->get_location().subtract(la->get_location());
-            if (scooch.r > 2.0)
-            {
-                scooch.r -= 2.0;
-                ligand->move(scooch);
-
-                #if _dbg_priority_hbond
-                cout << "Scooched ligand " << scooch.r << "Å." << endl;
-                cout << "Ligand was centered at " << cen << "; now " << ligand->get_barycenter() << endl;
-                cout << "Atoms are now " << aaa->distance_to(la) << "Å apart" << endl;
-                #endif
-            }
-
-            // TODO: Pin the ligand so it can only rotate about the hbond atom.
-
-            // Rotate the ligand about the hbond in order to minimize the intermolecular energy.
-            SCoord v = la->get_location().subtract(aaa->get_location());
-            lv = v;
-            lv.origin = aaa->get_location();
-            float theta = 0, th, step = M_PI/50, clash;
-            AminoAcid* reaches[256];
-            protein->get_residues_can_clash_ligand(reaches, ligand, ligand->get_barycenter(), Point(5,5,5), nullptr);
-            for (th=0; th<circle; th += step)
-            {
-                float c = ligand->get_intermol_clashes((Molecule**)reaches);
-
-                if (!th || c < clash)
-                {
-                    clash = c;
-                    theta = th;
-                }
-
-                ligand->rotate(lv, step);
-            }
-
-            ligand->rotate(lv, theta);
+            do_pivotal_hbond_rot_and_scoot();
 
             #if _dbg_priority_hbond
             cout << endl;

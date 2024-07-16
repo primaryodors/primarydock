@@ -14,7 +14,7 @@
 #define _kJmol_cuA 1.0
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
-#define default_cavity_stuffing 0.003
+#define default_cavity_stuffing 0.03
 #define _DEFAULT_INTERA_R_CUTOFF 6
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -138,7 +138,7 @@
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 4.0
+#define lmpush 1.0
 #define lmpull 0.3
 #define lmsteps 3
 #define recapture_ejected_ligand 0

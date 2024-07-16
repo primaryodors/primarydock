@@ -392,7 +392,7 @@ Atom::~Atom()
     {
         int i;
         for (i=0; i<geometry; i++)
-            if (bonded_to[i].atom2)
+            if (bonded_to[i].atom2 && abs((__int64_t)(this) - (__int64_t)bonded_to[i].atom2) < memsanity)
                 bonded_to[i].atom2->unbond(this);
     }
 }

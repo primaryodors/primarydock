@@ -236,7 +236,7 @@ void Molecule::delete_atom(Atom* a)
 void Molecule::delete_all_atoms()
 {
     if (!atoms) return;
-    if (paths) delete[] paths;
+    if (paths && abs(reinterpret_cast<long>(paths) - reinterpret_cast<long>(atoms)) < memsanity) delete[] paths;
     paths = nullptr;
 
     int i;
@@ -244,7 +244,7 @@ void Molecule::delete_all_atoms()
     {
         delete atoms[i];
     }
-    
+
     delete[] atoms;
     atoms = nullptr;
     atcount = 0;
@@ -1077,10 +1077,10 @@ int Molecule::from_pdb(FILE* is, bool het_only)
                     ;
                 }
             }
+
+            delete[] words;
         }
         buffer[0] = 0;
-
-        delete words;
     }
 
     afterload();

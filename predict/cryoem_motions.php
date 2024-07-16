@@ -4,7 +4,7 @@ chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir("..");
 
-$data_keys = ["x.50", "exr", "cyt"];
+$data_keys = ["x.50", "exr", "cyt", "vec", "rot"];
 
 $output = [];
 echo "Executing pepd script...\n";
@@ -32,11 +32,17 @@ foreach ($output as $line)
         if ($hxno == 1) $hxdata = [];
         foreach($pieces as $k => $v)
         {
-            $v = str_replace("[", "", trim($v));
-            $v = str_replace("]", "", trim($v));
+            $v = trim($v);
+            if (substr($v, 0, 1) == '[')
+            {
+                $v = str_replace("[", "", trim($v));
+                $v = str_replace("]", "", trim($v));
 
-            $xyz = explode(",",$v);
-            $hxdata[$hxno][$data_keys[$k]] = ['x' => $xyz[0], 'y' => $xyz[1], 'z' => $xyz[2]];
+                $xyz = explode(",",$v);
+                $hxdata[$hxno][$data_keys[$k]] = ['x' => $xyz[0], 'y' => $xyz[1], 'z' => $xyz[2]];
+            }
+            else
+                $hxdata[$hxno][$data_keys[$k]] = floatval($v);
         }
         if ($hxno == 7) $data[$prot][] = $hxdata;
     }
@@ -51,10 +57,19 @@ foreach ($data as $prot => $values)
         {
             foreach ($metrics as $metric => $xyz)
             {
-                foreach ($xyz as $dimension => $cartesian)
+                if (is_array($xyz) || is_object($xyz))
                 {
-                    if (!isset($average[$prot][$helix][$metric][$dimension])) $average[$prot][$helix][$metric][$dimension] = 0.0;
-                    $average[$prot][$helix][$metric][$dimension] += $cartesian;
+                    foreach ($xyz as $dimension => $cartesian)
+                    {
+                        if (!isset($average[$prot][$helix][$metric][$dimension])) $average[$prot][$helix][$metric][$dimension] = 0.0;
+                        $average[$prot][$helix][$metric][$dimension] += $cartesian;
+                    }
+                }
+                else
+                {
+                    if (!isset($average[$prot][$helix][$metric])) $average[$prot][$helix][$metric] = 0.0;
+                    $average[$prot][$helix][$metric] += $xyz;
+                    // echo "$metric = $xyz\n";
                 }
             }
         }
@@ -67,10 +82,13 @@ foreach ($data as $prot => $values)
         {
             foreach ($metrics as $metric => $xyz)
             {
-                foreach ($xyz as $dimension => $cartesian)
-                {
-                    $average[$prot][$helix][$metric][$dimension] /= $count;
-                }
+                if (is_array($xyz))
+                    foreach ($xyz as $dimension => $cartesian)
+                    {
+                        $average[$prot][$helix][$metric][$dimension] /= $count;
+                    }
+                else
+                    $average[$prot][$helix][$metric] /= $count;
             }
         }
     }
@@ -85,16 +103,19 @@ foreach ($data as $prot => $values)
         {
             foreach ($metrics as $metric => $xyz)
             {
-                if (!isset($deviation[$prot][$helix][$metric])) $deviation[$prot][$helix][$metric] = 0.0;
-                $radius_sqrd = 0.0;
-                foreach ($xyz as $dimension => $cartesian)
+                if (is_array($xyz))
                 {
-                    $delta = $cartesian - $average[$prot][$helix][$metric][$dimension];
-                    $delta *= $delta;
-                    
-                    $radius_sqrd += $delta;
+                    if (!isset($deviation[$prot][$helix][$metric])) $deviation[$prot][$helix][$metric] = 0.0;
+                    $radius_sqrd = 0.0;
+                    foreach ($xyz as $dimension => $cartesian)
+                    {
+                        $delta = $cartesian - $average[$prot][$helix][$metric][$dimension];
+                        $delta *= $delta;
+                        
+                        $radius_sqrd += $delta;
+                    }
+                    $deviation[$prot][$helix][$metric] += $radius_sqrd;
                 }
-                $deviation[$prot][$helix][$metric] += $radius_sqrd;
             }
         }
     }
@@ -109,7 +130,7 @@ foreach ($deviation as $prot => $helices)
     {
         foreach ($metrics as $metric => $xyz)
         {
-            foreach ($output[$prot][$helix][$metric] as $dimension => $cartesian) $output[$prot][$helix][$metric][$dimension] = round($cartesian, 4);
+            if (is_array($output[$prot][$helix][$metric])) foreach ($output[$prot][$helix][$metric] as $dimension => $cartesian) $output[$prot][$helix][$metric][$dimension] = round($cartesian, 4);
 
             if ($count) $deviation[$prot][$helix][$metric] /= $count;
             $output[$prot][$helix][$metric]["sigma"] = round(sqrt($deviation[$prot][$helix][$metric]), 5);

@@ -80,23 +80,29 @@ function build_template()
             {
                 foreach ($metrics as $metric => $dimensions)
                 {
-                    foreach (array_keys($dimensions) as $dimension)
+                    if (is_array($dimensions))
                     {
-                        if ($dimension == "sigma")
+                        foreach (array_keys($dimensions) as $dimension)
                         {
-                            $template[$hxno][$metric][$dimension]
-                                = 0.8 * $cryoem["OR5K1"][$hxno][$metric][$dimension]
-                                + 0.2 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
-                        }
-                        else
-                        {
-                            // TODO: Make the proportions dependent on sequence similarity.
-                            $template[$hxno][$metric][$dimension]
-                                = 0.25 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
-                                + 0.25 * $cryoem["OR52"][$hxno][$metric][$dimension]
-                                + 0.50 * $cryoem["OR5K1"][$hxno][$metric][$dimension];
+                            if ($dimension == "sigma")
+                            {
+                                /*$template[$hxno][$metric][$dimension]
+                                    = 0.8 * $cryoem["OR5K1"][$hxno][$metric][$dimension]
+                                    + 0.2 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];*/
+                                $template[$hxno][$metric][$dimension] = $cryoem["OR5K1"][$hxno][$metric][$dimension];
+                            }
+                            else
+                            {
+                                // TODO: Make the proportions dependent on sequence similarity.
+                                /*$template[$hxno][$metric][$dimension]
+                                    = 0.25 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
+                                    + 0.25 * $cryoem["OR52"][$hxno][$metric][$dimension]
+                                    + 0.50 * $cryoem["OR5K1"][$hxno][$metric][$dimension];*/
+                                $template[$hxno][$metric][$dimension] = $cryoem["OR5K1"][$hxno][$metric][$dimension];
+                            }
                         }
                     }
+                    else $template[$hxno][$metric] = $cryoem["OR5K1"][$hxno][$metric];
                 }
             }
         }
@@ -155,10 +161,11 @@ function do_templated_activation()
             }
 
             $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
-            $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
+            if (is_array($dimensions)) $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
+            else $args .= " $cmdarg $dimensions";
         }
     }
-    $cmd = "bin/fyg_activate_or $args";
+    $cmd = "bin/fyg_activate_or $args --tplonly";
     echo "$cmd\n";
     passthru($cmd);
     unlink("tmp/$protid.fyg");

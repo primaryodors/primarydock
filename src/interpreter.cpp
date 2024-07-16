@@ -456,6 +456,15 @@ Point interpret_single_point(const char* param, Point old_value = Point(0,0,0))
             {
                 raise_error((std::string)"Residue " + std::to_string(resno) + (std::string)" is missing from strand.");
             }
+
+            const char* colon = strchr(param, ':');
+            if (colon)
+            {
+                Atom* a = aa->get_atom(colon+1);
+                if (!a) raise_error((std::string)"Residue " + std::to_string(resno) + (std::string)" has no atom named " + (std::string)(colon+1) + ".");
+                return a->get_location();
+            }
+
             return aa->get_CA_location();
         }
     }

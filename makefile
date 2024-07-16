@@ -24,8 +24,11 @@ ic: $(DIRS) $(OBJS) $(BINDIR)/ic
 
 CC=g++
 
-# Default CFLAG - no code coverage
-CFLAGS=-Og -Wwrite-strings -fextended-identifiers -std=c++14
+# Default CFLAG - release mode
+CFLAGS=-O -Wwrite-strings -fextended-identifiers -std=c++14
+
+# Debug CFLAG - allows breakpoints, valgrind
+# CFLAGS=-g -Wwrite-strings -fextended-identifiers -std=c++14
 
 # For profiling with gprof
 # CFLAGS=-g -pg -Wwrite-strings -fextended-identifiers -std=c++14

@@ -2666,6 +2666,24 @@ int main(int argc, char** argv)
                 // TODO: Option to include ligand in motion.
             }	// MOVEREL
 
+            else if (!strcmp(words[0], "PERTURN"))
+            {
+                int sr, er;
+
+                l = 1;
+                if (!words[l]) raise_error("Insufficient parameters given for PERTURN.");
+                sr = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for PERTURN.");
+                er = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for PERTURN.");
+
+                Star s;
+                s.f = working->helix_tightness(sr, er);
+                set_variable(words[l++], s);
+
+                if (words[l]) raise_error("Too many parameters given for PERTURN.");
+            }	// PERTURN
+
             else if (!strcmp(words[0], "PTALIGN"))
             {
                 Point point, align, center;

@@ -4495,3 +4495,52 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
 
     return num_applied;
 }
+
+float Protein::helix_tightness(int sr, int er)
+{
+    int i, j, samples=0;
+    float looseness = 0;
+
+    for (i=sr; i<=er; i++)
+    {
+        AminoAcid* res = get_residue(i);
+        if (!res) continue;
+
+        j = i-3;
+        AminoAcid* cmp3 = get_residue(j);
+        AminoAcid* cmp4 = get_residue(j-1);
+        if (cmp3 && cmp4)
+        {
+            Atom* NH = res->HN_or_substitute();
+            Atom* O3 = cmp3->get_atom("O");
+            Atom* O4 = cmp4->get_atom("O");
+
+            if (NH->distance_to(O3) < hx_tight_cutoff && NH->distance_to(O4) < hx_tight_cutoff)
+            {
+                float f = scalene_distance(NH->get_location(), O3->get_location(), O4->get_location()) + 2.6;
+                looseness += f;
+                samples++;
+            }
+        }
+
+        j = i+3;
+        cmp3 = get_residue(j);
+        cmp4 = get_residue(j+1);
+        if (cmp3 && cmp4)
+        {
+            Atom* O = res->get_atom("O");
+            Atom* NH3 = cmp3->HN_or_substitute();
+            Atom* NH4 = cmp4->HN_or_substitute();
+
+            if (O->distance_to(NH3) < hx_tight_cutoff && O->distance_to(NH4) < hx_tight_cutoff)
+            {
+                float f = scalene_distance(O->get_location(), NH3->get_location(), NH4->get_location()) + 2.6;
+                looseness += f;
+                samples++;
+            }
+        }
+    }
+
+    if (samples) looseness /= samples;
+    return looseness;
+}

@@ -4,7 +4,7 @@ chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir("..");
 
-$data_keys = ["x.50", "exr", "cyt", "vec", "rot"];
+$data_keys = ["x.50", "exr", "cyt", "vec", "rot", "ptrn"];
 
 $output = [];
 echo "Executing pepd script...\n";

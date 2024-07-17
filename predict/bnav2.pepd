@@ -244,11 +244,14 @@ PTALIGN @nci1 @nca1 @zero @normal &angle
 STRAND I
 ROTATE @normal &angle %1.50 %1.40 %1.55
 
+STRAND A
+PERTURN %1.40 %1.50 &pta1
+
 LET @delta1 = @A.1.50 - @I.1.50
 LET @exr1 = @A.1.40 - @I.1.40
 LET @cyt1 = @A.1.55 - @I.1.55
 
-ECHO "1: " @delta1 " | " @exr1 " | " @cyt1 " | " @normal " | " &angle
+ECHO "1: " @delta1 " | " @exr1 " | " @cyt1 " | " @normal " | " &angle " | " &pta1
 
 
 LET @nca2 = @A.2.50:C - @A.2.50:N
@@ -257,11 +260,14 @@ PTALIGN @nci2 @nca2 @zero @normal &angle
 STRAND I
 ROTATE @normal &angle %2.50 %2.40 %2.63
 
+STRAND A
+PERTURN %2.50 %2.53 &pta2
+
 LET @delta2 = @A.2.50 - @I.2.50
 LET @exr2 = @A.2.63 - @I.2.63
 LET @cyt2 = @A.2.40 - @I.2.40
 
-ECHO "2: " @delta2 " | " @exr2 " | " @cyt2 " | " @normal " | " &angle
+ECHO "2: " @delta2 " | " @exr2 " | " @cyt2 " | " @normal " | " &angle " | " &pta2
 
 
 LET @nca3 = @A.3.50:C - @A.3.50:N
@@ -270,11 +276,14 @@ PTALIGN @nci3 @nca3 @zero @normal &angle
 STRAND I
 ROTATE @normal &angle %3.50 %3.22 %3.55
 
+STRAND A
+PERTURN %3.32 %3.50 &pta3
+
 LET @delta3 = @A.3.50 - @I.3.50
 LET @exr3 = @A.3.22 - @I.3.22
 LET @cyt3 = @A.3.55 - @I.3.55
 
-ECHO "3: " @delta3 " | " @exr3 " | " @cyt3 " | " @normal " | " &angle
+ECHO "3: " @delta3 " | " @exr3 " | " @cyt3 " | " @normal " | " &angle " | " &pta3
 
 
 LET @nca4 = @A.4.50:C - @A.4.50:N
@@ -283,11 +292,14 @@ PTALIGN @nci4 @nca4 @zero @normal &angle
 STRAND I
 ROTATE @normal &angle %4.50 %4.40 %4.58
 
+STRAND A
+PERTURN %4.50 %4.57 &pta4
+
 LET @delta4 = @A.4.50 - @I.4.50
 LET @exr4 = @A.4.58 - @I.4.58
 LET @cyt4 = @A.4.40 - @I.4.40
 
-ECHO "4: " @delta4 " | " @exr4 " | " @cyt4 " | " @normal " | " &angle
+ECHO "4: " @delta4 " | " @exr4 " | " @cyt4 " | " @normal " | " &angle " | " &pta4
 
 
 LET @nca5 = @A.5.50:C - @A.5.50:N
@@ -296,11 +308,14 @@ PTALIGN @nci5 @nca5 @zero @normal &angle
 STRAND I
 ROTATE @normal &angle %5.50 %5.38 %5.58
 
+STRAND A
+PERTURN %5.42 %5.50 &pta5
+
 LET @delta5 = @A.5.50 - @I.5.50
 LET @exr5 = @A.5.38 - @I.5.38
 LET @cyt5 = @A.5.58 - @I.5.58
 
-ECHO "5: " @delta5 " | " @exr5 " | " @cyt5 " | " @normal " | " &angle
+ECHO "5: " @delta5 " | " @exr5 " | " @cyt5 " | " @normal " | " &angle " | " &pta5
 
 
 LET @nca6 = @A.6.50:C - @A.6.50:N
@@ -309,11 +324,14 @@ PTALIGN @nci6 @nca6 @zero @normal &angle
 STRAND I
 ROTATE @normal &angle %6.50 %6.40 %6.55
 
+STRAND A
+PERTURN %6.50 %6.55 &pta6
+
 LET @delta6 = @A.6.50 - @I.6.50
 LET @exr6 = @A.6.55 - @I.6.55
 LET @cyt6 = @A.6.40 - @I.6.40
 
-ECHO "6: " @delta6 " | " @exr6 " | " @cyt6 " | " @normal " | " &angle
+ECHO "6: " @delta6 " | " @exr6 " | " @cyt6 " | " @normal " | " &angle " | " &pta6
 
 
 LET @nca7 = @A.7.50:C - @A.7.50:N
@@ -322,15 +340,17 @@ PTALIGN @nci7 @nca7 @zero @normal &angle
 STRAND I
 ROTATE @normal &angle %7.50 %7.32 %7.53
 
-LET @wa7 = @A.7.42:C - @A.7.42:N
-LET @wi7 = @I.7.42:C - @I.7.42:N
-PTALIGN @wi7 @wa7 @zero @wnormal &wind
+# LET @wa7 = @A.7.42:C - @A.7.42:N
+# LET @wi7 = @I.7.42:C - @I.7.42:N
+# PTALIGN @wi7 @wa7 @zero @wnormal &wind
+STRAND A
+PERTURN %7.42 %7.50 &pta7
 
 LET @delta7 = @A.7.50 - @I.7.50
 LET @exr7 = @A.7.32 - @I.7.32
 LET @cyt7 = @A.7.53 - @I.7.53
 
-ECHO "7: " @delta7 " | " @exr7 " | " @cyt7 " | " @normal " | " &angle
+ECHO "7: " @delta7 " | " @exr7 " | " @cyt7 " | " @normal " | " &angle " | " &pta7
 ECHO ""
 
 RETURN

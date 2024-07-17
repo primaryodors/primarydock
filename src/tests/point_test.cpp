@@ -55,6 +55,27 @@ int main (int argc, char** argv)
              << find_3d_angle(ptrot8, ptref, pt5)*fiftyseven << " degrees apart."
              << endl;
     }
+
+
+    Point A(0,3,0), B(0,0,0), C(4,0,0);
+    f = scalene_distance(A, B, C);
+    cout << "Scalene distance: " << f;
+    A.x = 1;
+    f = scalene_distance(A, B, C);
+    cout << ", " << f;
+    A.x = 2;
+    f = scalene_distance(A, B, C);
+    cout << ", " << f;
+    A.y = 1.5;
+    f = scalene_distance(A, B, C);
+    cout << ", " << f;
+    A.x = 3;
+    f = scalene_distance(A, B, C);
+    cout << ", " << f;
+    A.x = 4;
+    f = scalene_distance(A, B, C);
+    cout << ", " << f;
+    cout << endl;
 }
 
 

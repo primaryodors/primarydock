@@ -1559,9 +1559,9 @@ std::ostream& operator<<(std::ostream& os, const InteratomicForce& f)
     return os;
 }
 
-float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs, LocationProbability* rlp, Point* cl)
+float Atom::interatomic_energy(Atom* ref, InteratomicForce** ifs)
 {
-    Point myloc = cl ? *cl : location;
+    Point myloc = location;
     float energy = 0;
     if (!ifs) return energy;
     if (!ref) return energy;

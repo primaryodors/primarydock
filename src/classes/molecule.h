@@ -217,9 +217,6 @@ public:
     void zero_mandatory_connection_cache();
     void delete_mandatory_connections();
 
-    // Probability voxel functions
-    float assemble_voxelized();
-
     // Debug stuff.
     #if debug_break_on_move
     void set_atoms_break_on_move(bool break_on_move)

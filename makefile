@@ -90,56 +90,56 @@ $(OBJDIR)/moiety.o: src/classes/moiety.h src/classes/moiety.cpp $(OBJDIR)/molecu
 $(OBJDIR)/scoring.o: src/classes/scoring.h src/classes/scoring.cpp $(OBJDIR)/protein.o
 	$(CC) -c src/classes/scoring.cpp -o $(OBJDIR)/scoring.o $(CFLAGS)
 
-test/point_test: src/point_test.cpp $(OBJDIR)/point.o
-	$(CC) src/point_test.cpp $(OBJDIR)/point.o $(OBJDIR)/misc.o -o test/point_test $(CFLAGS)
+test/point_test: src/tests/point_test.cpp $(OBJDIR)/point.o
+	$(CC) src/tests/point_test.cpp $(OBJDIR)/point.o $(OBJDIR)/misc.o -o test/point_test $(CFLAGS)
 
-test/atom_test: src/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
-	$(CC) src/atom_test.cpp $(OBJDIR)/misc.o $(OBJDIR)/atom.o $(OBJDIR)/point.o -o test/atom_test $(CFLAGS)
+test/atom_test: src/tests/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
+	$(CC) src/tests/atom_test.cpp $(OBJDIR)/misc.o $(OBJDIR)/atom.o $(OBJDIR)/point.o -o test/atom_test $(CFLAGS)
 
-test/molecule_test: src/molecule_test.cpp $(OBJS)
-	$(CC) src/molecule_test.cpp $(OBJS) -o test/molecule_test $(CFLAGS)
+test/molecule_test: src/tests/molecule_test.cpp $(OBJS)
+	$(CC) src/tests/molecule_test.cpp $(OBJS) -o test/molecule_test $(CFLAGS)
 
-test/ring_test: src/ring_test.cpp $(OBJDIR)/molecule.o
-	$(CC) src/ring_test.cpp $(OBJS) -o test/ring_test $(CFLAGS)
+test/ring_test: src/tests/ring_test.cpp $(OBJDIR)/molecule.o
+	$(CC) src/tests/ring_test.cpp $(OBJS) -o test/ring_test $(CFLAGS)
 
-test/pi_stack_test: src/pi_stack_test.cpp $(OBJS)
-	$(CC) src/pi_stack_test.cpp $(OBJS) -o test/pi_stack_test $(CFLAGS)
+test/pi_stack_test: src/tests/pi_stack_test.cpp $(OBJS)
+	$(CC) src/tests/pi_stack_test.cpp $(OBJS) -o test/pi_stack_test $(CFLAGS)
 
-test/aniso_test: src/aniso_test.cpp $(OBJS)
-	$(CC) src/aniso_test.cpp $(OBJS) -o test/aniso_test $(CFLAGS)
+test/aniso_test: src/tests/aniso_test.cpp $(OBJS)
+	$(CC) src/tests/aniso_test.cpp $(OBJS) -o test/aniso_test $(CFLAGS)
 
-test/group_test_mol: src/group_test_mol.cpp $(OBJS)
-	$(CC) src/group_test_mol.cpp $(OBJS) -o test/group_test_mol $(CFLAGS)
+test/group_test_mol: src/tests/group_test_mol.cpp $(OBJS)
+	$(CC) src/tests/group_test_mol.cpp $(OBJS) -o test/group_test_mol $(CFLAGS)
 
-test/group_test_res: src/group_test_res.cpp $(OBJS)
-	$(CC) src/group_test_res.cpp $(OBJS) -o test/group_test_res $(CFLAGS)
+test/group_test_res: src/tests/group_test_res.cpp $(OBJS)
+	$(CC) src/tests/group_test_res.cpp $(OBJS) -o test/group_test_res $(CFLAGS)
 
-test/moiety_test: src/moiety_test.cpp $(OBJS)
-	$(CC) src/moiety_test.cpp $(OBJS) -o test/moiety_test $(CFLAGS)
+test/moiety_test: src/tests/moiety_test.cpp $(OBJS)
+	$(CC) src/tests/moiety_test.cpp $(OBJS) -o test/moiety_test $(CFLAGS)
 
-test/mol_assem_test: src/mol_assem_test.cpp $(OBJS)
-	$(CC) src/mol_assem_test.cpp $(OBJS) -o test/mol_assem_test $(CFLAGS)
+test/mol_assem_test: src/tests/mol_assem_test.cpp $(OBJS)
+	$(CC) src/tests/mol_assem_test.cpp $(OBJS) -o test/mol_assem_test $(CFLAGS)
 
-test/eclipsing_test: src/eclipsing_test.cpp $(OBJS)
-	$(CC) src/eclipsing_test.cpp $(OBJS) -o test/eclipsing_test $(CFLAGS)
+test/eclipsing_test: src/tests/eclipsing_test.cpp $(OBJS)
+	$(CC) src/tests/eclipsing_test.cpp $(OBJS) -o test/eclipsing_test $(CFLAGS)
 
-test/amino_test: src/amino_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o
-	$(CC) src/amino_test.cpp $(OBJS) -o test/amino_test $(CFLAGS)
+test/amino_test: src/tests/amino_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o
+	$(CC) src/tests/amino_test.cpp $(OBJS) -o test/amino_test $(CFLAGS)
 
-test/protein_test: src/protein_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
-	$(CC) src/protein_test.cpp $(OBJS) -o test/protein_test $(CFLAGS)
+test/protein_test: src/tests/protein_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+	$(CC) src/tests/protein_test.cpp $(OBJS) -o test/protein_test $(CFLAGS)
 
-test/backbone_test: src/backbone_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
-	$(CC) src/backbone_test.cpp $(OBJS) -o test/backbone_test $(CFLAGS)
+test/backbone_test: src/tests/backbone_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+	$(CC) src/tests/backbone_test.cpp $(OBJS) -o test/backbone_test $(CFLAGS)
 
-test/bond_rotation_test: src/bond_rotation_test.cpp $(OBJS) $(OBJDIR)/molecule.o
-	$(CC) src/bond_rotation_test.cpp $(OBJS) -o test/bond_rotation_test $(CFLAGS)
+test/bond_rotation_test: src/tests/bond_rotation_test.cpp $(OBJS) $(OBJDIR)/molecule.o
+	$(CC) src/tests/bond_rotation_test.cpp $(OBJS) -o test/bond_rotation_test $(CFLAGS)
 
-test/flexion_test: src/flexion_test.cpp $(OBJS)
-	$(CC) src/flexion_test.cpp $(OBJS) -o test/flexion_test $(CFLAGS)
+test/flexion_test: src/tests/flexion_test.cpp $(OBJS)
+	$(CC) src/tests/flexion_test.cpp $(OBJS) -o test/flexion_test $(CFLAGS)
 
-test/histidine_test: src/histidine_test.cpp $(OBJS)
-	$(CC) src/histidine_test.cpp $(OBJS) -o test/histidine_test $(CFLAGS)
+test/histidine_test: src/tests/histidine_test.cpp $(OBJS)
+	$(CC) src/tests/histidine_test.cpp $(OBJS) -o test/histidine_test $(CFLAGS)
 
 $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/scoring.o
 	$(CC) src/primarydock.cpp $(OBJS) -o $(BINDIR)/primarydock $(CFLAGS)

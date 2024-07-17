@@ -96,9 +96,6 @@
 #define pi_CH_dkytw 0.0766
 #define pi_HT_dkytw 0.002657
 
-#define _voxel_resolution 0.1
-#define USE_VOXEL_ARRAY false
-
 #define ATOM_NOT_OF_AMINO_ACID 0x907aa
 #define NOT_ATOM_RECORD 0xb1207e19
 

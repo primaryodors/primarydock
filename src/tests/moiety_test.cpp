@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstring>
 #include <sys/stat.h>
-#include "classes/moiety.h"
+#include "../classes/moiety.h"
 
 using namespace std;
 

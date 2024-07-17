@@ -5354,22 +5354,6 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
 }
 
 
-float Molecule::assemble_voxelized()
-{
-    float final_score = 0;
-
-    if (!atoms) return final_score;
-    if (!atoms[0]) return final_score;
-
-    // Set one definite atom position.
-    atoms[0]->move(Point(0,0,0));
-    LocationProbability lpa0(atoms[0]->get_location());
-
-    return final_score;
-}
-
-
-
 
 
 

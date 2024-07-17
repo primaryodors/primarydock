@@ -682,7 +682,19 @@ int LocationProbability::index_from_coord(Point pt)
     return x + edge_size*y + edge_size*edge_size*z;
 }
 
+double scalene_distance(Point A, Point B, Point C)
+{
+    double AB = A.get_3d_distance(B), AC = A.get_3d_distance(C), BC = B.get_3d_distance(C);
+    double AB2 = AB*AB, AC2 = AC*AC, BC2 = BC*BC;
+    double rb = AC2 - (AB2 + BC2);                  // If A is aligned to B, then AC is a hypotenuse.
+    double rc = AB2 - (AC2 + BC2);                  // If A is aligned to C, then AB is a hypotenuse.
 
+    if (rb <= 0 && rc <= 0)
+    {
+        return -rb / fabs(rb+rc);
+    }
+    else return -1;                 // Out of range.
+}
 
 
 

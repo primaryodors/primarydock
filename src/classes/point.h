@@ -226,6 +226,7 @@ float sphere_intersection(float r1, float r2, float d);         // Volume of the
 float sphere_inter_area(float r1, float r2, float d);           // Area of the circle formed by the spheres' intersection.
 
 SCoord v_from_pt_sub(Point distal, Point reference);
+double scalene_distance(Point A, Point B, Point C);
 
 std::ostream& operator<<(std::ostream& os, const Point& p);
 std::ostream& operator<<(std::ostream& os, const SCoord& v);

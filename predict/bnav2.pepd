@@ -322,6 +322,10 @@ PTALIGN @nci7 @nca7 @zero @normal &angle
 STRAND I
 ROTATE @normal &angle %7.50 %7.32 %7.53
 
+LET @wa7 = @A.7.42:C - @A.7.42:N
+LET @wi7 = @I.7.42:C - @I.7.42:N
+PTALIGN @wi7 @wa7 @zero @wnormal &wind
+
 LET @delta7 = @A.7.50 - @I.7.50
 LET @exr7 = @A.7.32 - @I.7.32
 LET @cyt7 = @A.7.53 - @I.7.53

@@ -117,7 +117,7 @@ int main(int argc, char** argv)
         cout << "Too few args." << endl;
         return -1;
     }
-    int i, j, l, m, n, sr, er;
+    int i, j, l, m, n, sr, er, iter;
     char c;
 
     int fam = 0, mem = 0;
@@ -431,17 +431,19 @@ int main(int argc, char** argv)
             AminoAcid* pr = p.get_residue_bw(i, 50);
             pt = pr->get_CA_location();
 
-            p.rotate_piece(sr, er, pt, vec[i], rot[i]);
+            p.rotate_piece(sr, er, pt, vec[i], -rot[i]);
         }
     }
+
+    save_file(p, "tmp/step1.pdb");
 
 
     ////////////////////////////////////////////////////////////////////////////////
     // n.50 translations.
     ////////////////////////////////////////////////////////////////////////////////
-    for (i=1; i<=7; i++)
+    /* for (iter = 0; iter < 10; iter++) */ for (i=1; i<=7; i++)
     {
-        if (xl8[i].r)
+        if (xl8[i].r >= 0.00001)
         {
             std::string name = (std::string)"TMR" + to_string(i);
             sr = p.get_region_start(name);
@@ -456,13 +458,16 @@ int main(int argc, char** argv)
             }
 
             SCoord motion = xl8[i];
-            float r = p.region_can_move(sr, er, motion, true, sr1, er1);
-            if (r < motion.r) motion.r = r;
+            // float r = p.region_can_move(sr, er, motion, true, sr1, er1);
+            // if (r < motion.r) motion.r = r;
 
             cout << "Applying helix " << i << " translation " << motion.r << "A of " << xl8[i].r << " limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.move_piece(sr, er, motion);
+            xl8[i].r -= motion.r;
         }
     }
+
+    save_file(p, "tmp/step2.pdb");
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -500,6 +505,8 @@ int main(int argc, char** argv)
             cout << " limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
         }
     }
+
+    save_file(p, "tmp/step3.pdb");
 
 
 

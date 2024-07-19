@@ -154,13 +154,16 @@ function do_templated_activation()
     {
         foreach ($metrics as $metric => $dimensions)
         {
-            if ($hxno == 6)
+            /*if ($hxno == 6)
             {
                 if ($metric == "cyt" && ($has_fyg || $has_rock6)) continue;
                 else if ($metric == "exr" && $has_rock6) continue;
-            }
+            }*/
 
-            $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
+            $arg = substr($metric, 0, 1);
+            if ($metric == 'ptrn') $arg = 'pt';
+
+            $cmdarg = "--$arg$hxno";
             if (is_array($dimensions)) $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
             else $args .= " $cmdarg $dimensions";
         }

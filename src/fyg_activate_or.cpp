@@ -18,7 +18,7 @@ using namespace std;
 #define dbg_57_contact 0
 
 // TODO: These should be stored in a dedicated config file and made available to the predict/bnav2.pepd script.
-const BallesterosWeinstein ebw[8] = { "0.0", "1.40", "2.63", "3.22", "4.60", "5.35", "6.55", "7.32" };
+const BallesterosWeinstein ebw[8] = { "0.0", "1.40", "2.63", "3.32", "4.58", "5.38", "6.55", "7.42" };
 const BallesterosWeinstein cbw[8] = { "0.0", "1.55", "2.40", "3.55", "4.40", "5.58", "6.40", "7.53" };
 
 void save_file(Protein& p, std::string filename, Molecule* ligand = nullptr)
@@ -136,12 +136,16 @@ int main(int argc, char** argv)
     SCoord xl8[10];
     SCoord exr[10];
     SCoord cyt[10];
+    float ptrn[10];
     Point pt;
+
+    Point hxc[10];
+    Point hxe[10];
 
     for (i=0; i<10; i++)
     {
         vec[i] = xl8[i] = exr[i] = cyt[i] = SCoord(0,0,0);
-        rot[i] = 0;
+        rot[i] = ptrn[i] = 0;
     }
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -158,7 +162,7 @@ int main(int argc, char** argv)
             else if (!strcmp(argv[i], "--tplonly")) template_only = true;
             else if (!strcmp(argv[i], "-o")) override_ofname = argv[++i];
             else if (argv[i][1] == '-'
-                && (argv[i][2] == 'r')
+                && argv[i][2] == 'r'
                 && argv[i][3] >= '1' && argv[i][3] <= '7'
                 && !argv[i][4]
                 )
@@ -170,6 +174,21 @@ int main(int argc, char** argv)
                     return -1;
                 }
                 rot[j] = atof(argv[i]) / fiftyseven;
+            }
+            else if (argv[i][1] == '-'
+                && argv[i][2] == 'p'
+                && argv[i][3] == 't'
+                && argv[i][4] >= '1' && argv[i][4] <= '7'
+                && !argv[i][5]
+                )
+            {
+                j = atoi(argv[i]+4);
+                i++; if (i >= argc)
+                {
+                    cout << "Too few args." << endl;
+                    return -1;
+                }
+                ptrn[j] = atof(argv[i]);
             }
             else if (argv[i][1] == '-'
                 && (argv[i][2] == 'x' || argv[i][2] == 'e' || argv[i][2] == 'c' || argv[i][2] == 'v')
@@ -417,6 +436,34 @@ int main(int argc, char** argv)
         initial_clash_[i] = p.get_internal_clashes(p.get_region_start(region), p.get_region_end(region));
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Preliminary info for EXR and CYT bends.
+    ////////////////////////////////////////////////////////////////////////////////
+    for (i=1; i<=7; i++)
+    {
+        if (exr[i].r)
+        {
+            AminoAcid* aaterm = p.get_residue(ebw[i]);
+            if (!aaterm)
+            {
+                cout << "Error: helix " << i << " EXR terminus or BW50 residue not found in PDB model." << endl;
+                return -1;
+            }
+
+            hxe[i] = aaterm->get_CA_location().add(exr[i]);
+        }
+        if (cyt[i].r)
+        {
+            AminoAcid* aaterm = p.get_residue(cbw[i]);
+            if (!aaterm)
+            {
+                cout << "Error: helix " << i << " CYT terminus or BW50 residue not found in PDB model." << endl;
+                return -1;
+            }
+
+            hxc[i] = aaterm->get_CA_location().add(cyt[i]);
+        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////////
     // n.50 rotations.
@@ -436,6 +483,43 @@ int main(int argc, char** argv)
     }
 
     save_file(p, "tmp/step1.pdb");
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // helix perturns.
+    ////////////////////////////////////////////////////////////////////////////////
+    for (i=1; i<=7; i++)
+    {
+        if (ptrn[i])
+        {
+            std::string name = (std::string)"TMR" + to_string(i);
+            sr = p.get_region_start(name);
+            er = p.get_region_end(name);
+            int b50 = p.get_bw50(i);
+
+            if (i & 1) er = sr;
+            sr = b50;
+
+            Point ps = p.get_residue(sr)->get_CA_location();
+            Point pt = p.get_residue(er)->get_CA_location();
+
+            float t = p.helix_tightness(sr, er);
+            float f = ptrn[i] - t;
+
+            DynamicMotion dyn(&p);
+            dyn.type = dyn_wind;
+            dyn.start_resno = BallesterosWeinstein(i, 50+sr-b50);
+            dyn.end_resno = BallesterosWeinstein(i, 50+er-b50);
+            dyn.bias = f*5.3;
+            dyn.minimum = -10;
+            dyn.apply_incremental(1);
+
+            // Rotation rot = align_points_3d(p.get_residue(er)->get_CA_location(), pt, ps);
+            // p.rotate_piece(sr, er, rot, sr);
+        }
+    }
+
+    save_file(p, "tmp/step2.pdb");
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -467,7 +551,7 @@ int main(int argc, char** argv)
         }
     }
 
-    save_file(p, "tmp/step2.pdb");
+    save_file(p, "tmp/step3.pdb");
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -475,9 +559,18 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////////
     for (i=1; i<=7; i++)
     {
+        bool odd = (i&1);
+
+        AminoAcid* aasrc = p.get_residue_bw(i, 50);
+        Point center = aasrc->get_CA_location();
+        int b50 = aasrc->get_residue_no();
+
+        std::string name = (std::string)"TMR" + to_string(i);
+        sr = p.get_region_start(name);
+        er = p.get_region_end(name);
+
         if (exr[i].r)
         {
-            AminoAcid* aasrc = p.get_residue_bw(i, 50);
             AminoAcid* aaterm = p.get_residue(ebw[i]);
             if (!aasrc || !aaterm)
             {
@@ -486,13 +579,16 @@ int main(int argc, char** argv)
             }
 
             cout << "Applying helix " << i << " extracellular bend ";
-            do_template_bend(p, aasrc, aaterm, i, exr[i], xl8[i]);
-            cout << " limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+
+            Rotation rot = align_points_3d(aaterm->get_CA_location(), hxe[i], center);
+            p.rotate_piece(odd ? sr : b50, odd ? b50 : er, center, rot.v, rot.a);
+
+            cout << aaterm->get_CA_location() << " target was " << hxe[i];
+            cout << endl;
         }
 
         if (cyt[i].r)
         {
-            AminoAcid* aasrc = p.get_residue_bw(i, 50);
             AminoAcid* aaterm = p.get_residue(cbw[i]);
             if (!aasrc || !aaterm)
             {
@@ -501,12 +597,17 @@ int main(int argc, char** argv)
             }
 
             cout << "Applying helix " << i << " cytoplasmic bend ";
-            do_template_bend(p, aasrc, aaterm, i, cyt[i], xl8[i]);
-            cout << " limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+
+            Rotation rot = align_points_3d(aaterm->get_CA_location(), hxc[i], center);
+            p.rotate_piece(odd ? b50 : sr, odd ? er : b50, center, rot.v, rot.a);
+            cout << (odd ? b50 : sr) << "-" << (odd ? er : b50) << " " << center << ", " << (rot.a*fiftyseven) << " deg. ";
+
+            cout << aaterm->get_CA_location() << " target was " << hxc[i];
+            cout << endl;
         }
     }
 
-    save_file(p, "tmp/step3.pdb");
+    save_file(p, "tmp/step4.pdb");
 
 
 
@@ -939,6 +1040,18 @@ int main(int argc, char** argv)
                 aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
         }
     }
+
+    cout << "Minimizing residue clashes...";
+    er = p.get_end_resno();
+    for (i=0; i<3; i++)
+    {
+        for (j=1; j<=er; j++)
+        {
+            p.minimize_residue_clashes(j);
+            if (!(j%10)) cout << "." << flush;
+        }
+    }
+    cout << endl;
 
 
     ////////////////////////////////////////////////////////////////////////////////

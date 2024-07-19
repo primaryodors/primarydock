@@ -229,6 +229,7 @@ float DynamicMotion::apply_incremental_nochecks(float amt)
     int i, j, sr, er;
     float lamt, lamt_phi, lamt_psi;
     LocatedVector lv;
+    int inc;
 
     switch (type)
     {
@@ -308,10 +309,12 @@ float DynamicMotion::apply_incremental_nochecks(float amt)
         lamt_phi = lamt/(M_PI*2) * (ALPHA_PHI - -M_PI);
         lamt_psi = lamt/(M_PI*2) * (ALPHA_PSI - -M_PI);
 
-        for (i=sr; i<=er; i++)
+        inc = sgn(er-sr);
+        for (i=sr; ; i+=inc)
         {
-            prot->rotate_backbone_partial(i, er, N_asc, lamt_phi);
-            prot->rotate_backbone_partial(i, er, CA_asc, lamt_psi);
+            prot->rotate_backbone_partial(i, er, (inc>0) ? N_asc : CA_desc, lamt_phi);
+            prot->rotate_backbone_partial(i, er, (inc>0) ? CA_asc : C_desc, lamt_psi);
+            if (i == er) break;
         }
         applied += amt;
 

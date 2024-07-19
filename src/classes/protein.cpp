@@ -3044,6 +3044,13 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
 {
     save_undo_state();
 
+    if (start_res > end_res)
+    {
+        int swap = start_res;
+        start_res = end_res;
+        end_res = swap;
+    }
+
     LocatedVector lv(axis);
     lv.origin = pivot;
     int i;

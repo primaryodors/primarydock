@@ -246,13 +246,29 @@ LET @nci1 = @I.1.50:C - @I.1.50:N
 PTALIGN @nci1 @nca1 @zero @normal &angle
 
 STRAND A
-PERTURN %1.40 %1.50 &pta1
+LET %j = %1.50
+LET %i = %j - 4
+PERTURN %i %j &pta1
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta2
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta3
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta4
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta5
+LET %qpta = 5
 
 LET @delta1 = @A.1.50 - @I.1.50
 LET @exr1 = @A.1.40 - @I.1.40
 LET @cyt1 = @A.1.55 - @I.1.55
 
-ECHO "1: " @delta1 " | " @exr1 " | " @cyt1 " | " @normal " | " &angle " | " &pta1
+LET %tmrno = 1
+GOSUB print
 
 
 LET @nca2 = @A.2.50:C - @A.2.50:N
@@ -260,13 +276,26 @@ LET @nci2 = @I.2.50:C - @I.2.50:N
 PTALIGN @nci2 @nca2 @zero @normal &angle
 
 STRAND A
-PERTURN %2.50 %2.53 &pta2
+LET %j = %2.50
+LET %i = %j + 4
+PERTURN %j %i &pta1
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta2
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta3
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta4
+LET %qpta = 4
 
 LET @delta2 = @A.2.50 - @I.2.50
 LET @exr2 = @A.2.63 - @I.2.63
 LET @cyt2 = @A.2.40 - @I.2.40
 
-ECHO "2: " @delta2 " | " @exr2 " | " @cyt2 " | " @normal " | " &angle " | " &pta2
+LET %tmrno = 2
+GOSUB print
 
 
 LET @nca3 = @A.3.50:C - @A.3.50:N
@@ -274,13 +303,35 @@ LET @nci3 = @I.3.50:C - @I.3.50:N
 PTALIGN @nci3 @nca3 @zero @normal &angle
 
 STRAND A
-PERTURN %3.32 %3.50 &pta3
+LET %j = %3.50
+LET %i = %j - 4
+PERTURN %i %j &pta1
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta2
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta3
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta4
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta5
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta6
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta7
+LET %qpta = 7
 
 LET @delta3 = @A.3.50 - @I.3.50
 LET @exr3 = @A.3.32 - @I.3.32
 LET @cyt3 = @A.3.55 - @I.3.55
 
-ECHO "3: " @delta3 " | " @exr3 " | " @cyt3 " | " @normal " | " &angle " | " &pta3
+LET %tmrno = 3
+GOSUB print
 
 
 LET @nca4 = @A.4.50:C - @A.4.50:N
@@ -288,13 +339,23 @@ LET @nci4 = @I.4.50:C - @I.4.50:N
 PTALIGN @nci4 @nca4 @zero @normal &angle
 
 STRAND A
-PERTURN %4.50 %4.57 &pta4
+LET %j = %4.50
+LET %i = %j + 4
+PERTURN %j %i &pta1
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta2
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta3
+LET %qpta = 3
 
 LET @delta4 = @A.4.50 - @I.4.50
 LET @exr4 = @A.4.58 - @I.4.58
 LET @cyt4 = @A.4.40 - @I.4.40
 
-ECHO "4: " @delta4 " | " @exr4 " | " @cyt4 " | " @normal " | " &angle " | " &pta4
+LET %tmrno = 4
+GOSUB print
 
 
 LET @nca5 = @A.5.50:C - @A.5.50:N
@@ -302,13 +363,26 @@ LET @nci5 = @I.5.50:C - @I.5.50:N
 PTALIGN @nci5 @nca5 @zero @normal &angle
 
 STRAND A
-PERTURN %5.42 %5.50 &pta5
+LET %j = %5.50
+LET %i = %j - 4
+PERTURN %i %j &pta1
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta2
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta3
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta4
+LET %qpta = 4
 
 LET @delta5 = @A.5.50 - @I.5.50
 LET @exr5 = @A.5.38 - @I.5.38
 LET @cyt5 = @A.5.58 - @I.5.58
 
-ECHO "5: " @delta5 " | " @exr5 " | " @cyt5 " | " @normal " | " &angle " | " &pta5
+LET %tmrno = 5
+GOSUB print
 
 
 LET @nca6 = @A.6.50:C - @A.6.50:N
@@ -316,13 +390,23 @@ LET @nci6 = @I.6.50:C - @I.6.50:N
 PTALIGN @nci6 @nca6 @zero @normal &angle
 
 STRAND A
-PERTURN %6.50 %6.55 &pta6
+LET %j = %6.50
+LET %i = %j + 4
+PERTURN %j %i &pta1
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta2
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta3
+LET %qpta = 3
 
 LET @delta6 = @A.6.50 - @I.6.50
 LET @exr6 = @A.6.55 - @I.6.55
 LET @cyt6 = @A.6.40 - @I.6.40
 
-ECHO "6: " @delta6 " | " @exr6 " | " @cyt6 " | " @normal " | " &angle " | " &pta6
+LET %tmrno = 6
+GOSUB print
 
 
 LET @nca7 = @A.7.50:C - @A.7.50:N
@@ -330,13 +414,50 @@ LET @nci7 = @I.7.50:C - @I.7.50:N
 PTALIGN @nci7 @nca7 @zero @normal &angle
 
 STRAND A
-PERTURN %7.42 %7.50 &pta7
+LET %j = %7.50
+LET %i = %j - 4
+PERTURN %i %j &pta1
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta2
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta3
+LET %j = %i
+LET %i -= 4
+PERTURN %i %j &pta4
+LET %qpta = 4
 
 LET @delta7 = @A.7.50 - @I.7.50
 LET @exr7 = @A.7.42 - @I.7.42
 LET @cyt7 = @A.7.53 - @I.7.53
 
-ECHO "7: " @delta7 " | " @exr7 " | " @cyt7 " | " @normal " | " &angle " | " &pta7
+LET %tmrno = 7
+GOSUB print
+
+ECHO "END"
+ECHO ""
+
+RETURN
+
+
+print:
+
+ECHO "TMR" %tmrno ":"
+ECHO "XFORM " @delta%tmrno
+ECHO "EXR " @exr%tmrno
+ECHO "CYT " @cyt%tmrno
+ECHO "AXIS " @normal
+ECHO "ROT " &angle
+ECHO "WIND" ~
+
+LET %tno = 1
+_tno_loop:
+ECHO " " &pta%tno ~
+LET %tno ++
+IF %tno <= %qpta GOTO _tno_loop
+ECHO ""
+
 ECHO ""
 
 RETURN

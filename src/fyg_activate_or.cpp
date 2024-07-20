@@ -506,13 +506,7 @@ int main(int argc, char** argv)
             float t = p.helix_tightness(sr, er);
             float f = ptrn[i] - t;
 
-            DynamicMotion dyn(&p);
-            dyn.type = dyn_wind;
-            dyn.start_resno = BallesterosWeinstein(i, 50+sr-b50);
-            dyn.end_resno = BallesterosWeinstein(i, 50+er-b50);
-            dyn.bias = f*5.3;
-            dyn.minimum = -10;
-            dyn.apply_incremental(1);
+            p.wind_helix(sr, er, f*5.3);
 
             // Rotation rot = align_points_3d(p.get_residue(er)->get_CA_location(), pt, ps);
             // p.rotate_piece(sr, er, rot, sr);
@@ -608,7 +602,6 @@ int main(int argc, char** argv)
     }
 
     save_file(p, "tmp/step4.pdb");
-
 
 
     if (!template_only)
@@ -1040,6 +1033,7 @@ int main(int argc, char** argv)
                 aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
         }
     }
+
 
     cout << "Minimizing residue clashes...";
     er = p.get_end_resno();

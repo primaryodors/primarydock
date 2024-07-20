@@ -201,6 +201,7 @@ public:
         float angle,									// 0 = horizontal; positive = ascending (+Y) with increasing resno.
         int iterations
     );
+    float wind_helix(int start_resno, int end_resno, float wind_amount, int region_end = 0);        // Adjust helix tightness/looseness.
 
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);

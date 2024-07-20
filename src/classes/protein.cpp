@@ -2926,6 +2926,23 @@ float Protein::orient_helix(int startres, int endres, int stopat, float angle, i
     return ha;
 }
 
+float Protein::wind_helix(int sr, int er, float amt, int re)
+{
+    if (!re) re = er;
+    float lamt_phi = amt/(M_PI*2) * (ALPHA_PHI - -M_PI);
+    float lamt_psi = amt/(M_PI*2) * (ALPHA_PSI - -M_PI);
+
+    int i, inc = sgn(er-sr);
+    for (i=sr; ; i+=inc)
+    {
+        rotate_backbone_partial(i, re, (inc>0) ? N_asc : CA_desc, lamt_phi);
+        rotate_backbone_partial(i, re, (inc>0) ? CA_asc : C_desc, lamt_psi);
+        if (i == er) break;
+    }
+
+    return helix_tightness(min(sr, er), max(sr, er));
+}
+
 SCoord Protein::get_region_axis(int startres, int endres)
 {
     int rglen = endres-startres;

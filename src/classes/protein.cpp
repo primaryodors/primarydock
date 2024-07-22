@@ -4571,7 +4571,7 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
 
 float Protein::helix_tightness(int sr, int er)
 {
-    int i, j, samples=0;
+    int i, samples=0;
     float looseness = 0;
 
     if (sr > er)
@@ -4585,34 +4585,33 @@ float Protein::helix_tightness(int sr, int er)
     {
         AminoAcid* res = get_residue(i);
         if (!res) continue;
+        AminoAcid* cmp3, * cmp4;
 
-        j = i-3;
-        AminoAcid* cmp3 = get_residue(j);
-        AminoAcid* cmp4 = get_residue(j-1);
-        /*if (cmp3 && cmp4)             code monkey too retarded figure this out
-        {
-            Atom* H = res->HN_or_substitute();
-            Atom* O = cmp4->get_atom("O");
-            Atom* N = cmp3->get_atom("N");
-            Atom* A = cmp4->get_atom("CA");
-
-            if (H->distance_to(O) < hx_tight_cutoff)
-            {
-                float f = scalene_distance(H->get_location(), N->get_location(), A->get_location());
-                looseness += f;
-                samples++;
-            }
-        }*/
-
-        j = i+3;
-        cmp3 = get_residue(j);
-        cmp4 = get_residue(j+1);
+        cmp3 = get_residue(i+3);
+        cmp4 = get_residue(i+4);
         if (cmp3 && cmp4)
         {
             Atom* O = res->get_atom("O");
             Atom* H = cmp4->HN_or_substitute();
             Atom* C = cmp3->get_atom("C");
             Atom* A = cmp4->get_atom("CA");
+
+            if (O->distance_to(H) < hx_tight_cutoff)
+            {
+                float f = scalene_distance(O->get_location(), C->get_location(), A->get_location()) + 0.32265;
+                looseness += f;
+                samples++;
+            }
+        }
+
+        cmp3 = get_residue(i-1);
+        cmp4 = get_residue(i-4);
+        if (cmp3 && cmp4)
+        {
+            Atom* O = cmp4->get_atom("O");
+            Atom* H = res->HN_or_substitute();
+            Atom* C = cmp3->get_atom("C");
+            Atom* A = res->get_atom("CA");
 
             if (O->distance_to(H) < hx_tight_cutoff)
             {

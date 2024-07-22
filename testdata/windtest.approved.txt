@@ -1,0 +1,4 @@
+Initial perturn: 3.569998
+Wrote tmp/wind_test_1.pdb.
+New perturn: 3.670575
+Wrote tmp/wind_test_2.pdb.

@@ -49,6 +49,17 @@ else
 fi
 
 
+REPORT="testdata/windtest.approved.txt"
+./bin/pepteditor test/windtest.pepd | sed '/^#/d' >testdata/received/windtest.received.txt
+RESULT=$(diff --unified $REPORT testdata/received/windtest.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Wind test succeeded.${NC}\n"
+else
+    printf "${RED}Wind test FAILED.${NC}\n"
+    diff --color --unified $REPORT testdata/received/windtest.received.txt
+fi
+
+
 
 printf "${CYN}Running prediction tests and docking tests; these will take some time. Please wait.${NC}\n"
 

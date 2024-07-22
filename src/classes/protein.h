@@ -176,9 +176,9 @@ public:
     LocRotation rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res);
     LocRotation rotate_piece(int start_res, int end_res, Point origin, SCoord axis, float theta);
 
-    void rotate_backbone(int residue_no, bb_rot_dir direction, float angle);
+    void rotate_backbone(int residue_no, bb_rot_dir direction, float angle, bool update_clashables = true);
     void conform_backbone(int startres, int endres, Atom* a, Point target, int iters = 50);
-    void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle);
+    void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle, bool update_clashables = true);
     void conform_backbone(int startres, int endres, int iters = 50, bool backbone_atoms_only = false);
     void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, Atom* a3, Point target3, int iters = 50);
     void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, int iters = 50, bool backbone_atoms_only = false);
@@ -201,7 +201,8 @@ public:
         float angle,									// 0 = horizontal; positive = ascending (+Y) with increasing resno.
         int iterations
     );
-    float wind_helix(int start_resno, int end_resno, float wind_amount, int region_end = 0);        // Adjust helix tightness/looseness.
+    float wind_helix(int start_resno, int end_resno, double wind_amount, int region_end = 0);        // Adjust helix tightness/looseness.
+    float wind_helix_to_tightness(int start_resno, int end_resno, float target_tightness, int region_end = 0);
 
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);

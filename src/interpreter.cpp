@@ -3231,18 +3231,15 @@ int main(int argc, char** argv)
                 l = 1;
                 if (!words[l]) raise_error("Insufficient parameters for WIND");
 
-                DynamicMotion dyn(working);
-                dyn.type = dyn_wind;
-
-                dyn.start_resno = working->get_bw_from_resno(interpret_single_int(words[l++]));
+                int sr = interpret_single_int(words[l++]);
                 if (!words[l]) raise_error("Insufficient parameters for WIND");
-                dyn.end_resno = working->get_bw_from_resno(interpret_single_int(words[l++]));
+                int er = interpret_single_int(words[l++]);
 
                 if (!words[l]) raise_error("Insufficient parameters for WIND");
-                dyn.bias = interpret_single_float(words[l++]);
+                float windamt = interpret_single_float(words[l++]);
 
                 if (words[l]) raise_error("Too many parameters for WIND");
-                dyn.apply_absolute(1);
+                working->wind_helix(sr, er, windamt);
             }	// WIND
 
             else

@@ -390,7 +390,7 @@ LET @nci6 = @I.6.50:C - @I.6.50:N
 PTALIGN @nci6 @nca6 @zero @normal &angle
 
 STRAND A
-LET %j = %6.50
+LET %j = %6.40
 LET %i = %j + 4
 PERTURN %j %i &pta1
 LET %j = %i
@@ -399,7 +399,13 @@ PERTURN %j %i &pta2
 LET %j = %i
 LET %i += 4
 PERTURN %j %i &pta3
-LET %qpta = 3
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta4
+LET %j = %i
+LET %i += 4
+PERTURN %j %i &pta5
+LET %qpta = 5
 
 LET @delta6 = @A.6.50 - @I.6.50
 LET @exr6 = @A.6.55 - @I.6.55

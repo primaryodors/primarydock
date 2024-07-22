@@ -744,3 +744,20 @@ UNLIG
 ```
 
 Deletes any ligands that were loaded from a PDB by a `LOAD` command. Takes no arguments.
+
+
+# WIND
+Example:
+```
+WIND 100 200 0.1
+WIND 6.28 6.58 -0.25
+WIND %start_resno %end_resno &amount
+```
+
+Changes the tightness of a stretch of alpha helix.
+
+The magnitude of the wind amount does not correspond simply to the amount of change in the helix's residues per turn,
+but rather is applied to each residue's phi and psi angles as a rotation by an amount multiplied by the usual phi and psi angles
+for an alpha helix. As an example, an alpha helix peptide made using the `GEN` and `HELIX` commands (q.v.) will have a `PERTURN` of
+about 3.5385, and if it is subsequently loosened slightly by passing a value of -0.1 to the `WIND` command, its new residues-per-turn
+value will be about 3.6392, a difference of slightly more than 0.1.

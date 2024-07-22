@@ -220,6 +220,7 @@ int main(int argc, char** argv)
                 ptrn[tmrno][i] = atof(words[i]);
             }
         }
+        else if (!strcmp(words[0], "END")) break;
     }
 
     fclose(fp);
@@ -328,6 +329,7 @@ int main(int argc, char** argv)
         sr = p.get_region_start(name);
         er = p.get_region_end(name);
         int b50 = p.get_bw50(i);
+        if (i == 6) b50 -= 10;
 
         if (i & 1) er = sr;
         sr = b50;
@@ -343,7 +345,9 @@ int main(int argc, char** argv)
             float t = p.helix_tightness(tsr, ter);
             float f = ptrn[i][j] - t;
 
-            p.wind_helix(tsr, ter, f*5.3, er);
+            // float now = p.wind_helix(tsr, ter, f*-1, (er>sr) ? max(er, ter) : min(er, ter));
+            float now = p.wind_helix_to_tightness(tsr, ter, ptrn[i][j], (er>sr) ? max(er, ter) : min(er, ter));
+            cout << "Helix " << i << " winding was " << t << ", now " << now << ", target " << ptrn[i][j] << endl;
 
             // Rotation rot = align_points_3d(p.get_residue(er)->get_CA_location(), pt, ps);
             // p.rotate_piece(sr, er, rot, sr);
@@ -376,7 +380,9 @@ int main(int argc, char** argv)
             // float r = p.region_can_move(sr, er, motion, true, sr1, er1);
             // if (r < motion.r) motion.r = r;
 
-            cout << "Applying helix " << i << " translation " << motion.r << "A of " << xl8[i].r << " limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            cout << "Applying helix " << i << " translation " << motion.r << "A"
+                // << " of " << xl8[i].r << " limited by " << *(p.stop1) << "->" << *(p.stop2)
+                << endl;
             p.move_piece(sr, er, motion);
             xl8[i].r -= motion.r;
         }

@@ -1,0 +1,15 @@
+
+GEN "TAACRICRQEMMEADEEVTAQSV"
+HELIX ALPHA 1 23
+
+PERTURN 1 23 &initpt
+ECHO "Initial perturn: " &initpt
+
+SAVE "tmp/wind_test_1.pdb"
+
+WIND 1 23 -0.1
+PERTURN 1 23 &newpt
+ECHO "New perturn: " &newpt
+
+SAVE "tmp/wind_test_2.pdb"
+

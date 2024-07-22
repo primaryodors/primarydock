@@ -96,7 +96,7 @@
 #define pi_CH_dkytw 0.0766
 #define pi_HT_dkytw 0.002657
 
-#define hx_tight_cutoff 4.6
+#define hx_tight_cutoff 2.6
 
 #define ATOM_NOT_OF_AMINO_ACID 0x907aa
 #define NOT_ATOM_RECORD 0xb1207e19

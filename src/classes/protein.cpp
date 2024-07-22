@@ -1678,7 +1678,7 @@ int Protein::search_sequence(const int sr, const int esr, const char* psz, const
     return k;
 }
 
-void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
+void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle, bool uc)
 {
     save_undo_state();
 
@@ -1698,12 +1698,12 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
             // cout << "Rotating " << i << endl;
             movable->rotate(lv, angle);
             movable->ensure_pi_atoms_coplanar();
-            set_clashables(i);
+            if (uc) set_clashables(i);
         }
     }
 }
 
-void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle)
+void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle, bool uc)
 {
     save_undo_state();
     if (startres == endres) return;
@@ -1733,7 +1733,7 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
         }
     }
 
-    set_clashables();
+    if (uc) set_clashables();
 }
 
 void Protein::conform_backbone(int startres, int endres, int iters, bool backbone_atoms_only)
@@ -2926,21 +2926,70 @@ float Protein::orient_helix(int startres, int endres, int stopat, float angle, i
     return ha;
 }
 
-float Protein::wind_helix(int sr, int er, float amt, int re)
+float Protein::wind_helix(int sr, int er, double amt, int re)
 {
     if (!re) re = er;
-    float lamt_phi = amt/(M_PI*2) * (ALPHA_PHI - -M_PI);
-    float lamt_psi = amt/(M_PI*2) * (ALPHA_PSI - -M_PI);
+    double lamt_phi = amt/(M_PI*2) * (ALPHA_PHI + M_PI);
+    double lamt_psi = amt/(M_PI*2) * (ALPHA_PSI + M_PI);
 
     int i, inc = sgn(er-sr);
     for (i=sr; ; i+=inc)
     {
-        rotate_backbone_partial(i, re, (inc>0) ? N_asc : CA_desc, lamt_phi);
-        rotate_backbone_partial(i, re, (inc>0) ? CA_asc : C_desc, lamt_psi);
+        rotate_backbone_partial(i, re, (inc>0) ? N_asc : CA_desc, lamt_phi, false);
+        rotate_backbone_partial(i, re, (inc>0) ? CA_asc : C_desc, lamt_psi, false);
         if (i == er) break;
     }
 
     return helix_tightness(min(sr, er), max(sr, er));
+}
+
+float Protein::wind_helix_to_tightness(int sr, int er, float t, int re)
+{
+    Pose bestp[4];
+    float bestt = 0;
+
+    float ot = helix_tightness(min(sr, er), max(sr, er)), nt;
+    if (!ot) return 0;
+    float inc = -0.01 * (t - ot);
+    int i, j, reversals=0;
+
+    cout << endl << "wind_helix_to_tightness " << sr << "~" << er << " " << t << ":";
+    for (i=0; i<500; i++)
+    {
+        nt = wind_helix(sr, er, inc, re);
+        cout << " " << nt << flush;
+        if (sgn(nt-t) != sgn(ot-t))
+        {
+            inc *= -0.5;
+            cout << "*";
+        }
+        else if (fabs(nt-t) > fabs(ot-t))
+        {
+            inc *= -1;
+            cout << "#";
+            reversals++;
+            if (reversals == 3) inc *= 0.1;
+        }
+        ot = nt;
+        if (fabs(nt-t) < 0.00001) break;
+
+        if (fabs(nt-t) < fabs(bestt-t))
+        {
+            for (j=0; j<4; j++) bestp[j].copy_state(get_residue(min(sr, er)+j));
+            bestt = nt;
+            cout << ".";
+        }
+    }
+    cout << endl << flush;
+
+    if (fabs(nt-t) > 0.0001)
+    {
+        for (j=0; j<4; j++) bestp[j].restore_state(get_residue(min(sr, er)+j));
+        cout << "Restoring saved " << bestt << endl;
+        nt = bestt;
+    }
+
+    return nt;
 }
 
 SCoord Protein::get_region_axis(int startres, int endres)
@@ -4525,6 +4574,13 @@ float Protein::helix_tightness(int sr, int er)
     int i, j, samples=0;
     float looseness = 0;
 
+    if (sr > er)
+    {
+        int swap = sr;
+        sr = er;
+        er = swap;
+    }
+
     for (i=sr; i<=er; i++)
     {
         AminoAcid* res = get_residue(i);
@@ -4533,19 +4589,20 @@ float Protein::helix_tightness(int sr, int er)
         j = i-3;
         AminoAcid* cmp3 = get_residue(j);
         AminoAcid* cmp4 = get_residue(j-1);
-        if (cmp3 && cmp4)
+        /*if (cmp3 && cmp4)             code monkey too retarded figure this out
         {
-            Atom* NH = res->HN_or_substitute();
-            Atom* O3 = cmp3->get_atom("O");
-            Atom* O4 = cmp4->get_atom("O");
+            Atom* H = res->HN_or_substitute();
+            Atom* O = cmp4->get_atom("O");
+            Atom* N = cmp3->get_atom("N");
+            Atom* A = cmp4->get_atom("CA");
 
-            if (NH->distance_to(O3) < hx_tight_cutoff && NH->distance_to(O4) < hx_tight_cutoff)
+            if (H->distance_to(O) < hx_tight_cutoff)
             {
-                float f = scalene_distance(NH->get_location(), O3->get_location(), O4->get_location()) + 2.6;
+                float f = scalene_distance(H->get_location(), N->get_location(), A->get_location());
                 looseness += f;
                 samples++;
             }
-        }
+        }*/
 
         j = i+3;
         cmp3 = get_residue(j);
@@ -4553,12 +4610,13 @@ float Protein::helix_tightness(int sr, int er)
         if (cmp3 && cmp4)
         {
             Atom* O = res->get_atom("O");
-            Atom* NH3 = cmp3->HN_or_substitute();
-            Atom* NH4 = cmp4->HN_or_substitute();
+            Atom* H = cmp4->HN_or_substitute();
+            Atom* C = cmp3->get_atom("C");
+            Atom* A = cmp4->get_atom("CA");
 
-            if (O->distance_to(NH3) < hx_tight_cutoff && O->distance_to(NH4) < hx_tight_cutoff)
+            if (O->distance_to(H) < hx_tight_cutoff)
             {
-                float f = scalene_distance(O->get_location(), NH3->get_location(), NH4->get_location()) + 2.6;
+                float f = scalene_distance(O->get_location(), C->get_location(), A->get_location()) + 0.32265;
                 looseness += f;
                 samples++;
             }
@@ -4566,5 +4624,7 @@ float Protein::helix_tightness(int sr, int er)
     }
 
     if (samples) looseness /= samples;
-    return looseness;
+    float ptatoms = 10.0 + 2.0 * looseness;
+    float ptres = ptatoms / 3;
+    return ptres;
 }

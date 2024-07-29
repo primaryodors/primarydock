@@ -49,5 +49,6 @@ if [[ "$FIRST4" = "OR51" ]]; then
 elif [[ "$FIRST4" = "OR52" ]]; then
     php -f predict/method_directmdl.php "prot=$PROT" "$LIGARG" "$DKRARG"
 else
-    php -f predict/method_fygactive.php "prot=$PROT" "$LIGARG" "$DKRARG"
+    # php -f predict/method_fygactive.php "prot=$PROT" "$LIGARG" "$DKRARG"
+    php -f predict/method_directmdl.php "prot=$PROT" "$LIGARG" "$DKRARG"
 fi

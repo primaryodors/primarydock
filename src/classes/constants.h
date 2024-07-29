@@ -96,7 +96,7 @@
 #define pi_CH_dkytw 0.0766
 #define pi_HT_dkytw 0.002657
 
-#define hx_tight_cutoff 2.6
+#define hx_tight_cutoff 3.2
 
 #define ATOM_NOT_OF_AMINO_ACID 0x907aa
 #define NOT_ATOM_RECORD 0xb1207e19
@@ -416,6 +416,7 @@
 #define _dbg_trap_nans 0
 #define _DBG_TUMBLE_SPHERES 0
 #define _dbg_unreciprocated_bonds 0
+#define _dbg_winding_algorithm 0
 #define _dbg_worst_energy 0
 #define _debug_active_bond_rot 0
 #define debug_stop_after_tumble_sphere 0

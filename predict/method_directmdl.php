@@ -82,6 +82,7 @@ chdir("..");
 
 $pdbfname_inactive = str_replace(".upright.pdb", ".apo.pdb", $pdbfname);
 $pdbfname_active = str_replace(".upright.pdb", ".bound.pdb", $pdbfname);
+if (!file_exists($pdbfname_active)) $pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
 if (!file_exists($pdbfname_inactive) && file_exists($pdbfname_active))              // If no apo model, just use upright.
@@ -94,7 +95,7 @@ if (!file_exists($pdbfname_active) && (substr($protid, 0, 4) == "OR51" || substr
     exec("bin/pepteditor data/OR52.pepd");
 }
 
-if (!file_exists($pdbfname_active)) die("No bound model.\n");
+if (!file_exists($pdbfname_active)) die("No active model.\n");
 
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);

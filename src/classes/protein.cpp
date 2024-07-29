@@ -2953,20 +2953,28 @@ float Protein::wind_helix_to_tightness(int sr, int er, float t, int re)
     float inc = -0.01 * (t - ot);
     int i, j, reversals=0;
 
+    #if _dbg_winding_algorithm
     cout << endl << "wind_helix_to_tightness " << sr << "~" << er << " " << t << ":";
+    #endif
     for (i=0; i<500; i++)
     {
         nt = wind_helix(sr, er, inc, re);
+        #if _dbg_winding_algorithm
         cout << " " << nt << flush;
+        #endif
         if (sgn(nt-t) != sgn(ot-t))
         {
             inc *= -0.5;
+            #if _dbg_winding_algorithm
             cout << "*";
+            #endif
         }
         else if (fabs(nt-t) > fabs(ot-t))
         {
             inc *= -1;
+            #if _dbg_winding_algorithm
             cout << "#";
+            #endif
             reversals++;
             if (reversals == 3) inc *= 0.1;
         }
@@ -2977,15 +2985,21 @@ float Protein::wind_helix_to_tightness(int sr, int er, float t, int re)
         {
             for (j=0; j<4; j++) bestp[j].copy_state(get_residue(min(sr, er)+j));
             bestt = nt;
+            #if _dbg_winding_algorithm
             cout << ".";
+            #endif
         }
     }
+    #if _dbg_winding_algorithm
     cout << endl << flush;
+    #endif
 
     if (fabs(nt-t) > 0.0001)
     {
         for (j=0; j<4; j++) bestp[j].restore_state(get_residue(min(sr, er)+j));
+        #if _dbg_winding_algorithm
         cout << "Restoring saved " << bestt << endl;
+        #endif
         nt = bestt;
     }
 
@@ -4593,10 +4607,12 @@ float Protein::helix_tightness(int sr, int er)
         {
             Atom* O = res->get_atom("O");
             Atom* H = cmp4->HN_or_substitute();
+            Atom* N = cmp4->get_atom("N");
             Atom* C = cmp3->get_atom("C");
             Atom* A = cmp4->get_atom("CA");
 
-            if (O->distance_to(H) < hx_tight_cutoff)
+            // if (H) cout << " (" << H->name << " " << O->distance_to(H) << ") " << flush;
+            if ( (H && O->distance_to(H) < hx_tight_cutoff) || O->distance_to(N) < (1.0 + hx_tight_cutoff))
             {
                 float f = scalene_distance(O->get_location(), C->get_location(), A->get_location()) + 0.32265;
                 looseness += f;
@@ -4610,10 +4626,11 @@ float Protein::helix_tightness(int sr, int er)
         {
             Atom* O = cmp4->get_atom("O");
             Atom* H = res->HN_or_substitute();
+            Atom* N = res->get_atom("N");
             Atom* C = cmp3->get_atom("C");
             Atom* A = res->get_atom("CA");
 
-            if (O->distance_to(H) < hx_tight_cutoff)
+            if ( (H && O->distance_to(H) < hx_tight_cutoff) || O->distance_to(N) < (1.0 + hx_tight_cutoff))
             {
                 float f = scalene_distance(O->get_location(), C->get_location(), A->get_location()) + 0.32265;
                 looseness += f;
@@ -4622,6 +4639,7 @@ float Protein::helix_tightness(int sr, int er)
         }
     }
 
+    if (!samples) return 0;
     if (samples) looseness /= samples;
     float ptatoms = 10.0 + 2.0 * looseness;
     float ptres = ptatoms / 3;

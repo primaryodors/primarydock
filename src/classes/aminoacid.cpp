@@ -2763,7 +2763,7 @@ Atom* AminoAcid::HN_or_substitute()
 
         for (i=0; i<g; i++)
         {
-            if (bb[i]->atom2 && strcmp(bb[i]->atom2->name, "CA")) return bb[i]->atom2;
+            if (bb[i] && bb[i]->atom2 && strcmp(bb[i]->atom2->name, "CA") && strcmp(bb[i]->atom2->name, "C")) return bb[i]->atom2;
         }
     }
     return retval;

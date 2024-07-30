@@ -336,6 +336,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     this->m_atom2_name      = new const char*[metcount];
     this->missed_connections = new float[metcount];
     ligand_self = ligand->get_intermol_binding(ligand) - ligand->total_eclipses();
+    A100 = protein->A100();
     kJmol += ligand_self;
     #if _dbg_internal_energy
     cout << "Ligand internal = " << ligand_self << endl;
@@ -513,6 +514,9 @@ _btyp_unassigned:
     {
         output << endl << dr.miscdata << endl;
     }
+
+    output << "A100 score: " << dr.A100 << endl;
+    output << endl;
 
     if (dr.out_lig_pol_sat)
     {

@@ -156,6 +156,7 @@ public:
     void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
     void set_conditional_basicities();
     float A100();
+    Atom* region_pivot_atom(Region region);
 
     // Motion functions
     void upright();

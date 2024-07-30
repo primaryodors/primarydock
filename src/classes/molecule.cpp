@@ -2396,6 +2396,36 @@ float Molecule::total_intermol_clashes(Molecule** ligands)
     return clash;
 }
 
+void Molecule::mutual_closest_atoms(Molecule* mol, Atom** a1, Atom** a2)
+{
+    if (!a1 || !a2) return;
+
+    *a1 = *a2 = nullptr;
+
+    int i, j, m, n;
+    Atom *a, *b;
+    float rbest = Avogadro;
+
+    m = get_atom_count();
+    n = mol->get_atom_count();
+    for (i=0; i<m; i++)
+    {
+        a = get_atom(i);
+        for (j=0; j<n; j++)
+        {
+            b = mol->get_atom(j);
+
+            float r = a->distance_to(b);
+            if (r < rbest)
+            {
+                rbest = r;
+                *a1 = a;
+                *a2 = b;
+            }
+        }
+    }
+}
+
 void Molecule::move(SCoord move_amt, bool override_residue)
 {
     if (noAtoms(atoms)) return;

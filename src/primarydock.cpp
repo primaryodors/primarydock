@@ -138,6 +138,11 @@ int pid = getpid();
 bool append_pdb = false;
 bool do_output_colors = false;
 
+bool softdock = false;
+float softness = 0;
+std::vector<Region> softrgns;
+std::vector<Atom*> softrgpiva;
+
 AminoAcid*** reaches_spheroid = nullptr;
 int sphres = 0;
 
@@ -404,12 +409,14 @@ void iteration_callback(int iter, Molecule** mols)
     int l;
     float f = 0;
 
+    // Initialization for best-iteration saving for pose output.
     if (iter == 1)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
         iter_best_bind = 0;
     }
 
+    // Stochastically force flexion on some side chains that get clashes.
     for (l=0; mols[l]; l++)
     {
         float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
@@ -424,7 +431,7 @@ void iteration_callback(int iter, Molecule** mols)
         }
 
         if (flex
-            && iter < 5
+            // && iter < 5
             && (lf < -10 || lf < 0.1 * ptnl)
             && mols[l]->movability == MOV_FLXDESEL
             && lres
@@ -458,7 +465,32 @@ void iteration_callback(int iter, Molecule** mols)
 
     float progress = (float)iter / iters;
 
-    n = dyn_motions.size();
+    n = softrgns.size();
+    if (n) for (i=0; i<n; i++)
+    {
+        for (j=softrgns[i].start; j<=softrgns[i].end; j++)
+        {
+            AminoAcid* aa = protein->get_residue(j);
+            if (!aa) continue;
+            float c = aa->get_intermol_clashes(ligand);
+            if (c > clash_limit_per_aa)
+            {
+                Point A = aa->get_CA_location();
+                SCoord AB = ligand->get_nearest_atom(A)->get_location().subtract(A);
+                AB.r = pow(c, 1.0/3);
+                Point B = A.subtract(AB);
+                Point C = softrgpiva[i]->get_location();
+                Rotation rot = align_points_3d(A, B, C);
+                rot.a = fmin(rot.a, 0.1*softness*fiftyseventh);
+
+                float c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, rot.a);
+                float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                if (c2 > c1) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
+            }
+        }
+    }
+
     if (!iter) goto _oei;
     if (iter == (iters-1)) goto _oei;
     
@@ -1177,7 +1209,10 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "SOFT"))
     {
-        //
+        softdock = true;
+        softness = 1;
+
+        // TODO: Args.
     }
     else if (!strcmp(words[0], "STATE"))
     {
@@ -1689,7 +1724,7 @@ void do_tumble_spheres(Point l_pocket_cen)
 
 void apply_protein_specific_settings(Protein* p)
 {
-    int i, n;
+    int i, j, n;
 
     n = atomto.size();
     for (i=0; i<n; i++)
@@ -1752,6 +1787,61 @@ void apply_protein_specific_settings(Protein* p)
         dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
         dyn.bias = 30*fiftyseventh;
         dyn_motions.push_back(dyn);
+    }
+
+    if (softdock)
+    {
+        n = protein->get_end_resno();
+        for (i=1; i<=n; i++)
+        {
+            bool helixed = false;
+            AminoAcid* aa = protein->get_residue(i);
+            if (!aa) continue;
+            if (aa->priority) continue;
+
+            if (aa->is_alpha_helix()) helixed = true;
+            else for (j=i-2; j<=i+2; j++)
+            {
+                if (j < 1) continue;
+                if (j == i) continue;
+                if (j > n) break;
+                aa = protein->get_residue(j);
+                if (!aa) continue;
+                if (aa->is_alpha_helix() || aa->priority) helixed = true;
+                if (helixed) break;
+            }
+
+            if (!helixed) protein->delete_residue(i);
+        }
+
+        for (i=1; i<=n; i++)
+        {
+            if (protein->get_residue(i))
+            {
+                Region r;
+                r.start = i;
+                for (j=i+1; j<=n; j++)
+                {
+                    if (j==n || !protein->get_residue(j))
+                    {
+                        r.end = j-1;
+                        Atom* a = protein->region_pivot_atom(r);
+                        if (a)
+                        {
+                            softrgns.push_back(r);
+                            softrgpiva.push_back(a);
+                            cout << "Region " << r.start << "-" << r.end << " pivots about " << a->residue << ":" << a->name << endl;
+                        }
+                        else
+                        {
+                            cout << "Region " << r.start << "-" << r.end << " cannot soft pivot." << endl;
+                        }
+                        i=j;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
 

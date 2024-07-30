@@ -43,6 +43,7 @@ class DockResult
     #endif
     float polsat = 0;
     float protclash = 0;
+    float A100 = 0;
     bool do_output_colors = false;
     bool include_pdb_data = true;
     bool display_clash_atom1 = false;

@@ -3078,6 +3078,55 @@ float Protein::A100()
     return A100_score;
 }
 
+Atom* Protein::region_pivot_atom(Region rgn)
+{
+    int i, j, n;
+    Atom **a = new Atom*, **b = new Atom*, *retval = nullptr;
+    float beststr = 0;
+
+    n = get_end_resno();
+    for (i=rgn.start; i<=rgn.end; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
+        bool is_thiol = aa->is_thiol();
+
+        for (j=1; j<n; j++)
+        {
+            if (j >= rgn.start && j <= rgn.end) continue;
+
+            AminoAcid* ab = get_residue(j);
+            if (!ab) continue;
+            aa->mutual_closest_atoms(ab, a, b);
+            
+            if (is_thiol && ab->is_thiol())
+            {
+                float r = (*a)->distance_to(*b);
+                if ((*a)->get_Z() == 16 && (*b)->get_Z() == 16 && r < 2.5 && beststr > -252)
+                {
+                    if (retval && retval->get_Z() == 16 && beststr < 250) return nullptr;            // Multiple disulfide bridges; region cannot rotate.
+                    else
+                    {
+                        beststr = -251;
+                        retval = *a;
+                    }
+                }
+            }
+            else
+            {
+                float e = fmin(-InteratomicForce::total_binding(*a, *b), -aa->get_intermol_binding(ab));
+                if (e < beststr)
+                {
+                    beststr = e;
+                    retval = *a;
+                }
+            }
+        }
+    }
+
+    return retval;
+}
+
 Point Protein::find_loneliest_point(Point cen, Point sz)
 {
     if (!residues) return cen;

@@ -186,6 +186,7 @@ public:
     float hydrophilicity();
     float get_intermol_polar_sat(Molecule* ligand);
     float get_intermol_contact_area(Molecule* ligand, bool hydrophobic_only = false);
+    void mutual_closest_atoms(Molecule* mol2, Atom** atom1, Atom** atom2);
 
     float get_vdW_repulsion(Molecule* ligand);
 

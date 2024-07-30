@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "classes/atom.h"
+#include "../classes/atom.h"
 
 using namespace std;
 

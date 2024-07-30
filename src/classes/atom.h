@@ -58,18 +58,6 @@ public:
     Bond(Atom* a, Atom* b, int card);
     ~Bond();
 
-    #if bond_reciprocity_fix
-    Atom* get_atom1();
-    Atom* get_atom2();
-    void set_atom1(Atom* a);
-    void set_atom2(Atom* a);
-    #else
-    inline Atom* get_atom1() { return atom1; }
-    inline Atom* get_atom2() { return atom2; }
-    inline void set_atom1(Atom* a) { atom1 = a; }
-    inline void set_atom2(Atom* a) { atom2 = a; }
-    #endif
-
     bool rotate(float angle_radians, bool allow_backbone = false, bool skip_inverse_check = false);
     Point ring_rotate(float angle_radians, Atom* stop_at);
     void clear_moves_with_cache()
@@ -83,9 +71,10 @@ public:
     Bond* get_reversed();
     void swing(SCoord newdir);		// Rotate atom2, and all its moves_with atoms, about atom1 so that the bond points to newdir.
 
-protected:
     Atom* atom1 = nullptr;
     Atom* atom2 = nullptr;
+
+protected:
     void fill_moves_with_cache();
     void enforce_moves_with_uniqueness();
     Atom** moves_with_atom2 = 0;
@@ -260,13 +249,13 @@ public:
             int i;
             for (i=0; i<geometry; i++)
             {
-                if (bonded_to[i].get_atom2() && in_same_ring_as(bonded_to[i].get_atom2()))
+                if (bonded_to[i].atom2 && in_same_ring_as(bonded_to[i].atom2))
                 {
                     if (bonded_to[i].cardinality > 1
                             ||
                             (	bonded_to[i].cardinality == 1
-                                && bonded_to[i].get_atom2()->get_Z() > 1
-                                && bonded_to[i].get_atom2()->get_bonded_atoms_count() < 4
+                                && bonded_to[i].atom2->get_Z() > 1
+                                && bonded_to[i].atom2->get_bonded_atoms_count() < 4
                             )
                     )
                     {

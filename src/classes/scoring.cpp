@@ -514,12 +514,6 @@ _btyp_unassigned:
         output << endl << dr.miscdata << endl;
     }
 
-    if (dr.softrock.size())
-    {
-        output << "Active Helix Soft Rotations:" << endl
-                << dr.softrock << endl;
-    }
-
     if (dr.out_lig_pol_sat)
     {
         output << "Ligand polar satisfaction: " << dr.polsat << endl;

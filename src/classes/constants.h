@@ -183,7 +183,6 @@
 
 #define redo_tumble_spheres_on_activation 0
 #define redo_tumble_spheres_every_node 1
-#define soft_dynamics_every_n_iters 20
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
 // the viewer can update its cartoon backbone.
@@ -195,12 +194,6 @@
 #define write_active_rotation 1
 
 #define _use_groups 1
-
-#define soft_ligand_importance 20
-#define soft_bias_overlap 0.1
-
-#define soft_rock_clash_allowance 0
-#define soft_rock_clash_penalty 0.1
 
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through
@@ -354,6 +347,7 @@
 // Should normally be false or zero:
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
+#define _dbg_A100 0
 #define _dbg_anemia 0
 #define _dbg_asunder_atoms 0
 #define _dbg_bb_pullaway 0
@@ -402,8 +396,6 @@
 #define _dbg_residue_poses 0
 #define _dbg_rock_pic 0
 #define _dbg_soft 0
-#define _dbg_soft_dynamics 0
-#define _dbg_softrock 0
 #define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0

@@ -457,85 +457,8 @@ void iteration_callback(int iter, Molecule** mols)
     Atom *atom1, *atom2;
 
     float progress = (float)iter / iters;
-    // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;
-    float lsrca = (progress < 0.5) ? soft_rock_clash_allowance : 0;
 
     n = dyn_motions.size();
-    if (!(iter % soft_dynamics_every_n_iters) && n)
-    {
-        #if _dbg_soft_dynamics
-        cout << endl;
-        #endif
-
-        // Each dynamic motion, try successively smaller increments/decrements, realigning BB pairs each time, until optimal energy.
-        // Include contacts between dynamic motion region and nearby residues in the energy calculation.
-        for (l=0; l<n; l++)
-        {
-            float incr = 0.1;
-            float before = dyn_motions[l].get_nearby_contact_energy() + dyn_motions[l].get_ligand_contact_energy(ligand);
-            float after;
-            #if _dbg_soft_dynamics
-            cout << dyn_motions[l].fulcrum_resno.helix_no << "." << dyn_motions[l].fulcrum_resno.member_no
-                << " starting contact energy " << before << endl;
-            #endif
-
-            for (i=0; i<25; i++)
-            {
-                Pose ligand_was;
-                ligand_was.copy_state(ligand);
-                #if _dbg_soft_dynamics
-                cout << "Copied states." << endl << flush;
-                #endif
-
-                dyn_motions[l].apply_incremental(incr);
-                #if _dbg_soft_dynamics
-                cout << "Applied motion." << endl << flush;
-                #endif
-
-                if (use_bestbind_algorithm && global_pairs.size() >= 2)
-                    GroupPair::align_groups(ligand, global_pairs, false, bb_realign_amount);
-                #if _dbg_soft_dynamics
-                cout << "Aligned groups." << endl << flush;
-                #endif
-
-                after = dyn_motions[l].get_nearby_contact_energy() + dyn_motions[l].get_ligand_contact_energy(ligand);
-                #if _dbg_soft_dynamics
-                cout << "New contact energy " << after << flush;
-                #endif
-                
-
-                if (after > before)
-                {
-                    dyn_motions[l].apply_incremental(-incr);
-                    ligand_was.restore_state(ligand);
-                    incr *= -0.666;
-
-                    #if _dbg_soft_dynamics
-                    cout << " reverting.";
-                    #endif
-                }
-                else
-                {
-                    before = after;
-
-                    #if _dbg_soft_dynamics
-                    cout << " total applied " << dyn_motions[l].get_total_applied();
-                    #endif
-                }
-
-                #if _dbg_soft_dynamics
-                cout << endl << flush;
-                #endif
-
-                if (fabs(incr) < 0.01) break;
-            }
-        }
-
-        #if _dbg_soft_dynamics
-        cout << endl;
-        #endif
-    }
-
     if (!iter) goto _oei;
     if (iter == (iters-1)) goto _oei;
     
@@ -1254,7 +1177,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "SOFT"))
     {
-        dyn_strings.push_back(origbuff);
+        //
     }
     else if (!strcmp(words[0], "STATE"))
     {
@@ -1963,6 +1886,11 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
     protein->load_pdb(pf, 0, protstrand ?: 'A');
+
+    #if _dbg_A100
+    float init_A100 = protein->A100();
+    #endif
+
     apply_protein_specific_settings(protein);
     fclose(pf);
     #if _DBG_STEPBYSTEP

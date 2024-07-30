@@ -49,11 +49,6 @@ float DynamicMotion::get_ligand_contact_energy(Molecule* ligand)
         if (!aa) continue;
     
         float e = -((Molecule*)aa)->get_intermol_binding(ligand);
-            
-        #if _dbg_soft_dynamics
-        // cout << *aa << " ~ ligand energy: " << e << endl;
-        #endif
-
         result += e;
     }
 
@@ -136,10 +131,6 @@ float DynamicMotion::get_nearby_contact_energy()
                     }
                 }
             }
-
-            #if _dbg_soft_dynamics
-            // if (e < 0) cout << *aa << " contacts " << *(nearby_contacts[j]) << " with energy " << e << endl;
-            #endif
 
             #if _dbg_internal_clashes
             if (e > 0) cout << *aa << " clashes with " << *(nearby_contacts[j]) << " by " << e << endl;

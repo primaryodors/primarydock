@@ -14983,87 +14983,6 @@
         "btree": "000000010000001001001",
         "aligned": "----------------------------------MDSTFTGYNLYNLQVKTEMDKLSSGLDIYRNPLKNKTEVTMFILTGFTDDF-ELQVFLFLLFFAIYLFTLIGNLGLVVLVIEDSWLHN-PMYYFLSVLSFLDACYSTVVTPKMLVNFLAK----NKSISFIGCATQMLLFVTFG------TTECFLLAAMAYDHYVAIYNPLLY---------SVSMSPRVYVPLITASYVAGILHATIHIVATFSLSFCGSN----EIRHVFCDMPPLLAISCSDTH--------TNQLLLFYFVGSIEIVTILIVLISCDFILLSILKMHSAKGRQ-KAFSTCGSHLTGVTIYHGTILVSYMRPSSSYASDH------DIIVSIFYTIVIPKLNPIIYSLRNKEVKKAVKKMLKLVYK---------------------------------------------------"
     },
-    "OR5U1":
-    {
-        "id": "OR5U1",
-        "uniprot_id": "Q9UGF5",
-        "sequence": "MVNLTSMSGFLLMGFSDERKLQILHALVFLVTYLLALTGNLLIITIITVDRRLHSPMYYFLKHLSLLDLCFISVTVPQSIANSLMGNGYISLVQCILQVFFFIALASSEVAILTVMSYDRYAAICQPLHYETIMDPRACRHAVIAVWIAGGLSGLMHAAINFSIPLCGKRVIHQFFCDVPQMLKLACSYEFINEIALAAFTTSAAFICLISIVLSYIRIFSTVLRIPSAEGRTKVFSTCLPHLFVATFFLSAAGFEFLRLPSDSSSTVDLVFSVFYTVIPPTLNPVIYSLRNDSMKAALRKMLSKEELPQRKMCLKAMFKL",
-        "bw":
-        {
-            "1.50": "40",
-            "2.50": "68",
-            "3.50": "120",
-            "4.50": "147",
-            "5.50": "208",
-            "6.50": "252",
-            "7.50": "285",
-            "45.50": "177",
-            "56.50": "228",
-            "34.50": "127",
-            "8.50": "299"
-        },
-        "deletion":
-        [
-            "1.59",
-            "4.65",
-            "7.31",
-            "7.35",
-            "7.36"
-        ],
-        "insertion":
-        [
-            "2.66",
-            "2.66",
-            "6.28",
-            "7.34",
-            "7.34"
-        ],
-        "region":
-        {
-            "TMR1":
-            {
-                "start": 18,
-                "end": 48
-            },
-            "TMR2":
-            {
-                "start": 56,
-                "end": 85
-            },
-            "TMR3":
-            {
-                "start": 91,
-                "end": 126
-            },
-            "TMR4":
-            {
-                "start": 136,
-                "end": 161
-            },
-            "TMR5":
-            {
-                "start": 190,
-                "end": 226
-            },
-            "TMR6":
-            {
-                "start": 229,
-                "end": 262
-            },
-            "TMR7":
-            {
-                "start": 266,
-                "end": 291
-            },
-            "HXR8":
-            {
-                "start": 293,
-                "end": 321
-            }
-        },
-        "btree": "0000100001100",
-        "aligned": "------------------------------------------------------------------MVNLTSMSGFLLMGFSDER-KLQILHALVFLVTYLLALTGNLLIITIITVDRRLHS-PMYYFLKHLSLLDLCFISVTVPQSIANSLMGN----GYISLVQCILQVFFFIALAS------SEVAILTVMSYDRYAAICQPLHYE---------TIMDPRACRHAVIAVWIAGGLSGLMHAAINFSIPLCGKR----VIHQFFCDVPQMLKLACSYEF--------INEIALAAFTTSAAFICLISIVLSYIRIFSTVLRIPSAEGRT-KVFSTCLPHLFVATFFLSAAGFEFLRLPSDSSSTV------DLVFSVFYTVIPPTLNPVIYSLRNDSMKAALRKMLSKEELPQRKMCLKAMFKL--------------------------------------"
-    },
     "OR5V1":
     {
         "id": "OR5V1",
@@ -15781,86 +15700,6 @@
         "btree": "00000001000000100011",
         "aligned": "----------------------------------------------------------------MLESNYTMPTEFLFVGFTDYL-PLRVTLFLVFLLVYTLTMVGNILLIILVNINSSLQI-PMYYFLSNLSFLDISCSTAITPKMLANFLAS----RKSISPYGCALQMFFFASFA------DAECLILAAMAYDRYAAICNPLLY---------TTLMSRRVCVCFIVLAYFSGSTTSLVHVCLTFRLSFCGSN----IVNHFFCDIPPLLALSCTDTQ--------INQLLLFALCSFIQTSTFVVIFISYFCILITVLSIKSSGGRS-KTFSTCASHLIAVTLFYGALLFMYLQPTTSYSLDT------DKVVAVFYTVVFPMFNPIIYSFRNKDVKNALKKLLERIGYSNEWYLNRLRIVNI-------------------------------------"
     },
-    "OR5AT1":
-    {
-        "id": "OR5AT1",
-        "uniprot_id": "Q8NHC5",
-        "sequence": "MANLTIVTEFILMGFSTNKNMCILHSILFLLIYLCALMGNVLIIMITTLDHHLHTPVYFFLKNLSFLDLCLISVTAPKSIANSLIHNNSISFLGCVSQVFLLLSSASAELLLLTVMSFDRYTAICHPLHYDVIMDRSTCVQRATVSWLYGGLIAVMHTAGTFSLSYCGSNMVHQFFCDIPQLLAISCSENLIREIALILINVVLDFCCFIVIIITYVHVFSTVKKIPSTEGQSKAYSICLPHLLVVLFLSTGFIAYLKPASESPSILDAVISVFYTMLPPTFNPIIYSLRNKAIKVALGMLIKGKLTKK",
-        "bw":
-        {
-            "1.50": "40",
-            "2.50": "68",
-            "3.50": "120",
-            "4.50": "147",
-            "5.50": "208",
-            "6.50": "252",
-            "7.50": "284",
-            "45.50": "177",
-            "56.50": "228",
-            "34.50": "127",
-            "8.50": "298"
-        },
-        "deletion":
-        [
-            "1.59",
-            "2.65",
-            "4.65",
-            "7.32",
-            "7.35",
-            "7.36"
-        ],
-        "insertion":
-        [
-            "6.28",
-            "7.34",
-            "7.34"
-        ],
-        "region":
-        {
-            "TMR1":
-            {
-                "start": 18,
-                "end": 48
-            },
-            "TMR2":
-            {
-                "start": 56,
-                "end": 82
-            },
-            "TMR3":
-            {
-                "start": 91,
-                "end": 126
-            },
-            "TMR4":
-            {
-                "start": 136,
-                "end": 161
-            },
-            "TMR5":
-            {
-                "start": 190,
-                "end": 226
-            },
-            "TMR6":
-            {
-                "start": 229,
-                "end": 262
-            },
-            "TMR7":
-            {
-                "start": 266,
-                "end": 290
-            },
-            "HXR8":
-            {
-                "start": 292,
-                "end": 309
-            }
-        },
-        "btree": "0000100001000",
-        "aligned": "------------------------------------------------------------------MANLTIVTEFILMGFSTNK-NMCILHSILFLLIYLCALMGNVLIIMITTLDHHLHT-PVYFFLKNLSFLDLCLISVTAPKSIANSLIHN----NSISFLGCVSQVFLLLSSAS------AELLLLTVMSFDRYTAICHPLHYD---------VIMDRSTCVQRATVSWLYGGLIAVMHTAGTFSLSYCGSN----MVHQFFCDIPQLLAISCSENL--------IREIALILINVVLDFCCFIVIIITYVHVFSTVKKIPSTEGQS-KAYSICLPHLLVV-LFLSTGFIAYLKPASESPSIL------DAVISVFYTMLPPTFNPIIYSLRNKAIKVALGMLIKGKLTKK-------------------------------------------------"
-    },
     "OR5AU1":
     {
         "id": "OR5AU1",
@@ -15940,243 +15779,6 @@
         },
         "btree": "0000101",
         "aligned": "-------------MTEFHLQSQMPSIRLIFRRLSLGRIKPSQSPRCSTSFMVVPSFSIAEHWRRMKGANLSQGMEFELLGLTTDP-QLQRLLFVVFLGMYTATLLGNLVMFLLIHVSATLHT-PMYSLLKSLSFLDFCYSSTVVPQTLVNFLAK----RKVISYFGCMTQMFFYAGFA------TSECYLIAAMAYDRYAAICNPLLY---------STIMSPEVCASLIVGSYSAGFLNSLIHTGCIFSLKFCGAH----VVTHFFCDGPPILSLSCVDTS--------LCEILLFIFAGFNLLSCTLTILISYFLILNTILKMSSAQGRF-KAFSTCASHLTAICLFFGTTLFMYLRPRSSYSLTQ------DRTVAVIYTVVIPVLNPLMYSLRNKDVKKALIKVWGRKTME--------------------------------------------------"
-    },
-    "OR5AY1":
-    {
-        "id": "OR5AY1",
-        "uniprot_id": "Q8NGZ2",
-        "sequence": "MTNQTQMMEFLLVRFTENWVLLRLHALLFSLIYLTAVLMNLVIILLMILDHRLHMAMYFFLRHLSFLDLCLISATVPKSILNSVASTDSISFLGCVLQLFLVVLLAGSEIGILTAMSYDRYAAICCPLHCEAVMSRGLCVQLMALSWLNRGALGLLYTAGTFSLNFYGSDELHQFFCDVPALLKLTCSKEHAIISVSVAIGVCYAFSCLVCIVVSYVYIFSAVLRISQRQRQSKAFSNCVPHLIVVTVFLVTGAVAYLKPGSDAPSILDLLVSVFYSVAPPTLNPVIYCLKNKDIKSALSKVLWNVRSSGVMKR",
-        "bw":
-        {
-            "1.50": "40",
-            "2.50": "68",
-            "3.50": "120",
-            "4.50": "147",
-            "5.50": "208",
-            "6.50": "252",
-            "7.50": "285",
-            "45.50": "177",
-            "56.50": "228",
-            "34.50": "127",
-            "8.50": "299"
-        },
-        "deletion":
-        [
-            "1.59",
-            "2.65",
-            "4.65",
-            "7.31",
-            "7.35",
-            "7.36"
-        ],
-        "insertion":
-        [
-            "7.34",
-            "7.34"
-        ],
-        "region":
-        {
-            "TMR1":
-            {
-                "start": 18,
-                "end": 48
-            },
-            "TMR2":
-            {
-                "start": 56,
-                "end": 82
-            },
-            "TMR3":
-            {
-                "start": 91,
-                "end": 126
-            },
-            "TMR4":
-            {
-                "start": 136,
-                "end": 161
-            },
-            "TMR5":
-            {
-                "start": 190,
-                "end": 226
-            },
-            "TMR6":
-            {
-                "start": 230,
-                "end": 262
-            },
-            "TMR7":
-            {
-                "start": 266,
-                "end": 291
-            },
-            "HXR8":
-            {
-                "start": 293,
-                "end": 314
-            }
-        },
-        "btree": "00001000100",
-        "aligned": "------------------------------------------------------------------MTNQTQMMEFLLVRFTENW-VLLRLHALLFSLIYLTAVLMNLVIILLMILDHRLHM-AMYFFLRHLSFLDLCLISATVPKSILNSVAST----DSISFLGCVLQLFLVVLLAG------SEIGILTAMSYDRYAAICCPLHCE---------AVMSRGLCVQLMALSWLNRGALGLLYTAGTFSLNFYGSD----ELHQFFCDVPALLKLTCSKEH--------AIISVSVAIGVCYAFSCLVCIVVSYVYIFSAVLRISQRQRQS-KAFSNCVPHLIVVTVFLVTGAVAYLKPGSDAPSIL------DLLVSVFYSVAPPTLNPVIYCLKNKDIKSALSKVLWNVRSSGVMKR---------------------------------------------"
-    },
-    "OR5BF1":
-    {
-        "id": "OR5BF1",
-        "uniprot_id": "Q8NHC7",
-        "sequence": "MPNSTTVMEFLLMRFSDVWTLQILHSASFFMLYLVTLMGNILIVTVTTCDSSLHMPMYFFLRNLSILDACYISVTVPTSCVNSLLDSTTISKAGCVAQVFLVVFFVYVELLFLTIMAHDRYVAVCQPLHYPVIVNSRICIQMTLASLLSGLVYAGMHTGSTFQLPFCRSNVIHQFFCDIPSLLKLSCSDTFSNEVMIVVSALGVGGGCFIFIIRSYIHIFSTVLGFPRGADRTKAFSTCIPHILVVSVFLSSCSSVYLRPPAIPAATQDLILSGFYSIMPPLFNPIIYSLRNKQIKVAIKKIMKRIFYSENV",
-        "bw":
-        {
-            "1.50": "40",
-            "2.50": "68",
-            "3.50": "120",
-            "4.50": "147",
-            "5.50": "208",
-            "6.50": "252",
-            "7.50": "285",
-            "45.50": "177",
-            "56.50": "228",
-            "34.50": "127",
-            "8.50": "299"
-        },
-        "deletion":
-        [
-            "1.59",
-            "4.65",
-            "7.35",
-            "7.36"
-        ],
-        "insertion":
-        [
-            "2.66",
-            "2.66",
-            "7.34",
-            "7.34"
-        ],
-        "region":
-        {
-            "TMR1":
-            {
-                "start": 18,
-                "end": 48
-            },
-            "TMR2":
-            {
-                "start": 56,
-                "end": 85
-            },
-            "TMR3":
-            {
-                "start": 91,
-                "end": 126
-            },
-            "TMR4":
-            {
-                "start": 136,
-                "end": 161
-            },
-            "TMR5":
-            {
-                "start": 190,
-                "end": 226
-            },
-            "TMR6":
-            {
-                "start": 230,
-                "end": 262
-            },
-            "TMR7":
-            {
-                "start": 266,
-                "end": 291
-            },
-            "HXR8":
-            {
-                "start": 293,
-                "end": 312
-            }
-        },
-        "btree": "0000110",
-        "aligned": "------------------------------------------------------------------MPNSTTVMEFLLMRFSDVW-TLQILHSASFFMLYLVTLMGNILIVTVTTCDSSLHM-PMYFFLRNLSILDACYISVTVPTSCVNSLLDS----TTISKAGCVAQVFLVVFFVY------VELLFLTIMAHDRYVAVCQPLHYP---------VIVNSRICIQMTLASLLSGLVYAGMHTGSTFQLPFCRSN----VIHQFFCDIPSLLKLSCSDTF--------SNEVMIVVSALGVGGGCFIFIIRSYIHIFSTVLGFPRGADRT-KAFSTCIPHILVVSVFLSSCSSVYLRPPAIPAATQ------DLILSGFYSIMPPLFNPIIYSLRNKQIKVAIKKIMKRIFYSENV-----------------------------------------------"
-    },
-    "OR5BU1":
-    {
-        "id": "OR5BU1",
-        "uniprot_id": "A6ND48",
-        "sequence": "MDNLTKVTEFLLMEFSGIWELQVLHAGLFLLIYLAVLVGNLLIIAVITLDQHLHTPMYFFLKNLSVLDLCYISVTVPKSIRNSLTRRSSISYLGCVAQVYFFSAFASAELAFLTVMSYDRYVAICHPLQYRAVMTSGGCYQMAVTTWLSCFSYAAVHTGNMFREHVCRSSVIHQFFRDIPHVLALVSCEVFFVEFLTLALSSCLVLGCFILMMISYFQIFSTVLRIPSGQSRAKAFSTCSPQLIVIMLFLTTGLFAALGPIAKALSIQDLVIALTYTVLPPFLNPIIYSLRNKEIKTAMWRLFVKIYFLQK",
-        "bw":
-        {
-            "1.50": "40",
-            "2.50": "68",
-            "3.50": "120",
-            "4.50": "147",
-            "5.50": "208",
-            "6.50": "252",
-            "7.50": "285",
-            "45.50": "177",
-            "56.50": "228",
-            "34.50": "127",
-            "8.50": "299"
-        },
-        "deletion":
-        [
-            "1.59",
-            "4.65",
-            "7.31",
-            "7.35",
-            "7.36"
-        ],
-        "insertion":
-        [
-            "2.66",
-            "7.34",
-            "7.34"
-        ],
-        "region":
-        {
-            "TMR1":
-            {
-                "start": 18,
-                "end": 48
-            },
-            "TMR2":
-            {
-                "start": 56,
-                "end": 84
-            },
-            "TMR3":
-            {
-                "start": 91,
-                "end": 126
-            },
-            "TMR4":
-            {
-                "start": 136,
-                "end": 161
-            },
-            "TMR5":
-            {
-                "start": 190,
-                "end": 226
-            },
-            "TMR6":
-            {
-                "start": 230,
-                "end": 262
-            },
-            "TMR7":
-            {
-                "start": 266,
-                "end": 291
-            },
-            "HXR8":
-            {
-                "start": 293,
-                "end": 311
-            }
-        },
-        "btree": "0000100001010",
-        "aligned": "------------------------------------------------------------------MDNLTKVTEFLLMEFSGIW-ELQVLHAGLFLLIYLAVLVGNLLIIAVITLDQHLHT-PMYFFLKNLSVLDLCYISVTVPKSIRNSLTRR----SSISYLGCVAQVYFFSAFAS------AELAFLTVMSYDRYVAICHPLQYR---------AVMTSGGCYQMAVTTWLSCFSYAAVHTGNMFREHVCRSS----VIHQFFRDIPHVLALVSCEVF--------FVEFLTLALSSCLVLGCFILMMISYFQIFSTVLRIPSGQSRA-KAFSTCSPQLIVIMLFLTTGLFAALGPIAKALSIQ------DLVIALTYTVLPPFLNPIIYSLRNKEIKTAMWRLFVKIYFLQK------------------------------------------------"
     },
     "OR6A2":
     {
@@ -27772,6 +27374,7 @@
     "OR14A16":
     {
         "id": "OR14A16",
+        "alias": "OR5AT1",
         "uniprot_id": "Q8NHC5",
         "ordb": "15103",
         "sequence": "MANLTIVTEFILMGFSTNKNMCILHSILFLLIYLCALMGNVLIIMITTLDHHLHTPVYFFLKNLSFLDLCLISVTAPKSIANSLIHNNSISFLGCVSQVFLLLSSASAELLLLTVMSFDRYTAICHPLHYDVIMDRSTCVQRATVSWLYGGLIAVMHTAGTFSLSYCGSNMVHQFFCDIPQLLAISCSENLIREIALILINVVLDFCCFIVIIITYVHVFSTVKKIPSTEGQSKAYSICLPHLLVVLFLSTGFIAYLKPASESPSILDAVISVFYTMLPPTFNPIIYSLRNKAIKVALGMLIKGKLTKK",
@@ -27860,6 +27463,7 @@
     "OR14C36":
     {
         "id": "OR14C36",
+        "alias": "OR5BF1",
         "uniprot_id": "Q8NHC7",
         "sequence": "MPNSTTVMEFLLMRFSDVWTLQILHSASFFMLYLVTLMGNILIVTVTTCDSSLHMPMYFFLRNLSILDACYISVTVPTSCVNSLLDSTTISKAGCVAQVFLVVFFVYVELLFLTIMAHDRYVAVCQPLHYPVIVNSRICIQMTLASLLSGLVYAGMHTGSTFQLPFCRSNVIHQFFCDIPSLLKLSCSDTFSNEVMIVVSALGVGGGCFIFIIRSYIHIFSTVLGFPRGADRTKAFSTCIPHILVVSVFLSSCSSVYLRPPAIPAATQDLILSGFYSIMPPLFNPIIYSLRNKQIKVAIKKIMKRIFYSENV",
         "bw":
@@ -27943,6 +27547,7 @@
     "OR14I1":
     {
         "id": "OR14I1",
+        "alias": "OR5BU1",
         "uniprot_id": "A6ND48",
         "sequence": "MDNLTKVTEFLLMEFSGIWELQVLHAGLFLLIYLAVLVGNLLIIAVITLDQHLHTPMYFFLKNLSVLDLCYISVTVPKSIRNSLTRRSSISYLGCVAQVYFFSAFASAELAFLTVMSYDRYVAICHPLQYRAVMTSGGCYQMAVTTWLSCFSYAAVHTGNMFREHVCRSSVIHQFFRDIPHVLALVSCEVFFVEFLTLALSSCLVLGCFILMMISYFQIFSTVLRIPSGQSRAKAFSTCSPQLIVIMLFLTTGLFAALGPIAKALSIQDLVIALTYTVLPPFLNPIIYSLRNKEIKTAMWRLFVKIYFLQK",
         "bw":
@@ -28026,6 +27631,7 @@
     "OR14J1":
     {
         "id": "OR14J1",
+        "alias": "OR5U1",
         "uniprot_id": "Q9UGF5",
         "sequence": "MVNLTSMSGFLLMGFSDERKLQILHALVFLVTYLLALTGNLLIITIITVDRRLHSPMYYFLKHLSLLDLCFISVTVPQSIANSLMGNGYISLVQCILQVFFFIALASSEVAILTVMSYDRYAAICQPLHYETIMDPRACRHAVIAVWIAGGLSGLMHAAINFSIPLCGKRVIHQFFCDVPQMLKLACSYEFINEIALAAFTTSAAFICLISIVLSYIRIFSTVLRIPSAEGRTKVFSTCLPHLFVATFFLSAAGFEFLRLPSDSSSTVDLVFSVFYTVIPPTLNPVIYSLRNDSMKAALRKMLSKEELPQRKMCLKAMFKL",
         "bw":
@@ -28112,6 +27718,7 @@
     "OR14K1":
     {
         "id": "OR14K1",
+        "alias": "OR5AY1",
         "uniprot_id": "Q8NGZ2",
         "sequence": "MTNQTQMMEFLLVRFTENWVLLRLHALLFSLIYLTAVLMNLVIILLMILDHRLHMAMYFFLRHLSFLDLCLISATVPKSILNSVASTDSISFLGCVLQLFLVVLLAGSEIGILTAMSYDRYAAICCPLHCEAVMSRGLCVQLMALSWLNRGALGLLYTAGTFSLNFYGSDELHQFFCDVPALLKLTCSKEHAIISVSVAIGVCYAFSCLVCIVVSYVYIFSAVLRISQRQRQSKAFSNCVPHLIVVTVFLVTGAVAYLKPGSDAPSILDLLVSVFYSVAPPTLNPVIYCLKNKDIKSALSKVLWNVRSSGVMKR",
         "bw":

@@ -476,6 +476,7 @@ void Molecule::hydrogenate(bool steric_only)
         #endif
 
         bcardsum -= atoms[i]->get_charge();
+        if (atoms[i]->is_backbone && !strcmp(atoms[i]->name, "N")) bcardsum = 1;
 
         #if _dbg_hydrogenate
         cout << " given charge makes " << bcardsum << endl;
@@ -2411,9 +2412,12 @@ void Molecule::mutual_closest_atoms(Molecule* mol, Atom** a1, Atom** a2)
     for (i=0; i<m; i++)
     {
         a = get_atom(i);
+        int aZ = a->get_Z();
         for (j=0; j<n; j++)
         {
             b = mol->get_atom(j);
+            int bZ = b->get_Z();
+            if (aZ == 1 && bZ == 1) continue;
 
             float r = a->distance_to(b);
             if (r < rbest)

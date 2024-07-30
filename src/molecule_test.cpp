@@ -128,7 +128,7 @@ int main(int argc, char** argv)
     {
         for (i=0; b[i]; i++)
         {
-            cout << "# Bond " << b[i]->get_atom1()->name << " - " << b[i]->get_atom2()->name << " can rotate." << endl;
+            cout << "# Bond " << b[i]->atom1->name << " - " << b[i]->atom2->name << " can rotate." << endl;
             b[i]->rotate(30.0 * M_PI / 180);
         }
     }

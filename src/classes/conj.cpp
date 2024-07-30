@@ -47,12 +47,12 @@ void Conjugation::add_atom(Atom* a, Atom* prev, Atom* orig)
 
     for (i=0; b[i]; i++)
     {
-        if (!b[i]->get_atom2()) continue;
-        if (!b[i]->get_atom2()->is_pi()) continue;
-        if (b[i]->get_atom2() == prev) continue;
-        if (b[i]->get_atom2() == orig) continue;
+        if (!b[i]->atom2) continue;
+        if (!b[i]->atom2->is_pi()) continue;
+        if (b[i]->atom2 == prev) continue;
+        if (b[i]->atom2 == orig) continue;
 
-        add_atom(b[i]->get_atom2(), a, orig);              // RECURSION!
+        add_atom(b[i]->atom2, a, orig);              // RECURSION!
     }
 }
 

@@ -142,6 +142,7 @@ bool softdock = false;
 float softness = 0;
 std::vector<Region> softrgns;
 std::vector<Atom*> softrgpiva;
+std::vector<int> softrgn_allowed;
 
 AminoAcid*** reaches_spheroid = nullptr;
 int sphres = 0;
@@ -1212,7 +1213,24 @@ int interpret_config_line(char** words)
         softdock = true;
         softness = 1;
 
-        // TODO: Args.
+        for (i=1; words[i]; i++)
+        {
+            if (strchr(words[i], '.'))
+            {
+                softness = atof(words[i]);
+                #if _dbg_soft
+                cout << "Softness: " << softness << endl;
+                #endif
+            }
+            else
+            {
+                int j = atoi(words[i]);
+                if (j) softrgn_allowed.push_back(j);
+                #if _dbg_soft
+                cout << "Allowed soft region: " << j << endl;
+                #endif
+            }
+        }
     }
     else if (!strcmp(words[0], "STATE"))
     {
@@ -1814,27 +1832,56 @@ void apply_protein_specific_settings(Protein* p)
             if (!helixed) protein->delete_residue(i);
         }
 
-        for (i=1; i<=n; i++)
+        if (!softrgns.size()) for (i=1; i<=n; i++)
         {
             if (protein->get_residue(i))
             {
                 Region r;
                 r.start = i;
+                BallesterosWeinstein bwi = protein->get_bw_from_resno(i);
                 for (j=i+1; j<=n; j++)
                 {
-                    if (j==n || !protein->get_residue(j))
+                    BallesterosWeinstein bwj = protein->get_bw_from_resno(j);
+                    if (j==n || !protein->get_residue(j) || bwi.helix_no != bwj.helix_no)
                     {
                         r.end = j-1;
-                        Atom* a = protein->region_pivot_atom(r);
-                        if (a)
+                        if (r.end > r.start+2)
                         {
-                            softrgns.push_back(r);
-                            softrgpiva.push_back(a);
-                            cout << "Region " << r.start << "-" << r.end << " pivots about " << a->residue << ":" << a->name << endl;
-                        }
-                        else
-                        {
-                            cout << "Region " << r.start << "-" << r.end << " cannot soft pivot." << endl;
+                            bool allowed = true;
+                            int l = (i+j-1)/2;
+                            BallesterosWeinstein bw = protein->get_bw_from_resno(l);
+
+                            int m;
+                            if (m = softrgn_allowed.size())         // assignment not comparison
+                            {
+                                allowed = false;
+                                for (l=0; l<m; l++) if (bw.helix_no == softrgn_allowed[l]) allowed = true;
+                            }
+
+                            if (allowed)
+                            {
+                                Atom* a = protein->region_pivot_atom(r);
+                                if (a)
+                                {
+                                    softrgns.push_back(r);
+                                    softrgpiva.push_back(a);
+                                    #if _dbg_soft
+                                    cout << "Region " << r.start << "-" << r.end << " bw " << bw.helix_no << " pivots about " << a->residue << ":" << a->name << endl;
+                                    #endif
+                                }
+                                #if _dbg_soft
+                                else
+                                {
+                                    cout << "Region " << r.start << "-" << r.end << " bw " << bw.helix_no << " cannot soft pivot." << endl;
+                                }
+                                #endif
+                            }
+                            #if _dbg_soft
+                            else
+                            {
+                                cout << "Region " << r.start << "-" << r.end << " bw " << bw.helix_no << " is not allowed to soft pivot." << endl;
+                            }
+                            #endif
                         }
                         i=j;
                         break;

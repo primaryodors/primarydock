@@ -698,7 +698,7 @@ OUTVDWR 1
 # MOVIE
 
 FLEX 1
-SOFT
+SOFT 2.5 4 45 5 6 7
 WET
 
 OUT $outfname

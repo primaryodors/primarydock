@@ -1308,9 +1308,15 @@ void prepare_initb()
     if (differential_dock)
     {
         initial_binding = new float[seql+4];
+        #if compute_vdw_repulsion
         initial_vdWrepl = new float[seql+4];
+        #endif
 
+        #if compute_vdw_repulsion
         for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
+        #else
+        for (i=0; i<seql+4; i++) initial_binding[i] = 0;
+        #endif
 
         std::vector<AminoAcid*> preres = protein->get_residues_near(pocketcen, pre_ligand_multimol_radius);
         int qpr = preres.size();
@@ -1383,7 +1389,9 @@ void prepare_initb()
                 #endif
 
                 initial_binding[resno] += f;
+                #if compute_vdw_repulsion
                 initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(prem[j]);
+                #endif
             }
 
             #if _DBG_TOOLARGE_DIFFNUMS
@@ -3128,6 +3136,7 @@ _try_again:
             float weaa = dr[drcount][nodeno].worst_nrg_aa;
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
+            #if compute_clashdirs
             n = protein->get_end_resno();
             for (i=1; i<=n; i++)
             {
@@ -3148,6 +3157,7 @@ _try_again:
                     }
                 }
             }
+            #endif
 
             dr[drcount][nodeno].proximity = ligand->get_barycenter().get_3d_distance(nodecen);
 
@@ -3524,6 +3534,7 @@ _exitposes:
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
 
+    #if compute_clashdirs
     if (regions)
     {
         cout << endl;
@@ -3556,6 +3567,7 @@ _exitposes:
         cout << endl;
         if (output) *output << endl;
     }
+    #endif
 
     if (met) delete met;
 

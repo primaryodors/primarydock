@@ -395,7 +395,7 @@ void Molecule::clear_all_bond_caches()
         {
             for (j=0; b[j]; j++) b[j]->clear_moves_with_cache();
         }
-        atoms[i]->used = false;
+        atoms[i]->used = 0;
     }
 }
 
@@ -2277,6 +2277,7 @@ float Molecule::get_internal_clashes()
     return clash; // -base_internal_clashes;
 }
 
+#if compute_vdw_repulsion
 float Molecule::get_vdW_repulsion(Molecule* ligand)
 {
     if (!ligand) return 0;
@@ -2319,6 +2320,7 @@ float Molecule::get_vdW_repulsion(Molecule* ligand)
 
     return retval;
 }
+#endif
 
 float Molecule::get_intermol_clashes(Molecule* ligand)
 {
@@ -3629,8 +3631,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     int q, rang=0;
                     for (q=0; bb[q]; q++)
                     {
-                        if (!bb[q]->count_moves_with_atom2()) continue;
                         if (!bb[q]->atom1 || !bb[q]->atom2) continue;         // Sanity check, otherwise we're sure to get random foolish segfaults.
+                        if (bb[q]->atom1->get_Greek() > bb[q]->atom2->get_Greek()) bb[q] = bb[q]->get_reversed();
+                        if (!bb[q]->count_moves_with_atom2()) continue;
                         if (bb[q]->atom1->is_backbone && strcmp(bb[q]->atom1->name, "CA")) continue;
                         if (bb[q]->atom2->is_backbone) continue;
                         float theta;

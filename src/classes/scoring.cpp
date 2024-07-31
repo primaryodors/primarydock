@@ -6,7 +6,9 @@ float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 float fin_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 float* initial_binding;
+#if compute_vdw_repulsion
 float* initial_vdWrepl;
+#endif
 
 DockResult::DockResult()
 {
@@ -25,8 +27,10 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     char metrics[end1][20];
     float lmkJmol[end1];
     float limkJmol[end1];
+    #if compute_vdw_repulsion
     float lmvdWrepl[end1];
     float limvdWrepl[end1];
+    #endif
     int metcount = 0;
     float btot = 0;
     float pstot = 0;
@@ -36,7 +40,11 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
     for (i=0; i<end1; i++)
     {
+        #if compute_vdw_repulsion
         lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = lmc[i] = 0;
+        #else
+        lmkJmol[i] = limkJmol[i] = lmc[i] = 0;
+        #endif
     }
 
     worst_energy = worst_nrg_aa = 0;
@@ -56,10 +64,11 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         limkJmol[metcount] = 0;								// TODO
         lmc[metcount] = -mc_bpotential / missed_connection.r;
 
+        #if compute_vdw_repulsion
         lmvdWrepl[metcount] = 0;
         lmvdWrepl[metcount] += ligand->get_vdW_repulsion(met);		// TODO: Include repulsions with non-mcoord side chains.
-
         limvdWrepl[metcount] = 0;							// TODO
+        #endif
 
         metcount++;
 
@@ -68,8 +77,12 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     }
 
     float final_binding[end1];
+    #if compute_vdw_repulsion
     float final_vdWrepl[end1];
     for (i=0; i<end1; i++) final_binding[i] = final_vdWrepl[i] = 0;
+    #else
+    for (i=0; i<end1; i++) final_binding[i] = 0;
+    #endif
 
     std::vector<AminoAcid*> allres = protein->get_residues_near(ligand->get_barycenter(), 100000);
     int qpr = allres.size();
@@ -129,7 +142,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
                 if (f) ibdbg += to_string(postaa[j]->get_atom(0)->residue) + (std::string)" " + to_string(f) + (std::string)"\n";
                 #endif
 
+                #if compute_vdw_repulsion
                 final_vdWrepl[resno] += postaa[i]->get_vdW_repulsion(postaa[j]);
+                #endif
             }
 
             #if _DBG_TOOLARGE_DIFFNUMS
@@ -198,6 +213,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     }
 
     int prot_seq_len = protein->get_end_resno();
+    #if compute_clashdirs
     residue_clash = new float[prot_seq_len+8];
     res_clash_dir = new SCoord[prot_seq_len+8];
 
@@ -206,6 +222,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         residue_clash[i] = 0;
         res_clash_dir[i] = SCoord(0,0,0);
     }
+    #endif
 
     for (i=0; i<sphres; i++)
     {
@@ -224,6 +241,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
         if (-lb > worst_nrg_aa) worst_nrg_aa = -lb;
 
+        #if compute_clashdirs
         if (lb > 0 && ligand->clash1 && ligand->clash2)
         {
             residue_clash[resno] += lb;
@@ -231,6 +249,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             clashdir.r = ligand->clash1->get_vdW_radius() + ligand->clash2->get_vdW_radius() - ligand->clash1->distance_to(ligand->clash2);
             res_clash_dir[resno] = res_clash_dir[resno].add(clashdir);
         }
+        #endif
 
         #if include_residue_eclipses
         lb -= fmax(reaches_spheroid[i]->total_eclipses() - reaches_spheroid[i]->initial_eclipses, 0);
@@ -273,11 +292,14 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         if (differential_dock)
         {
             limkJmol[metcount] = initial_binding[resno];
+            #if compute_vdw_repulsion
             lmvdWrepl[metcount] = final_vdWrepl[resno];
             limvdWrepl[metcount] = initial_vdWrepl[resno];
+            #endif
         }
         else
         {
+            #if compute_vdw_repulsion
             lmvdWrepl[metcount] = 0;
             lmvdWrepl[metcount] += ligand->get_vdW_repulsion(reaches_spheroid[i]);
             /*for (j=0; j<sphres; j++)
@@ -285,8 +307,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
                 if (j == i) continue;
                 mvdWrepl[metcount] += reaches_spheroid[i]->get_vdW_repulsion(reaches_spheroid[j]);
             }*/
-            limkJmol[metcount] = 0;
             limvdWrepl[metcount] = 0;
+            #endif
+            limkJmol[metcount] = 0;
         }
         metcount++;
         btot += lb;
@@ -332,11 +355,15 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     metric            = new char*[metcount+4];
     this->mkJmol       = new float[metcount];
     this->imkJmol       = new float[metcount];
+    #if compute_vdw_repulsion
     this->mvdWrepl       = new float[metcount];
     this->imvdWrepl       = new float[metcount];
+    #endif
     this->m_atom1_name     = new const char*[metcount];
     this->m_atom2_name      = new const char*[metcount];
+    #if compute_missed_connections
     this->missed_connections = new float[metcount];
+    #endif
     ligand_self = ligand->get_intermol_binding(ligand) - ligand->total_eclipses();
     A100 = protein->A100();
     kJmol += ligand_self;
@@ -370,11 +397,15 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         strcpy(metric[i], metrics[i]);
         mkJmol[i] = lmkJmol[i];
         imkJmol[i] = limkJmol[i];
+        #if compute_vdw_repulsion
         mvdWrepl[i] = lmvdWrepl[i];
         imvdWrepl[i] = limvdWrepl[i];
+        #endif
         m_atom1_name[i] = lma1n[i];
         m_atom2_name[i] = lma2n[i];
+        #if compute_missed_connections
         missed_connections[i] = lmc[i];
+        #endif
         // cout << "*" << metric[i] << ": " << mkJmol[i] << endl;
     }
 
@@ -539,6 +570,7 @@ _btyp_unassigned:
     }
     #endif
 
+    #if compute_missed_connections
     if (dr.out_mc)
     {
         output << "# Missed Connections" << endl << "MC:" << endl;
@@ -558,7 +590,9 @@ _btyp_unassigned:
         }
         output << endl;
     }
+    #endif
 
+    #if compute_vdw_repulsion
     if (dr.out_vdw_repuls)
     {
         output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
@@ -590,6 +624,7 @@ _btyp_unassigned:
         }
         output << endl;
     }
+    #endif
 
     if (dr.include_pdb_data)
     {

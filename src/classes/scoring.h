@@ -20,16 +20,22 @@ class DockResult
     char** metric = nullptr;
     float* mkJmol = 0;
     float* imkJmol = 0;
+    #if compute_vdw_repulsion
     float* mvdWrepl = 0;
     float* imvdWrepl = 0;
+    #endif
     float ligand_self = 0;
     float worst_energy = 0;
     float worst_nrg_aa = 0;
     Atom* worst_clash_1 = nullptr;
     Atom* worst_clash_2 = nullptr;
+    #if compute_clashdirs
     float* residue_clash = nullptr;
     SCoord* res_clash_dir = nullptr;
+    #endif
+    #if compute_missed_connections
     float* missed_connections = 0;
+    #endif
     const char** m_atom1_name = nullptr;
     const char** m_atom2_name = nullptr;
     std::string pdbdat;
@@ -65,7 +71,9 @@ extern float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 extern float fin_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 extern float* initial_binding;
+#if compute_vdw_repulsion
 extern float* initial_vdWrepl;
+#endif
 
 std::ostream& operator<<(std::ostream& output, const DockResult& dr);
 

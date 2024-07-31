@@ -1,11 +1,13 @@
 <?php
 
-// method_fygactive.php
+// method_directmdl.php
 //
-// Performs a dock of an odorant inside inactive and FYG-motif active conformer PDB files.
+// Performs a dock of an odorant inside inactive and active conformer PDB files.
+// The active PDB may be an experimental structure from a crystallography or cryo-EM
+// measurement, or it may be a homology model based on experimental models.
 //
 // Example call syntax:
-// php -f predict/method_fygactive.php prot=OR1A1 lig=d-limonene
+// php -f predict/method_directmdl.php prot=OR1A1 lig=d-limonene
 //
 
 chdir(__DIR__);
@@ -80,21 +82,11 @@ function make_prediction($data)
 chdir(__DIR__);
 chdir("..");
 
-$pdbfname_inactive = str_replace(".upright.pdb", ".apo.pdb", $pdbfname);
-$pdbfname_active = str_replace(".upright.pdb", ".bound.pdb", $pdbfname);
+$pdbfname_inactive = $pdbfname;
+$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
-if (!file_exists($pdbfname_inactive) && file_exists($pdbfname_active))              // If no apo model, just use upright.
-    $pdbfname_inactive = $pdbfname;
-
-if (!file_exists($pdbfname_active) && (substr($protid, 0, 4) == "OR51" || substr($protid, 0, 4) == "OR52"))
-{
-    exec("php -f predict/cryoem_motions.php");
-    exec("bin/pepteditor data/OR51.pepd");
-    exec("bin/pepteditor data/OR52.pepd");
-}
-
-if (!file_exists($pdbfname_active)) die("No bound model.\n");
+if (!file_exists($pdbfname_active)) die("No active model.\n");
 
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);

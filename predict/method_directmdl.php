@@ -1,11 +1,13 @@
 <?php
 
-// method_fygactive.php
+// method_directmdl.php
 //
-// Performs a dock of an odorant inside inactive and FYG-motif active conformer PDB files.
+// Performs a dock of an odorant inside inactive and active conformer PDB files.
+// The active PDB may be an experimental structure from a crystallography or cryo-EM
+// measurement, or it may be a homology model based on experimental models.
 //
 // Example call syntax:
-// php -f predict/method_fygactive.php prot=OR1A1 lig=d-limonene
+// php -f predict/method_directmdl.php prot=OR1A1 lig=d-limonene
 //
 
 chdir(__DIR__);

@@ -65,10 +65,9 @@ fi
 
 
 REPORT="testdata/TAAR8_cadaverine_pred.approved.txt"
-php -f predict/method_fygactive.php prot=TAAR8 lig=cadaverine | grep '[[]Predicted[]] => ' > testdata/received/TAAR8_cadaverine_pred.received.txt
+php -f predict/method_directmdl.php prot=TAAR8 lig=cadaverine | grep '[[]Predicted[]] => ' > testdata/received/TAAR8_cadaverine_pred.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/TAAR8_cadaverine_pred.received.txt)
 if [ -z "$RESULT" ]; then
-    # printf "${GRN}TAAR8 cadaverine prediction test succeeded.${NC}\n"
     ASP111=$( cat output/TAAR/TAAR8/TAAR8.cadaverine.active.dock | grep -m 1 "Asp111(3.32): " )
     ASP111="${ASP111/Asp111(3.32): /}"
     ASP111="${ASP111/[.][0-9]*/}"

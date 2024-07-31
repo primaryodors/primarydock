@@ -34,8 +34,7 @@ chdir("..");
 $dock_results = json_decode(file_get_contents("predict/dock_results.json"), true);
 $version = max(filemtime("bin/primarydock"),
     filemtime("predict/methods_common.php"),
-    filemtime("predict/method_directmdl.php"),
-    filemtime("predict/method_fygactive.php")
+    filemtime("predict/method_directmdl.php")
     );
 $lines = explode("\n", @file_get_contents("jobq"));
 

@@ -42,13 +42,7 @@ ligands in PDB files and aggregate the resulting data into a JSON file. Predicti
 `process_dock()` function is called, a dock is performed and the difference between active and inactive dock results is
 used by the `make_prediction()` function to ascertain whether the odorant is likely to be an agonist for the receptor.
 
-The currently prediction methods are `method_fygactive.php` and `method_directmdl.php`.
-
-The `fygactive` method is useful for class II ORs and uses a utility application called `bin/fyg_activate_or` to examine
-the structure and sequence of the receptor and determine 1.) whether it includes the FYG motif in transmembrane region VI
-(TMR6), and 2.) whether TMR6 has room to perform a rocking motion (rock6) based on contact potential between the conserved
-Y6.55 and D/E45.51 of most class II ORs. If the receptor cannot perform a rock6 motion, but it has the FYG motif, then the
-utility will create an active state model by performing a TMR6 bend at the flexible Gly6.49 residue.
+Currently the only prediction method in use is `method_directmdl.php`.
 
 The `directmdl` method, by contrast, is used when a cryo-EM model of the active state is available for either the target
 receptor, or one that is deemed similar enough for the cryo-EM model to act as a substitute. Currently, only the OR51,
@@ -60,14 +54,14 @@ SCFA predictions in OR51E2, though predictions for other class I ORs and/or non-
 An example of the command line for running a prediction might be:
 
 ```
-php -f predict/method_fygactive.php prot=OR1A1 lig=cis-3-hexen-1-ol
+php -f predict/method_directmdl.php prot=OR1A1 lig=cis-3-hexen-1-ol
 ```
 
 If the name of the ligand contains spaces, then the spaces should be replaced with underscores, e.g. `lig=isoamyl_acetate`.
 If the ligand name contains parentheses, it's a good idea to put the entire lig= parameter in quotes, e.g.:
 
 ```
-php -f predict/method_icactive.php prot=OR1A1 "lig=(S)-(+)-carvone"
+php -f predict/method_directmdl.php prot=OR1A1 "lig=(S)-(+)-carvone"
 ```
 
 

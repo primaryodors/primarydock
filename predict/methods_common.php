@@ -650,7 +650,7 @@ heredoc;
                 break;
 
                 case "TAAR":
-                $softness = 0.1;
+                $softness = 0;
                 break;
 
                 default:
@@ -682,6 +682,7 @@ heredoc;
         else $iso = "";
 
         $excl = resno_from_bw($protid, "2.37");
+        $soft = $softness ? "SOFT $softness 2 3 4 45 5 6 7" : "";
 
         $configf = <<<heredoc
 
@@ -710,7 +711,7 @@ OUTVDWR 1
 # MOVIE
 
 FLEX 1
-SOFT $softness 2 3 4 45 5 6 7
+$soft
 WET
 
 OUT $outfname

@@ -2350,6 +2350,19 @@ Bond* Bond::get_reversed()
     return reversed;
 }
 
+void Bond::compute_flip_capability()
+{
+    if (!this || !atom1 || !atom2) return;
+    if (atom1->get_Z() == 1 || atom2->get_Z() == 1) return;
+    if (atom2->get_bonded_atoms_count() == 1) return;
+    can_flip = !caged
+        && !can_rotate
+        && (!atom1->is_pi() || !atom2->is_pi() || !(atom1->in_same_ring_as(atom2)))
+        && (cardinality == 1 || (atom1->get_family() != TETREL && atom2->get_family() != TETREL))
+        && (!atom1->is_backbone || !atom2->is_backbone || atom1->get_family() != PNICTOGEN || atom2->get_family() != PNICTOGEN)
+        ;
+}
+
 int Bond::count_heavy_moves_with_atom()
 {
     Bond* rev = get_reversed();
@@ -2669,8 +2682,8 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             if (b)
             {
                 #if _ALLOW_FLEX_RINGS
-                b->can_flip = b->can_rotate;
                 b->can_rotate = false;
+                b->compute_flip_capability();
                 #else
                 b->can_rotate = b->can_flip = false;
                 #endif
@@ -2679,8 +2692,8 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             if (b)
             {
                 #if _ALLOW_FLEX_RINGS
-                b->can_flip = b->can_rotate;
                 b->can_rotate = false;
+                b->compute_flip_capability();
                 #else
                 b->can_rotate = b->can_flip = false;
                 #endif
@@ -2692,8 +2705,8 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             if (b)
             {
                 #if _ALLOW_FLEX_RINGS
-                b->can_flip = b->can_rotate;
                 b->can_rotate = false;
+                b->compute_flip_capability();
                 #else
                 b->can_rotate = b->can_flip = false;
                 #endif
@@ -2702,8 +2715,8 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             if (b)
             {
                 #if _ALLOW_FLEX_RINGS
-                b->can_flip = b->can_rotate;
                 b->can_rotate = false;
+                b->compute_flip_capability();
                 #else
                 b->can_rotate = b->can_flip = false;
                 #endif

@@ -1851,8 +1851,8 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                 if (lb[j]->atom1->in_same_ring_as(lb[j]->atom2))
                 {
                     #if _ALLOW_FLEX_RINGS
-                    lb[j]->can_flip = !lb[j]->caged && (lb[j]->cardinality == 1);
                     lb[j]->can_rotate = false;
+                    lb[j]->compute_flip_capability();
                     #else
                     lb[j]->can_rotate = lb[j]->can_flip = false;
                     continue;
@@ -1863,7 +1863,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                 if (pia && pib)
                 {
                     lb[j]->can_rotate = false;
-                    lb[j]->can_flip = !lb[j]->caged;
+                    lb[j]->compute_flip_capability();
                 }
 
                 // If atoms a and b are pi, and a-b cannot rotate, then a-b can flip.
@@ -1873,7 +1873,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                     && !(lb[j]->atom1->in_same_ring_as(lb[j]->atom2))
                     )
                 {
-                    lb[j]->can_flip = !lb[j]->caged;
+                    lb[j]->compute_flip_capability();
                 }
 
                 if (lb[j]->atom2
@@ -2082,7 +2082,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                         if (lb->atom1->is_pi() && lb->atom2 && lb->atom2->is_pi())
                         {
                             lb->can_rotate = false;
-                            lb->can_flip = !lb->caged;
+                            lb->compute_flip_capability();
                             lb->flip_angle = M_PI;
                         }
 
@@ -3694,7 +3694,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                             if (!bb[q]->can_rotate)
                             {
-                                bb[q]->can_flip = !bb[q]->caged;
+                                bb[q]->compute_flip_capability();
                                 if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
                             }
 
@@ -4093,106 +4093,11 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 aloop[l-sqidx[j]] = 0;
                 int ringsz = l-sqidx[j];
 
-                /*
-                if (!ring_atoms)
-                {	ring_atoms = new Atom**[16];
-                	int n; for (n=0; n<16; n++) ring_atoms[n] = nullptr;
-                }
-
-                if (!ring_aromatic)
-                {	ring_aromatic = new bool[16];
-                	int n; for (n=0; n<16; n++) ring_aromatic[n] = false;
-                }
-
-                if (!ring_atoms[ringcount])
-                {	ring_atoms[ringcount] = new Atom*[ringsz+2];
-                	int n; for (n=0; n<ringsz; n++) ring_atoms[ringcount][n] = nullptr;
-                }*/
-
                 add_ring(aloop);
-
-                // Also default all unmarked double bonds to cis.
-                /*for (l=0; l<dbi; l++)
-                {	if (!EZgiven[l] && EZatom0[l] && EZatom1[l])
-                	{	Bond* lb = EZatom0[l]->get_bond_between(EZatom1[l]);
-                		lb->can_rotate = true;
-                		lb->flip_angle = M_PI;
-                		lb = EZatom1[l]->get_bond_between(EZatom0[l]);
-                		if (lb)
-                		{	lb->can_flip = !lb->caged;
-                			lb->flip_angle = M_PI;
-                		}
-                	}
-                }*/
-
-                // If the ring has fewer than 5 members, or if it's aromatic, turn it into a regular polygon.
-                /*if (ringsz<5 || allarom)
-                {
-                    Point ringcen;
-
-                    SCoord v;
-                    sequence[sqidx[j]]->arom_center = &ringcen;
-                    sequence[sqidx[j]]->clear_geometry_cache();
-                    SCoord* geob = sequence[sqidx[j]]->get_geometry_aligned_to_bonds();
-                    int geon     = sequence[sqidx[j]]->get_geometry();
-                    int gvi;
-                    if (sqidx[j])		// First atom of ring is not first atom of molecule.
-                        gvi = 0;		// The previous atom is outside the ring and forms the incoming SCoord.
-                    else				// First atom of ring is first atom of molecule.
-                        gvi = 2;		// Geometry vectors 0 and 1 will be ring bonds, so SCoord 2 forms the input.
-
-                    if (geon == 3)
-                    {
-                        v = geob[gvi];
-                    }
-                    else
-                    {
-                        Point _4avg[2];
-                        _4avg[0] = geob[gvi];
-                        _4avg[1] = geob[3];
-
-                        v = average_of_points(_4avg, 2);
-                    }
-
-                    if (allarom) card = 1.5;
-
-                    preva->bond_to(numbered[j], card);
-
-                    // TODO: Un-hardcode the bond lengths below.
-                    v.r = polygon_radius(allarom?1.40:1.54, ringsz);
-                    ringcen = sequence[sqidx[j]]->get_location().subtract(&v);
-
-                    // Get the normal of v and the first two atoms.
-                    Point _4norm[3];
-                    _4norm[0] = sequence[sqidx[j]]->get_location().add(&v);
-                    _4norm[1] = sequence[sqidx[j]]->get_location();
-                    _4norm[2] = sequence[sqidx[j]+1]->get_location();
-
-                    SCoord normal = compute_normal(&_4norm[0], &_4norm[1], &_4norm[2]);
-
-                    for (l=0; l<ringsz; l++)
-                    {
-                        if (l)
-                        {
-                            Point lpt = rotate3D(&_4norm[1], &ringcen, &normal, M_PI*2/ringsz*l);
-                            sequence[sqidx[j]+l]->move(&lpt);
-                        }
-                        sequence[sqidx[j]+l]->arom_center = &ringcen;
-                        sequence[sqidx[j]+l]->clear_geometry_cache();
-                    }
-
-                	ring_aromatic[ringcount-1] = true;
-                    numbered[j] = 0;
-                    card = 1;
-
-                    continue;
-                }*/
-
                 float anomaly = close_loop(aloop, card);
 
                 if (card) preva->bond_to(numbered[j], card);
                 card = 1;
-                // ring_aromatic[ringcount-1] = ring_is_aromatic(ringcount-1);
 
                 numbered[j] = 0;
 
@@ -5185,10 +5090,18 @@ void Molecule::identify_cages()
                     {
                         // If no bond between atoms, all bonds in both rings cannot flip.
                         Bond** bb = rings[i]->get_bonds();
-                        if (bb) for (n=0; bb[n]; n++) bb[n]->can_rotate = bb[n]->can_flip = !(bb[n]->caged = true);
+                        if (bb) for (n=0; bb[n]; n++)
+                        {
+                            bb[n]->can_rotate = bb[n]->can_flip = false;
+                            bb[n]->caged = true;
+                        }
                         delete[] bb;
                         bb = other->get_bonds();
-                        if (bb) for (n=0; bb[n]; n++) bb[n]->can_rotate = bb[n]->can_flip = !(bb[n]->caged = true);
+                        if (bb) for (n=0; bb[n]; n++)
+                        {
+                            bb[n]->can_rotate = bb[n]->can_flip = false;
+                            bb[n]->caged = true;
+                        }
                         delete[] bb;
 
                         #if _dbg_identify_rings

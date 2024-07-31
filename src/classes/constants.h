@@ -27,6 +27,7 @@
 #define clash_limit_per_aa 7.0
 #define clash_limit_per_atom 6.0
 #define contact_r_5x58_7x53 3.93
+#define include_eclipses 1
 #define eclipsing_kJmol_per_radian 1.86453
 #define memsanity 0x10000000
 
@@ -160,7 +161,7 @@
 #define bb_scooch_threshold_distance 1.5
 #define flexion_selection 1
 #define no_zero_flexions 1
-#define flexion_probability_multiplier 0.4
+#define flexion_probability_multiplier 0.3
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
 
@@ -395,7 +396,7 @@
 #define _DBG_RESBMULT 0
 #define _dbg_residue_poses 0
 #define _dbg_rock_pic 0
-#define _dbg_soft 1
+#define _dbg_soft 0
 #define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0

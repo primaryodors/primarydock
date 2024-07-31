@@ -667,6 +667,10 @@ std::vector<Atom*> Molecule::longest_dimension()
 
 float Molecule::total_eclipses()
 {
+    #if !include_eclipses
+    return 0;
+    #endif
+
     if (!atoms) return 0;
     float result = 0;
     int i, j, k, l, m, n;
@@ -1856,16 +1860,10 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
                 }
 
                 // Generally, a single bond from a pi atom to an amino group cannot rotate.
-                if (	(pia && (fb == PNICTOGEN || fb == CHALCOGEN))
-                        ||
-                        (pib && (fa == PNICTOGEN || fa == CHALCOGEN))
-                   )
+                if (pia && pib)
                 {
                     lb[j]->can_rotate = false;
-                    if ((fa == CHALCOGEN || fb == CHALCOGEN)
-                        && fa != fb
-                        && lb[j]->atom2->get_bonded_atoms_count() > 1
-                        ) lb[j]->can_flip = !lb[j]->caged;
+                    lb[j]->can_flip = !lb[j]->caged;
                 }
 
                 // If atoms a and b are pi, and a-b cannot rotate, then a-b can flip.

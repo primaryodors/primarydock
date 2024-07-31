@@ -143,6 +143,7 @@ float softness = 0;
 std::vector<Region> softrgns;
 std::vector<Atom*> softrgpiva;
 std::vector<int> softrgn_allowed;
+std::vector<float> softrgn_initclash;
 
 AminoAcid*** reaches_spheroid = nullptr;
 int sphres = 0;
@@ -484,10 +485,17 @@ void iteration_callback(int iter, Molecule** mols)
                 Rotation rot = align_points_3d(A, B, C);
                 rot.a = fmin(rot.a, 0.1*softness*fiftyseventh);
 
-                float c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                float c1;
+                if (i >= softrgn_initclash.size())
+                {
+                    c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                    softrgn_initclash.push_back(c1);
+                }
+                else c1 = softrgn_initclash[i];
+
                 protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, rot.a);
                 float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
-                if (c2 > c1) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
+                if (c2 > c1 + clash_limit_per_aa*2) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
             }
         }
     }
@@ -1834,6 +1842,7 @@ void apply_protein_specific_settings(Protein* p)
 
         if (!softrgns.size()) for (i=1; i<=n; i++)
         {
+            softrgn_initclash.clear();
             if (protein->get_residue(i))
             {
                 Region r;

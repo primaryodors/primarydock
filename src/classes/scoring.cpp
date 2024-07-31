@@ -508,7 +508,9 @@ _btyp_unassigned:
         if (dr.do_output_colors) colorless();
     }
 
+    #if include_eclipses
     if (dr.out_lig_int_e) output << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
+    #endif
 
     if (dr.miscdata.size())
     {

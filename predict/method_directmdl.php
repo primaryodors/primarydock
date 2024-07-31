@@ -49,14 +49,14 @@ function make_prediction($data)
         {
             $data['Predicted'] = 'Agonist';
             $dock_score = -$ascore*$aeff;
-            if ($aa100 && $ia100) $dock_score *= max(1, ($aa100 - $ia100) / 50);
+            if ($aa100 && $ia100) $dock_score *= min(1, ($aa100 - $ia100) / 50);
             $data['DockScore'] = $dock_score;
         }
         else if ($iscore < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
             $dock_score = $iscore*$aeff;
-            if ($aa100 && $ia100) $dock_score *= max(1, ($aa100 - $ia100) / 50);
+            if ($aa100 && $ia100) $dock_score *= min(1, ($aa100 - $ia100) / 50);
             $data['DockScore'] = $dock_score;
         }
         else

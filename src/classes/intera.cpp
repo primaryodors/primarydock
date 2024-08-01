@@ -1082,6 +1082,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 SCoord mc = bloc.subtract(aloc);
                 mc.r = r - forces[i]->distance; // fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
 
+                #if compute_missed_connections
                 #if summed_missed_connections
                 missed_connection = missed_connection.add(mc);
                 mc_bpotential += forces[i]->kJ_mol;
@@ -1092,6 +1093,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     missed_connection = mc;
                     mc_bpotential = forces[i]->kJ_mol;
                 }
+                #endif
                 #endif
             }
             else

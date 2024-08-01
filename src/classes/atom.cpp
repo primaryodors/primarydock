@@ -213,7 +213,8 @@ Atom::Atom(const char* elem_sym)
 {
     Z = Z_from_esym(elem_sym);
 
-    reciprocity = used = false;
+    reciprocity = false;
+    used = 0;
 
     figure_out_valence();
 
@@ -233,7 +234,8 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
 
     Z = Z_from_esym(elem_sym);
 
-    reciprocity = used = false;
+    reciprocity = false;
+    used = 0;
 
     figure_out_valence();
 
@@ -254,7 +256,8 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
 
     Z = Z_from_esym(elem_sym);
 
-    reciprocity = used = false;
+    reciprocity = false;
+    used = 0;
 
     figure_out_valence();
 
@@ -327,7 +330,8 @@ Atom::Atom(FILE* is)
                     Z = Z_from_esym(esym);
                     if (!Z && !strcmp(name, "OXT")) Z = 8;
 
-                    reciprocity = used = false;
+                    reciprocity = false;
+                    used = 0;
 
                     figure_out_valence();
                     bonded_to = new Bond[abs(geometry)];
@@ -454,10 +458,12 @@ Point Atom::get_location()
 
 void Bond::fetch_moves_with_atom2(Atom** result)
 {
-    enforce_moves_with_uniqueness();
-
     int i;
-    if (!moves_with_atom2) fill_moves_with_cache();
+    if (!moves_with_atom2)
+    {
+        fill_moves_with_cache();
+        enforce_moves_with_uniqueness();
+    }
     if (!moves_with_atom2)
     {
         result[0] = nullptr;
@@ -1237,17 +1243,37 @@ void Atom::consolidate_bonds()
     //
 }
 
+int Atom::get_Greek()
+{
+    if (!this || !name || !residue) return 0;
+    int i=0, j;
+    if (name[i] >= '0' && name[i] <= '9') i++;
+    i += strlen(get_elem_sym());
+    const char* c = strchr(Greek, name[i]);
+    if (c)
+    {
+        j = c - Greek + 1;
+        return j;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
 void Bond::fill_moves_with_cache()
 {
     Atom* attmp[65536];
     int tmplen = 0;
     int i, j, k;
+    int lused = rand();
 
     if (!atom2) return;
+    if (atom2->get_Greek() < atom1->get_Greek()) return;
 
     if (_DBGMOVES) cout << atom2->aa3let << atom2->residue << ": What moves with " << atom2->name << " when rotating about " << atom1->name << "?" << endl;
 
-    atom2->used = true;
+    atom2->used = lused;
     Bond* b[16];
     atom2->fetch_bonds(b);
     if (!b[0]) return;
@@ -1256,7 +1282,7 @@ void Bond::fill_moves_with_cache()
         if (b[i]->atom2 && b[i]->atom2 != atom1 && b[i]->atom2->residue == atom2->residue)
         {
             attmp[tmplen++] = b[i]->atom2;
-            b[i]->atom2->used = true;
+            b[i]->atom2->used = lused;
             if (_DBGMOVES) cout << b[i]->atom2->name << " ";
         }
     }
@@ -1268,7 +1294,8 @@ void Bond::fill_moves_with_cache()
         {
             if (attmp[j]->in_same_ring_as(atom1))
             {
-                attmp[j]->used = true;
+                attmp[j]->used = lused;
+                if (_DBGMOVES) cout << attmp[j]->name << " in same ring as " << atom1->name << " ";
                 continue;
             }
 
@@ -1277,16 +1304,17 @@ void Bond::fill_moves_with_cache()
             {
                 for (i=0; b[i]; i++)
                 {
-                    if (_DBGMOVES) if (b[i]->atom2) cout << "(" << attmp[j]->name << "-" << b[i]->atom2->name << (b[i]->atom2->used ? "*" : "") << "?) ";
-                    if (b[i]->atom2 && !b[i]->atom2->used && b[i]->atom2 != atom1 && b[i]->atom2->residue == atom2->residue)
+                    if (_DBGMOVES) if (b[i]->atom2) cout << "(" << attmp[j]->name << "-" << b[i]->atom2->name << ((b[i]->atom2->used == lused) ? "*" : "") << "?) ";
+                    if (b[i]->atom2 && b[i]->atom2->used != lused && b[i]->atom2 != atom1 && b[i]->atom2->residue == atom2->residue)
                     {
                         if (b[i]->atom2->in_same_ring_as(atom1))
                         {
-                            b[i]->atom2->used = true;
+                            b[i]->atom2->used = lused;
+                        if (_DBGMOVES) cout << atom2->name << " in same ring as " << atom1->name << " ";
                             continue;
                         }
                         attmp[tmplen++] = b[i]->atom2;
-                        b[i]->atom2->used = true;
+                        b[i]->atom2->used = lused;
                         if (_DBGMOVES) cout << b[i]->atom2->name << " " << flush;
                         k++;
                     }
@@ -1302,10 +1330,10 @@ void Bond::fill_moves_with_cache()
     for (i=0; i<tmplen; i++)
     {
         moves_with_atom2[i] = attmp[i];
-        attmp[i]->used = false;
+        attmp[i]->used = 0;
     }
     moves_with_atom2[i] = 0;
-    atom2->used = false;
+    atom2->used = 0;
 
     if (_DBGMOVES) cout << endl << endl;
 
@@ -2322,6 +2350,19 @@ Bond* Bond::get_reversed()
     return reversed;
 }
 
+void Bond::compute_flip_capability()
+{
+    if (!this || !atom1 || !atom2) return;
+    if (atom1->get_Z() == 1 || atom2->get_Z() == 1) return;
+    if (atom2->get_bonded_atoms_count() == 1) return;
+    can_flip = !caged
+        && !can_rotate
+        && (!atom1->is_pi() || !atom2->is_pi() || !(atom1->in_same_ring_as(atom2)))
+        && (cardinality == 1 || (atom1->get_family() != TETREL && atom2->get_family() != TETREL))
+        && (!atom1->is_backbone || !atom2->is_backbone || atom1->get_family() != PNICTOGEN || atom2->get_family() != PNICTOGEN)
+        ;
+}
+
 int Bond::count_heavy_moves_with_atom()
 {
     Bond* rev = get_reversed();
@@ -2641,8 +2682,8 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             if (b)
             {
                 #if _ALLOW_FLEX_RINGS
-                b->can_flip = b->can_rotate;
                 b->can_rotate = false;
+                b->compute_flip_capability();
                 #else
                 b->can_rotate = b->can_flip = false;
                 #endif
@@ -2651,8 +2692,8 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             if (b)
             {
                 #if _ALLOW_FLEX_RINGS
-                b->can_flip = b->can_rotate;
                 b->can_rotate = false;
+                b->compute_flip_capability();
                 #else
                 b->can_rotate = b->can_flip = false;
                 #endif
@@ -2664,8 +2705,8 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             if (b)
             {
                 #if _ALLOW_FLEX_RINGS
-                b->can_flip = b->can_rotate;
                 b->can_rotate = false;
+                b->compute_flip_capability();
                 #else
                 b->can_rotate = b->can_flip = false;
                 #endif
@@ -2674,8 +2715,8 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             if (b)
             {
                 #if _ALLOW_FLEX_RINGS
-                b->can_flip = b->can_rotate;
                 b->can_rotate = false;
+                b->compute_flip_capability();
                 #else
                 b->can_rotate = b->can_flip = false;
                 #endif

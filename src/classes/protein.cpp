@@ -3049,7 +3049,86 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
     return retval;
 }
 
+float Protein::A100()
+{
+    AminoAcid* aa1x53 = get_residue_bw(1, 53);
+    AminoAcid* aa2x50 = get_residue_bw(2, 50);
+    AminoAcid* aa3x42 = get_residue_bw(3, 42);
+    AminoAcid* aa5x66 = get_residue_bw(5, 66);
+    AminoAcid* aa6x58 = get_residue_bw(6, 58);
 
+    AminoAcid* aa7x55 = get_residue_bw(7, 55);
+    AminoAcid* aa3x37 = get_residue_bw(3, 37);
+    AminoAcid* aa4x42 = get_residue_bw(4, 42);
+    AminoAcid* aa6x34 = get_residue_bw(6, 34);
+    AminoAcid* aa7x35 = get_residue_bw(7, 35);
+
+    float term1 = (aa1x53 && aa7x55) ? (-14.43 * aa1x53->get_CA_location().get_3d_distance(aa7x55->get_CA_location())) : -164.76021;
+    float term2 = (aa2x50 && aa3x37) ? ( -7.62 * aa2x50->get_CA_location().get_3d_distance(aa3x37->get_CA_location())) : -92.39641;
+    float term3 = (aa3x42 && aa4x42) ? (  9.11 * aa3x42->get_CA_location().get_3d_distance(aa4x42->get_CA_location())) :  93.44191;
+    float term4 = (aa5x66 && aa6x34) ? ( -6.32 * aa5x66->get_CA_location().get_3d_distance(aa6x34->get_CA_location())) : -59.16911;
+    float term5 = (aa6x58 && aa7x35) ? ( -5.22 * aa6x58->get_CA_location().get_3d_distance(aa7x35->get_CA_location())) : -55.99571;
+
+    float A100_score = term1 + term2 + term3 + term4 + term5 + 278.88;
+
+    #if _dbg_A100
+    cout << "A100 value: " << term1 << " + " << term2 << " + " << term3 << " + " << term4 << " + " << term5 << " + 278.88 = " << A100_score << endl;
+    #endif
+
+    return A100_score;
+}
+
+Atom* Protein::region_pivot_atom(Region rgn)
+{
+    int i, j, n;
+    Atom **a = new Atom*, **b = new Atom*, *retval = nullptr;
+    float beststr = 0;
+
+    n = get_end_resno();
+    for (i=rgn.start; i<=rgn.end; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
+        bool is_thiol = aa->is_thiol();
+
+        for (j=1; j<n; j++)
+        {
+            if (j >= rgn.start && j <= rgn.end) continue;
+
+            AminoAcid* ab = get_residue(j);
+            if (!ab) continue;
+            aa->mutual_closest_atoms(ab, a, b);
+
+            if ((*a)->get_Z() == 1 && (*a)->is_bonded_to("S")) *a = (*a)->get_bond_by_idx(0)->atom2;
+            if ((*b)->get_Z() == 1 && (*b)->is_bonded_to("S")) *b = (*b)->get_bond_by_idx(0)->atom2;
+
+            if (is_thiol && ab->is_thiol())
+            {
+                float r = (*a)->distance_to(*b);
+                if ((*a)->get_Z() == 16 && (*b)->get_Z() == 16 && r < 2.5 && beststr > -252)
+                {
+                    if (retval && retval->get_Z() == 16 && beststr < 250) return nullptr;            // Multiple disulfide bridges; region cannot rotate.
+                    else
+                    {
+                        beststr = -251;
+                        retval = *a;
+                    }
+                }
+            }
+            else
+            {
+                float e = fmin(-InteratomicForce::total_binding(*a, *b), -aa->get_intermol_binding(ab));
+                if (e < beststr)
+                {
+                    beststr = e;
+                    retval = *a;
+                }
+            }
+        }
+    }
+
+    return retval;
+}
 
 Point Protein::find_loneliest_point(Point cen, Point sz)
 {
@@ -3822,171 +3901,6 @@ void Protein::bridge(int resno1, int resno2)
     aa2->movability = MOV_PINNED;
 
     _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
-}
-
-void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
-{
-    save_undo_state();
-    bool wmu = mass_undoable;
-    mass_undoable = true;
-
-    int l;
-    float prebind;
-
-    int sz = l_soft_rgns.size();
-    if (sz)
-    {
-        for (l=0; l<sz; l++)
-        {
-            if (!l) prebind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
-            
-            #if _dbg_soft
-            cout << iter << ": from " << prebind;
-            #endif
-
-            int tweak = rand() % 6;
-            float amount = nanf("unbiased");
-
-            if (isnan(amount) || !amount) amount = frand(-1, 1);
-            else
-            {
-                if (amount > 0) amount = frand(-amount*soft_bias_overlap, amount);
-                else amount = frand(amount, -amount*soft_bias_overlap);
-            }
-
-            Point bary = get_region_center(1, 9999);
-            Point ptrgn = get_region_center(l_soft_rgns[l].start, l_soft_rgns[l].end);
-            SCoord r = ptrgn.subtract(bary);
-            r.theta = 0;
-            r.r = amount;
-            Point pr1 = bary.add(r);
-            Point pr2 = pr1;
-            pr2.y += 20;
-            SCoord normal = compute_normal(bary, pr1, pr2);
-            normal.r = amount;
-            SCoord alpha = get_region_axis(l_soft_rgns[l].start, l_soft_rgns[l].end);
-            alpha.r = amount;
-            Point rgncen = get_region_center(l_soft_rgns[l].start, l_soft_rgns[l].end);
-
-            switch (tweak)
-            {
-                case 0:
-                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, r);
-                break;
-
-                case 1:
-                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, normal);
-                break;
-
-                case 2:
-                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, alpha);
-                break;
-
-                case 3:
-                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, alpha, amount/10);
-                break;
-
-                case 4:
-                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, r, amount/50);
-                break;
-
-                case 5:
-                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, normal, amount/30);
-                break;
-
-                default:
-                ;
-            }
-
-            float postbind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;
-            #if _dbg_soft
-            cout << " to " << postbind;
-            #endif
-
-            switch (tweak)
-            {
-                case 0:
-                if (ligand && postbind > prebind) g_rgnxform_r[l] += amount;
-                else
-                {
-                    r.r = -r.r;
-                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, r);
-                    #if _dbg_soft
-                    cout << " reverting r.";
-                    #endif
-                }
-                break;
-
-                case 1:
-                if (ligand && postbind > prebind) g_rgnxform_theta[l] += amount;
-                else
-                {
-                    normal.r = -normal.r;
-                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, normal);
-                    #if _dbg_soft
-                    cout << " reverting normal.";
-                    #endif
-                }
-                break;
-
-                case 2:
-                if (ligand && postbind > prebind) g_rgnxform_y[l] += amount;
-                else
-                {
-                    alpha.r = -alpha.r;
-                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, alpha);
-                    #if _dbg_soft
-                    cout << " reverting alpha.";
-                    #endif
-                }
-                break;
-
-                case 3:
-                if (ligand && postbind > prebind) g_rgnrot_alpha[l] += amount/10;
-                else
-                {
-                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, alpha, -amount/10);
-                    #if _dbg_soft
-                    cout << " reverting alpha rot.";
-                    #endif
-                }
-                break;
-
-                case 4:
-                if (ligand && postbind > prebind) g_rgnrot_w[l] += amount/50;
-                else
-                {
-                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, r, -amount/50);
-                    #if _dbg_soft
-                    cout << " reverting r rot.";
-                    #endif
-                }
-                break;
-
-                case 5:
-                if (ligand && postbind > prebind) g_rgnrot_u[l] += amount/30;
-                else
-                {
-                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, normal, -amount/30);
-                    #if _dbg_soft
-                    cout << " reverting normal rot.";
-                    #endif
-                }
-                break;
-
-                default:
-                ;
-            }
-
-            if (postbind > prebind) prebind = postbind;
-
-            #if _dbg_soft
-            cout << endl;
-            #endif
-        }
-    }
-
-    mass_undoable = wmu;
 }
 
 void Protein::minimize_residue_clashes(int resno)

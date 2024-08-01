@@ -7,6 +7,7 @@ int Moiety::contained_by(Molecule* mol, Atom** out_matches)
 {
     int i, j, l=0, num_matched = 0;
     molsize = mol->get_atom_count();
+    int lused = rand();
 
     for (i=0; i<molsize; i++)
     {
@@ -17,7 +18,7 @@ int Moiety::contained_by(Molecule* mol, Atom** out_matches)
         for (j=0; j<molsize; j++)
         {
             Atom* b = mol->get_atom(j);
-            if (b) b->used = false;
+            if (b) b->used = 0;
         }
 
         if (j = does_atom_match(a, out_matches + l))
@@ -88,6 +89,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
     int num_duds = 0;
     int atoms_used = 0;
     int num_numbers = 0;
+    int lused = rand();
 
     for (iter=0; iter<10; iter++)
     {
@@ -128,7 +130,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
         cout << "Matched " << cursor[parens]->name << " to start of expression " << p << endl;
         #endif
         out_matches[atoms_used++] = cursor[parens];
-        cursor[parens]->used = true;
+        cursor[parens]->used = lused;
 
         for (; i<n; i++)
         {
@@ -213,7 +215,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
             {
                 if (!b[j]) continue;
                 if (!b[j]->atom2) continue;
-                if (b[j]->atom2->used)
+                if (b[j]->atom2->used == lused)
                 {
                     #if _dbg_moieties
                     cout << "Skipping " << b[j]->atom2->name << " as 'used'..." << endl;
@@ -261,7 +263,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                     #endif
                     cursor[parens] = b[j]->atom2;
                     out_matches[atoms_used++] = b[j]->atom2;
-                    b[j]->atom2->used = true;
+                    b[j]->atom2->used = lused;
                     break;
                 }
                 #if _dbg_moieties

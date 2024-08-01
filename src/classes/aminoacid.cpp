@@ -2304,8 +2304,12 @@ bool AminoAcid::is_helix(int p)
         if (aa)
         {
             a = (j ? this : aa)->get_atom("O");
-            b = (j ? aa : this)->get_atom("HN");
-            if (!b) b = (j ? aa : this)->get_atom("H");
+            b = (j ? aa : this)->HN_or_substitute();
+
+            if (b->get_Z() == 7 && !b->is_bonded_to("H"))
+            {
+                b = add_atom("H", "HN", b, 1);
+            }
 
             if (a && b)
             {
@@ -2763,8 +2767,10 @@ Atom* AminoAcid::HN_or_substitute()
 
         for (i=0; i<g; i++)
         {
-            if (bb[i]->atom2 && strcmp(bb[i]->atom2->name, "CA")) return bb[i]->atom2;
+            if (bb[i] && bb[i]->atom2 && bb[i]->atom2->get_family() != TETREL) return bb[i]->atom2;
         }
+
+        retval = a;
     }
     return retval;
 }

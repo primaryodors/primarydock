@@ -138,6 +138,13 @@ int pid = getpid();
 bool append_pdb = false;
 bool do_output_colors = false;
 
+bool softdock = false;
+float softness = 0;
+std::vector<Region> softrgns;
+std::vector<Atom*> softrgpiva;
+std::vector<int> softrgn_allowed;
+std::vector<float> softrgn_initclash;
+
 AminoAcid*** reaches_spheroid = nullptr;
 int sphres = 0;
 
@@ -404,12 +411,14 @@ void iteration_callback(int iter, Molecule** mols)
     int l;
     float f = 0;
 
+    // Initialization for best-iteration saving for pose output.
     if (iter == 1)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
         iter_best_bind = 0;
     }
 
+    // Stochastically force flexion on some side chains that get clashes.
     for (l=0; mols[l]; l++)
     {
         float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
@@ -424,7 +433,7 @@ void iteration_callback(int iter, Molecule** mols)
         }
 
         if (flex
-            && iter < 5
+            // && iter < 5
             && (lf < -10 || lf < 0.1 * ptnl)
             && mols[l]->movability == MOV_FLXDESEL
             && lres
@@ -457,83 +466,38 @@ void iteration_callback(int iter, Molecule** mols)
     Atom *atom1, *atom2;
 
     float progress = (float)iter / iters;
-    // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;
-    float lsrca = (progress < 0.5) ? soft_rock_clash_allowance : 0;
 
-    n = dyn_motions.size();
-    if (!(iter % soft_dynamics_every_n_iters) && n)
+    n = softrgns.size();
+    if (n) for (i=0; i<n; i++)
     {
-        #if _dbg_soft_dynamics
-        cout << endl;
-        #endif
-
-        // Each dynamic motion, try successively smaller increments/decrements, realigning BB pairs each time, until optimal energy.
-        // Include contacts between dynamic motion region and nearby residues in the energy calculation.
-        for (l=0; l<n; l++)
+        for (j=softrgns[i].start; j<=softrgns[i].end; j++)
         {
-            float incr = 0.1;
-            float before = dyn_motions[l].get_nearby_contact_energy() + dyn_motions[l].get_ligand_contact_energy(ligand);
-            float after;
-            #if _dbg_soft_dynamics
-            cout << dyn_motions[l].fulcrum_resno.helix_no << "." << dyn_motions[l].fulcrum_resno.member_no
-                << " starting contact energy " << before << endl;
-            #endif
-
-            for (i=0; i<25; i++)
+            AminoAcid* aa = protein->get_residue(j);
+            if (!aa) continue;
+            float c = aa->get_intermol_clashes(ligand);
+            if (c > clash_limit_per_aa)
             {
-                Pose ligand_was;
-                ligand_was.copy_state(ligand);
-                #if _dbg_soft_dynamics
-                cout << "Copied states." << endl << flush;
-                #endif
+                Point A = aa->get_CA_location();
+                SCoord AB = ligand->get_nearest_atom(A)->get_location().subtract(A);
+                AB.r = pow(c, 1.0/3);
+                Point B = A.subtract(AB);
+                Point C = softrgpiva[i]->get_location();
+                Rotation rot = align_points_3d(A, B, C);
+                rot.a = fmin(rot.a, 0.1*softness*fiftyseventh);
 
-                dyn_motions[l].apply_incremental(incr);
-                #if _dbg_soft_dynamics
-                cout << "Applied motion." << endl << flush;
-                #endif
-
-                if (use_bestbind_algorithm && global_pairs.size() >= 2)
-                    GroupPair::align_groups(ligand, global_pairs, false, bb_realign_amount);
-                #if _dbg_soft_dynamics
-                cout << "Aligned groups." << endl << flush;
-                #endif
-
-                after = dyn_motions[l].get_nearby_contact_energy() + dyn_motions[l].get_ligand_contact_energy(ligand);
-                #if _dbg_soft_dynamics
-                cout << "New contact energy " << after << flush;
-                #endif
-                
-
-                if (after > before)
+                float c1;
+                if (i >= softrgn_initclash.size())
                 {
-                    dyn_motions[l].apply_incremental(-incr);
-                    ligand_was.restore_state(ligand);
-                    incr *= -0.666;
-
-                    #if _dbg_soft_dynamics
-                    cout << " reverting.";
-                    #endif
+                    c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                    softrgn_initclash.push_back(c1);
                 }
-                else
-                {
-                    before = after;
+                else c1 = softrgn_initclash[i];
 
-                    #if _dbg_soft_dynamics
-                    cout << " total applied " << dyn_motions[l].get_total_applied();
-                    #endif
-                }
-
-                #if _dbg_soft_dynamics
-                cout << endl << flush;
-                #endif
-
-                if (fabs(incr) < 0.01) break;
+                protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, rot.a);
+                float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                if (c2 > c1 + clash_limit_per_aa*2) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
             }
         }
-
-        #if _dbg_soft_dynamics
-        cout << endl;
-        #endif
     }
 
     if (!iter) goto _oei;
@@ -1254,7 +1218,27 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "SOFT"))
     {
-        dyn_strings.push_back(origbuff);
+        softdock = true;
+        softness = 1;
+
+        for (i=1; words[i]; i++)
+        {
+            if (strchr(words[i], '.'))
+            {
+                softness = atof(words[i]);
+                #if _dbg_soft
+                cout << "Softness: " << softness << endl;
+                #endif
+            }
+            else
+            {
+                int j = atoi(words[i]);
+                if (j) softrgn_allowed.push_back(j);
+                #if _dbg_soft
+                cout << "Allowed soft region: " << j << endl;
+                #endif
+            }
+        }
     }
     else if (!strcmp(words[0], "STATE"))
     {
@@ -1324,9 +1308,15 @@ void prepare_initb()
     if (differential_dock)
     {
         initial_binding = new float[seql+4];
+        #if compute_vdw_repulsion
         initial_vdWrepl = new float[seql+4];
+        #endif
 
+        #if compute_vdw_repulsion
         for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
+        #else
+        for (i=0; i<seql+4; i++) initial_binding[i] = 0;
+        #endif
 
         std::vector<AminoAcid*> preres = protein->get_residues_near(pocketcen, pre_ligand_multimol_radius);
         int qpr = preres.size();
@@ -1399,7 +1389,9 @@ void prepare_initb()
                 #endif
 
                 initial_binding[resno] += f;
+                #if compute_vdw_repulsion
                 initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(prem[j]);
+                #endif
             }
 
             #if _DBG_TOOLARGE_DIFFNUMS
@@ -1766,7 +1758,7 @@ void do_tumble_spheres(Point l_pocket_cen)
 
 void apply_protein_specific_settings(Protein* p)
 {
-    int i, n;
+    int i, j, n;
 
     n = atomto.size();
     for (i=0; i<n; i++)
@@ -1829,6 +1821,91 @@ void apply_protein_specific_settings(Protein* p)
         dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
         dyn.bias = 30*fiftyseventh;
         dyn_motions.push_back(dyn);
+    }
+
+    if (softdock)
+    {
+        n = protein->get_end_resno();
+        for (i=1; i<=n; i++)
+        {
+            bool helixed = false;
+            AminoAcid* aa = protein->get_residue(i);
+            if (!aa) continue;
+            if (aa->priority) continue;
+
+            if (aa->is_alpha_helix()) helixed = true;
+            else for (j=i-2; j<=i+2; j++)
+            {
+                if (j < 1) continue;
+                if (j == i) continue;
+                if (j > n) break;
+                aa = protein->get_residue(j);
+                if (!aa) continue;
+                if (aa->is_alpha_helix() || aa->priority) helixed = true;
+                if (helixed) break;
+            }
+
+            if (!helixed) protein->delete_residue(i);
+        }
+
+        if (!softrgns.size()) for (i=1; i<=n; i++)
+        {
+            softrgn_initclash.clear();
+            if (protein->get_residue(i))
+            {
+                Region r;
+                r.start = i;
+                BallesterosWeinstein bwi = protein->get_bw_from_resno(i);
+                for (j=i+1; j<=n; j++)
+                {
+                    BallesterosWeinstein bwj = protein->get_bw_from_resno(j);
+                    if (j==n || !protein->get_residue(j) || bwi.helix_no != bwj.helix_no)
+                    {
+                        r.end = j-1;
+                        if (r.end > r.start+2)
+                        {
+                            bool allowed = true;
+                            int l = (i+j-1)/2;
+                            BallesterosWeinstein bw = protein->get_bw_from_resno(l);
+
+                            int m;
+                            if (m = softrgn_allowed.size())         // assignment not comparison
+                            {
+                                allowed = false;
+                                for (l=0; l<m; l++) if (bw.helix_no == softrgn_allowed[l]) allowed = true;
+                            }
+
+                            if (allowed)
+                            {
+                                Atom* a = protein->region_pivot_atom(r);
+                                if (a)
+                                {
+                                    softrgns.push_back(r);
+                                    softrgpiva.push_back(a);
+                                    #if _dbg_soft
+                                    cout << "Region " << r.start << "-" << r.end << " bw " << bw.helix_no << " pivots about " << a->residue << ":" << a->name << endl;
+                                    #endif
+                                }
+                                #if _dbg_soft
+                                else
+                                {
+                                    cout << "Region " << r.start << "-" << r.end << " bw " << bw.helix_no << " cannot soft pivot." << endl;
+                                }
+                                #endif
+                            }
+                            #if _dbg_soft
+                            else
+                            {
+                                cout << "Region " << r.start << "-" << r.end << " bw " << bw.helix_no << " is not allowed to soft pivot." << endl;
+                            }
+                            #endif
+                        }
+                        i=j;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1963,6 +2040,11 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
     protein->load_pdb(pf, 0, protstrand ?: 'A');
+
+    #if _dbg_A100
+    float init_A100 = protein->A100();
+    #endif
+
     apply_protein_specific_settings(protein);
     fclose(pf);
     #if _DBG_STEPBYSTEP
@@ -3054,6 +3136,7 @@ _try_again:
             float weaa = dr[drcount][nodeno].worst_nrg_aa;
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
+            #if compute_clashdirs
             n = protein->get_end_resno();
             for (i=1; i<=n; i++)
             {
@@ -3074,6 +3157,7 @@ _try_again:
                     }
                 }
             }
+            #endif
 
             dr[drcount][nodeno].proximity = ligand->get_barycenter().get_3d_distance(nodecen);
 
@@ -3450,6 +3534,7 @@ _exitposes:
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
 
+    #if compute_clashdirs
     if (regions)
     {
         cout << endl;
@@ -3482,6 +3567,7 @@ _exitposes:
         cout << endl;
         if (output) *output << endl;
     }
+    #endif
 
     if (met) delete met;
 

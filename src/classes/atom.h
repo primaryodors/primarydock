@@ -69,6 +69,7 @@ public:
     int count_heavy_moves_with_atom();
     int count_heavy_moves_with_atom2();
     Bond* get_reversed();
+    void compute_flip_capability();
     void swing(SCoord newdir);		// Rotate atom2, and all its moves_with atoms, about atom1 so that the bond points to newdir.
 
     Atom* atom1 = nullptr;
@@ -181,6 +182,7 @@ public:
     bool is_pi();
     bool is_amide();
     bool is_aldehyde();
+    int get_Greek();
 
     // Setters.
     void set_aa_properties();
@@ -325,7 +327,7 @@ public:
     char* region;					// "
     bool is_backbone=false;			// "
     char* name;						// "
-    bool used = false;      		// Required for certain algorithms such as Molecule::identify_rings().
+    int used = 0;      		        // Required for certain algorithms such as Molecule::identify_rings().
     int mirror_geo=-1;				// If >= 0, mirror the geometry of the atom2 of bonded_to[mirror_geo].
     bool flip_mirror=false;			// If true, do trans rather than cis bond conformation.
     bool dnh=false;					// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.

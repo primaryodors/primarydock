@@ -46,17 +46,6 @@ struct ResiduePlaceholder
     void resolve_resno(Protein* prot);
 };
 
-struct SoftBias
-{
-    std::string region_name;
-    float radial_transform = 0;                 // Motion away from or towards the pocket center.
-    float angular_transform = 0;                // Motion towards and away from neighboring helices.
-    float vertical_transform = 0;               // Motion in the extracelllar or cytoplasmic direction.
-    float helical_rotation = 0;                 // Rotation about the helical axis.
-    float radial_rotation = 0;                  // Rotation about the imaginary line to the pocket center.
-    float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
-};
-
 struct MCoord
 {
     int Z = 29;
@@ -166,6 +155,8 @@ public:
     float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false, float extra_clash_allowance = 0, int ignore_startres = 0, int ignore_endres = 0);     // Searches positive theta.
     void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
     void set_conditional_basicities();
+    float A100();
+    Atom* region_pivot_atom(Region region);
 
     // Motion functions
     void upright();
@@ -203,7 +194,6 @@ public:
 
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
-    void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
     int replace_side_chains_from_other_protein(Protein* other);
 
     int* mcoord_resnos = NULL;

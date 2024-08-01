@@ -222,7 +222,7 @@ fi
 
 
 MOLECULE="dipeptide_GG"
-test/bond_rotation_test "NCC(=O)NCC(=O)O" | sed '/^#/d' > testdata/received/brot.$MOLECULE.received.txt
+test/bond_rotation_test "NCC([O-])=[NH+]CC(=O)O" | sed '/^#/d' > testdata/received/brot.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/brot.$MOLECULE.approved.txt testdata/received/brot.$MOLECULE.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}\u2588${NC}"

@@ -643,6 +643,20 @@ heredoc;
             $censz = [];
             exec($cmd, $censz);
 
+            switch (family_from_protid($protid))
+            {
+                case "OR":
+                $softness = 5.0;
+                break;
+
+                case "TAAR":
+                $softness = 0;
+                break;
+
+                default:
+                $softness = 1.0;
+            }
+
             foreach ($censz as $ln)
             {
                 if (substr($ln, 0, 4) == "SZ: ")
@@ -667,6 +681,9 @@ heredoc;
         }
         else $iso = "";
 
+        $excl = resno_from_bw($protid, "2.37");
+        $soft = $softness ? "SOFT $softness 2 3 4 45 5 6 7" : "";
+
         $configf = <<<heredoc
 
 PROT $pdbfname
@@ -681,7 +698,7 @@ $atomto
 $stcr
 $flxr
 
-EXCL 1 56		# Head, TMR1, and CYT1.
+EXCL 1 $excl		# Head, TMR1, and CYT1.
 
 SEARCH $search
 POSE $pose
@@ -694,6 +711,7 @@ OUTVDWR 1
 # MOVIE
 
 FLEX 1
+$soft
 WET
 
 OUT $outfname
@@ -949,6 +967,19 @@ heredoc;
                     }
                     continue;
                 }
+                else if ($coldiv[0] == "A100 score")
+                {
+                    $mode = "A100";
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                    }
+                    continue;
+                }
                 else if ($coldiv[0] == "Protein clashes")
                 {
                     $mode = "PCLASH";
@@ -962,7 +993,7 @@ heredoc;
                     }
                     continue;
                 }
-                else if (strpos($coldiv[0], " active theta: "))
+                else if (strpos($coldiv[0], " active theta"))
                 {
                     $morceaux = explode(' ', $coldiv[0]);
                     $mode = "ACVTH.{$morceaux[0]}";

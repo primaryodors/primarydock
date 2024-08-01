@@ -27,6 +27,8 @@
 #define clash_limit_per_aa 7.0
 #define clash_limit_per_atom 6.0
 #define contact_r_5x58_7x53 3.93
+#define include_eclipses 0
+#define include_residue_eclipses 0
 #define eclipsing_kJmol_per_radian 1.86453
 #define memsanity 0x10000000
 
@@ -160,7 +162,7 @@
 #define bb_scooch_threshold_distance 1.5
 #define flexion_selection 1
 #define no_zero_flexions 1
-#define flexion_probability_multiplier 0.4
+#define flexion_probability_multiplier 0.3
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
 
@@ -170,6 +172,11 @@
 
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
+
+// Obsolete stuff.
+#define compute_missed_connections 0
+#define compute_vdw_repulsion 0
+#define compute_clashdirs 0
 
 // If using an activation matrix, active_persistence "rewards" the ligand for keeping
 // bindings to the same residues post-activation as pre-activation. The noflex option
@@ -183,7 +190,6 @@
 
 #define redo_tumble_spheres_on_activation 0
 #define redo_tumble_spheres_every_node 1
-#define soft_dynamics_every_n_iters 20
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
 // the viewer can update its cartoon backbone.
@@ -195,12 +201,6 @@
 #define write_active_rotation 1
 
 #define _use_groups 1
-
-#define soft_ligand_importance 20
-#define soft_bias_overlap 0.1
-
-#define soft_rock_clash_allowance 0
-#define soft_rock_clash_penalty 0.1
 
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through
@@ -354,6 +354,7 @@
 // Should normally be false or zero:
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
+#define _dbg_A100 0
 #define _dbg_anemia 0
 #define _dbg_asunder_atoms 0
 #define _dbg_bb_pullaway 0
@@ -402,8 +403,6 @@
 #define _dbg_residue_poses 0
 #define _dbg_rock_pic 0
 #define _dbg_soft 0
-#define _dbg_soft_dynamics 0
-#define _dbg_softrock 0
 #define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0

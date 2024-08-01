@@ -20,7 +20,7 @@ chdir(__DIR__);
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1).
-$pose = 15;
+$pose = 10;
 $iter = 30;
 $elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
@@ -28,6 +28,7 @@ $num_std_devs = 2.0;            // How many standard deviations to move the heli
 prepare_outputs();
 
 $metrics_to_process["BEST"] = "Pose1";
+$metrics_to_process["A100"] = "A100";
 
 function make_prediction($data)
 {
@@ -38,11 +39,8 @@ function make_prediction($data)
         $ascore = min(0, floatval(@$data['a_Pose1']));
         $iscore = min(0, floatval(@$data['i_Pose1']));
 
-        if ($ascore >= $iscore)
-        {
-            $ascore = min(0, floatval(@$data['a_BindingEnergy']));
-            $iscore = min(0, floatval(@$data['i_BindingEnergy']));
-        }
+        $aa100 = floatval(@$data['a_A100']);
+        $ia100 = floatval(@$data['i_A100']);
 
         $aeff = isset($data["a_POSES"]) ? (floatval($data["a_POSES"]) / $pose) : 1;
         $ieff = isset($data["i_POSES"]) ? (floatval($data["i_POSES"]) / $pose) : 1;
@@ -50,12 +48,16 @@ function make_prediction($data)
         if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($iscore, 0) - $ascore)*$aeff;
+            $dock_score = -$ascore*$aeff;
+            if ($aa100 && $ia100) $dock_score *= min(1, ($aa100 - $ia100) / 50);
+            $data['DockScore'] = $dock_score;
         }
         else if ($iscore < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = (min($iscore, 0) - $ascore)*$ieff;
+            $dock_score = $iscore*$aeff;
+            if ($aa100 && $ia100) $dock_score *= min(1, ($aa100 - $ia100) / 50);
+            $data['DockScore'] = $dock_score;
         }
         else
         {

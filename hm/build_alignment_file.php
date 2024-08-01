@@ -50,8 +50,9 @@ foreach ($prots as $rcpid => $p)
         break;
 
         default:
+        $famn = substr($fam, 2);
         $sub = subfamily_from_protid($rcpid);
-        $deets .= "Olfactory receptor family $fam subfamily $sub number $mem";
+        $deets .= "Olfactory receptor family $famn subfamily $sub number $mem";
     }
     $deets .= ":Homo sapiens: 1.90: 0.19";
     fwrite($fp, "$deets\n");

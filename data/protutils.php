@@ -116,7 +116,7 @@ function subfamily_from_protid($protid)
 	if (substr($protid, 0, 2) == "OR")
 	{
 		$fam = family_from_protid($protid);
-		return preg_replace("[^A-Z]", "", substr($protid, strlen($fam)));
+		return preg_replace("/[^A-Z]/", "", substr($protid, strlen($fam)));
 	}
 	else return "";
 }
@@ -127,7 +127,7 @@ function member_from_protid($protid)
 	{
 		$fam = family_from_protid($protid);
 		$sub = subfamily_from_protid($protid);
-		return preg_replace("[^0-9]", "", substr($protid, strlen($fam)+strlen($sub)));
+		return preg_replace("/[^0-9]/", "", substr($protid, strlen($fam)+strlen($sub)));
 	}
 	else return substr($protid, 4);
 }

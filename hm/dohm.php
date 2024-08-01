@@ -57,7 +57,7 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "'7dhr', '8gej', '6gdg', '8f76', '8hti'";
+    $knowns = "'7dhr', '8gej', '6gdg', '8iw9', '8jln', '8f76', '8hti'";
 }
 
 
@@ -86,6 +86,9 @@ a = DOPEHRLoopModel(env,
               sequence = '$rcpid')
 a.starting_model= 1
 a.ending_model  = 1
+a.library_schedule = autosched.slow
+a.max_var_iterations = 300
+a.md_level = refine.very_slow
 a.make()
 
 natrixs;
@@ -132,6 +135,7 @@ DELETE 1 %1.20
 HYDRO
 UPRIGHT A
 BWCENTER
+MINC
 
 # LET \$mdlf = "pdbs/" + \$rcpid
 # LET \$mdlf += ".models.pdb"
@@ -152,3 +156,6 @@ fclose($fp);
 chdir(__DIR__);
 chdir("..");
 passthru("./bin/pepteditor hm/hm.pepd");
+
+chdir(__DIR__);
+foreach (glob("$rcpid.*") as $doomed) unlink($doomed);

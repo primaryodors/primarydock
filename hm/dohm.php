@@ -88,7 +88,7 @@ a.starting_model= 1
 a.ending_model  = 1
 a.library_schedule = autosched.slow
 a.max_var_iterations = 300
-a.md_level = refine.very_slow
+# a.md_level = refine.very_slow
 a.make()
 
 natrixs;

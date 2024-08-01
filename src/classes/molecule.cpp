@@ -669,8 +669,7 @@ float Molecule::total_eclipses()
 {
     #if !include_eclipses
     return 0;
-    #endif
-
+    #else
     if (!atoms) return 0;
     float result = 0;
     int i, j, k, l, m, n;
@@ -720,6 +719,7 @@ float Molecule::total_eclipses()
     }
 
     return result*eclipsing_kJmol_per_radian;
+    #endif
 }
 
 float Molecule::bindability_by_type(intera_type t, bool ib)

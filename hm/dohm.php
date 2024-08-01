@@ -10,6 +10,16 @@ $rcpid = @$argv[1];
 $p = $prots[$rcpid];
 if (!$rcpid) die("Usage:\nphp -f hm/dohm.php PROTID\n\n");
 
+$helices = "";
+foreach ($p["region"] as $rgname => $rgnse)
+{
+    $nmsub3 = substr($rgname, 0, 3);
+    if ($nmsub3 != "TMR" && $nmsub3 != "HXR") continue;
+    $rgs = $rgnse['start'];
+    $rge = $rgnse['end'];
+    $helices .= "        rsr.add(secondary_structure.Alpha(self.residue_range('$rgs:A', '$rge:A')))\n";
+}
+
 $disulfs = "";
 $xlinx = [ ["3.25", "45.62"] ];
 foreach ($xlinx as $xl)
@@ -23,7 +33,7 @@ foreach ($xlinx as $xl)
         ."                                                  self.residues['$rno2:A']))\n";
 }
 
-if ($disulfs) $disulfs = "class MyModel(DOPEHRLoopModel):\n    def special_patches(self, aln):\n$disulfs";
+if ($disulfs) $disulfs = "    def special_patches(self, aln):\n$disulfs";
 
 $fam = family_from_protid($rcpid);
 switch ($fam)
@@ -47,7 +57,7 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9', '8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
+    $knowns = "'7dhr', '8gej', '6gdg', '8f76', '8hti'";
 }
 
 
@@ -60,6 +70,11 @@ from modeller.automodel import *
 log.verbose()
 env = Environ()
 
+class MyModel(DOPEHRLoopModel):
+    def special_restraints(self, aln):
+        rsr = self.restraints
+        at = self.atoms
+$helices
 $disulfs
 
 # directories for input atom files

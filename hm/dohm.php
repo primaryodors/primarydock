@@ -24,8 +24,16 @@ $disulfs = "";
 $xlinx = [ ["3.25", "45.62"] ];
 foreach ($xlinx as $xl)
 {
-    $rno1 = resno_from_bw($rcpid, $xl[0]);
-    $rno2 = resno_from_bw($rcpid, $xl[1]);
+    try
+    {
+        $rno1 = resno_from_bw($rcpid, $xl[0]);
+        $rno2 = resno_from_bw($rcpid, $xl[1]);
+    }
+    catch (Exception $e)
+    {
+        continue;
+    }
+
     $raa1 = substr($p['sequence'], $rno1-1, 1);
     $raa2 = substr($p['sequence'], $rno2-1, 1);
     if ($raa1 == 'C' && $raa2 == 'C') $disulfs .=
@@ -35,15 +43,22 @@ foreach ($xlinx as $xl)
 
 if ($disulfs) $disulfs = "    def special_patches(self, aln):\n$disulfs";
 
+$CLASSI = "'8f76', '8hti'";
+$TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
+$MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
+$ADRB2 = "'7dhr', '8gej'";
+$ADORA2A = "'6gdg'";
+$LPAR1 = "'7td0', '7yu3'";
+
 $fam = family_from_protid($rcpid);
 switch ($fam)
 {
     case 'TAAR':
-    $knowns = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9', '8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
+    $knowns = "$MTAAR9, $TAAR1";
     break;
 
     case 'VN1R':
-    $knowns = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9', '8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";         // ??? TODO: Find closest relatives of VN1Rs.
+    $knowns = "$LPAR1, $TAAR1";
     break;
 
     case 'MS4A':
@@ -53,11 +68,11 @@ switch ($fam)
     case 'OR51':
     case 'OR52':
     case 'OR56':
-    $knowns = "'8f76', '8hti'";
+    $knowns = "$CLASSI";
     break;
 
     default:        // Class II ORs
-    $knowns = "'7dhr', '8gej', '6gdg', '8iw9', '8jln', '8f76', '8hti'";
+    $knowns = "$ADORA2A, $CLASSI";
 }
 
 

@@ -2319,6 +2319,36 @@ var PODefSchemeRainbow = NGL.ColormakerRegistry.addScheme(function (params)
 	}
 });
 
+var PODefSchemeFire = NGL.ColormakerRegistry.addScheme(function (params)
+{
+	/**/
+
+	this.atomColor = function(atom) 
+	{
+		if (isNaN(atom.structure.rnbPos))
+		{
+			var morceaux = atom.structure.name.split("|");
+
+			var i;
+			var nmax = 0;
+
+			for (i=0; i<model.length; i++)
+			{
+				if (mpos[i] == gpose && mnod[i] > nmax) nmax = mnod[i];
+			}
+
+			var nodeNo = parseInt(morceaux[1]);
+			atom.structure.rnbPos = Math.PI * nodeNo / nmax;
+		}
+
+		var red   = 128 - Math.cos(atom.structure.rnbPos + 0.5) * 127;
+		var green = atom.structure.rnbPos >= 1.5 ? (128 - Math.cos((atom.structure.rnbPos - 1.5)*2.3) * 127) : 0;
+		var blue  = 128 - Math.cos((atom.structure.rnbPos + 1.5)*1.7) * 127;
+
+		return 0x10000*parseInt(red) + 0x100*parseInt(green) + parseInt(blue);
+	}
+});
+
 function aa_scheme(atom)
 {
 	switch (atom.resname.toUpperCase())
@@ -2840,7 +2870,7 @@ function showPose(p)
     {
         if (mpos[i] == p && mnod[i] == 0)
         {
-			if (mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;
+			if (mrparams[i].colorScheme == PODefSchemeFire || mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;
 			model[i].removeAllRepresentations();
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
@@ -2923,7 +2953,7 @@ function showNode(n)
     {
         if (mpos[i] == gpose && mnod[i] == n)
         {
-			if (mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;			// @#$% shallow copy.
+			if (mrparams[i].colorScheme == PODefSchemeFire || mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;			// @#$% shallow copy.
 			model[i].removeAllRepresentations();
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
@@ -3036,7 +3066,11 @@ function rainbowNodes()
         if (mpos[i] == gpose)
         {
 			var mrp = mrparams[i];
-			if (mrp.colorScheme == PODefSchemeLigand) mrp.colorScheme = PODefSchemeRainbow;
+			if (mrp.colorScheme == PODefSchemeLigand)
+			{
+				mrp.colorScheme = PODefSchemeFire;
+				mrp.opacity = 0.6;
+			}
 			else continue;
 			model[i].removeAllRepresentations();
 			if (spcfill || whtbk) mrp.opacity = 1;

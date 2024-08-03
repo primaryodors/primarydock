@@ -1,6 +1,6 @@
 Contributing to this project:
 
-- I am sooo very grateful for the help!
+- Any and all help is very much appreciated!
 - Please make sure your branch is based off `stable`;
 - Each PR should ideally add or change one feature only, or at most, a few closely related features;
 - All PRs that change the C++ classes or the primarydock app *must* pass the Big Three test (see the test/big_three file), and receive a three green squares message, before merge.

@@ -712,7 +712,6 @@ OUTVDWR 1
 
 FLEX 1
 $soft
-WET
 
 OUT $outfname
 OUTPDB 1 $modelfname

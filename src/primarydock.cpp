@@ -1586,7 +1586,7 @@ void do_tumble_spheres(Point l_pocket_cen)
 
                                         if (tsphres[j]->priority)
                                         {
-                                            weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                                            weight = ts_priority_coefficient;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
                                         }
 
                                         #if !tumble_spheres_include_vdW

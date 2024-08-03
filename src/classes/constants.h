@@ -27,7 +27,7 @@
 #define clash_limit_per_aa 7.0
 #define clash_limit_per_atom 6.0
 #define contact_r_5x58_7x53 3.93
-#define include_eclipses 0
+#define include_eclipses 1
 #define include_residue_eclipses 0
 #define eclipsing_kJmol_per_radian 1.86453
 #define memsanity 0x10000000
@@ -145,6 +145,7 @@
 #define amide_zwitterionic_amount 0.1
 
 #define priority_weight_group 4
+#define ts_priority_coefficient 10
 
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1

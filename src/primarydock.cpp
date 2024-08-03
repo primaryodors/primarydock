@@ -156,6 +156,11 @@ bool use_bestbind_algorithm = default_bestbind;
 bool use_prealign = false;
 std::string prealign_residues = "";
 Bond retain_bindings[4];
+std::vector<int> priority_resnos;
+
+Atom* pivotal_hbond_aaa = nullptr;
+Atom* pivotal_hbond_la = nullptr;
+float pivotal_hbond_r = 0;
 
 #if _use_groups
 AtomGroup ligand_groups[3];
@@ -403,6 +408,59 @@ void reconnect_bridges()
     freeze_bridged_residues();
 }
 
+void do_pivotal_hbond_rot_and_scoot()
+{
+    // Rotate ligand so atom faces side chain atom.
+    ligand->movability = MOV_ALL;
+    float r = pivotal_hbond_aaa->distance_to(pivotal_hbond_la);
+    Point cen = ligand->get_barycenter();
+    Rotation rot = align_points_3d(pivotal_hbond_la->get_location(), pivotal_hbond_aaa->get_location(), cen);
+    LocatedVector lv = rot.v;
+    lv.origin = cen;
+    ligand->rotate(lv, rot.a);
+
+    #if _dbg_priority_hbond
+    cout << "Rotated ligand " << (rot.a*fiftyseven) << "deg." << endl;
+    cout << "Atoms were " << r << "Å apart, now " << pivotal_hbond_aaa->distance_to(pivotal_hbond_la) << "Å" << endl;
+    #endif
+
+    // Measure the distance between atoms and move the ligand to optimize that distance.
+    SCoord scooch = pivotal_hbond_aaa->get_location().subtract(pivotal_hbond_la->get_location());
+    if (scooch.r > 2.0)
+    {
+        scooch.r -= 2.0;
+        ligand->move(scooch);
+
+        #if _dbg_priority_hbond
+        cout << "Scooched ligand " << scooch.r << "Å." << endl;
+        cout << "Ligand was centered at " << cen << "; now " << ligand->get_barycenter() << endl;
+        cout << "Atoms are now " << pivotal_hbond_aaa->distance_to(pivotal_hbond_la) << "Å apart" << endl;
+        #endif
+    }
+
+    // Rotate the ligand about the hbond in order to minimize the intermolecular energy.
+    SCoord v = pivotal_hbond_la->get_location().subtract(pivotal_hbond_aaa->get_location());
+    lv = v;
+    lv.origin = pivotal_hbond_aaa->get_location();
+    float theta = 0, th, step = M_PI/50, clash;
+    AminoAcid* reaches[256];
+    protein->get_residues_can_clash_ligand(reaches, ligand, ligand->get_barycenter(), Point(5,5,5), nullptr);
+    for (th=0; th<circle; th += step)
+    {
+        float c = ligand->get_intermol_clashes((Molecule**)reaches);
+
+        if (!th || c < clash)
+        {
+            clash = c;
+            theta = th;
+        }
+
+        ligand->rotate(lv, step);
+    }
+
+    ligand->rotate(lv, theta);
+}
+
 Pose iter_best_pose[1000];
 float iter_best_bind;
 void iteration_callback(int iter, Molecule** mols)
@@ -456,6 +514,8 @@ void iteration_callback(int iter, Molecule** mols)
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
     }
     #endif
+
+    if (pivotal_hbond_aaa && pivotal_hbond_la) do_pivotal_hbond_rot_and_scoot();
     
     int i, j, n;
 
@@ -494,7 +554,7 @@ void iteration_callback(int iter, Molecule** mols)
                 else c1 = softrgn_initclash[i];
 
                 protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, rot.a);
-                float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 20);
                 if (c2 > c1 + clash_limit_per_aa*2) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
             }
         }
@@ -745,29 +805,28 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
     if (!strcmp(words[i], "RES"))
     {
         i++;
-        std::vector<int> resnos;
         for (; words[i]; i++)
         {
             int j = interpret_resno(words[i]);
             if (!j) break;
-            resnos.push_back(j);
+            priority_resnos.push_back(j);
             AminoAcid* aa = protein->get_residue(j);
             if (aa) aa->priority = true;
         }
 
-        int sz = resnos.size(), div=0;
+        int sz = priority_resnos.size(), div=0;
         Point foravg[sz + 2];
         for (i=0; i<sz; i++)
         {
             #if pocketcen_from_reach_atoms
-            AminoAcid* aa = protein->get_residue(resnos[i]);
+            AminoAcid* aa = protein->get_residue(priority_resnos[i]);
             if (aa)
             {
                 foravg[i] = aa->get_reach_atom_location();
                 div++;
             }
             #else
-            foravg[div++] = protein->get_atom_location(resnos[i], "CA");
+            foravg[div++] = protein->get_atom_location(priority_resnos[i], "CA");
             #endif
         }
 
@@ -1271,9 +1330,15 @@ int interpret_config_line(char** words)
         }
         return i-1;
     }
-    else if (!strcmp(words[0], "WET"))
+    else if (!strcmp(words[0], "CAVS"))
     {
-        wet_environment = true;
+        cavity_stuffing = atof(words[1]);
+        return 1;
+    }
+    else if (!strcmp(words[0], "CFLEE"))
+    {
+        clash_fleeing = atof(words[1]);
+        return 1;
     }
 
     return 0;
@@ -1586,7 +1651,7 @@ void do_tumble_spheres(Point l_pocket_cen)
 
                                         if (tsphres[j]->priority)
                                         {
-                                            weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                                            weight = ts_priority_coefficient;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
                                         }
 
                                         #if !tumble_spheres_include_vdW
@@ -1756,9 +1821,107 @@ void do_tumble_spheres(Point l_pocket_cen)
     // End tumble sphere behavior.
 }
 
+void attempt_priority_hbond()
+{
+    int i, j, m, n;
+
+    n = priority_resnos.size();
+    for (i=0; i<n; i++)
+    {
+        AminoAcid* aa = protein->get_residue(priority_resnos[i]);
+        if (fabs(aa->hydrophilicity()) >= hydrophilicity_cutoff)
+        {
+            // Find atom of side chain capable of hydrogen bond.
+            Atom* aaa = aa->capable_of_inter(hbond);
+            if (!aaa) continue;
+
+            #if _dbg_priority_hbond
+            cout << aa->get_name() << ":" << aaa->name << " found." << endl;
+            #endif
+
+            // Find nearest atom of ligand capable of hbond.
+            m = ligand->get_atom_count();
+            float r = Avogadro;
+            Atom* la = nullptr;
+            for (j=0; j<m; j++)
+            {
+                if (frand(0, 1) < 0.29) continue;
+                Atom* a1 = ligand->get_atom(j);
+                if (fabs(a1->is_polar()) >= hydrophilicity_cutoff)
+                {
+                    float r1 = a1->distance_to(aaa);
+                    if (r1 < r)
+                    {
+                        r = r1;
+                        la = a1;
+                    }
+                }
+            }
+            if (!la) continue;
+
+            #if _dbg_priority_hbond
+            cout << "ligand:" << la->name << " found." << endl;
+            #endif
+
+            // Ensure one atom is a donor and the other an acceptor. If one donor and one acceptor cannot be found, skip.
+            if (sgn(aaa->is_polar()) == sgn(la->is_polar()))
+            {
+                if (aaa->get_Z() == 1)
+                {
+                    Atom* heavy = aaa->get_bond_by_idx(0)->atom1;
+                    if (heavy->get_family() == CHALCOGEN) aaa = heavy;
+                }
+                else
+                {
+                    Atom* hyd = aaa->is_bonded_to("H");
+                    if (hyd) aaa = hyd;
+                }
+            }
+            if (sgn(aaa->is_polar()) == sgn(la->is_polar()))
+            {
+                if (la->get_Z() == 1)
+                {
+                    Atom* heavy = la->get_bond_by_idx(0)->atom1;
+                    if (heavy->get_family() == CHALCOGEN) la = heavy;
+                    else if (heavy->get_family() == PNICTOGEN && !heavy->get_charge()) la = heavy;
+                }
+                else
+                {
+                    Atom* hyd = la->is_bonded_to("H");
+                    if (hyd) la = hyd;
+                }
+            }
+            if (sgn(aaa->is_polar()) == sgn(la->is_polar())) continue;
+
+            #if _dbg_priority_hbond
+            cout << aa->get_name() << ":" << aaa->name << " and ligand:" << la->name << endl;
+            #endif
+
+            // Pin the ligand so it can only rotate about the hbond atom.
+            pivotal_hbond_aaa = aaa;
+            pivotal_hbond_la = la;
+            pivotal_hbond_r = 2.0;
+
+            do_pivotal_hbond_rot_and_scoot();
+
+            #if _dbg_priority_hbond
+            cout << endl;
+            #endif
+            return;
+        }
+    }
+}
+
+
 void apply_protein_specific_settings(Protein* p)
 {
     int i, j, n;
+
+    char buffer[1024];
+    strcpy(buffer, CEN_buf.c_str());
+    char** words = chop_spaced_words(buffer);
+    pocketcen = pocketcen_from_config_words(words, nullptr);
+    delete[] words;
 
     n = atomto.size();
     for (i=0; i<n; i++)
@@ -2471,10 +2634,6 @@ _try_again:
             apply_protein_specific_settings(protein);
         }
 
-        strcpy(buffer, CEN_buf.c_str());
-        words = chop_spaced_words(buffer);
-        pocketcen = pocketcen_from_config_words(words, nullptr);
-
         freeze_bridged_residues();
         prepare_initb();
 
@@ -2485,6 +2644,8 @@ _try_again:
         if (!use_bestbind_algorithm && !use_prealign)
         {
             do_tumble_spheres(pocketcen);
+            attempt_priority_hbond();
+            pocketcen = ligand->get_barycenter();
 
             #if debug_stop_after_tumble_sphere
             return 0;
@@ -2580,10 +2741,6 @@ _try_again:
 
                 freeze_bridged_residues();
                 prepare_initb();
-
-                strcpy(buffer, CEN_buf.c_str());
-                words = chop_spaced_words(buffer);
-                pocketcen = pocketcen_from_config_words(words, nullptr);
 
                 for (i=1; i<=seql; i++)
                 {
@@ -2682,7 +2839,12 @@ _try_again:
             nodecens[nodeno] = ligcen_target;
 
             #if redo_tumble_spheres_every_node
-            if (!use_bestbind_algorithm && !use_prealign && (!prevent_ligand_360_on_activate)) do_tumble_spheres(ligcen_target);
+            
+            if (!use_bestbind_algorithm && !use_prealign && (!prevent_ligand_360_on_activate))
+            {
+                do_tumble_spheres(ligcen_target);
+                attempt_priority_hbond();
+            }
             #endif
 
             #if _DBG_STEPBYSTEP
@@ -2922,7 +3084,25 @@ _try_again:
                     {
                         ligand_groups[l] = *(global_pairs[l]->ag);
                         sc_groups[l] = *(global_pairs[l]->scg);
+
+                        if (out_bb_pairs)
+                        {
+                            n = global_pairs[l]->ag->atoms.size();
+                            int j2;
+                            for (j2=0; j2<n; j2++)
+                                cout << global_pairs[l]->ag->atoms[j2]->name << " ";
+
+                            cout << "- ";
+
+                            n = global_pairs[l]->scg->aminos.size();
+                            for (j2=0; j2<n; j2++)
+                                cout << global_pairs[l]->scg->aminos[j2]->get_name() << " ";
+
+                            cout << endl;
+                        }
                     }
+
+                    if (out_bb_pairs) cout << endl;
                 }
 
                 // Best-Binding Algorithm
@@ -3589,6 +3769,7 @@ _exitposes:
             }
             protein->load_pdb(pf);
             fclose(pf);
+            apply_protein_specific_settings(protein);
             FILE* pf = fopen(outfname, "ab");
             fprintf(pf, "\nOriginal PDB:\n");
             protein->save_pdb(pf);

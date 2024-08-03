@@ -8,12 +8,13 @@
 #define triangular (M_PI/1.5)
 #define square (M_PI/2)
 #define hexagonal (M_PI/3)
+#define circle M_PI*2
 
 #define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 1.0
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
-#define oxytocin 0.003
+#define default_cavity_stuffing 0.03
 #define _DEFAULT_INTERA_R_CUTOFF 6
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -22,6 +23,7 @@
 #define Avogadro 6.02214076e+23
 
 #define helix_hbond_cutoff 2.8
+#define hx_tight_cutoff 3.2
 #define peptide_bond_length 1.32
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 7.0
@@ -130,21 +132,24 @@
 #define polar_repulsion 10.0
 #define charge_repulsion 5.0
 
+#define atom_object_forces 1
+#define charge_attraction 60.0
+
 #define global_clash_allowance 0.4
 #define double_hydrogen_clash_allowance_multiplier 1.5
 #define ignore_double_hydrogen_clashes 0
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 4.0
-#define lmpull 0.3
+#define lmpush 1.0
+#define lmpull 0.4
 #define lmsteps 3
 #define recapture_ejected_ligand 0
 #define summed_missed_connections 1
 
 #define amide_zwitterionic_amount 0.1
 
-#define priority_weight_group 4
+#define priority_weight_group 10
 #define ts_priority_coefficient 10
 
 #define _enhanced_pi_stacking 0
@@ -190,7 +195,7 @@
 #define active_persistence_threshold 5
 
 #define redo_tumble_spheres_on_activation 0
-#define redo_tumble_spheres_every_node 1
+#define redo_tumble_spheres_every_node 0
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
 // the viewer can update its cartoon backbone.
@@ -257,10 +262,10 @@
 // instead of the barycenter, to prevent "letting go" of the strongest binding.
 #define allow_tethered_rotations 1
 
-// Overwrite the user supplied pocket center with the loneliest point as determined by
+// Overwrites the user supplied pocket center with the loneliest point as determined by
 // distances to the nearest residue atoms to the supplied pocket center.
-#define pocketcen_is_loneliest 1
-#define pocketcen_from_reach_atoms 1
+#define pocketcen_is_loneliest 0
+#define pocketcen_from_reach_atoms 0
 
 // Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
 #define default_bestbind 1
@@ -348,6 +353,7 @@
 
 // For auditing binding energies between individual atoms:
 #define _peratom_audit 0
+#define _peratom_audit_nans 0
 
 // A short-term feature that can be used in case the bond reciprocity problem recurs. See issue #423.
 #define bond_reciprocity_fix 0

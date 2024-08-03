@@ -18,9 +18,11 @@ using namespace std;
 float conformer_momenta_multiplier = 1;
 float conformer_tumble_multiplier = 1;
 
+float cavity_stuffing = default_cavity_stuffing;
+float clash_fleeing = lmpush;
+
 bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
-bool wet_environment = false;
 
 Molecule *worst_clash_1 = nullptr, *worst_clash_2 = nullptr;
 float worst_mol_clash = 0;
@@ -3183,7 +3185,7 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     float rawbind = get_intermol_binding(om, !is_ac);
     float lbind = rawbind * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
-    if (wet_environment) lbind += get_intermol_contact_area(om, true) * oxytocin;
+    lbind += get_intermol_contact_area(om, true) * cavity_stuffing;
 
     if (mandatory_connection && rawbind >= 0)                   // Allow pullaway if mols are clashing.
     {

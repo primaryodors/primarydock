@@ -82,7 +82,7 @@ $py = <<<natrixs
 from modeller import *
 from modeller.automodel import *
 
-log.verbose()
+# log.verbose()
 env = Environ()
 
 class MyModel(DOPEHRLoopModel):
@@ -99,8 +99,8 @@ a = DOPEHRLoopModel(env,
               alnfile  = 'allgpcr.ali',
               knowns   = ($knowns),
               sequence = '$rcpid')
-a.starting_model= 1
-a.ending_model  = 1
+a.starting_model = 0
+a.ending_model   = 9
 a.library_schedule = autosched.slow
 a.max_var_iterations = 300
 # a.md_level = refine.very_slow
@@ -112,19 +112,23 @@ $fp = fopen("hm.py", "w");
 fwrite($fp, $py);
 fclose($fp);
 
-passthru("python3 hm.py");
-
+passthru("python3 hm.py | tee hm.out");
+$c = file_get_contents("hm.out");
+$best_energy = 1e9;
 $pyoutfn = false;
-$dir = dir(__DIR__);
-while (false !== ($entry = $dir->read()))
+foreach (explode("\n", $c) as $ln)
 {
-    if (preg_match("/^{$rcpid}[.]BL[0-9]+[.]pdb$/", $entry))
+    $ln = preg_replace("/\\s+/", " ", $ln);
+    $pieces = explode(" ", $ln);
+    if (count($pieces) < 2) continue;
+    if (!is_numeric($pieces[1])) continue;
+    $e = floatval($pieces[1]);
+    if ($e < $best_energy)
     {
-        $pyoutfn = $entry;
-        break;
+        $best_energy = $e;
+        $pyoutfn = $pieces[0];
     }
 }
-$dir->close();
 
 if (!$pyoutfn) die("FAIL.\n");
 
@@ -158,6 +162,9 @@ MINC
 
 UNCHAIN I
 UNCHAIN O
+STRAND A
+ECHO "A100 Score: " ~
+A100
 
 LET \$outf = "pdbs/$fam/$rcpid.active.pdb"
 SAVE \$outf

@@ -746,6 +746,19 @@ int main(int argc, char** argv)
             {
                 ;
             }
+            else if (!strcmp(words[0], "A100"))
+            {
+                l = 1;
+                Star s;
+                s.f = working->A100();
+                if (!words[l]) cout << s.f << endl;
+                else
+                {
+                    set_variable(words[l], s);
+                    l++;
+                    if (words[l]) raise_error("Too many parameters given for BENERG.");
+                }
+            }
             else if (!strcmp(words[0], "ALIGN"))
             {
                 int sr, er, asr, aer, eachend;

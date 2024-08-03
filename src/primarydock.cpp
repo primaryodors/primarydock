@@ -1917,6 +1917,12 @@ void apply_protein_specific_settings(Protein* p)
 {
     int i, j, n;
 
+    char buffer[1024];
+    strcpy(buffer, CEN_buf.c_str());
+    char** words = chop_spaced_words(buffer);
+    pocketcen = pocketcen_from_config_words(words, nullptr);
+    delete[] words;
+
     n = atomto.size();
     for (i=0; i<n; i++)
     {
@@ -2628,10 +2634,6 @@ _try_again:
             apply_protein_specific_settings(protein);
         }
 
-        strcpy(buffer, CEN_buf.c_str());
-        words = chop_spaced_words(buffer);
-        pocketcen = pocketcen_from_config_words(words, nullptr);
-
         freeze_bridged_residues();
         prepare_initb();
 
@@ -2739,10 +2741,6 @@ _try_again:
 
                 freeze_bridged_residues();
                 prepare_initb();
-
-                strcpy(buffer, CEN_buf.c_str());
-                words = chop_spaced_words(buffer);
-                pocketcen = pocketcen_from_config_words(words, nullptr);
 
                 for (i=1; i<=seql; i++)
                 {

@@ -72,7 +72,7 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "$ADORA2A, $CLASSI";
+    $knowns = "$ADORA2A, $MTAAR9, $CLASSI";                 // This combination seems to produce the most energetically favorable models.
 }
 
 

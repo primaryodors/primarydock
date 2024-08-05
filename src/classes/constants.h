@@ -162,6 +162,7 @@
 #define bb_pullaway_allowance 1.0
 #define bb_realign_amount 0.1
 #define bb_realign_mol 0
+#define bb_realign_flexions 1
 #define bb_realign_threshold_distance 2.8
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1

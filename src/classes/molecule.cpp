@@ -1975,7 +1975,7 @@ void Molecule::crumple(float theta)
     {
         if (b[i]->can_rotate)
         {
-            float ltheta = frand(-theta, theta);
+            float ltheta = frand(-theta, theta)*pow(frand(0,1),2);
             b[i]->rotate(ltheta);
             if (get_internal_clashes() > int_clsh*4) b[i]->rotate(-ltheta);
         }
@@ -3710,10 +3710,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             }
                             else bb[q]->rotate(theta, false);
 
-                            if (a->agroups.size() && group_realign)
-                            {
-                                // group_realign(a, a->agroups);
-                            }
+                            #if bb_realign_flexions
+                            if (!a->is_residue() && a->agroups.size() && group_realign) group_realign(a, a->agroups);
+                            #endif
 
                             tryenerg = cfmol_multibind(a, nearby);
 

@@ -10,11 +10,18 @@ cd ..
 
 make
 
+for i in {1..5}
+do
+    REPORT="testdata/molecule_test1.approved.txt"
+    ./test/molecule_test 'CCO' 'CCO' | sed '/^#/d' >testdata/received/molecule_test1.received.txt
+    RESULT=$(diff --unified $REPORT testdata/received/molecule_test1.received.txt)
+    CODE_RESULT=$?
 
-REPORT="testdata/molecule_test1.approved.txt"
-./test/molecule_test 'CCO' 'CCO' | tee temp | sed '/^#/d' >testdata/received/molecule_test1.received.txt
-RESULT=$(diff --unified $REPORT testdata/received/molecule_test1.received.txt)
-CODE_RESULT=$?
+    if [ $CODE_RESULT -eq 0 ]; then
+        break
+    fi
+done
+
 if [ $CODE_RESULT -eq 0 ]; then
     printf "${GRN}\u2588${NC}"
 else

@@ -1427,6 +1427,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         cout << "I. Rotating " << *gp[0]->ag << "(" << gp[0]->ag->get_center() << ") "
             << (rot.a * fiftyseven) << "deg about " << rot.v
             << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
+        cout << "Groups are now " << gp[0]->ag->distance_to(gp[0]->scg->get_nearest_atom(gp[0]->ag->get_center())->get_location()) << "A apart." << endl;
         #endif
 
         #if _dbg_improvements_only_rule
@@ -1454,17 +1455,17 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
     bool do0 = false, do1 = false;
     Point rel(0,0,0);
-    if (r0 > bb_scooch_threshold_distance)
+    if (r0 > bb_scooch_threshold_distance && r1 <= bb_scooch_threshold_distance)
     {
         Point pt = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        pt.scale((r0-bb_scooch_threshold_distance) *amount);
+        pt.scale((r0-bb_scooch_threshold_distance) *amount/2);
         rel = rel.add(pt);
         do0 = true;
     }
-    if (r1 > bb_scooch_threshold_distance)
+    else if (r1 > bb_scooch_threshold_distance)
     {
         Point pt = gp[1]->scg->get_center().subtract(gp[1]->ag->get_center());
-        pt.scale((r1-bb_scooch_threshold_distance) *amount);
+        pt.scale((r1-bb_scooch_threshold_distance) *amount/2);
         rel = rel.add(pt);
         do1 = true;
     }
@@ -1474,13 +1475,10 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         #if _dbg_groupsel || _dbg_groupsalign
         // cout << "Atom group is " << gp[0]->scg->distance_to(gp[0]->ag->get_center()) << "A from side chain group. ";
         // cout << "Side chain group reach is " << gp[0]->scg->group_reach() << "A." << endl;
-        cout << "Ia. Scooching ";
-        if (do0) cout << *gp[0]->ag << " ";
-        if (do1) cout << *gp[1]->ag << " ";
-        cout << rel.magnitude() << "Å into the reach of ";
-        if (do0) cout << *gp[0]->scg << " ";
-        if (do1) cout << *gp[1]->scg << " ";
-        cout << endl;
+        int dowhich = do1 ? 1 : 0;
+        cout << "Ia. Scooching " << *gp[dowhich]->ag << " " << rel.magnitude() << "Å into the reach of ";
+        cout << *gp[dowhich]->scg << " " << endl;
+        cout << "Groups are now " << gp[dowhich]->ag->distance_to(gp[dowhich]->scg->get_nearest_atom(gp[dowhich]->ag->get_center())->get_location()) << "A apart." << endl;
         #endif
 
         #if _dbg_improvements_only_rule
@@ -1505,6 +1503,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         cout << "II. Rotating " << *gp[1]->ag << " (" << gp[1]->ag->get_center() << ") "
             << (rot.a * fiftyseven) << "deg about " << rot.v
             << " in the direction of " << *gp[1]->scg << " (" << gp[1]->scg->get_center() << ")." << endl;
+        cout << "Groups are now " << gp[1]->ag->distance_to(gp[1]->scg->get_nearest_atom(gp[1]->ag->get_center())->get_location()) << "A apart." << endl;
         #endif
 
         #if _dbg_improvements_only_rule
@@ -1525,6 +1524,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     float theta = find_angle_along_vector(gp[2]->ag->get_center(), gp[2]->scg->get_center(), zcen, axis);
     #if _dbg_groupsel || _dbg_groupsalign
     cout << "III. \"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
+    cout << "Groups are now " << gp[2]->ag->distance_to(gp[2]->scg->get_nearest_atom(gp[2]->ag->get_center())->get_location()) << "A apart." << endl;
     #endif
 
     #if _dbg_improvements_only_rule

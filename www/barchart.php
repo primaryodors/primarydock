@@ -135,7 +135,7 @@ $maxp = count($p) ? ( @max($p) ?: 1 ) : 1;
 
 if ($maxt < 1) $maxt = 1;
 if ($maxp < 1) $maxp = 1;
-if ($maxp > 50) $maxp = 50;
+// if ($maxp > 50) $maxp = 50;
 
 if ($maxe <= $mine+2) { $maxe += 1; $mine -= 1; }
 
@@ -220,12 +220,13 @@ if (count($t) || count($e))
 
 if (count($p))
 {
-    for ($score = floor($maxp); $score > 1; $score -= 7)
+    $step = floor($maxp / 7);
+    for ($score = floor($maxp); $score > 1; $score -= $step)
     {   
         $dy = intval($base-1 - $pscale*$score);
 
         imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $sapphire);
-        imagestring($im, 3, $w-$xbuf/6,$dy-8, $score, $azure);
+        imagestring($im, 3, $w-$xbuf/10-$xbuf/13*strlen($score),$dy-8, $score, $azure);
     }
 }
 

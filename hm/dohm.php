@@ -20,6 +20,8 @@ foreach ($p["region"] as $rgname => $rgnse)
     $helices .= "        rsr.add(secondary_structure.Alpha(self.residue_range('$rgs:A', '$rge:A')))\n";
 }
 
+$seqlen = strlen($p['sequence']);
+
 $disulfs = "";
 $xlinx = [ ["3.25", "45.62"] ];
 foreach ($xlinx as $xl)
@@ -43,6 +45,8 @@ foreach ($xlinx as $xl)
 
 if ($disulfs) $disulfs = "    def special_patches(self, aln):\n$disulfs";
 
+$mdlcls = "DOPEHRLoopModel";
+
 $CLASSI = "'8f76', '8hti'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
 $MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
@@ -54,7 +58,11 @@ $fam = family_from_protid($rcpid);
 switch ($fam)
 {
     case 'TAAR':
-    if ($rcpid == "TAAR1") $knowns = $TAAR1;
+    if ($rcpid == "TAAR1")
+    {
+        $knowns = $TAAR1;
+        $mdlcls = "AutoModel";
+    }
     else if ($rcpid == "TAAR9") $knowns = $MTAAR9;
     else $knowns = "$MTAAR9, $TAAR1";
     break;
@@ -88,7 +96,7 @@ from modeller.automodel import *
 # log.verbose()
 env = Environ()
 
-class MyModel(DOPEHRLoopModel):
+class MyModel($mdlcls):
     def special_restraints(self, aln):
         rsr = self.restraints
         at = self.atoms
@@ -98,7 +106,7 @@ $disulfs
 # directories for input atom files
 env.io.atom_files_directory = ['.', '../atom_files']
 
-a = DOPEHRLoopModel(env,
+a = $mdlcls(env,
               alnfile  = 'allgpcr.ali',
               knowns   = ($knowns),
               sequence = '$rcpid')
@@ -119,8 +127,12 @@ passthru("python3 hm.py | tee hm.out");
 $c = file_get_contents("hm.out");
 $best_energy = 1e9;
 $pyoutfn = false;
+$mode = false;
 foreach (explode("\n", $c) as $ln)
 {
+    if (false !== strpos($ln, "Summary of successfully produced models:")) $mode = true;
+    if (!$mode) continue;
+
     $ln = preg_replace("/\\s+/", " ", $ln);
     $pieces = explode(" ", $ln);
     if (count($pieces) < 2) continue;

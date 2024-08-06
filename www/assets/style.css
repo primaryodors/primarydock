@@ -239,7 +239,7 @@ table.rcplist tr:nth-of-type(odd), table.liglist tr:nth-of-type(odd)
     box-shadow: 0px 0px 15px #00c6d4;
 }
 
-#skeletal
+#skeletal, #skeletal1
 {
     display: block;
     width: 300px;

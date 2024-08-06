@@ -28,15 +28,15 @@ structure:8itf:22   :R:329  :R:Trace amine-associated receptor 9:Mus musculus: 3
 
 >P1;8jln
 structure:8jln:20   :R:318  :R:Trace amine-associated receptor 1:Homo sapiens: 3.24: 0.20
--------------------------------------------------------------------------------------NDVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELNFKGAEEIYYK-----------------------------------------------------HVHCRGGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDANQKLQ------------ER---------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMM*
+-------------------------------------------------------------------------------------NDVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELNFKGAEEIYYK-----------------------------------------------------HVHCRGGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDANQKLQ-------------ER--------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMM*
 
 >P1;8jlo
 structure:8jlo:21   :R:319  :R:Trace amine-associated receptor 1:Homo sapiens: 3.52: 0.20
---------------------------------------------------------------------------------------DVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELNFKGAEEIYYK-----------------------------------------------------HVHCRGGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDANQKLQI------------R---------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMML*
+--------------------------------------------------------------------------------------DVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELNFKGAEEIYYK-----------------------------------------------------HVHCRGGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDANQKLQI-------------R--------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMML*
 
 >P1;8jlp
 structure:8jlp:19   :R:319  :R:Trace amine-associated receptor 1:Homo sapiens: 3.23: 0.20
-------------------------------------------------------------------------------------SNDVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELNFKGAEEIYYK-----------------------------------------------------HVHCRGGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDANQ---------------ER---------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMML*
+------------------------------------------------------------------------------------SNDVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELNFKGAEEIYYK-----------------------------------------------------HVHCRGGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDANQ----------------ER--------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMML*
 
 >P1;8jlq
 structure:8jlq:22   :R:319  :R:Trace amine-associated receptor 1:Homo sapiens: 2.84: 0.20
@@ -44,11 +44,11 @@ structure:8jlq:22   :R:319  :R:Trace amine-associated receptor 1:Homo sapiens: 2
 
 >P1;8jlr
 structure:8jlr:19   :R:319  :R:Trace amine-associated receptor 1:Homo sapiens: 3.00: 0.20
-------------------------------------------------------------------------------------SNDVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELN--------------------------------------------------------------------GGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDAN-----------------R---------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMML*
+------------------------------------------------------------------------------------SNDVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELN--------------------------------------------------------------------GGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDAN------------------R--------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMML*
 
 >P1;8jso
 structure:8jso:19   :R:319  :R:Trace amine-associated receptor 1:Homo sapiens: 3.40: 0.20
-------------------------------------------------------------------------------------SNDVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELNFKGAEEIYYK-----------------------------------------------------HVHCRGGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDAN-----------------R---------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMML*
+------------------------------------------------------------------------------------SNDVRASLYSLMVLIILTTLVGNLIVIVSISH-FKQLHTPTNWLIHSMATVDFLLGCLVMPYSMVRSAEHCW----YFGEVFCKIHTSTDIMLSS------ASIFHLSFISIDRYYAVCDPLRY---------KAKMNILVICVMIFISWSVPAVFAFGMIF----------------------------LELNFKGAEEIYYK-----------------------------------------------------HVHCRGGCSVFF-SKISGVLTFMTSFYIPGSIMLCVYYRIYLIAKEQARLISDAN------------------R--------------KAVKTLGIVMGVFLICWCPFFICTVMDPFLHYIIP----PTLNDVLIWFGYLNSTFNPMVYAFFYPWFRKALKMML*
 
 >P1;7dhr
 structure:7dhr:30   :R:339  :R:Beta-2 adrenergic receptor:Homo sapiens: 3.80: 0.20

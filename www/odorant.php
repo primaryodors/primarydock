@@ -86,6 +86,7 @@ function load_viewer(obj)
 window.setTimeout( function()
 {
     $('#skeletal')[0].innerHTML = svg_from_smiles('<?php echo str_replace("\\", "\\\\", $odor['smiles']); ?>', 300, 300);
+    $('#skeletal1')[0].innerHTML = svg_from_smiles('<?php echo str_replace("\\", "\\\\", $odor['smiles']); ?>', 300, 300);
     var boundary = parseInt($(".tab")[0].getClientRects()[0].bottom);
     $("#tabAroma").click();
 }, 123);
@@ -272,7 +273,7 @@ foreach (array_keys($sorted) as $rcpid)
 
 <div class="scrollw">
     <div>
-        <img class="skeletal" src="<?php echo $imgfname; ?>">
+        <div id="skeletal1">&nbsp;</div>
         <img class="barchart" src="barchart.php?m=p&o=<?php echo urlencode($odor['smiles']); ?>&t=<?php echo time(); ?>">
     </div>
 </div>

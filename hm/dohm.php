@@ -54,7 +54,9 @@ $fam = family_from_protid($rcpid);
 switch ($fam)
 {
     case 'TAAR':
-    $knowns = "$MTAAR9, $TAAR1";
+    if ($rcpid == "TAAR1") $knowns = $TAAR1;
+    else if ($rcpid == "TAAR9") $knowns = $MTAAR9;
+    else $knowns = "$MTAAR9, $TAAR1";
     break;
 
     case 'VN1R':
@@ -68,7 +70,8 @@ switch ($fam)
     case 'OR51':
     case 'OR52':
     case 'OR56':
-    $knowns = "$CLASSI";
+    if ($rcpid == "OR51E2") $knowns = "'8f76'";
+    else $knowns = "$CLASSI";
     break;
 
     default:        // Class II ORs

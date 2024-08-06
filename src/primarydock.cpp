@@ -3631,6 +3631,7 @@ _try_again:
                             for (j1=1; j1 <= n1; j1++)
                             {
                                 AminoAcid* aa = protein->get_residue(j1);
+                                if (aa) aa->set_pdb_chain('A');
                                 if (aa /* && aa->been_flexed */)
                                 {
                                     // tmp_pdb_residue[j+1][j1].restore_state(aa);

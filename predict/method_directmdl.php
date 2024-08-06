@@ -36,8 +36,8 @@ function make_prediction($data)
 
     if (isset($data["a_Pose1"]) || isset($data["a_BindingEnergy"]))
     {
-        $ascore = min(0, floatval(@$data['a_Pose1']));
-        $iscore = min(0, floatval(@$data['i_Pose1']));
+        $ascore = max(0, -floatval(@$data['a_Pose1']));
+        $iscore = max(0, -floatval(@$data['i_Pose1']));
 
         $aa100 = floatval(@$data['a_A100']);
         $ia100 = floatval(@$data['i_A100']);
@@ -45,17 +45,17 @@ function make_prediction($data)
         $aeff = isset($data["a_POSES"]) ? (floatval($data["a_POSES"]) / $pose) : 1;
         $ieff = isset($data["i_POSES"]) ? (floatval($data["i_POSES"]) / $pose) : 1;
 
-        if ($ascore < 0 && $ascore < $iscore)
+        if ($ascore > 0 && $ascore > $iscore)
         {
             $data['Predicted'] = 'Agonist';
-            $dock_score = -$ascore*$aeff;
+            $dock_score = $ascore*$aeff - $iscore*$ieff;
             if ($aa100 && $ia100) $dock_score *= min(1, ($aa100 - $ia100) / 50);
             $data['DockScore'] = $dock_score;
         }
-        else if ($iscore < 0 && $iscore < $ascore)
+        else if ($iscore > 0 && $iscore > $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
-            $dock_score = $iscore*$aeff;
+            $dock_score = $ascore*$aeff - $iscore*$ieff;
             if ($aa100 && $ia100) $dock_score *= min(1, ($aa100 - $ia100) / 50);
             $data['DockScore'] = $dock_score;
         }

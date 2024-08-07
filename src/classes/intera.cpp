@@ -1067,7 +1067,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (debug_criteria) cout << "Anisotropy: " << aniso << " from " << asum << " * " << bsum << endl;
             #endif
 
-            if (r1 >= 1)
+            if (r1 >= 0.99)
             {
                 rdecayed = (forces[i]->type == vdW
                             ||
@@ -1098,8 +1098,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
             else
             {
-                rdecayed = r1*r1*r1*r1*r1*r1;
-                partial = aniso * forces[i]->kJ_mol * rdecayed;
+                // rdecayed = r1*r1*r1*r1*r1*r1;
+                partial = aniso * forces[i]->kJ_mol - Lennard_Jones(a, b, forces[i]->get_distance());
             }
 
             // TODO: Replace this with a more generalized model of competitive h-bonding as well as ionic, mcoord, etc.

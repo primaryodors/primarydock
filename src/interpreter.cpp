@@ -1069,7 +1069,7 @@ int main(int argc, char** argv)
                 if (!words[1] || !words[2]) raise_error("Insufficient parameters given for BWMOTIF.");
 
                 l = atoi(words[1]);
-                char rgn[8];
+                char rgn[16];
                 if (l < 8) sprintf(rgn, "TMR%d", l);
                 else if (l >= 12 && l <= 78)
                 {

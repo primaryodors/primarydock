@@ -85,7 +85,7 @@ hr
 a[href], a:visited
 {
     text-decoration: none;
-    color: #50cea8;
+    color: #66cea8;
 }
 
 a[href]:hover
@@ -239,7 +239,7 @@ table.rcplist tr:nth-of-type(odd), table.liglist tr:nth-of-type(odd)
     box-shadow: 0px 0px 15px #00c6d4;
 }
 
-#skeletal
+#skeletal, #skeletal1
 {
     display: block;
     width: 300px;

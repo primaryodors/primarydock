@@ -11,7 +11,6 @@
 #define circle M_PI*2
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 1.0
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
 #define default_cavity_stuffing 0.03
@@ -28,6 +27,7 @@
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 7.0
 #define clash_limit_per_atom 6.0
+#define iteration_additional_clash_coefficient 10.0
 #define contact_r_5x58_7x53 3.93
 #define include_eclipses 0
 #define include_residue_eclipses 0
@@ -363,6 +363,7 @@
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
 #define _dbg_A100 0
+#define _dbg_allow_excessive_aa_clashes 0
 #define _dbg_anemia 0
 #define _dbg_asunder_atoms 0
 #define _dbg_bb_pullaway 0

@@ -285,7 +285,7 @@ function prepare_outputs()
     $odor = find_odorant($ligname);
 
     $size = "7.5 7.5 7.5";
-    $search = "TS";
+    $search = "BB";
     $atomto = [];
     $stcr = "";
     $flxr = "";
@@ -1105,18 +1105,14 @@ heredoc;
             exec("which sox", $hassox);
             if ($play_sound && count($hassox))
             {
-                if (strtolower($outdata['Predicted']) == 'agonist')
+                if (strtolower($outdata['Predicted']) == strtolower($actual)) exec("play success.mp3 &");
+                else if (strtolower($actual) == "non-agonist" && strtolower($outdata['Predicted']) == 'inverse agonist') exec("play success.mp3 &");
+                else if (strtolower($actual) == "(unknown)")
                 {
-                    if (strtolower($outdata['Predicted']) == strtolower($actual)) exec("play success.mp3 &");
-                    else if (strtolower($actual) == "(unknown)") exec("play agonist.mp3 &");
-                    else exec("play fail.mp3 &");
+                    if (strtolower($outdata['Predicted']) == 'agonist') exec("play agonist.mp3 &");
+                    else exec("play non-agonist.mp3 &");
                 }
-                else
-                {
-                    if (strtolower($actual) == 'agonist') exec("play fail.mp3 &");
-                    else if (strtolower($actual) == "(unknown)") exec("play non-agonist.mp3 &");
-                    else exec("play success.mp3 &");
-                }
+                else exec("play fail.mp3 &");
             }
         }
     }

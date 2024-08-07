@@ -495,7 +495,7 @@ void Molecule::hydrogenate(bool steric_only)
         int h_to_add = round(valence - bcardsum);
         for (j=0; j<h_to_add; j++)
         {
-            char hname[5];
+            char hname[15];
             sprintf(hname, "H%d", atcount+1);
             Atom* H = add_atom("H", hname, atoms[i], 1);
             #if _dbg_hydrogenate
@@ -2384,7 +2384,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
         }
     }
 
-    return clash; //*_kJmol_cuA;
+    return clash;
 }
 
 float Molecule::total_intermol_clashes(Molecule** ligands)
@@ -3186,6 +3186,8 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     float lbind = rawbind * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
     lbind += get_intermol_contact_area(om, true) * cavity_stuffing;
+    float clashes = get_intermol_clashes(om);
+    lbind -= clashes * iteration_additional_clash_coefficient;
 
     if (mandatory_connection && rawbind >= 0)                   // Allow pullaway if mols are clashing.
     {

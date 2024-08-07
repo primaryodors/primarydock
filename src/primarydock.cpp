@@ -3312,8 +3312,6 @@ _try_again:
             dr[drcount][nodeno].out_vdw_repuls = out_vdw_repuls;
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
-            float we = dr[drcount][nodeno].worst_energy;
-            float weaa = dr[drcount][nodeno].worst_nrg_aa;
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
             #if compute_clashdirs
@@ -3472,7 +3470,8 @@ _try_again:
                 }
                 // else cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " satisfactory." << endl << endl;
 
-                if (dr[drcount][nodeno].worst_energy > l_atom_clash_limit)
+                #if !_dbg_allow_excessive_aa_clashes
+                if (dr[drcount][nodeno].worst_energy > l_atom_clash_limit || dr[drcount][nodeno].worst_nrg_aa > clash_limit_per_aa)
                 {
                     #if _dbg_worst_energy
                     cout << "Total binding energy " << dr[drcount][nodeno].kJmol
@@ -3490,6 +3489,7 @@ _try_again:
                     break;          // Exit nodeno loop.
                 }
                 // else cout << "Least favorable binding energy " << dr[drcount][nodeno].worst_energy << " satisfactory." << endl << endl;
+                #endif
 
                 if (pose==1) dr[drcount][nodeno].pose = pose;
                 else
@@ -3529,10 +3529,10 @@ _try_again:
 
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
-            if ((btot < kJmol_cutoff || we > clash_limit_per_atom || weaa > clash_limit_per_aa) && !differential_dock)
+            if ((btot < kJmol_cutoff) && !differential_dock)
             {
                 #if _dbg_worst_energy
-                cout << "Total binding energy " << -btot << " and worst energy " << we << "; skipping." << endl << endl;
+                cout << "Total binding energy " << -btot << "; skipping." << endl << endl;
                 #endif
                 drcount++;
                 break;

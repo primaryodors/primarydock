@@ -233,13 +233,20 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
         mc_bpotential = 0;
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
+        float clash = ligand->get_intermol_clashes(reaches_spheroid[i]);
         if (ligand->clash_worst > worst_energy)
         {
             worst_energy = ligand->clash_worst;
             worst_clash_1 = ligand->clash1;
             worst_clash_2 = ligand->clash2;
         }
-        if (-lb > worst_nrg_aa) worst_nrg_aa = -lb;
+        if (lb < 0 && clash > worst_nrg_aa)
+        {
+            worst_nrg_aa = clash;
+            #if _dbg_worst_energy
+            cout << reaches_spheroid[i]->get_name() << " binding strength " << lb << " clashes " << clash << " updates worst_nrg_aa to " << worst_nrg_aa << endl;
+            #endif
+        }
 
         #if compute_clashdirs
         if (lb > 0 && ligand->clash1 && ligand->clash2)

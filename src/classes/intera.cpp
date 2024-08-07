@@ -1067,7 +1067,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (debug_criteria) cout << "Anisotropy: " << aniso << " from " << asum << " * " << bsum << endl;
             #endif
 
-            if (r1 >= 1)
+            if (r1 >= 0.99)
             {
                 rdecayed = (forces[i]->type == vdW
                             ||

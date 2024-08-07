@@ -135,7 +135,6 @@ $maxp = count($p) ? ( @max($p) ?: 1 ) : 1;
 
 if ($maxt < 1) $maxt = 1;
 if ($maxp < 1) $maxp = 1;
-// if ($maxp > 50) $maxp = 50;
 
 if ($maxe <= $mine+2) { $maxe += 1; $mine -= 1; }
 

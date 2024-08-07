@@ -20,8 +20,6 @@ foreach ($p["region"] as $rgname => $rgnse)
     $helices .= "        rsr.add(secondary_structure.Alpha(self.residue_range('$rgs:A', '$rge:A')))\n";
 }
 
-$seqlen = strlen($p['sequence']);
-
 $disulfs = "";
 $xlinx = [ ["3.25", "45.62"] ];
 foreach ($xlinx as $xl)

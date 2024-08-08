@@ -36,6 +36,30 @@ function get_sequence($protid)
         if ($j) $ret .= substr($s, $j);
         return $ret;
     }
+    else if (@$_REQUEST['bybw'])
+    {
+        $ret = "";
+        $p = $prots[$protid];
+        $s = $p['sequence'];
+        $j = 0;
+        foreach ($p['region'] as $rgn => $regionse)
+        {
+            // Make each rgend-rgend take up 100 places, with the x.50 residue at position 70.
+            $seg = substr($s, $j, $regionse['end']-$j);
+
+            $rgno = intval(preg_replace("/[^0-9]/", "", $rgn));
+            if ($rgno >= 10) continue;
+            $n50 = resno_from_bw($protid, "$rgno.50");
+
+            $seg = str_repeat("-", 70 - ($n50 - $j)).$seg;
+            $seg .= str_repeat("-", 100-strlen($seg));
+
+            $ret .= $seg;
+            $j = $regionse['end'];
+        }
+        if ($j) $ret .= substr($s, $j);
+        return $ret;
+    }
     else return $prots[$protid]['sequence'];
 }
 

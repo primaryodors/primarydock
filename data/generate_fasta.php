@@ -44,15 +44,22 @@ function get_sequence($protid)
         $j = 0;
         foreach ($p['region'] as $rgn => $regionse)
         {
-            // Make each rgend-rgend take up 100 places, with the x.50 residue at position 70.
+            // Make each rgend-rgend take up 200 places, with the x.50 residue at position 150.
             $seg = substr($s, $j, $regionse['end']-$j);
 
             $rgno = intval(preg_replace("/[^0-9]/", "", $rgn));
             if ($rgno >= 10) continue;
-            $n50 = resno_from_bw($protid, "$rgno.50");
+            try
+            {
+                $n50 = resno_from_bw($protid, "$rgno.50");
+            }
+            catch (Exception $ex)
+            {
+                continue;
+            }
 
-            $seg = str_repeat("-", 70 - ($n50 - $j)).$seg;
-            $seg .= str_repeat("-", 100-strlen($seg));
+            $seg = str_repeat("-", 150 - ($n50 - $j)).$seg;
+            $seg .= str_repeat("-", 200-strlen($seg));
 
             $ret .= $seg;
             $j = $regionse['end'];

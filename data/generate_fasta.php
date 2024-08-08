@@ -2,7 +2,54 @@
 
 chdir(__DIR__);
 chdir("..");
-require_once("predict/protutils.php");
+require_once("data/protutils.php");
+
+$seqa = [];
+if (@$_REQUEST['aligned'])
+{
+    foreach (explode("\n", file_get_contents("data/sequences_aligned.txt")) as $ln)
+    {
+        $rcp = explode(" ", $ln)[0];
+        if (isset($prots[$rcp])) $seqa[$rcp] = str_replace(" ", "-", substr($ln, 8));
+    }
+}
+
+function get_sequence($protid)
+{
+    global $prots, $seqa;
+
+    if (@$_REQUEST['aligned']) return $seqa[$protid];
+    else if (@$_REQUEST['byrgn'])
+    {
+        $ret = "";
+        $p = $prots[$protid];
+        $s = $p['sequence'];
+        $j = 0;
+        foreach ($p['region'] as $rgn => $regionse)
+        {
+            $ret .= substr($s, $j, $regionse['start']-$j-1);
+            $ret .= "----------";
+            $ret .= substr($s, $regionse['start']-1, $regionse['end'] - $regionse['start']+1);
+            $ret .= "----------";
+            $j = $regionse['end'];
+        }
+        if ($j) $ret .= substr($s, $j);
+        return $ret;
+    }
+    else return $prots[$protid]['sequence'];
+}
+
+function make_fasta($protid, $sequence)
+{
+    $ret = ">$protid";
+    while ($sequence)
+    {
+        $ret .= "\n".substr($sequence, 0, 80);
+        $sequence = substr($sequence, 80);
+    }
+    $ret .= "*\n\n";
+    return $ret;
+}
 
 foreach (@$argv as $a)
 {
@@ -20,8 +67,19 @@ if (!$rcp && !$gp)
 
 if ($rcp)
 {
-    if (!isset($prots[$rcp])) die("Unable to locate $rcp in data/receptor.json; please check spelling.\n");
-    echo ">$rcp\n{$prots[$rcp]['sequence']}\n\n";
+    if ($rcp == "all")
+    {
+        foreach ($prots as $rcp => $p) echo make_fasta($rcp, get_sequence($rcp));
+    }
+    else if ($rcp == "allgpcr")
+    {
+        foreach ($prots as $rcp => $p) if (substr($rcp, 0, 4) != "MS4A") echo make_fasta($rcp, get_sequence($rcp));
+    }
+    else
+    {
+        if (!isset($prots[$rcp])) die("Unable to locate $rcp in data/receptor.json; please check spelling.\n");
+        echo make_fasta($rcp, get_sequence($rcp));
+    }
 }
 
 if ($gp)

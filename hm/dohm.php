@@ -176,8 +176,10 @@ MINC
 UNCHAIN I
 UNCHAIN O
 STRAND A
-ECHO "A100 Score: " ~
-A100
+
+A100 &a100
+ECHO "A100 Score: " &a100
+IF &a100 < 10 DIE "FAIL"
 
 LET \$outf = "pdbs/$fam/$rcpid.active.pdb"
 SAVE \$outf

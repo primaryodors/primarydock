@@ -51,6 +51,8 @@ $MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
 $ADRB2 = "'7dhr', '8gej'";
 $ADORA2A = "'6gdg'";
 $LPAR1 = "'7td0', '7yu3'";
+$TAS2R = "'7xp6'";
+$CB = "'5xr8', '5xra'";
 
 $fam = family_from_protid($rcpid);
 switch ($fam)
@@ -66,7 +68,7 @@ switch ($fam)
     break;
 
     case 'VN1R':
-    $knowns = "$LPAR1, $TAAR1";
+    $knowns = "$TAS2R, $CB";
     break;
 
     case 'MS4A':
@@ -163,6 +165,11 @@ UPRIGHT I
 BWCENTER
 
 STRAND A
+
+A100 &a100
+ECHO "A100 Score: " &a100
+IF &a100 < 10 DIE "FAIL"
+
 DELETE 1 %1.20
 HYDRO
 UPRIGHT A
@@ -176,8 +183,6 @@ MINC
 UNCHAIN I
 UNCHAIN O
 STRAND A
-ECHO "A100 Score: " ~
-A100
 
 LET \$outf = "pdbs/$fam/$rcpid.active.pdb"
 SAVE \$outf

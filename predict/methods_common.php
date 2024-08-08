@@ -400,6 +400,10 @@ function prepare_outputs()
         {
             $cenres_active = $cenres_inactive = "CEN RES 3.32 3.37 5.43 6.48 7.43";
         }
+        else if (substr($fam, 0, 4) == "VN1R")
+        {
+            $cenres_active = $cenres_inactive = "CEN RES 3.32 3.36 3.40 7.38";
+        }
         else die("Unsupported receptor family.\n");
     }
     

@@ -112,6 +112,7 @@ To add a new receptor protein to the PrimaryDock database, there is a series of 
 - Optionally, if you have MODELLER installed, you can generate an active-state PDB for the new protein:
   - Firstly, align the new protein's sequence to the sequences in `hm/experimental.ali`. *Note this is not the same alignment as in `data/sequences_aligned.txt`.*
   - Next, add the new alignment as a node called `"aligned"` in the new protein's record in `data/receptor.json`.
+  - Then run `php -f hm/build_alignment_file.php` to generate the alignment file for all included GPCRs.
   - Finally, run `php -f hm/dohm.php RCPID` changing `RCPID` to the ID of the new protein.
 - Create a new branch if necessary and `git add -f` each of the `*.upright.pdb` (and `*.active.pdb` if present) files from the getpdbs output.
 - Check in the new and updated files and create a pull request.

@@ -163,6 +163,11 @@ UPRIGHT I
 BWCENTER
 
 STRAND A
+
+A100 &a100
+ECHO "A100 Score: " &a100
+IF &a100 < 10 DIE "FAIL"
+
 DELETE 1 %1.20
 HYDRO
 UPRIGHT A
@@ -176,10 +181,6 @@ MINC
 UNCHAIN I
 UNCHAIN O
 STRAND A
-
-A100 &a100
-ECHO "A100 Score: " &a100
-IF &a100 < 10 DIE "FAIL"
 
 LET \$outf = "pdbs/$fam/$rcpid.active.pdb"
 SAVE \$outf

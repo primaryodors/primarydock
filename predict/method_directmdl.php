@@ -45,12 +45,12 @@ function make_prediction($data)
         $dock_score = $ascore - $iscore;
         if ($aa100 && $ia100) $dock_score *= max(0, min(1, ($aa100 - $ia100) / 50));
 
-        if ($ascore > 0 && $dock_score)
+        if ($ascore > 0 && $dock_score > 0)
         {
             $data['Predicted'] = 'Agonist';
             $data['DockScore'] = $dock_score;
         }
-        else if ($iscore > 0 && $dock_score)
+        else if ($iscore > 0 && $dock_score < 0)
         {
             $data['Predicted'] = 'Inverse Agonist';
             $data['DockScore'] = $dock_score;

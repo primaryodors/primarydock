@@ -235,6 +235,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
                                                 HN->name = new char[5];
                                                 strcpy(HN->name, "HN");
                                                 HN->is_backbone = true;
+                                                HN->residue = this->residue_no;
+                                                strcpy(HN->aa3let, this->get_3letter());
+                                                HN->aaletter = this->get_letter();
                                                 k = atom_idx_from_ptr(HN);
                                                 if (k >= 0) atom_Greek[k] = -1;
                                             }
@@ -2309,6 +2312,9 @@ bool AminoAcid::is_helix(int p)
             if (b->get_Z() == 7 && !b->is_bonded_to("H"))
             {
                 b = add_atom("H", "HN", b, 1);
+                b->residue = this->residue_no;
+                strcpy(b->aa3let, this->get_3letter());
+                b->aaletter = this->get_letter();
             }
 
             if (a && b)

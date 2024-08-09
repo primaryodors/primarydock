@@ -207,8 +207,6 @@
 #define write_activation_matrix 0
 #define write_active_rotation 1
 
-#define _use_groups 1
-
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through
 // the protein, we want to minimize the ligand's conformational changes from node to

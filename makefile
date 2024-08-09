@@ -6,7 +6,8 @@ TMPDIR=tmp
 
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR) $(TMPDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o \
-	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o $(OBJDIR)/conj.o
+	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o $(OBJDIR)/conj.o \
+	$(OBJDIR)/search.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
 	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test
@@ -78,6 +79,9 @@ $(OBJDIR)/protein.o: src/classes/protein.h src/classes/protein.cpp $(OBJDIR)/ami
 $(OBJDIR)/group.o: src/classes/group.h src/classes/group.cpp $(OBJDIR)/protein.o
 	$(CC) -c src/classes/group.cpp -o $(OBJDIR)/group.o $(CFLAGS)
 
+$(OBJDIR)/search.o: src/classes/search.h src/classes/search.cpp $(OBJDIR)/group.o
+	$(CC) -c src/classes/search.cpp -o $(OBJDIR)/search.o $(CFLAGS)
+
 $(OBJDIR)/dynamic.o: src/classes/dynamic.h src/classes/dynamic.cpp $(OBJDIR)/protein.o
 	$(CC) -c src/classes/dynamic.cpp -o $(OBJDIR)/dynamic.o $(CFLAGS)
 
@@ -138,7 +142,7 @@ test/flexion_test: src/test/flexion_test.cpp $(OBJS)
 test/histidine_test: src/test/histidine_test.cpp $(OBJS)
 	$(CC) src/test/histidine_test.cpp $(OBJS) -o test/histidine_test $(CFLAGS)
 
-$(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/scoring.o
+$(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/search.o $(OBJDIR)/scoring.o
 	$(CC) src/primarydock.cpp $(OBJS) -o $(BINDIR)/primarydock $(CFLAGS)
 
 $(BINDIR)/pepteditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o

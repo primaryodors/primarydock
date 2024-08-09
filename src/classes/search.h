@@ -20,4 +20,10 @@ extern std::vector<int> exclusion;
 extern AtomGroup ligand_groups[3];
 extern ResidueGroup sc_groups[3];
 
+extern std::vector<std::shared_ptr<AtomGroup>> agc;
+extern std::vector<AminoAcid*> cs_res;
+extern std::vector<intera_type> cs_bt;
+extern std::vector<AtomGroup*> cs_lag;
+extern int cs_idx;
+
 #endif

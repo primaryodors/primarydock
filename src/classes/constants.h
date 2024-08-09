@@ -153,7 +153,7 @@
 #define ts_priority_coefficient 10
 
 #define cs_max_tries 10
-#define cs_bondweight_exponent 0.33333
+#define cs_bondweight_exponent 2.0
 #define cs_360_step M_PI / 6.7
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1

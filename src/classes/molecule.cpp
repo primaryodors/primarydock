@@ -835,13 +835,14 @@ int Molecule::has_hbond_acceptors()
     return result;
 }
 
-int Molecule::has_pi_atoms()
+int Molecule::has_pi_atoms(bool ib)
 {
     if (!atoms) return 0;
 
     int i, result=0;
     for (i=0; atoms[i]; i++)
     {
+        if (!ib && atoms[i]->is_backbone) continue;
         if (atoms[i]->is_pi()) result++;
     }
 

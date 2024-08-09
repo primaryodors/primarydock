@@ -241,6 +241,25 @@ Point average_of_points(Point* points, int count)
     return retval;
 }
 
+Point size_of_point_space(Point* points, int count)
+{
+    int i;
+    float x0, y0, z0, x1, y1, z1;
+
+    for (i=0; i<count; i++)
+    {
+        Point pt = points[i];
+        if (!i || pt.x < x0) x0 = pt.x;
+        if (!i || pt.y < y0) y0 = pt.y;
+        if (!i || pt.z < z0) z0 = pt.z;
+        if (!i || pt.x > x1) x1 = pt.x;
+        if (!i || pt.y > y1) y1 = pt.y;
+        if (!i || pt.z > z1) z1 = pt.z;
+    }
+
+    return Point(x1-x0, y1-y0, z1-z0);
+}
+
 float find_angle(float dx, float dy)
 {
     float angle = atan2(dy,dx);

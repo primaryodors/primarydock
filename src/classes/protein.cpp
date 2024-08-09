@@ -1160,6 +1160,7 @@ void Protein::add_remark(const char* remark)
         && !strcmp(words[1], "800")
         && words[2]
         && !strcmp(words[2], "SITE")
+        && words[3]
         && !strcmp(words[3], "BW")
         )
     {

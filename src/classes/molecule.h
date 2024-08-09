@@ -151,7 +151,7 @@ public:
     void clear_atom_binding_energies();
     int has_hbond_donors();
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
-    int has_pi_atoms();
+    int has_pi_atoms(bool include_backbone = false);
 
     // Bond functions.
     Bond** get_rotatable_bonds(bool include_can_flip = true);

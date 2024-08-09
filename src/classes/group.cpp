@@ -129,7 +129,7 @@ float AtomGroup::max_potential_binding(intera_type typ)
             else if (fam == PNICTOGEN) result += 80;
         }
         else if (typ == ionic) result += 60.0 * fabs(atoms[i]->get_charge());
-        else if (typ == hbond) result += 21.0 * fabs(atoms[i]->get_electronegativity() - 2.2);
+        else if (typ == hbond) result += 21.0 * fabs(atoms[i]->is_polar());
         else if (typ == pi) result += atoms[i]->is_pi() ? 2.0 : 0;
         else if (typ == vdW) result += fmax(0, 4.0 - 2.0*fabs(atoms[i]->get_electronegativity() - 2.4));
     }

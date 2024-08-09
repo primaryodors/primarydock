@@ -10,6 +10,16 @@
 #ifndef _MISC
 #define _MISC
 
+enum PoseSearchType
+{
+    pst_best_binding,
+    pst_tumble_spheres,
+    pst_constrained
+};
+
+// Default search algorithm if not specified by config file or command line args.
+#define default_search_algorithm pst_constrained
+
 struct SCoord;
 struct Point;
 struct LocatedVector;

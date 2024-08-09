@@ -269,8 +269,6 @@
 #define pocketcen_is_loneliest 0
 #define pocketcen_from_reach_atoms 0
 
-// Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
-#define default_bestbind 1
 #define preemptively_minimize_intermol_clashes 0
 #define bestbind_springiness 15
 

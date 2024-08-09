@@ -149,8 +149,7 @@ std::string origbuff = "";
 std::string optsecho = "";
 
 // Switch to enable "best-binding" algorithm rather than "tumble spheres" algorithm.
-bool use_bestbind_algorithm = default_bestbind;
-bool use_prealign = false;
+PoseSearchType pdpst = default_search_algorithm;
 std::string prealign_residues = "";
 Bond retain_bindings[4];
 std::vector<int> priority_resnos;
@@ -550,7 +549,7 @@ void iteration_callback(int iter, Molecule** mols)
     if (iter == (iters-1)) goto _oei;
     
     #if enforce_no_bb_pullaway
-    if (use_bestbind_algorithm && ligand_groups[0].atoms.size())
+    if (pdpst == pst_best_binding && ligand_groups[0].atoms.size())
     {
         float ttl_bb_dist = 0;
         for (l=0; l<3; l++)
@@ -1141,12 +1140,6 @@ int interpret_config_line(char** words)
         optsecho = "Number of poses: " + to_string(poses);
         return 1;
     }
-    else if (!strcmp(words[0], "PREALIGN"))
-    {
-        use_prealign = true;
-        prealign_residues = origbuff;
-        return 1;
-    }
     else if (!strcmp(words[0], "PROGRESS"))
     {
         progressbar = true;
@@ -1201,12 +1194,17 @@ int interpret_config_line(char** words)
         if (!words[1]) return 0;       // Stay with default.
         if (!strcmp(words[1], "BB"))
         {
-            use_bestbind_algorithm = true;
+            pdpst = pst_best_binding;
             return 1;
         }
         else if (!strcmp(words[1], "TS"))
         {
-            use_bestbind_algorithm = false;
+            pdpst = pst_tumble_spheres;
+            return 1;
+        }
+        else if (!strcmp(words[1], "CS"))
+        {
+            pdpst = pst_constrained;
             return 1;
         }
         else
@@ -1668,7 +1666,7 @@ int main(int argc, char** argv)
         }
     }
 
-    if (out_bb_pairs && !use_bestbind_algorithm)
+    if (out_bb_pairs && pdpst != pst_best_binding)
     {
         cout << "Warning: OUTBBP is enabled but the search mode is not the best-binding algorithm." << endl;
     }
@@ -1956,45 +1954,6 @@ int main(int argc, char** argv)
     // Identify the ligand atom with the greatest potential binding.
     int k, n;
 
-    #if !flexion_selection
-
-    if (use_prealign) use_bestbind_algorithm = false;
-
-    if (use_prealign)
-    {        
-        strcpy(buffer, prealign_residues.c_str());
-        words = chop_spaced_words(buffer);
-
-        for (n=0; words[n]; n++);      // Get length.
-
-        Molecule** prealign_res = new Molecule*[n+4];
-        Molecule** lig_grp = new Molecule*[n+4];
-
-        for (i=0; i<n; i++)
-        {
-            int resno = atoi(words[i]);
-            prealign_res[i] = protein->get_residue(resno);
-        }
-
-        ligand->recenter(pocketcen);
-
-        // First line up ligand to stationary residues.
-        lig_grp[0] = ligand;
-        lig_grp[1] = nullptr;
-        ligand->movability = MOV_NORECEN;
-        Molecule::conform_molecules(lig_grp, prealign_res, prealign_iters, nullptr);
-
-        // Then line up residues to ligand.
-        if (flex) Molecule::conform_molecules(prealign_res, lig_grp, prealign_iters, nullptr);
-        ligand->movability = MOV_ALL;
-
-        delete words;
-        delete prealign_res;
-        delete lig_grp;
-    }
-
-    #endif
-
     // Best-Binding Code
 
     #if _DBG_STEPBYSTEP
@@ -2155,7 +2114,7 @@ _try_again:
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl;
 
-        if (!use_bestbind_algorithm && !use_prealign)
+        if (pdpst == pst_tumble_spheres)
         {
             Search::do_tumble_spheres(protein, ligand, pocketcen);
             attempt_priority_hbond();
@@ -2164,6 +2123,10 @@ _try_again:
             #if debug_stop_after_tumble_sphere
             return 0;
             #endif
+        }
+        else if (pdpst == pst_constrained)
+        {
+            Search::prepare_constrained_search(protein, ligand, pocketcen);
         }
 
         #if _DBG_STEPBYSTEP
@@ -2201,11 +2164,10 @@ _try_again:
             #endif
             conformer_tumble_multiplier = 1;
 
-            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && !use_prealign && !use_bestbind_algorithm;
-            allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true) /*&& !use_bestbind_algorithm*/;
+            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && pdpst == pst_tumble_spheres;
+            allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true);
 
-            if (use_prealign) conformer_tumble_multiplier *= prealign_momenta_mult;
-            if (use_bestbind_algorithm) conformer_tumble_multiplier *= prealign_momenta_mult;
+            if (pdpst == pst_best_binding) conformer_tumble_multiplier *= prealign_momenta_mult;
 
             if (strlen(protafname) && nodeno == activation_node)
             {
@@ -2353,7 +2315,7 @@ _try_again:
 
             #if redo_tumble_spheres_every_node
             
-            if (!use_bestbind_algorithm && !use_prealign && (!prevent_ligand_360_on_activate))
+            if (pdpst == pst_tumble_spheres && (!prevent_ligand_360_on_activate))
             {
                 Search::do_tumble_spheres(protein, ligand, ligcen_target);
                 attempt_priority_hbond();
@@ -2529,7 +2491,7 @@ _try_again:
                 #endif
 
                 protein->set_conditional_basicities();
-                if (use_bestbind_algorithm)
+                if (pdpst == pst_best_binding)
                 {
                     Search::do_best_binding(protein, ligand, ligcen_target, reaches_spheroid[nodeno]);
 
@@ -2557,6 +2519,10 @@ _try_again:
                     }
 
                     if (out_bb_pairs) cout << endl;
+                }
+                else if (pdpst == pst_constrained)
+                {
+                    Search::do_constrained_search(protein, ligand);
                 }
 
                 // else ligand->recenter(ligcen_target);
@@ -2786,7 +2752,7 @@ _try_again:
 
             dr[drcount][nodeno].proximity = ligand->get_barycenter().get_3d_distance(nodecen);
 
-            if (use_bestbind_algorithm && out_bb_pairs)
+            if (pdpst == pst_best_binding && out_bb_pairs)
             {
                 dr[drcount][nodeno].miscdata += (std::string)"Best-Binding Pairs:\n";
                 for (i=0; i<3 && i<global_pairs.size(); i++)

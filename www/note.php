@@ -3,6 +3,7 @@ chdir(__DIR__);
 require_once("../data/protutils.php");
 require_once("../data/odorutils.php");
 require_once("../predict/statistics.php");
+require_once("receptor_notes.php");
 
 $note = @$_REQUEST['n'];
 if (!$note)

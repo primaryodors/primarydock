@@ -110,6 +110,33 @@ float AtomGroup::get_avg_elecn()
     return result;
 }
 
+float AtomGroup::max_potential_binding(intera_type typ)
+{
+    float result = 0;
+    int atct = atoms.size();
+    if (!atct) return result;
+
+    int i;
+    for (i=0; i<atct; i++)
+    {
+        int Z = atoms[i]->get_Z();
+        if (Z < 2) continue;
+
+        if (typ == mcoord)
+        {
+            int fam = atoms[i]->get_family();
+            if (fam == CHALCOGEN) result += (Z > 8) ? 200 : 50;
+            else if (fam == PNICTOGEN) result += 80;
+        }
+        else if (typ == ionic) result += 60.0 * fabs(atoms[i]->get_charge());
+        else if (typ == hbond) result += 21.0 * fabs(atoms[i]->get_electronegativity() - 2.2);
+        else if (typ == pi) result += atoms[i]->is_pi() ? 2.0 : 0;
+        else if (typ == vdW) result += fmax(0, 4.0 - 2.0*fabs(atoms[i]->get_electronegativity() - 2.4));
+    }
+
+    return result;
+}
+
 float AtomGroup::hydrophilicity()
 {
     int atct = atoms.size();

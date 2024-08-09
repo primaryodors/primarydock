@@ -7,6 +7,11 @@ std::vector<int> exclusion;
 AtomGroup ligand_groups[3];
 ResidueGroup sc_groups[3];
 
+std::vector<std::shared_ptr<AtomGroup>> agc;
+std::vector<AminoAcid*> cs_res;
+std::vector<intera_type> cs_bt;
+std::vector<AtomGroup*> cs_lag;
+
 void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocket_cen)
 {
     int i, j, l, n;
@@ -391,4 +396,163 @@ void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_
         GroupPair::align_groups(ligand, global_pairs, false, 1);
     }
     #endif
+}
+
+void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Point l_pocket_cen)
+{
+    // Enumerate all binding pocket residues into an array.
+    AminoAcid* baa[256];
+    int nba = protein->get_residues_can_clash_ligand(baa, ligand, l_pocket_cen, size, nullptr);
+    agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+
+    const int num_allowed_type = 5;
+    const intera_type allowed_types[num_allowed_type] = {mcoord, ionic, hbond, pi, vdW};
+
+    // For each pocket residue,
+    int i, j, l, n;
+    for (i=0; i<nba; i++)
+    {
+        bool res_has_nonvdw = false;
+        bool res_has_ionic = false;
+
+        // For each of the binding types: mcoord, ionic, hbond, pi, vdW:
+        for (j=0; j<num_allowed_type; j++)
+        {
+            // If other binding types have already been found for this residue, skip vdW.
+            if (allowed_types[j] == vdW && res_has_nonvdw) continue;
+        
+            // Can the residue's side chain form this type of bond with the ligand?
+            bool can_bind = false;
+            float lc, rc;
+            switch (allowed_types[j])
+            {
+                case mcoord:
+                if (baa[i]->coordmtl && ligand->count_atoms_by_element("S"))
+                    can_bind = res_has_nonvdw = true;
+                break;
+
+                case ionic:
+                rc = baa[i]->get_charge();
+                lc = ligand->get_charge();
+                if (rc && lc && sgn(rc) == -sgn(lc)) can_bind = res_has_nonvdw = res_has_ionic = true;
+                break;
+
+                case hbond:
+                if (res_has_ionic) continue;
+                if (baa[i]->has_hbond_donors() && ligand->has_hbond_acceptors()) can_bind = res_has_nonvdw = true;
+                else if (baa[i]->has_hbond_acceptors() && ligand->has_hbond_donors()) can_bind = res_has_nonvdw = true;
+                break;
+
+                case pi:
+                if (baa[i]->has_pi_atoms() && ligand->has_pi_atoms()) can_bind = res_has_nonvdw = true;
+                break;
+
+                case vdW:
+                default:
+                if (baa[i]->hydrophilicity() < 1.5*hydrophilicity_cutoff && ligand->hydrophilicity() < 1.5*hydrophilicity_cutoff) can_bind = true;
+            }
+            
+            if (can_bind)
+            {
+                // If so, record the residue, the binding type, and the ligand atom group with the strongest potential.
+                AtomGroup* ag = nullptr;
+                float agbb = 0;
+                n = agc.size();
+                for (l=0; l<n; l++)
+                {
+                    float mpb = agc[l]->max_potential_binding(allowed_types[j]);
+                    if (mpb > agbb)
+                    {
+                        agbb = mpb;
+                        ag = agc[l].get();
+                    }
+                }
+                if (!ag) cout << "BAD CSAG BINDING: " << baa[i]->get_name() << " " << allowed_types[j] << endl;
+                if (!ag) continue;
+
+                cs_res.push_back(baa[i]);
+                cs_bt.push_back(allowed_types[j]);
+                cs_lag.push_back(ag);
+            }
+        }
+    }
+}
+
+void Search::do_constrained_search(Protein* protein, Molecule* ligand)
+{
+    int i, j, l, n;
+
+    // For a certain set number of tries:
+    for (i=0; i<cs_max_tries; i++)
+    {
+        // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
+        n = cs_res.size();
+        while (true)
+        {
+            for (j=0; j<n; j++)
+            {
+                float b;
+                switch (cs_bt[j])
+                {
+                    case mcoord: b = 200; break;
+                    case ionic: b = 60; break;
+                    case hbond: b = 25; break;
+                    case pi: b = 12; break;
+                    case vdW: default: b = 4;
+                }
+
+                float w = pow(b, cs_bondweight_exponent);
+
+                if (frand(0,1) < w) goto chose_residue;
+            }
+        }
+        chose_residue:
+
+        // Place the ligand so that the atom group is centered in the binding pocket.
+        Point agp = cs_lag[j]->get_center();
+        SCoord mov = loneliest.subtract(agp);
+        ligand->move(mov);
+        
+        // Move the ligand so that the atom group is at the optimal distance to the residue.
+        Point resna = cs_res[j]->get_nearest_atom(loneliest)->get_location();
+        mov = resna.subtract(cs_lag[j]->get_center());
+        mov.r = cs_lag[j]->distance_to(resna) - 2;              // One size fits all for now. It's the iterations' job to correct this distance.
+        
+        // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
+        Rotation rot = align_points_3d(ligand->get_barycenter(), loneliest, resna);
+        LocatedVector lv = rot.v;
+        lv.origin = resna;
+        ligand->rotate(lv, rot.a);
+        
+        // Conform the side chain and ligand to each other, ignoring other residues.
+        Molecule* mm[3];
+        mm[0] = cs_res[j];
+        mm[1] = ligand;
+        mm[2] = nullptr;
+        Molecule::conform_molecules(mm, 30);
+        
+        // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
+        // and look for the rotamer with the smallest clash total.
+        lv = (SCoord)resna.subtract(ligand->get_barycenter());
+        lv.origin = resna;
+        Pose best(ligand);
+        best.copy_state(ligand);
+        float least_clash;
+        float theta = 0;
+        for (; theta < M_PI*2; theta += cs_360_step)
+        {
+            AminoAcid* cc[256];
+            protein->get_residues_can_clash_ligand(cc, ligand, ligand->get_barycenter(), size, nullptr);
+            float f = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(cc));
+            if (!theta || f < least_clash)
+            {
+                least_clash = f;
+                best.copy_state(ligand);
+            }
+
+            ligand->rotate(lv, cs_360_step);
+        }
+                
+        best.restore_state(ligand);
+    }
 }

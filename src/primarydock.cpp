@@ -887,11 +887,6 @@ int interpret_config_line(char** words)
         optsecho = "Debug file: " + (std::string)words[1];
         return 1;
     }
-    else if (!strcmp(words[0], "DIFF"))
-    {
-        differential_dock = true;
-        optsecho = "Differential dock.";
-    }
     else if (!strcmp(words[0], "ECHO"))
     {
         echo_progress = true;
@@ -1325,110 +1320,6 @@ void read_config_file(FILE* pf)
             delete[] words;
         }
         buffer[0] = 0;
-    }
-}
-
-void prepare_initb()
-{
-    int i, j;
-
-    if (differential_dock)
-    {
-        initial_binding = new float[seql+4];
-        #if compute_vdw_repulsion
-        initial_vdWrepl = new float[seql+4];
-        #endif
-
-        #if compute_vdw_repulsion
-        for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
-        #else
-        for (i=0; i<seql+4; i++) initial_binding[i] = 0;
-        #endif
-
-        std::vector<AminoAcid*> preres = protein->get_residues_near(pocketcen, pre_ligand_multimol_radius);
-        int qpr = preres.size();
-        AminoAcid* preaa[seql+4];
-        MovabilityType aamov[seql+4];
-
-        for (i=0; i<seql+4; i++) preaa[i] = nullptr;
-        for (i=0; i<qpr; i++)
-        {
-            preaa[i] = preres[i];
-            Atom* CA = preaa[i]->get_atom("CA");
-            if (!CA)
-            {
-                cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl << flush;
-                throw 0xbad12e5;
-            }
-            float r = CA->get_location().get_3d_distance(pocketcen);
-
-            aamov[i] = preaa[i]->movability;
-
-            if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
-        }
-
-        Molecule* prem[seql+maxh2o+4];
-        for (i=0; i<qpr; i++) prem[i] = reinterpret_cast<Molecule*>(preaa[i]);
-        if (waters)
-        {
-            for (i=0; i<maxh2o; i++) prem[i+qpr] = waters[i];
-        }
-        int qpm = qpr + maxh2o;
-        prem[qpm] = nullptr;
-
-        #if !flexion_selection
-        bool preconform;
-
-        #if preconform_protein
-        preconform = flex;
-        #else
-        preconform = flex && (waters != nullptr) && differential_dock;
-        #endif
-
-        if (preconform && pre_ligand_iteration_ratio)
-        {
-            Molecule** delete_me;
-            Molecule::conform_molecules(
-                prem /*reinterpret_cast<Molecule**>(preaa)*/,
-                delete_me = protein->all_residues_as_molecules(),
-                iters*pre_ligand_iteration_ratio
-            );
-            delete delete_me;
-        }
-        #endif
-
-        for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
-        for (i=0; i<qpr; i++)
-        {
-            int resno = preaa[i]->get_residue_no();
-            #if _DBG_TOOLARGE_DIFFNUMS
-            std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
-            #endif
-
-            for (j=0; j<qpm; j++)
-            {
-                if (j == i) continue;
-                float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(prem[j]), j==0);
-
-                #if _DBG_TOOLARGE_DIFFNUMS
-                if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
-                #endif
-
-                initial_binding[resno] += f;
-                #if compute_vdw_repulsion
-                initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(prem[j]);
-                #endif
-            }
-
-            #if _DBG_TOOLARGE_DIFFNUMS
-            if (fabs(initial_binding[resno]) >= 200) cout << ibdbg << endl;
-            #endif
-        }
-
-        for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
-
-        for (i=0; i<qpr; i++) preaa[i]->movability = aamov[i];
     }
 }
 
@@ -2149,11 +2040,6 @@ int main(int argc, char** argv)
     if (output) *output << "PDB file: " << protfname << endl;
     cout << "Ligand: " << ligfname << endl;
     if (output) *output << "Ligand: " << ligfname << endl;
-    if (differential_dock)
-    {
-        cout << "Differential dock." << endl;
-        if (output) *output << "Differential dock." << endl;
-    }
     cout << endl;
     if (output) *output << endl;
 
@@ -2265,7 +2151,6 @@ _try_again:
         }
 
         freeze_bridged_residues();
-        prepare_initb();
 
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl;
@@ -2369,7 +2254,6 @@ _try_again:
                 apply_protein_specific_settings(protein);
 
                 freeze_bridged_residues();
-                prepare_initb();
 
                 for (i=1; i<=seql; i++)
                 {
@@ -2863,7 +2747,7 @@ _try_again:
             AminoAcid* aadbg = protein->get_residue(155);
             cout << aadbg->get_name() << " charge = " << aadbg->get_charge() << endl;
             #endif
-            dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
+            dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount);
             dr[drcount][nodeno].out_per_res_e = out_per_res_e;
             dr[drcount][nodeno].out_per_btyp_e = out_per_btyp_e;
             dr[drcount][nodeno].out_itemized_e_cutoff = out_itemized_e_cutoff;
@@ -3060,16 +2944,12 @@ _try_again:
                     int bestpose = pose;
                     for (i=0; i<drcount; i++)
                     {
-                        if ((	differential_dock
-                                &&
-                                (dr[i][0].kJmol - dr[i][0].ikJmol + dr[i][0].polsat * polar_sat_influence_for_scoring)
+                        if ((	(dr[i][0].kJmol - dr[i][0].ikJmol + dr[i][0].polsat * polar_sat_influence_for_scoring)
                                 <
                                 (dr[drcount][nodeno].kJmol - dr[drcount][nodeno].ikJmol + dr[drcount][nodeno].polsat * polar_sat_influence_for_scoring)
                             )
                             ||
-                            (	!differential_dock
-                                &&
-                                (dr[i][0].kJmol + dr[i][0].polsat * polar_sat_influence_for_scoring)
+                            (	(dr[i][0].kJmol + dr[i][0].polsat * polar_sat_influence_for_scoring)
                                 <
                                 (btot + pstot * polar_sat_influence_for_scoring)
                             ))
@@ -3092,7 +2972,7 @@ _try_again:
 
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
-            if ((btot < kJmol_cutoff) && !differential_dock)
+            if (btot < kJmol_cutoff)
             {
                 #if _dbg_worst_energy
                 cout << "Total binding energy " << -btot << "; skipping." << endl << endl;
@@ -3127,7 +3007,7 @@ _try_again:
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
-                if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)
+                if (dr[j][0].kJmol >= kJmol_cutoff)
                 {
                     for (k=0; k<=pathnodes; k++)
                     {

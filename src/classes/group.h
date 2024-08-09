@@ -18,6 +18,7 @@ class AtomGroup
     float get_mcoord();
     float get_sum();
     float get_avg_elecn();
+    float max_potential_binding(intera_type type);
     int contains_element(const char* esym);
     bool contains_atom(Atom* a);
     void remove_atom(Atom* a);

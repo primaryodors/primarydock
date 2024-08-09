@@ -835,6 +835,19 @@ int Molecule::has_hbond_acceptors()
     return result;
 }
 
+int Molecule::has_pi_atoms()
+{
+    if (!atoms) return 0;
+
+    int i, result=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_pi()) result++;
+    }
+
+    return result;
+}
+
 int Molecule::from_sdf(char const* sdf_dat)
 {
     if (!sdf_dat) return 0;

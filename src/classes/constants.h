@@ -152,6 +152,9 @@
 #define priority_weight_group 10
 #define ts_priority_coefficient 10
 
+#define cs_max_tries 10
+#define cs_bondweight_exponent 0.33333
+#define cs_360_step M_PI / 6.7
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25
@@ -276,9 +279,6 @@
 #define hydrophilicity_boost 5
 #define best_binding_stochastic 0.3
 
-// For differential docking, whether to conform_molecules() all the protein's residues into an
-// optimized initial conformation before adding the ligand.
-#define preconform_protein 0
 #define default_pre_ligand_multimol_radius 15
 #define default_pre_ligand_flex_radius 10
 #define pre_ligand_iteration_ratio 1

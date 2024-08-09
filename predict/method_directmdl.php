@@ -84,6 +84,17 @@ $pdbfname_inactive = $pdbfname;
 $pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
+if (!file_exists($pdbfname_active)
+    || filemtime($pdbfname_active) < filemtime("hm/allgpcr.ali")
+    || filemtime($pdbfname_active) < filemtime("hm/build_alignment_file.php")
+    || filemtime($pdbfname_active) < filemtime("hm/dohm.php")
+    || filemtime($pdbfname_active) < filemtime("hm/experimental.ali")
+    )
+{
+    if (filemtime("hm/experimental.ali") > filemtime("hm/allgpcr.ali")) passthru("php -f hm/build_alignment_file.php");
+    passthru("php -f hm/dohm.php $protid");
+}
+
 if (!file_exists($pdbfname_active)) die("No active model.\n");
 
 $flex_constraints = "";

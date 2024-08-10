@@ -754,7 +754,7 @@ void update_progressbar(float percentage)
         float cmpi = 1.25*i;
         if (cmpi <= percentage)
         {
-            float h = M_PI*2 * cmpi / 100 + hueoffset;
+            float h = M_PI*2 * cmpi / 46 + hueoffset;
             int r, g, b;
             r =  96 +  24 * sin(h-0.333);
             g = 128 +  26 * sin(h+0.333);
@@ -768,7 +768,7 @@ void update_progressbar(float percentage)
     cout << ("|/-\\")[spinchr] << " " << (int)percentage << "%.               " << endl;
     spinchr++;
     if (spinchr >= 4) spinchr = 0;
-    hueoffset += 0.03;
+    hueoffset += 0.1;
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
@@ -2168,7 +2168,7 @@ _try_again:
             #endif
             conformer_tumble_multiplier = 1;
 
-            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && pdpst == pst_tumble_spheres;
+            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && pdpst != pst_best_binding;
             allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true);
 
             if (pdpst == pst_best_binding) conformer_tumble_multiplier *= prealign_momenta_mult;
@@ -2528,6 +2528,7 @@ _try_again:
                             best_cslig.copy_state(ligand);
                             ultimate_csidx = cs_idx;
                         }
+                        if (cs_bt[cs_idx] == ionic) break;
                     }
                     best_cslig.restore_state(ligand);
 
@@ -2649,7 +2650,7 @@ _try_again:
             check_ligand = ligand;
             #endif
 
-            ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
+            ligand->movability = MOV_ALL;
             if (!flex) for (j=0; j<sphres; j++)
             {
                 reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;

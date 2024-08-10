@@ -255,6 +255,8 @@ public:
     Molecule** mclashables = nullptr;
     Atom *clash1 = nullptr, *clash2 = nullptr;
     float clash_worst = 0;
+    Atom *best_intera = nullptr, *best_other_intera = nullptr;
+    Molecule* best_interactor = nullptr;
 
 protected:
 

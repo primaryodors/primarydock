@@ -2821,6 +2821,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 
     lastshielded = 0;
     clash1 = clash2 = nullptr;
+    float best_atom_energy = 0;
 
     #if _dbg_internal_energy
     cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
@@ -2894,6 +2895,14 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         {
                             if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;
                             kJmol += abind;
+
+                            if (abind > best_atom_energy)
+                            {
+                                best_atom_energy = abind;
+                                best_intera = atoms[i];
+                                best_interactor = ligands[l];
+                                best_other_intera = ligands[l]->atoms[j];
+                            }
 
                             atoms[i]->last_bind_energy += abind;
                             if (abind > atoms[i]->strongest_bind_energy)
@@ -3597,6 +3606,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             {
                 pib.copy_state(a);
                 Point ptrnd(frand(-1,1), frand(-1,1), frand(-1,1));
+                if (frand(0,1) < 0.4 && a->best_intera && a->best_other_intera)
+                {
+                    ptrnd = a->best_other_intera->get_location().subtract(a->best_intera->get_location());
+                }
                 if (ptrnd.magnitude())
                 {
                     LocatedVector axis = (SCoord)ptrnd;

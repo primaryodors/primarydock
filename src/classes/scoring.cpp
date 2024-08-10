@@ -93,50 +93,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
     }
 
-    #if use_trip_switch          
-    for (i=0; i<qpr; i++)
-    {
-        int resno = allres[i]->get_residue_no();
-
-        bool is_trip_i = false;
-        for (n=0; n<tripswitch_clashables.size(); n++)
-            if (tripswitch_clashables[n] == resno)
-            {
-                is_trip_i = true;
-                break;
-            }
-
-        for (j=0; j<qpr; j++)
-        {
-            if (j == i) continue;
-            int jres = allres[j]->get_residue_no();
-
-            bool is_trip_j = false;
-            if (is_trip_i)
-                for (n=0; n<tripswitch_clashables.size(); n++)
-                    if (tripswitch_clashables[n] == jres)
-                    {
-                        is_trip_j = true;
-                        break;
-                    }
-            if (!is_trip_j) continue;
-
-            float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
-            if (f < 0)
-            {
-                tripclash -= f;
-                f = 0;
-            }
-        }
-    }
-    #endif
-
     for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = total_binding_by_type[i];
-
-    #if active_persistence
-    float res_kJmol[end1];
-    for (i=0; i<end1; i++) res_kJmol[i] = 0;
-    #endif
 
     #if _peratom_audit
     interaudit.clear();
@@ -216,10 +173,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         lma1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;
         lma2n[metcount] = ligand->clash2 ? ligand->clash2->name : nullptr;
 
-        #if active_persistence
-        res_kJmol[resno] = lb;
-        #endif
-
         BallesterosWeinstein bw = protein->get_bw_from_resno(resno);
         if (bw.helix_no)
             sprintf(metrics[metcount], "%s%d(%d.%d)", reaches_spheroid[i]->get_3letter(), resno, bw.helix_no, bw.member_no);
@@ -296,9 +249,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     kJmol += ligand_self;
     #if _dbg_internal_energy
     cout << "Ligand internal = " << ligand_self << endl;
-    #endif
-    #if use_trip_switch
-    tripswitch  = tripclash;
     #endif
     protclash = protein->get_rel_int_clashes();
 
@@ -451,13 +401,6 @@ _btyp_unassigned:
     if (dr.out_prox) output << "Proximity: " << dr.proximity << endl << endl;
 
     if (dr.out_pro_clash) output << "Protein clashes: " << dr.protclash << endl << endl;
-
-    #if use_trip_switch
-    if (tripswitch_clashables.size())
-    {
-        output << "Trip switch: " << dr.tripswitch << endl << endl;
-    }
-    #endif
 
     #if compute_missed_connections
     if (dr.out_mc)

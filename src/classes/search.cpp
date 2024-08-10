@@ -153,10 +153,6 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
                                 worth = 7;
                             }
 
-                            #if active_persistence
-                            worth *= residue_binding_multiplier(tsphres[j]->get_residue_no());
-                            #endif
-
                             if (tsphres[j]->capable_of_inter(it))
                             {
                                 float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));

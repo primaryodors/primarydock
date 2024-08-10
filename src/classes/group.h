@@ -10,7 +10,8 @@
 class AtomGroup
 {
     public:
-    std::vector<Atom*> atoms;
+    Atom* atoms[256];
+    int atct = 0;
     Point get_center();
     float get_pi();
     float get_polarity();

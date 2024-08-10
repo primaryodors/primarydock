@@ -176,10 +176,6 @@
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
 
-// If enabled, the trip switch functionality will have to be moved around in the code.
-// But since we are using an active vs. inactive energy comparison, this feature is obsolete.
-#define use_trip_switch 0
-
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
 
@@ -187,16 +183,6 @@
 #define compute_missed_connections 0
 #define compute_vdw_repulsion 0
 #define compute_clashdirs 0
-
-// If using an activation matrix, active_persistence "rewards" the ligand for keeping
-// bindings to the same residues post-activation as pre-activation. The noflex option
-// prevents rotating the ligand's bonds in the node immediately after activation.
-#define active_persistence 1
-#define active_persistence_follow 1
-#define active_persistence_limit 16
-#define active_persistence_noflex 0
-#define active_persistence_ratio 5
-#define active_persistence_threshold 5
 
 #define redo_tumble_spheres_on_activation 0
 #define redo_tumble_spheres_every_node 0

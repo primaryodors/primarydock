@@ -20,14 +20,6 @@ float pre_ligand_flex_radius = default_pre_ligand_flex_radius;
 
 char asterisk[5] = "*";
 
-#if active_persistence
-int active_persistence_resno[active_persistence_limit];
-#endif
-
-#if active_persistence_noflex
-bool allow_ligand_flex = true;
-#endif
-
 int in_array(void* needle, void** haystack)
 {
     int i;
@@ -259,20 +251,6 @@ std::string cardinality_printable(float card)
 
     return retval;
 }
-
-#if active_persistence
-float residue_binding_multiplier(int resno)
-{
-    int i;
-    for (i=0; i<active_persistence_limit; i++)
-    {
-        if (!active_persistence_resno[i]) return 1;
-        if (active_persistence_resno[i] == resno) return active_persistence_ratio;
-    }
-
-    return 1;
-}
-#endif
 
 const float pH_minus_pKa[22] = {-1.9, -0.9, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.6, 2.1, 2.6, 3.1};
 const float f_protonated[22] = {0.988, 0.888, 0.715, 0.666, 0.613, 0.557, 0.5, 0.443, 0.387, 0.334, 0.285, 0.240, 0.201, 0.166, 0.137, 0.112, 0.091, 0.074, 0.024, 0.008, 0.002, 0.001};

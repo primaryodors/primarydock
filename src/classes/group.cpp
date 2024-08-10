@@ -11,7 +11,6 @@ Point AtomGroup::get_center()
     int i;
     float mass = 0;
     Point result(0,0,0);
-    int atct = atoms.size();
     if (!atct) return Point(0,0,0);
     for (i=0; i<atct; i++)
     {
@@ -27,7 +26,6 @@ Point AtomGroup::get_center()
 
 float AtomGroup::get_pi()
 {
-    int atct = atoms.size();
     if (!atct) return 0;
     int i;
     float result = 0;
@@ -40,7 +38,6 @@ float AtomGroup::get_pi()
 
 float AtomGroup::get_polarity()
 {
-    int atct = atoms.size();
     if (!atct) return 0;
     int i;
     float result = 0;
@@ -55,7 +52,6 @@ float AtomGroup::get_polarity()
 
 float AtomGroup::get_ionic()
 {
-    int atct = atoms.size();
     if (!atct) return 0;
     int i;
     float result = 0;
@@ -69,7 +65,6 @@ float AtomGroup::get_ionic()
 
 float AtomGroup::get_mcoord()
 {
-    int atct = atoms.size();
     if (!atct) return 0;
     int i;
     float result = 0;
@@ -90,7 +85,6 @@ float AtomGroup::get_sum()
 
 float AtomGroup::get_avg_elecn()
 {
-    int atct = atoms.size();
     if (!atct) return 0;
     int i, j=0;
     float result = 0;
@@ -113,7 +107,6 @@ float AtomGroup::get_avg_elecn()
 float AtomGroup::max_potential_binding(intera_type typ)
 {
     float result = 0;
-    int atct = atoms.size();
     if (!atct) return result;
 
     int i;
@@ -139,7 +132,6 @@ float AtomGroup::max_potential_binding(intera_type typ)
 
 float AtomGroup::hydrophilicity()
 {
-    int atct = atoms.size();
     if (!atct) return 0;
     int i, j=0, num_heavy_atoms;
     float result = 0, divisor = 0;
@@ -173,7 +165,6 @@ float AtomGroup::hydrophilicity()
 
 bool AtomGroup::has_hbond_acceptors()
 {
-    int atct = atoms.size();
     if (!atct) return 0;
     int i;
     bool result = false;
@@ -185,7 +176,6 @@ bool AtomGroup::has_hbond_acceptors()
 
 bool AtomGroup::has_hbond_donors()
 {
-    int atct = atoms.size();
     if (!atct) return 0;
     int i;
     bool result = false;
@@ -199,7 +189,6 @@ int AtomGroup::contains_element(const char* esym)
 {
     int i;
     int findZ = Atom::Z_from_esym(esym);
-    int atct = atoms.size();
     int result = 0;
     for (i=0; i<atct; i++)
     {
@@ -210,7 +199,6 @@ int AtomGroup::contains_element(const char* esym)
 
 float AtomGroup::distance_to(Point pt)
 {
-    int atct = atoms.size();
     if (!atct) return -1;
     int i;
     float result = 0;
@@ -224,7 +212,6 @@ float AtomGroup::distance_to(Point pt)
 
 float AtomGroup::bounds()
 {
-    int atct = atoms.size();
     if (!atct) return -1;
     int i;
     Point ptmin(0,0,0), ptmax(0,0,0);
@@ -402,7 +389,7 @@ void ResidueGroup::conform_to(Molecule* mol)
 
 bool AtomGroup::is_bonded_to(Atom* a)
 {
-    int n = atoms.size();
+    int n = atct;
     if (!n) return false;
 
     int i;
@@ -418,7 +405,7 @@ bool AtomGroup::is_bonded_to(Atom* a)
 
 int AtomGroup::heavy_atom_count()
 {
-    int i, n = atoms.size(), result = 0;
+    int i, n = atct, result = 0;
 
     for (i=0; i<n; i++)
     {
@@ -513,7 +500,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                     Atom* a = matches[l*per_grp+j];
                     k = mol->atom_idx_from_ptr(a);
                     if (dirty[k]) continue;
-                    g->atoms.push_back(a);
+                    g->atoms[g->atct++] = a;
                     int fam = a->get_family();
 
                     Bond* bonds[16];
@@ -524,7 +511,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         if (bonds[m]->atom2->get_Z() > 1) continue;
                         k = mol->atom_idx_from_ptr(bonds[m]->atom2);
                         if (dirty[k]) continue;
-                        g->atoms.push_back(bonds[m]->atom2);
+                        g->atoms[g->atct++] = bonds[m]->atom2;
                         dirty[k] = true;
                     }
                 }
@@ -532,7 +519,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 g->remove_duplicates();
                 retval.push_back(g);
 
-                if (g->atoms.size() > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atoms.size()
+                if (g->atct > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atct
                     && (g->has_hbond_acceptors() || g->has_hbond_donors()))
                 {
                     std::vector<std::shared_ptr<AtomGroup>> subg = make_hbond_subgroups(g);
@@ -545,7 +532,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     int groupcount = retval.size();
     for (j=0; j<groupcount; j++)
     {
-        int groupsize = retval[j]->atoms.size();
+        int groupsize = retval[j]->atct;
         for (m=0; m<groupsize; m++)
         {
             int idx = mol->atom_idx_from_ptr(retval[j]->atoms[m]);
@@ -576,7 +563,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         }
 
         Atom* a_ = a;
-        g->atoms.push_back(a);
+        g->atoms[g->atct++] = a;
         #if _dbg_groupsel
         cout << "Creating group from " << a->name << "..." << endl;
         #endif
@@ -595,7 +582,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         bbhidx = mol->atom_idx_from_ptr(bb[h]->atom2);
                         if (bbhidx >= 0 && !dirty[bbhidx])
                         {
-                            g->atoms.push_back(bb[h]->atom2);
+                            g->atoms[g->atct++] = bb[h]->atom2;
                             dirty[bbhidx] = true;
 
                             #if _dbg_groupsel
@@ -659,7 +646,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 {
                     if (g->is_bonded_to(b))
                     {
-                        g->atoms.push_back(b);
+                        g->atoms[g->atct++] = b;
                         if (b->get_Z() > 1)
                         {
                             if (!b->is_polar() && !b->get_charge() && !b->is_pi()) aliphatic++;
@@ -685,7 +672,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                                         bbhidx = mol->atom_idx_from_ptr(bb[h]->atom2);
                                         if (bbhidx >= 0 && !dirty[bbhidx])
                                         {
-                                            g->atoms.push_back(bb[h]->atom2);
+                                            g->atoms[g->atct++] = bb[h]->atom2;
                                             dirty[bbhidx] = true;
 
                                             #if _dbg_groupsel
@@ -732,7 +719,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         cout << "Group complete." << endl << endl;
         #endif
 
-        if (g->atoms.size() > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atoms.size()
+        if (g->atct > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atct
             && (g->has_hbond_acceptors() || g->has_hbond_donors()))
         {
             std::vector<std::shared_ptr<AtomGroup>> subg = make_hbond_subgroups(g);
@@ -743,7 +730,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     l = retval.size();
     for (i=0; i<l; i++)
     {
-        int ni = retval[i]->atoms.size();
+        int ni = retval[i]->atct;
         if (retval[i]->heavy_atom_count() == 1)
         {
             int fam = retval[i]->atoms[0]->get_family();
@@ -753,7 +740,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         {
             if (retval[i]->get_center().get_3d_distance(retval[j]->get_center()) > ld/3) continue;
 
-            int nj = retval[j]->atoms.size();
+            int nj = retval[j]->atct;
             if (retval[j]->heavy_atom_count() == 1)
             {
                 int fam = retval[j]->atoms[0]->get_family();
@@ -777,7 +764,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
     for (i=0; i<l; i++)
     {
-        int ni = retval[i]->atoms.size();
+        int ni = retval[i]->atct;
         if (retval[i]->heavy_atom_count() == 1)
         {
             int fam = retval[i]->atoms[0]->get_family();
@@ -785,7 +772,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         }
         for (j=l-1; j>i; j--)
         {
-            int nj = retval[j]->atoms.size();
+            int nj = retval[j]->atct;
             if (retval[j]->heavy_atom_count() == 1)
             {
                 int fam = retval[j]->atoms[0]->get_family();
@@ -825,12 +812,12 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::sha
     std::vector<std::shared_ptr<AtomGroup>> retval;
     int j, l;
 
-    for (l=0; l<g->atoms.size(); l++)
+    for (l=0; l<g->atct; l++)
     {
         if (g->atoms[l]->get_family() == CHALCOGEN || g->atoms[l]->get_family() == PNICTOGEN || g->atoms[l]->get_family() == HALOGEN)
         {
             std::shared_ptr<AtomGroup> g1(new AtomGroup());
-            g1->atoms.push_back(g->atoms[l]);
+            g1->atoms[g1->atct++] = g->atoms[l];
             g1->ligand = g->ligand;
 
             #if _dbg_groupsel
@@ -843,7 +830,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::sha
             {
                 if (lbb[j]->atom2 && lbb[j]->atom2->get_Z() == 1)
                 {
-                    g1->atoms.push_back(lbb[j]->atom2);
+                    g1->atoms[g1->atct++] = lbb[j]->atom2;
 
                     #if _dbg_groupsel
                     cout << "Adding " << lbb[j]->atom2->name << "..." << endl;
@@ -864,17 +851,19 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::sha
 
 bool AtomGroup::contains_atom(Atom* a)
 {
-    int i, n = atoms.size();
+    int i, n = atct;
     for (i=0; i<n; i++) if (atoms[i] == a) return true;
     return false;
 }
 
 void AtomGroup::remove_atom(Atom* a)
 {
-    int i, n = atoms.size();
+    int i, j, n = atct;
     for (i=0; i<n; i++) if (atoms[i] == a)
     {
-        atoms.erase(atoms.begin()+i);
+        for (j=i+1; j<atct; j++) atoms[j-1] = atoms[j];
+        atct--;
+        atoms[atct] = nullptr;
         return;
     }
 }
@@ -884,7 +873,7 @@ float AtomGroup::average_similarity(AtomGroup* cw)
     float totsim = 0;
     int simqty = 0;
 
-    int i, j, m = atoms.size(), n = cw->atoms.size();
+    int i, j, m = atct, n = cw->atct;
 
     for (i=0; i<n; i++)
     {
@@ -909,7 +898,7 @@ int AtomGroup::intersecting(AtomGroup* cw)
 {
     int samesies = 0;
 
-    int i, j, m = atoms.size(), n = cw->atoms.size();
+    int i, j, m = atct, n = cw->atct;
 
     for (i=0; i<n; i++)
     {
@@ -929,7 +918,7 @@ void AtomGroup::merge(AtomGroup* mw)
     if (ligand && mw->ligand && ligand != mw->ligand) throw 0xbad3126;
     if (!ligand) ligand = mw->ligand;
 
-    int i, j, m = atoms.size(), n = mw->atoms.size();
+    int i, j, m = atct, n = mw->atct;
 
     for (i=0; i<n; i++)
     {
@@ -940,7 +929,7 @@ void AtomGroup::merge(AtomGroup* mw)
             if (atoms[j] == a) goto _already;
         }
 
-        atoms.push_back(a);
+        atoms[atct++] = a;
 
         _already:
         ;
@@ -1132,7 +1121,7 @@ std::ostream& operator<<(std::ostream& os, const AtomGroup& ag)
     {
         os << "atom_group[ ";
         int i;
-        for (i=0; i<ag.atoms.size(); i++) os << *ag.atoms[i] << " ";
+        for (i=0; i<ag.atct; i++) os << *ag.atoms[i] << " ";
         os << "]";
     }
     catch (int ex)
@@ -1165,7 +1154,7 @@ float GroupPair::get_weighted_potential()
 
     if (scg->metallic) f *= 60;
     else if (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff && fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff) f *= 25;
-    else if ((ag->get_pi()/ag->atoms.size()) >= 0.25 && scg->pi_stackability() > 0.25 ) f *= 7;
+    else if ((ag->get_pi()/ag->atct) >= 0.25 && scg->pi_stackability() > 0.25 ) f *= 7;
 
     // Pair priority never should have overridden binding strength. It was always a means to ensure that specific ligand-protein contacts
     // be made without undue precedence given to other potential contacts *of the same type*. It was never a feature to allow e.g. a van der
@@ -1180,7 +1169,7 @@ float GroupPair::get_potential()
     if (potential) return potential;
     else
     {
-        int m = ag->atoms.size(), n = scg->aminos.size();
+        int m = ag->atct, n = scg->aminos.size();
         if (!m || !n) return 0;
 
         bool polar_atoms = (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff);
@@ -1565,14 +1554,14 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
 void AtomGroup::remove_duplicates()
 {
-    int i, j, n = atoms.size();
+    int i, j, n = atct;
     for (i=n-1; i; i--)
     {
         for (j=0; j<i; j++)
         {
             if (atoms[i] == atoms[j])
             {
-                atoms.erase(atoms.begin()+i);
+                remove_atom(atoms[i]);
                 break;
             }
         }

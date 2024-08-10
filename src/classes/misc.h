@@ -74,10 +74,6 @@ float protonation(float pKa);
 float larger(float v1, float v2);
 bool file_exists(std::string fname);
 
-#if active_persistence
-float residue_binding_multiplier(int resno);
-#endif
-
 void colorrgb(int r, int g, int b);
 void colorize(float f);
 void colorless();
@@ -102,10 +98,6 @@ extern float pre_ligand_multimol_radius;
 extern float pre_ligand_flex_radius;
 
 extern char asterisk[5];
-
-#if active_persistence_noflex
-extern bool allow_ligand_flex;
-#endif
 
 #endif
 

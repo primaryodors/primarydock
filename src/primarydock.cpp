@@ -162,7 +162,6 @@ Pose pullaway_undo;
 float last_ttl_bb_dist = 0;
 
 std::vector<AcvBndRot> active_bond_rots;
-std::vector<int> tripswitch_clashables;
 std::vector<ResiduePlaceholder> required_contacts;
 std::vector<std::string> bridges;
 std::vector<std::string> atomto;
@@ -549,7 +548,7 @@ void iteration_callback(int iter, Molecule** mols)
     if (iter == (iters-1)) goto _oei;
     
     #if enforce_no_bb_pullaway
-    if (pdpst == pst_best_binding && ligand_groups[0].atoms.size())
+    if (pdpst == pst_best_binding && ligand_groups[0].atct)
     {
         float ttl_bb_dist = 0;
         for (l=0; l<3; l++)
@@ -563,7 +562,7 @@ void iteration_callback(int iter, Molecule** mols)
                 ttl_bb_dist += r * (1.0 + 1.0 / (l+1));
                 #if _dbg_bb_pullaway
                 cout << pose << ":" << iter << ": Ligand atoms ";
-                for (i=0; i<global_pairs[l]->ag->atoms.size(); i++) cout << global_pairs[l]->ag->atoms[i]->name << " ";
+                for (i=0; i<global_pairs[l]->ag->atct; i++) cout << global_pairs[l]->ag->atoms[i]->name << " ";
                 cout << "are " << r1 << " A from residues";
                 for (i=0; i<global_pairs[l]->scg->aminos.size(); i++) cout << " " << global_pairs[l]->scg->aminos[i]->get_3letter() << global_pairs[l]->scg->aminos[i]->get_residue_no();
                 cout << "." << endl;
@@ -1274,17 +1273,6 @@ int interpret_config_line(char** words)
         }
         return 1;
     }
-    else if (!strcmp(words[0], "TRIP"))
-    {
-        optsecho = "Added trip clashables ";
-        for (i = 1; words[i]; i++)
-        {
-            if (words[i][0] == '-' && words[i][1] == '-') break;
-            tripswitch_clashables.push_back(atoi(words[i]));
-            optsecho += (std::string)words[i] + (std::string)" ";
-        }
-        return i-1;
-    }
     else if (!strcmp(words[0], "CAVS"))
     {
         cavity_stuffing = atof(words[1]);
@@ -1607,13 +1595,6 @@ int main(int argc, char** argv)
     _momentum_rad_ceiling = fiftyseventh * 5;
 
     for (i=0; i<65536; i++) buffer[i] = 0;
-    #if active_persistence
-    for (i=0; i<active_persistence_limit; i++) active_persistence_resno[i] = 0;
-
-    #if _DBG_RESBMULT
-    cout << "Cleared active persistence resnos." << endl;
-    #endif
-    #endif
 
     for (i=0; i<256; i++)
         configfname[i] = protfname[i] = protafname[i] = ligfname[i] = 0;
@@ -1865,7 +1846,6 @@ int main(int argc, char** argv)
 
     l=0;
     for (i=0; mcoord_resno[i]; i++) addl_resno[l++] = mcoord_resno[i];
-    for (i=0; i < tripswitch_clashables.size(); i++) addl_resno[l++] = tripswitch_clashables[i];
     addl_resno[l] = 0;
 
     // Load the ligand or return an error.
@@ -2239,18 +2219,6 @@ _try_again:
                 }
             }
 
-            #if active_persistence
-            for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
-
-            #if _DBG_RESBMULT
-            cout << "Cleared active persistence resnos." << endl;
-            #endif
-
-            #if active_persistence_noflex
-            allow_ligand_flex = true;
-            #endif
-            #endif
-
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
             #endif
@@ -2504,7 +2472,7 @@ _try_again:
 
                         if (out_bb_pairs)
                         {
-                            n = global_pairs[l]->ag->atoms.size();
+                            n = global_pairs[l]->ag->atct;
                             int j2;
                             for (j2=0; j2<n; j2++)
                                 cout << global_pairs[l]->ag->atoms[j2]->name << " ";
@@ -2553,7 +2521,7 @@ _try_again:
             int iters_div = iters*0.259;
 
             Molecule* cfmols[SPHREACH_MAX+4];
-            for (i=0; i<SPHREACH_MAX+4; i++) cfmols[i] = nullptr;
+            for (i=0; i<=SPHREACH_MAX; i++) cfmols[i] = nullptr;
             gcfmols = cfmols;
             i=0;
             ligand->movability = MOV_ALL;
@@ -2585,18 +2553,9 @@ _try_again:
             }
 
             int cfmolqty = i;
-            for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
+            for (; i<=SPHREACH_MAX; i++) cfmols[i] = NULL;
 
             ligand->reset_conformer_momenta();
-
-            // Molecule** delete_me;
-            int trsz = tripswitch_clashables.size();
-            Molecule* trip[j = trsz+4];
-
-            for (; j; j--) trip[j-1] = nullptr;
-
-            for (j=0; j<trsz; j++)
-                trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);
             
             if (rcn)
             {
@@ -2685,18 +2644,6 @@ _try_again:
                 tmp_pdb_ligand[pose].copy_state(ligand);
             }
 
-            #if active_persistence
-            for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
-
-            #if _DBG_RESBMULT
-            cout << "Cleared active persistence resnos." << endl;
-            #endif
-            #endif
-            
-            #if active_persistence_noflex
-            allow_ligand_flex = true;
-            #endif
-
             // Add the current pose/path sequentially to the dr[][] array.
             // If the path node # is zero:
             // If it is the first (zeroth) entry, set the pose number to 1.
@@ -2758,7 +2705,7 @@ _try_again:
                 dr[drcount][nodeno].miscdata += (std::string)"Best-Binding Pairs:\n";
                 for (i=0; i<3 && i<global_pairs.size(); i++)
                 {
-                    n = global_pairs[i]->ag->atoms.size();
+                    n = global_pairs[i]->ag->atct;
                     int j2;
                     for (j2=0; j2<n; j2++)
                         dr[drcount][nodeno].miscdata += (std::string)global_pairs[i]->ag->atoms[j2]->name + (std::string)" ";

@@ -115,7 +115,7 @@ int main(int argc, char** argv)
     cout << "Loneliest point = " << loneliest << endl;
 
     Search::prepare_constrained_search(&p, &m, loneliest);
-    int n = cs_res.size();
+    int n = cs_res_qty;
     for (i=0; i<n; i++)
     {
         cout << "Candidate: " << cs_res[i]->get_name() << " ~ " << cs_bt[i] << " ~ " << *cs_lag[i] << endl;

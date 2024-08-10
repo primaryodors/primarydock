@@ -2025,8 +2025,19 @@ int main(int argc, char** argv)
     int wrote_acvmx = -1, wrote_acvmr = -1;
     float l_atom_clash_limit = clash_limit_per_atom - kJmol_cutoff;
 
+    std::vector<std::shared_ptr<AtomGroup>> lagc;
+    if (pdpst == pst_constrained)
+    {
+        ligand = &pose_ligands[1];
+        lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+        agqty = lagc.size();
+        for (i=0; i<agqty; i++)
+            agc[i] = lagc.at(i).get();
+        // for (i=0; i<agqty; i++) agc[i]->update_atom_pointers(ligand);
+        Search::prepare_constrained_search(protein, ligand, pocketcen);
+    }
+
 _try_again:
-    // srand(0xb00d1cca);
     srand(time(NULL));
     Point nodecens[pathnodes+1];
 
@@ -2044,6 +2055,11 @@ _try_again:
     {
         ligand = &pose_ligands[pose];
         ligand->movability = MOV_ALL;
+
+        if (agqty)
+        {
+            for (i=0; i<agqty; i++) agc[i]->update_atom_pointers(ligand);
+        }
 
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
@@ -2116,14 +2132,6 @@ _try_again:
             #if debug_stop_after_tumble_sphere
             return 0;
             #endif
-        }
-        else if (pdpst == pst_constrained)
-        {
-            std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
-            agqty = lagc.size();
-            for (i=0; i<agqty; i++)
-                agc[i] = lagc.at(i).get();
-            Search::prepare_constrained_search(protein, ligand, pocketcen);
         }
 
         #if _DBG_STEPBYSTEP
@@ -2508,6 +2516,10 @@ _try_again:
                 else if (pdpst == pst_constrained)
                 {
                     Search::do_constrained_search(protein, ligand);
+
+                    #if _dbg_groupsel
+                    cout << "Binding constraint:\n" << cs_res[cs_idx]->get_name() << " ~ " << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl << endl << flush;
+                    #endif
                 }
 
                 // else ligand->recenter(ligcen_target);
@@ -2735,6 +2747,15 @@ _try_again:
                     dr[drcount][nodeno].miscdata += (std::string)"\n";
                 }
                 dr[drcount][nodeno].miscdata += (std::string)"\n";
+            }
+
+            if (pdpst == pst_constrained)
+            {
+                dr[drcount][nodeno].miscdata += (std::string)"Binding constraint:\n";
+                dr[drcount][nodeno].miscdata += (std::string)cs_res[cs_idx]->get_name() + (std::string)" ~ ";
+                std:stringstream stst;
+                stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl << endl;
+                dr[drcount][nodeno].miscdata += stst.str();
             }
 
             if (dyn_motions.size())

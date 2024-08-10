@@ -1572,4 +1572,19 @@ void AtomGroup::remove_duplicates()
             }
         }
     }
+    i=0;
+}
+
+void AtomGroup::update_atom_pointers(Molecule* nl)
+{
+    int i;
+    for (i=0; i<atct; i++)
+    {
+        if (!atoms[i]) throw 0xbadda7a;
+        if (!atoms[i]->name) throw 0xbadda7a;
+        if (!atoms[i]->name[0]) throw 0xbadda7a;
+        Atom* a = nl->get_atom(atoms[i]->name);
+        if (!a) throw 0xbadda7a;
+        atoms[i] = a;
+    }
 }

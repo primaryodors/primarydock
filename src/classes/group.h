@@ -27,6 +27,7 @@ class AtomGroup
     float bounds();
     bool is_bonded_to(Atom* a);
     Molecule* get_ligand() { return ligand; }
+    void update_atom_pointers(Molecule* new_ligand);
     int intersecting(AtomGroup* compare_with);
     void merge(AtomGroup* merge_with);
     float average_similarity(AtomGroup* compare_with);

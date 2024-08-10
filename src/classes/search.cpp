@@ -516,6 +516,8 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     mov = resna.subtract(agcen);
     mov.r -= 2;              // One size fits all for now. It's the iterations' job to correct this distance.
     ligand->move(mov);
+
+    return;
     
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
     agcen = cs_lag[j]->get_center();

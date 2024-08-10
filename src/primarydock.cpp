@@ -756,9 +756,9 @@ void update_progressbar(float percentage)
         {
             float h = M_PI*2 * cmpi / 100 + hueoffset;
             int r, g, b;
-            r =  96 +  15 * sin(h-0.333);
-            g = 128 +  15 * sin(h+0.333);
-            b = 224 +  15 * sin(h);
+            r =  96 +  24 * sin(h-0.333);
+            g = 128 +  26 * sin(h+0.333);
+            b = 224 +  31 * sin(h);
             colorrgb(r, g, b);
             cout << "\u2593";
             colorless();
@@ -2514,10 +2514,27 @@ _try_again:
                 }
                 else if (pdpst == pst_constrained)
                 {
-                    Search::do_constrained_search(protein, ligand);
+                    int csiter, ultimate_csidx=0;
+                    float best_energy;
+                    Pose best_cslig;
+                    best_cslig.copy_state(ligand);
+                    for (csiter=0; csiter<5; csiter++)
+                    {
+                        Search::do_constrained_search(protein, ligand);
+                        float cse = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+                        if (!csiter || cse > best_energy)
+                        {
+                            best_energy = cse;
+                            best_cslig.copy_state(ligand);
+                            ultimate_csidx = cs_idx;
+                        }
+                    }
+                    best_cslig.restore_state(ligand);
 
                     #if _dbg_groupsel
-                    cout << "Binding constraint:\n" << cs_res[cs_idx]->get_name() << " ~ " << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl << endl << flush;
+                    cout << "Binding constraint:\n" << cs_res[ultimate_csidx]->get_name()
+                        << " ~ " << cs_bt[ultimate_csidx]
+                        << " ~ " << *cs_lag[ultimate_csidx] << endl << endl << flush;
                     #endif
                 }
 

@@ -336,12 +336,6 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
 
 void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_cen, AminoAcid** reaches_spheroid)
 {
-    #if _dbg_groupsel
-    cout << "Candidate binding residues: ";
-    for (i=0; i<sphres; i++) cout << *reaches_spheroid[i] << " ";
-    cout << endl;
-    #endif
-
     std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
     std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid, l_pocket_cen);
     global_pairs = GroupPair::pair_groups(agc, scg, l_pocket_cen);
@@ -466,7 +460,7 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                         ag = agc[l].get();
                     }
                 }
-                if (!ag) cout << "BAD CSAG BINDING: " << baa[i]->get_name() << " " << allowed_types[j] << endl;
+                if (!ag) cout << "BAD CSAG BINDING: " << baa[i]->get_name() << " n=" << n << " " << allowed_types[j] << endl << flush;
                 if (!ag) continue;
 
                 cs_res[cs_res_qty] = baa[i];

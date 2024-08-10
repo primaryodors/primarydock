@@ -740,22 +740,35 @@ void iteration_callback(int iter, Molecule** mols)
             fclose(fp);
         }
     }
+}
 
-    if (progressbar)
+int spinchr = 0;
+float hueoffset = 0;
+void update_progressbar(float percentage)
+{
+    percentage = percentage/poses + (float)(pose-1)*100.0/poses;
+    cout << "\033[A|";
+    int i;
+    for (i=0; i<80; i++)
     {
-        int ni = (pathnodes+1) * iters, pni = poses * ni;
-        float percentage = (float)((pose-1) * ni + nodeno * iters + iter) / pni * 100;
-
-        cout << "\033[A|";
-        for (i=0; i<80; i++)
+        float cmpi = 1.25*i;
+        if (cmpi <= percentage)
         {
-            float cmpi = 1.25*i;
-            if (cmpi <= percentage) cout << "\u2593";
-            else cout << "\u2591";
+            float h = M_PI*2 * cmpi / 100 + hueoffset;
+            int r, g, b;
+            r = 176 +  32 * sin(h-0.666);
+            g = 192 +  32 * sin(h+0.666);
+            b = 240 +  15 * sin(h);
+            colorrgb(r, g, b);
+            cout << "\u2593";
+            colorless();
         }
-        i = iter % 4;
-        cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
+        else cout << "\u2591";
     }
+    cout << ("|/-\\")[spinchr] << " " << (int)percentage << "%.               " << endl;
+    spinchr++;
+    if (spinchr >= 4) spinchr = 0;
+    hueoffset += 0.03;
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
@@ -2611,7 +2624,7 @@ _try_again:
                 reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
             }
             ligand->agroups = global_pairs;
-            Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform);
+            Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
 
             if (!nodeno) // && outpdb.length())
             {

@@ -3252,7 +3252,9 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     return result;
 }
 
-void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**), void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>))
+void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**),
+    void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>),
+    void (*progress)(float))
 {
     int m, n;
 
@@ -3369,7 +3371,9 @@ float Molecule::total_intermol_binding(Molecule** l)
     return f;
 }
 
-void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**), void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>))
+void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**),
+    void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>),
+    void (*progress)(float))
 {
     if (!mm) return;
     int i, j, l, n, iter;
@@ -3783,6 +3787,13 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
 
             if (!a->is_residue() && flipped_rings) a->evolve_structure(100);
+
+            if (!(i%8) && progress)
+            {
+                float f = (float)i / n;
+                float fiter = (f + iter) / iters * 100;
+                progress(fiter);
+            }
         }       // for i
 
         #if allow_iter_cb

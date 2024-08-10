@@ -494,7 +494,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
                 case vdW: default: b = 4;
             }
 
-            float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach());
+            float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach()/2);
             float w = pow(b/500, cs_bondweight_exponent) / pow(r, 3) * 10;
             if (cs_res[j]->priority) w *= 5;
             if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 2.5;
@@ -530,8 +530,6 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     mm[1] = ligand;
     mm[2] = nullptr;
     Molecule::conform_molecules(mm, 200);
-
-    return;
     
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.

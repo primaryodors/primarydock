@@ -756,8 +756,8 @@ void update_progressbar(float percentage)
         {
             float h = M_PI*2 * cmpi / 100 + hueoffset;
             int r, g, b;
-            r = 128 +  64 * sin(h-0.333);
-            g = 144 +  64 * sin(h+0.333);
+            r =  96 +  15 * sin(h-0.333);
+            g = 128 +  15 * sin(h+0.333);
             b = 224 +  15 * sin(h);
             colorrgb(r, g, b);
             cout << "\u2593";
@@ -2959,6 +2959,9 @@ _try_again:
             {
                 if (dr[j][0].kJmol >= kJmol_cutoff)
                 {
+                    if (dr[j][0].proximity > size.magnitude()) continue;
+                    if (dr[j][0].worst_nrg_aa > clash_limit_per_aa) continue;
+
                     for (k=0; k<=pathnodes; k++)
                     {
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.

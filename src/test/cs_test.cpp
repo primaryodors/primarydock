@@ -114,7 +114,10 @@ int main(int argc, char** argv)
     loneliest = p.find_loneliest_point(pocketcen, size);
     cout << "Loneliest point = " << loneliest << endl;
 
-    agc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords.size() > 0);
+    std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords.size() > 0);
+    agqty = lagc.size();
+    for (i=0; i<agqty; i++)
+        agc[i] = lagc.at(i).get();
     Search::prepare_constrained_search(&p, &m, loneliest);
     int n = cs_res_qty;
     for (i=0; i<n; i++)

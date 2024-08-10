@@ -7,7 +7,8 @@ std::vector<int> exclusion;
 AtomGroup ligand_groups[3];
 ResidueGroup sc_groups[3];
 
-std::vector<std::shared_ptr<AtomGroup>> agc;
+AtomGroup* agc[MAX_CS_RES];
+int agqty = 0;
 AminoAcid* cs_res[MAX_CS_RES];
 intera_type cs_bt[MAX_CS_RES];
 AtomGroup* cs_lag[MAX_CS_RES];
@@ -336,9 +337,9 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
 
 void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_cen, AminoAcid** reaches_spheroid)
 {
-    std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+    std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
     std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid, l_pocket_cen);
-    global_pairs = GroupPair::pair_groups(agc, scg, l_pocket_cen);
+    global_pairs = GroupPair::pair_groups(lagc, scg, l_pocket_cen);
 
     if (global_pairs.size() > 2)
     {
@@ -384,7 +385,7 @@ void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_
 
         global_pairs[0]->disqualify();
         std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid, l_pocket_cen);
-        global_pairs = GroupPair::pair_groups(agc, scg, l_pocket_cen);
+        global_pairs = GroupPair::pair_groups(lagc, scg, l_pocket_cen);
         GroupPair::align_groups(ligand, global_pairs, false, 1);
     }
     #endif
@@ -450,14 +451,14 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                 // If so, record the residue, the binding type, and the ligand atom group with the strongest potential.
                 AtomGroup* ag = nullptr;
                 float agbb = 0;
-                n = agc.size();
+                n = agqty;
                 for (l=0; l<n; l++)
                 {
                     float mpb = agc[l]->max_potential_binding(allowed_types[j]);
                     if (mpb > agbb)
                     {
                         agbb = mpb;
-                        ag = agc[l].get();
+                        ag = agc[l];
                     }
                 }
                 if (!ag) cout << "BAD CSAG BINDING: " << baa[i]->get_name() << " n=" << n << " " << allowed_types[j] << endl << flush;

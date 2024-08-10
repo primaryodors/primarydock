@@ -2119,7 +2119,10 @@ _try_again:
         }
         else if (pdpst == pst_constrained)
         {
-            agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+            std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+            agqty = lagc.size();
+            for (i=0; i<agqty; i++)
+                agc[i] = lagc.at(i).get();
             Search::prepare_constrained_search(protein, ligand, pocketcen);
         }
 

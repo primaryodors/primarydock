@@ -14,6 +14,7 @@ Point AtomGroup::get_center()
     if (!atct) return Point(0,0,0);
     for (i=0; i<atct; i++)
     {
+        if (!atoms[i]) continue;
         Point pt = atoms[i]->get_location();
         float m = pt.weight;
         pt.multiply(m);
@@ -204,6 +205,11 @@ float AtomGroup::distance_to(Point pt)
     float result = 0;
     for (i=0; i<atct; i++)
     {
+        if (!atoms[i])
+        {
+            atct = i;
+            break;
+        }
         float f = atoms[i]->get_location().get_3d_distance(pt);
         if (!i || !f || f < result) result = f;
     }

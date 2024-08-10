@@ -496,7 +496,8 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
             float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach());
             float w = pow(b/500, cs_bondweight_exponent) / pow(r, 3) * 10;
-            if (cs_res[j]->priority) w *= 3.7;
+            if (cs_res[j]->priority) w *= 5;
+            if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 2.5;
 
             if (frand(0,1) < w) goto chose_residue;
         }
@@ -513,9 +514,11 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     Point resna = cs_res[j]->get_nearest_atom(loneliest)->get_location();
     Point agcen = cs_lag[j]->get_center();
     mov = resna.subtract(agcen);
-    mov.r = cs_lag[j]->distance_to(resna) - 2;              // One size fits all for now. It's the iterations' job to correct this distance.
+    mov.r -= 2;              // One size fits all for now. It's the iterations' job to correct this distance.
+    ligand->move(mov);
     
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
+    agcen = cs_lag[j]->get_center();
     Rotation rot = align_points_3d(ligand->get_barycenter(), loneliest, agcen);
     LocatedVector lv = rot.v;
     lv.origin = agcen;
@@ -526,7 +529,9 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     mm[0] = cs_res[j];
     mm[1] = ligand;
     mm[2] = nullptr;
-    Molecule::conform_molecules(mm, 30);
+    Molecule::conform_molecules(mm, 200);
+
+    return;
     
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.

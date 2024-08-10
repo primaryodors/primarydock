@@ -15,8 +15,6 @@ require_once("methods_common.php");
 chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir(__DIR__);
-require_once("template.php");
-chdir(__DIR__);
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1).

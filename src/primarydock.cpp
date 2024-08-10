@@ -756,9 +756,9 @@ void update_progressbar(float percentage)
         {
             float h = M_PI*2 * cmpi / 100 + hueoffset;
             int r, g, b;
-            r = 176 +  32 * sin(h-0.666);
-            g = 192 +  32 * sin(h+0.666);
-            b = 240 +  15 * sin(h);
+            r = 128 +  64 * sin(h-0.333);
+            g = 144 +  64 * sin(h+0.333);
+            b = 224 +  15 * sin(h);
             colorrgb(r, g, b);
             cout << "\u2593";
             colorless();
@@ -2033,7 +2033,6 @@ int main(int argc, char** argv)
         agqty = lagc.size();
         for (i=0; i<agqty; i++)
             agc[i] = lagc.at(i).get();
-        // for (i=0; i<agqty; i++) agc[i]->update_atom_pointers(ligand);
         Search::prepare_constrained_search(protein, ligand, pocketcen);
     }
 

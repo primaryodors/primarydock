@@ -18909,12 +18909,20 @@
                 "TAAR6":
                 {
                     "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "adjusted_curve_top": "1"
                 },
                 "TAAR8":
                 {
                     "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "adjusted_curve_top": "1"
+                }
+            },
+            "https:\/\/doi.org\/10.3390\/cimb46080510":
+            {
+                "TAAR8":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "8.5"
                 }
             }
         },
@@ -30306,8 +30314,16 @@
                 "TAAR6":
                 {
                     "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "adjusted_curve_top": "1"
                 },
+                "TAAR8":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "1"
+                }
+            },
+            "https:\/\/doi.org\/10.3390\/cimb46080510":
+            {
                 "TAAR8":
                 {
                     "type": "vsa",

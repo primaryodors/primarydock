@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 
     std::vector<std::shared_ptr<AtomGroup>> ligand_groups = AtomGroup::get_potential_ligand_groups(&m, true);
 
-    AminoAcid* reach_residues[SPHREACH_MAX];
+    AminoAcid* reach_residues[SPHREACH_MAX+4];
     Point target, center;
     std::vector<Point> pocket;
 

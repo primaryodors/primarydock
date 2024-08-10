@@ -428,7 +428,7 @@ void do_pivotal_hbond_rot_and_scoot()
     lv = v;
     lv.origin = pivotal_hbond_aaa->get_location();
     float theta = 0, th, step = M_PI/50, clash;
-    AminoAcid* reaches[256];
+    AminoAcid* reaches[SPHREACH_MAX+4];
     protein->get_residues_can_clash_ligand(reaches, ligand, ligand->get_barycenter(), Point(5,5,5), nullptr);
     for (th=0; th<circle; th += step)
     {
@@ -2026,7 +2026,7 @@ int main(int argc, char** argv)
     }
 
     reaches_spheroid = new AminoAcid**[pathnodes+2];
-    for (i=0; i<=pathnodes; i++) reaches_spheroid[i] = new AminoAcid*[SPHREACH_MAX];
+    for (i=0; i<=pathnodes; i++) reaches_spheroid[i] = new AminoAcid*[SPHREACH_MAX+4];
 
     found_poses = 0;
     int wrote_acvmx = -1, wrote_acvmr = -1;
@@ -2126,6 +2126,7 @@ _try_again:
         }
         else if (pdpst == pst_constrained)
         {
+            agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
             Search::prepare_constrained_search(protein, ligand, pocketcen);
         }
 

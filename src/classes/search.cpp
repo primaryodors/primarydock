@@ -8,10 +8,11 @@ AtomGroup ligand_groups[3];
 ResidueGroup sc_groups[3];
 
 std::vector<std::shared_ptr<AtomGroup>> agc;
-std::vector<AminoAcid*> cs_res;
-std::vector<intera_type> cs_bt;
-std::vector<AtomGroup*> cs_lag;
-int cs_idx = -1;
+AminoAcid* cs_res[MAX_CS_RES];
+intera_type cs_bt[MAX_CS_RES];
+AtomGroup* cs_lag[MAX_CS_RES];
+int cs_res_qty = 0;
+int cs_idx = 0;
 
 void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocket_cen)
 {
@@ -402,9 +403,9 @@ void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_
 void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Point l_pocket_cen)
 {
     // Enumerate all binding pocket residues into an array.
-    AminoAcid* baa[256];
-    int nba = protein->get_residues_can_clash_ligand(baa, ligand, l_pocket_cen, size, nullptr);
-    agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+    int nba;
+    AminoAcid* baa[SPHREACH_MAX+8];
+    nba = protein->get_residues_can_clash_ligand(baa, ligand, l_pocket_cen, size, nullptr);
 
     const int num_allowed_type = 5;
     const intera_type allowed_types[num_allowed_type] = {mcoord, ionic, hbond, pi, vdW};
@@ -472,9 +473,11 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                 if (!ag) cout << "BAD CSAG BINDING: " << baa[i]->get_name() << " " << allowed_types[j] << endl;
                 if (!ag) continue;
 
-                cs_res.push_back(baa[i]);
-                cs_bt.push_back(allowed_types[j]);
-                cs_lag.push_back(ag);
+                cs_res[cs_res_qty] = baa[i];
+                cs_bt[cs_res_qty] = allowed_types[j];
+                cs_lag[cs_res_qty] = ag;
+                cs_res_qty++;
+                if (cs_res_qty > MAX_CS_RES-1) return;
             }
         }
     }
@@ -482,10 +485,10 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
 
 void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 {
-    int i, j, l, n;
+    int i, j=0, l, n;
 
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
-    n = cs_res.size();
+    n = cs_res_qty;
     while (true)
     {
         for (j=0; j<n; j++)
@@ -508,7 +511,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         }
     }
     chose_residue:
-    if (j<n) cs_idx = j;
+    cs_idx = j;
 
     // Place the ligand so that the atom group is centered in the binding pocket.
     Point agp = cs_lag[j]->get_center();
@@ -533,8 +536,6 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     mm[1] = ligand;
     mm[2] = nullptr;
     Molecule::conform_molecules(mm, 30);
-
-    // return;
     
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.
@@ -546,7 +547,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     float theta = 0;
     for (; theta < M_PI*2; theta += cs_360_step)
     {
-        AminoAcid* cc[256];
+        AminoAcid* cc[SPHREACH_MAX+4];
         protein->get_residues_can_clash_ligand(cc, ligand, ligand->get_barycenter(), size, nullptr);
         float f = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(cc));
         if (!theta || f < least_clash)

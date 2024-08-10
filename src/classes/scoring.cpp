@@ -17,7 +17,7 @@ DockResult::DockResult()
 
 DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl_resno, int drcount)
 {
-    int end1 = max(protein->get_end_resno()+1, 128);
+    int end1 = SPHREACH_MAX+4;
     AminoAcid* reaches_spheroid[end1];
     int sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, ligand->get_barycenter(), size, addl_resno);
     // cout << "sphres " << sphres << endl;

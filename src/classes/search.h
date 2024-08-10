@@ -21,9 +21,11 @@ extern AtomGroup ligand_groups[3];
 extern ResidueGroup sc_groups[3];
 
 extern std::vector<std::shared_ptr<AtomGroup>> agc;
-extern std::vector<AminoAcid*> cs_res;
-extern std::vector<intera_type> cs_bt;
-extern std::vector<AtomGroup*> cs_lag;
+#define MAX_CS_RES 1024
+extern AminoAcid* cs_res[MAX_CS_RES];
+extern intera_type cs_bt[MAX_CS_RES];
+extern AtomGroup* cs_lag[MAX_CS_RES];
+extern int cs_res_qty;
 extern int cs_idx;
 
 #endif

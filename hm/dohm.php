@@ -149,6 +149,9 @@ foreach (explode("\n", $c) as $ln)
 
 if (!$pyoutfn) die("FAIL.\n");
 
+$adjustments = "";
+if ($fam == "OR51" || $fam == "OR52" || $fam == "OR56") $adjustments .= "ATOMTO %6.59 EXTENT @4.60\n";
+
 $pepd = <<<blixtos
 
 LET \$rcpid = "$rcpid"
@@ -176,7 +179,9 @@ DELETE 1 %1.20
 HYDRO
 UPRIGHT A
 BWCENTER
+$adjustments
 MINC
+$adjustments
 
 # LET \$mdlf = "pdbs/" + \$rcpid
 # LET \$mdlf += ".models.pdb"

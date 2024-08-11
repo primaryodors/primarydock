@@ -408,14 +408,12 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
     for (i=0; i<nba; i++)
     {
         bool res_has_nonvdw = false;
-        bool res_has_ionic = false;
 
         // For each of the binding types: mcoord, ionic, hbond, pi, vdW:
         for (j=0; j<num_allowed_type; j++)
         {
             // If other binding types have already been found for this residue, skip vdW.
             if (allowed_types[j] == vdW && res_has_nonvdw) continue;
-            else if (res_has_ionic) continue;
         
             // Can the residue's side chain form this type of bond with the ligand?
             bool can_bind = false;
@@ -430,11 +428,10 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                 case ionic:
                 rc = baa[i]->get_charge();
                 lc = ligand->get_charge();
-                if (rc && lc && sgn(rc) == -sgn(lc)) can_bind = res_has_nonvdw = res_has_ionic = true;
+                if (rc && lc && sgn(rc) == -sgn(lc)) can_bind = res_has_nonvdw = true;
                 break;
 
                 case hbond:
-                if (res_has_ionic) continue;
                 if (baa[i]->has_hbond_donors() && ligand->has_hbond_acceptors()) can_bind = res_has_nonvdw = true;
                 else if (baa[i]->has_hbond_acceptors() && ligand->has_hbond_donors()) can_bind = res_has_nonvdw = true;
                 break;
@@ -485,27 +482,29 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     n = cs_res_qty;
     while (true)
     {
-        for (j=0; j<n; j++)
+        j = rand() % n;
+
+        #if _dbg_groupsel
+        cout << cs_res[j]->get_name() << (cs_res[j]->priority ? "!" : "") << " ";
+        #endif
+
+        // If any residue is priority, then only a priority residue can be chosen.
+        if (any_resnos_priority && !cs_res[j]->priority) continue;
+
+        float b;
+        switch (cs_bt[j])
         {
-            float b;
-            switch (cs_bt[j])
-            {
-                case mcoord: b = 200; break;
-                case ionic: b = 60; break;
-                case hbond: b = 25; break;
-                case pi: b = 12; break;
-                case vdW: default: b = 4;
-            }
-
-            float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach()/2);
-            float w = pow(b/500, cs_bondweight_exponent) / pow(r, 3) * 10;
-
-            // If any residue is priority, then only a priority residue can be chosen.
-            if (any_resnos_priority && !cs_res[j]->priority) w = -Avogadro;
-            if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 2.5;
-
-            if (frand(0,1) < w) goto chose_residue;
+            case mcoord: b = 200; break;
+            case ionic: b = 60; break;
+            case hbond: b = 25; break;
+            case pi: b = 12; break;
+            case vdW: default: b = 4;
         }
+
+        float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach()/2);
+        float w = pow(b/500, cs_bondweight_exponent) / pow(r, 3) * 100000;
+        if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 2.5;
+        if (frand(0,1) < w) goto chose_residue;
     }
     chose_residue:
     cs_idx = j;

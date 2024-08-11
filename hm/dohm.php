@@ -123,6 +123,7 @@ $fp = fopen("hm.py", "w");
 fwrite($fp, $py);
 fclose($fp);
 
+@unlink("hm.out");
 passthru("python3 hm.py | tee hm.out");
 $c = file_get_contents("hm.out");
 $best_energy = 1e9;

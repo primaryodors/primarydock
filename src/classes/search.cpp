@@ -14,6 +14,7 @@ intera_type cs_bt[MAX_CS_RES];
 AtomGroup* cs_lag[MAX_CS_RES];
 int cs_res_qty = 0;
 int cs_idx = 0;
+bool Search::any_resnos_priority = false;
 
 void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocket_cen)
 {
@@ -397,6 +398,7 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
     int nba;
     AminoAcid* baa[SPHREACH_MAX+8];
     nba = protein->get_residues_can_clash_ligand(baa, ligand, l_pocket_cen, size, nullptr);
+    any_resnos_priority = false;
 
     const int num_allowed_type = 5;
     const intera_type allowed_types[num_allowed_type] = {mcoord, ionic, hbond, pi, vdW};
@@ -468,6 +470,7 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                 cs_bt[cs_res_qty] = allowed_types[j];
                 cs_lag[cs_res_qty] = ag;
                 cs_res_qty++;
+                if (baa[i]->priority) any_resnos_priority = true;
                 if (cs_res_qty > MAX_CS_RES-1) return;
             }
         }
@@ -496,8 +499,10 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
             float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach()/2);
             float w = pow(b/500, cs_bondweight_exponent) / pow(r, 3) * 10;
-            if (cs_res[j]->priority) w *= 10;
-            if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 10;
+
+            // If any residue is priority, then only a priority residue can be chosen.
+            if (any_resnos_priority && !cs_res[j]->priority) w = -Avogadro;
+            if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 2.5;
 
             if (frand(0,1) < w) goto chose_residue;
         }

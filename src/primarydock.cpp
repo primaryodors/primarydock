@@ -152,6 +152,7 @@ std::string optsecho = "";
 PoseSearchType pdpst = default_search_algorithm;
 std::string prealign_residues = "";
 Bond retain_bindings[4];
+std::vector<int> center_resnos;
 std::vector<int> priority_resnos;
 
 Atom* pivotal_hbond_aaa = nullptr;
@@ -796,26 +797,39 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
         i++;
         for (; words[i]; i++)
         {
+            bool priority = false;
+            int n = strlen(words[i]);
+            if (words[i][n-1] == '!')
+            {
+                priority = true;
+                words[i][n-1] = 0;
+            }
+
             int j = interpret_resno(words[i]);
             if (!j) break;
-            priority_resnos.push_back(j);
+
+            center_resnos.push_back(j);
             AminoAcid* aa = protein->get_residue(j);
-            if (aa) aa->priority = true;
+            if (priority)
+            {
+                priority_resnos.push_back(j);
+                if (aa) aa->priority = true;
+            }
         }
 
-        int sz = priority_resnos.size(), div=0;
+        int sz = center_resnos.size(), div=0;
         Point foravg[sz + 2];
         for (i=0; i<sz; i++)
         {
             #if pocketcen_from_reach_atoms
-            AminoAcid* aa = protein->get_residue(priority_resnos[i]);
+            AminoAcid* aa = protein->get_residue(center_resnos[i]);
             if (aa)
             {
                 foravg[i] = aa->get_reach_atom_location();
                 div++;
             }
             #else
-            foravg[div++] = protein->get_atom_location(priority_resnos[i], "CA");
+            foravg[div++] = protein->get_atom_location(center_resnos[i], "CA");
             #endif
         }
 

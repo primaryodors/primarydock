@@ -12,6 +12,9 @@ class Search
     static void do_constrained_search(Protein* protein, Molecule* ligand);
     static void do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_cen, AminoAcid** reaches_spheroid);
     static void do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocket_cen);
+
+    protected:
+    static bool any_resnos_priority;
 };
 
 extern Point size, loneliest;

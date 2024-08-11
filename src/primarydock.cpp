@@ -453,6 +453,21 @@ void iteration_callback(int iter, Molecule** mols)
     int l;
     float f = 0;
 
+    if (pdpst == pst_constrained)
+    {
+        Point resca = cs_res[cs_idx]->get_CA_location();
+        Point agcen = cs_lag[cs_idx]->get_center();
+        Point barcn = ligand->get_barycenter();
+        Rotation csrot = align_points_3d(agcen, resca, barcn);
+        csrot.a *= cs_ligand_rotation;
+        Pose cswas(ligand);
+        cswas.copy_state(ligand);
+        float e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+        ligand->rotate(&csrot.v, csrot.a, true);
+        float e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+        if (e2 < e1) cswas.restore_state(ligand);
+    }
+
     // Initialization for best-iteration saving for pose output.
     if (iter == 1)
     {
@@ -512,7 +527,7 @@ void iteration_callback(int iter, Molecule** mols)
     float progress = (float)iter / iters;
 
     n = softrgns.size();
-    if (n) for (i=0; i<n; i++)
+    if (n && iter>8) for (i=0; i<n; i++)
     {
         for (j=softrgns[i].start; j<=softrgns[i].end; j++)
         {
@@ -747,6 +762,7 @@ float hueoffset = 0;
 void update_progressbar(float percentage)
 {
     percentage = percentage/poses + (float)(pose-1)*100.0/poses;
+    if (percentage > 100) percentage = 100;
     cout << "\033[A|";
     int i;
     for (i=0; i<80; i++)
@@ -2531,6 +2547,7 @@ _try_again:
                         if (cs_bt[cs_idx] == ionic) break;
                     }
                     best_cslig.restore_state(ligand);
+                    cs_idx = ultimate_csidx;
 
                     #if _dbg_groupsel
                     cout << "Binding constraint:\n" << cs_res[ultimate_csidx]->get_name()

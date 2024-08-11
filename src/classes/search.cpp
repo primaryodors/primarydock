@@ -511,17 +511,25 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     SCoord mov = loneliest.subtract(agp);
     ligand->move(mov);
 
+    // Rotate the ligand so the atom group faces the chosen residue.
+    Point resca = cs_res[j]->get_CA_location();
+    Point agcen = cs_lag[j]->get_center();
+    Rotation rot = align_points_3d(agcen, resca, ligand->get_barycenter());
+    LocatedVector lv = rot.v;
+    lv.origin = ligand->get_barycenter();
+    ligand->rotate(lv, rot.a);
+
     // Move the ligand so that the atom group is at the optimal distance to the residue.
     Point resna = cs_res[j]->get_nearest_atom(loneliest)->get_location();
-    Point agcen = cs_lag[j]->get_center();
+    agcen = cs_lag[j]->get_center();
     mov = resna.subtract(agcen);
     mov.r -= 1;
     if (mov.r > 0) ligand->move(mov);
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
     agcen = cs_lag[j]->get_center();
-    Rotation rot = align_points_3d(ligand->get_barycenter(), loneliest, agcen);
-    LocatedVector lv = rot.v;
+    rot = align_points_3d(ligand->get_barycenter(), loneliest, agcen);
+    lv = rot.v;
     lv.origin = agcen;
     ligand->rotate(lv, rot.a);
 

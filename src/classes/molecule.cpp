@@ -204,7 +204,20 @@ void Pose::restore_state(Molecule* m)
     }
 }
 
+float Pose::total_atom_motions()
+{
+    if (!saved_from || !saved_from->atoms || !sz) return 0;
+    int i;
+    float result = 0;
 
+    for (i=0; i<sz && saved_from->atoms[i]; i++)
+    {
+        float r = saved_from->atoms[i]->get_location().get_3d_distance(saved_atom_locs[i]);
+        result += r;
+    }
+
+    return result;
+}
 
 void Molecule::delete_atom(Atom* a)
 {
@@ -2932,9 +2945,13 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         {
                             Point mc = missed_connection;
                             // cout << mc << endl;
-                            lmx += lmpull * mc.x * mc_bpotential / missed_connection.r / missed_connection.r;
-                            lmy += lmpull * mc.y * mc_bpotential / missed_connection.r / missed_connection.r;
-                            lmz += lmpull * mc.z * mc_bpotential / missed_connection.r / missed_connection.r;
+                            if (ligands[l]->priority) mc_bpotential *= 3.333;
+                            float lc = ligands[l]->atoms[j]->get_charge();
+                            if (lc && sgn(lc) == -sgn(atoms[i]->get_charge())) mc_bpotential *= 3.333;
+                            float mcrr = missed_connection.r * missed_connection.r;
+                            lmx += lmpull * mc.x * mc_bpotential / mcrr;
+                            lmy += lmpull * mc.y * mc_bpotential / mcrr;
+                            lmz += lmpull * mc.z * mc_bpotential / mcrr;
                         }
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
@@ -3406,6 +3423,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             Molecule* a = mm[i];
             bool flipped_rings = false;
 
+            if (!a->iterbegan) a->iterbegan = new Pose(a);
+            a->iterbegan->copy_state(a);
+            if (!iter) a->iters_without_change = 0;
+
             #if _dbg_asunder_atoms
             if (!a->check_Greek_continuity()) throw 0xbadc0de;
             #endif
@@ -3801,6 +3822,15 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             if (!a->is_residue() && flipped_rings) a->evolve_structure(100);
 
+            if (!i && !a->is_residue())
+            {
+                float ttl_atom_mtn = a->iterbegan->total_atom_motions() / a->get_heavy_atom_count();
+                if (ttl_atom_mtn < iter_lostreturns_threshold) a->iters_without_change++;
+                else a->iters_without_change = 0;
+                if (a->iters_without_change >= max_iters_without_ligand_change) iter = iters;
+                // cout << "                  " << ttl_atom_mtn << " " << a->iters_without_change << "                   ";
+            }
+
             if (!(i%8) && progress)
             {
                 float f = (float)i / n;
@@ -3825,6 +3855,20 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
     #endif
 
     minimum_searching_aniso = 0;
+}
+
+int Molecule::get_heavy_atom_count() const
+{
+    if (!atoms) return 0;
+
+    int i, result=0;
+    for (i=0; i<atcount; i++)
+    {
+        if (!atoms[i]) break;
+        if (atoms[i]->get_Z() > 1) result++;
+    }
+
+    return result;
 }
 
 #define dbg_optimal_contact 0

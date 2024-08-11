@@ -61,6 +61,7 @@ public:
     ~Pose();
     void copy_state(Molecule* from_mol);
     void restore_state(Molecule* to_mol);
+    float total_atom_motions();
     void reset();
 
 protected:
@@ -105,6 +106,7 @@ public:
     {
         return atcount;
     }
+    int get_heavy_atom_count() const;
     int get_bond_count(bool unidirectional) const;
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
@@ -274,6 +276,8 @@ protected:
     Molecule** mandatory_connection = nullptr;
     float* last_mc_binding = nullptr;
     Atom** most_bindable = nullptr;
+    Pose* iterbegan = nullptr;
+    int iters_without_change = 0;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

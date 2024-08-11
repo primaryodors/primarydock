@@ -155,6 +155,9 @@
 #define cs_max_tries 10
 #define cs_bondweight_exponent 2.0
 #define cs_360_step M_PI / 6.7
+#define cs_ligand_rotation 0.333
+#define iter_lostreturns_threshold 0.1
+#define max_iters_without_ligand_change 5
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25

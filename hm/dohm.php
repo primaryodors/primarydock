@@ -132,6 +132,7 @@ $mode = false;
 foreach (explode("\n", $c) as $ln)
 {
     if (false !== strpos($ln, "Summary of successfully produced models:")) $mode = true;
+    if (false !== strpos($ln, "Summary of successfully produced loop models:")) $mode = true;
     if (!$mode) continue;
 
     $ln = preg_replace("/\\s+/", " ", $ln);

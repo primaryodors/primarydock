@@ -119,12 +119,12 @@ a.make()
 
 natrixs;
 
-$fp = fopen("hm.py", "w");
+$fp = fopen("$rcpid.hm.py", "w");
 fwrite($fp, $py);
 fclose($fp);
 
 @unlink("hm.out");
-passthru("python3 hm.py | tee hm.out");
+passthru("python3 $rcpid.hm.py | tee hm.out");
 $c = file_get_contents("hm.out");
 $best_energy = 1e9;
 $pyoutfn = false;
@@ -191,13 +191,13 @@ SAVE \$outf
 
 blixtos;
 
-$fp = fopen("hm.pepd", "w");
+$fp = fopen("$rcpid.hm.pepd", "w");
 fwrite($fp, $pepd);
 fclose($fp);
 
 chdir(__DIR__);
 chdir("..");
-passthru("./bin/pepteditor hm/hm.pepd");
+passthru("./bin/pepteditor hm/$rcpid.hm.pepd");
 
 chdir(__DIR__);
 foreach (glob("$rcpid.*") as $doomed) unlink($doomed);

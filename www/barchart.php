@@ -219,8 +219,8 @@ if (count($t) || count($e))
 
 if (count($p))
 {
-    $step = floor($maxp / 7);
-    for ($score = floor($maxp); $score > 1; $score -= $step)
+    $step = max(0.5, floor($maxp / 7));
+    for ($score = floor($maxp); $score > 0.1; $score -= $step)
     {   
         $dy = intval($base-1 - $pscale*$score);
 

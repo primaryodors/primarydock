@@ -472,7 +472,7 @@ void iteration_callback(int iter, Molecule** mols)
         cs_res[cs_idx]->mutual_closest_atoms(ligand, &ra, &la);
         SCoord r = ra->get_location().subtract(la->get_location());
         r.r -= 2.5;
-        r.r *= frand(0,1);
+        r.r *= frand(0.333,0.666);
         cswas.copy_state(ligand);
         e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->move(r);

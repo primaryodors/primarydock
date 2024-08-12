@@ -150,7 +150,8 @@ foreach (explode("\n", $c) as $ln)
 if (!$pyoutfn) die("FAIL.\n");
 
 $adjustments = "";
-if ($fam == "OR51" || $fam == "OR52" || $fam == "OR56") $adjustments .= "ATOMTO %6.59 EXTENT @4.60\n";
+if ($fam == "OR51" || $fam == "OR52") $adjustments .= "ATOMTO %6.59 EXTENT @4.57\n";
+else if ($rcpid == "OR56B2") $adjustments .= "ATOMTO %6.58 EXTENT @4.57\n";
 
 $pepd = <<<blixtos
 

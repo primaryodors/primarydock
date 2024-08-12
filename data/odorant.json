@@ -9264,7 +9264,12 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "chemical","phenolic","medicinal","sweet","musty","meaty"
+                "chemical",
+                "phenolic",
+                "medicinal",
+                "sweet",
+                "musty",
+                "meaty"
             ]
         },
         "activity":
@@ -9276,7 +9281,8 @@
                     "type": "na"
                 }
             }
-        }
+        },
+        "oid": "3d0e63c97def943bad9874b25671aefd"
     },
     "3d2edb2ff61fc2f6be9e53f0177dee35":
     {
@@ -13420,6 +13426,27 @@
             }
         },
         "oid": "5edab60160a0153687127fee995daae4"
+    },
+    "5ef83c038980f8a67c2d0c9d1885913e":
+    {
+        "full_name": "(Z)-3-hexen-1-yl (Z)-3-hexenoate",
+        "smiles": "CC\/C=C\\CCOC(=O)C\/C=C\\CC",
+        "name1": "Williams' ester",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "fruity",
+                "pear",
+                "melon",
+                "tropical",
+                "banana_peel",
+                "tomato_leaf",
+                "metallic",
+                "fennel"
+            ]
+        }
     },
     "5f14e9c196635f4b84919ded96c1b71a":
     {
@@ -31544,9 +31571,16 @@
         "smiles": "CCOC(=O)CCCC",
         "aroma":
         {
-            "http://www.thegoodscentscompany.com":
+            "http:\/\/www.thegoodscentscompany.com":
             [
-                "sweet", "fruity", "acidic", "pineapple", "apple", "green", "berry", "tropical"
+                "sweet",
+                "fruity",
+                "acidic",
+                "pineapple",
+                "apple",
+                "green",
+                "berry",
+                "tropical"
             ]
         },
         "activity":
@@ -32848,7 +32882,9 @@
             ],
             "http:\/\/www.leffingwell.com\/chirality\/mercaptomethylpentanol.htm":
             [
-                "brothy", "sweaty", "leek"
+                "brothy",
+                "sweaty",
+                "leek"
             ]
         },
         "activity":

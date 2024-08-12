@@ -432,8 +432,11 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                 break;
 
                 case hbond:
-                if (baa[i]->has_hbond_donors() && ligand->has_hbond_acceptors()) can_bind = res_has_nonvdw = true;
-                else if (baa[i]->has_hbond_acceptors() && ligand->has_hbond_donors()) can_bind = res_has_nonvdw = true;
+                if (fabs(baa[i]->hydrophilicity()) >= hydrophilicity_cutoff)
+                {
+                    if (baa[i]->has_hbond_donors() && ligand->has_hbond_acceptors()) can_bind = res_has_nonvdw = true;
+                    else if (baa[i]->has_hbond_acceptors() && ligand->has_hbond_donors()) can_bind = res_has_nonvdw = true;
+                }
                 break;
 
                 case pi:

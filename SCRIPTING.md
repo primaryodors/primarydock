@@ -122,9 +122,11 @@ the indicated residues.
 Example:
 ```
 ATOMTO %residue_number $atom_name @target
+ATOMTO %residue_number EXTENT @target
 ```
 
 Flexes the side chain of `%residue_number` to bring `$atom_name` as close to `@target` as physically possible.
+If the atom name is given as `EXTENT`, then the farthest side chain atom from the alpha carbon will be used.
 
 
 # BEND

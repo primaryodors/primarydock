@@ -285,7 +285,7 @@ function prepare_outputs()
     $odor = find_odorant($ligname);
 
     $size = "7.5 7.5 7.5";
-    $search = "BB";
+    $search = "CS";
     $atomto = [];
     $stcr = "";
     $flxr = "";
@@ -377,9 +377,9 @@ function prepare_outputs()
         }
     }
     
-    if ($mbp && isset($mbp["pocket"]))
+    if ($mbp && (isset($mbp["pocket"]) || (isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))))
     {
-        $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
+        if (isset($mbp["pocket"])) $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
     
         if ($mbp && isset($mbp["active_pocket"]))
         {
@@ -650,15 +650,15 @@ heredoc;
             switch (family_from_protid($protid))
             {
                 case "OR":
-                $softness = 5.0;
+                $softness = "5.0";
                 break;
 
                 case "TAAR":
-                $softness = 0;
+                $softness = "0.0";
                 break;
 
                 default:
-                $softness = 1.0;
+                $softness = "1.0";
             }
 
             foreach ($censz as $ln)
@@ -686,7 +686,7 @@ heredoc;
         else $iso = "";
 
         $excl = resno_from_bw($protid, "2.37");
-        $soft = $softness ? "SOFT $softness 2 3 4 45 5 6 7" : "";
+        $soft = $softness ? "SOFT $softness 3 4 45 5 6 7" : "";
 
         $configf = <<<heredoc
 

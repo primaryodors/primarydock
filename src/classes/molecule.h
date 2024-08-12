@@ -61,6 +61,7 @@ public:
     ~Pose();
     void copy_state(Molecule* from_mol);
     void restore_state(Molecule* to_mol);
+    float total_atom_motions();
     void reset();
 
 protected:
@@ -105,6 +106,7 @@ public:
     {
         return atcount;
     }
+    int get_heavy_atom_count() const;
     int get_bond_count(bool unidirectional) const;
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
@@ -151,6 +153,7 @@ public:
     void clear_atom_binding_energies();
     int has_hbond_donors();
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
+    int has_pi_atoms(bool include_backbone = false);
 
     // Bond functions.
     Bond** get_rotatable_bonds(bool include_can_flip = true);
@@ -195,9 +198,20 @@ public:
     float bindability_by_type(intera_type type, bool include_backbone = false);
 
     static float total_intermol_binding(Molecule** ligands);
-    static void conform_molecules(Molecule** molecules, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
-    static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
-    static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
+
+    static void conform_molecules(Molecule** molecules, int iterations = 50,
+        void (*callback)(int, Molecule**) = nullptr,
+        void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr,
+        void (*progress)(float) = nullptr
+        );
+    
+    static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50,
+        void (*callback)(int, Molecule**) = nullptr,
+        void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr,
+        void (*progress)(float) = nullptr
+        );
+    
+    // static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
     void conform_atom_to_location(int atom_idx, Point target, int iterations = 50);
     void conform_atom_to_location(const char* atom_name, Point target, int iterations = 50);
     SCoord motion_to_optimal_contact(Molecule* ligand);
@@ -243,6 +257,8 @@ public:
     Molecule** mclashables = nullptr;
     Atom *clash1 = nullptr, *clash2 = nullptr;
     float clash_worst = 0;
+    Atom *best_intera = nullptr, *best_other_intera = nullptr;
+    Molecule* best_interactor = nullptr;
 
 protected:
 
@@ -260,6 +276,8 @@ protected:
     Molecule** mandatory_connection = nullptr;
     float* last_mc_binding = nullptr;
     Atom** most_bindable = nullptr;
+    Pose* iterbegan = nullptr;
+    int iters_without_change = 0;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

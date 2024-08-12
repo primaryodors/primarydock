@@ -15,9 +15,9 @@ DockResult::DockResult()
     ;
 }
 
-DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl_resno, int drcount, bool differential_dock)
+DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl_resno, int drcount)
 {
-    int end1 = max(protein->get_end_resno()+1, 128);
+    int end1 = SPHREACH_MAX+4;
     AminoAcid* reaches_spheroid[end1];
     int sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, ligand->get_barycenter(), size, addl_resno);
     // cout << "sphres " << sphres << endl;
@@ -93,112 +93,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
     }
 
-    if (differential_dock)
-    {
-        for (i=0; i<qpr+1; i++)
-        {
-            int resno = i ? (allres[i-1]->get_residue_no()) : 0;
-            #if _DBG_TOOLARGE_DIFFNUMS
-            std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
-            #endif
-
-            #if use_trip_switch
-            bool is_trip_i = false;
-            for (n=0; n<tripswitch_clashables.size(); n++)
-                if (tripswitch_clashables[n] == resno)
-                {
-                    is_trip_i = true;
-                    break;
-                }
-            #endif
-
-            for (j=0; j<qpr+1; j++)
-            {
-                if (j == i) continue;
-                int jres = j ? allres[j-1]->get_residue_no() : 0;
-
-                #if use_trip_switch
-                bool is_trip_j = false;
-                if (is_trip_i && j)
-                    for (n=0; n<tripswitch_clashables.size(); n++)
-                        if (tripswitch_clashables[n] == jres)
-                        {
-                            is_trip_j = true;
-                            break;
-                        }
-                #endif
-
-                float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
-                #if use_trip_switch
-                if (f < 0 && is_trip_j)
-                {
-                    tripclash -= f;
-                    f = 0;
-                }
-                #endif
-                final_binding[resno] += f;
-
-                #if _DBG_TOOLARGE_DIFFNUMS
-                if (f) ibdbg += to_string(postaa[j]->get_atom(0)->residue) + (std::string)" " + to_string(f) + (std::string)"\n";
-                #endif
-
-                #if compute_vdw_repulsion
-                final_vdWrepl[resno] += postaa[i]->get_vdW_repulsion(postaa[j]);
-                #endif
-            }
-
-            #if _DBG_TOOLARGE_DIFFNUMS
-            if (fabs(final_binding[resno]) >= 200) cout << ibdbg << endl;
-            #endif
-        }
-    }
-    else
-    {      
-        #if use_trip_switch          
-        for (i=0; i<qpr; i++)
-        {
-            int resno = allres[i]->get_residue_no();
-
-            bool is_trip_i = false;
-            for (n=0; n<tripswitch_clashables.size(); n++)
-                if (tripswitch_clashables[n] == resno)
-                {
-                    is_trip_i = true;
-                    break;
-                }
-
-            for (j=0; j<qpr; j++)
-            {
-                if (j == i) continue;
-                int jres = allres[j]->get_residue_no();
-
-                bool is_trip_j = false;
-                if (is_trip_i)
-                    for (n=0; n<tripswitch_clashables.size(); n++)
-                        if (tripswitch_clashables[n] == jres)
-                        {
-                            is_trip_j = true;
-                            break;
-                        }
-                if (!is_trip_j) continue;
-
-                float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
-                if (f < 0)
-                {
-                    tripclash -= f;
-                    f = 0;
-                }
-            }
-        }
-        #endif
-    }
-
     for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = total_binding_by_type[i];
-
-    #if active_persistence
-    float res_kJmol[end1];
-    for (i=0; i<end1; i++) res_kJmol[i] = 0;
-    #endif
 
     #if _peratom_audit
     interaudit.clear();
@@ -271,23 +166,12 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
         #endif
 
-        if (differential_dock)
-        {
-            lmkJmol[metcount] = final_binding[resno] + lb;
-        }
-        else
-        {
-            if (lb > 500) lb = 0;
-            lmkJmol[metcount] = lb;
-        }
+        if (lb > 500) lb = 0;
+        lmkJmol[metcount] = lb;
         lmc[metcount] = -mc_bpotential / missed_connection.r;
 
         lma1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;
         lma2n[metcount] = ligand->clash2 ? ligand->clash2->name : nullptr;
-
-        #if active_persistence
-        res_kJmol[resno] = lb;
-        #endif
 
         BallesterosWeinstein bw = protein->get_bw_from_resno(resno);
         if (bw.helix_no)
@@ -296,28 +180,18 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             sprintf(metrics[metcount], "%s%d", reaches_spheroid[i]->get_3letter(), resno);
         // cout << metrics[metcount] << ": " << lb << " . ";
 
-        if (differential_dock)
+        #if compute_vdw_repulsion
+        lmvdWrepl[metcount] = 0;
+        lmvdWrepl[metcount] += ligand->get_vdW_repulsion(reaches_spheroid[i]);
+        /*for (j=0; j<sphres; j++)
         {
-            limkJmol[metcount] = initial_binding[resno];
-            #if compute_vdw_repulsion
-            lmvdWrepl[metcount] = final_vdWrepl[resno];
-            limvdWrepl[metcount] = initial_vdWrepl[resno];
-            #endif
-        }
-        else
-        {
-            #if compute_vdw_repulsion
-            lmvdWrepl[metcount] = 0;
-            lmvdWrepl[metcount] += ligand->get_vdW_repulsion(reaches_spheroid[i]);
-            /*for (j=0; j<sphres; j++)
-            {
-                if (j == i) continue;
-                mvdWrepl[metcount] += reaches_spheroid[i]->get_vdW_repulsion(reaches_spheroid[j]);
-            }*/
-            limvdWrepl[metcount] = 0;
-            #endif
-            limkJmol[metcount] = 0;
-        }
+            if (j == i) continue;
+            mvdWrepl[metcount] += reaches_spheroid[i]->get_vdW_repulsion(reaches_spheroid[j]);
+        }*/
+        limvdWrepl[metcount] = 0;
+        #endif
+        limkJmol[metcount] = 0;
+        
         metcount++;
         btot += lb;
         // cout << *(reaches_spheroid[i]) << " adds " << lb << " to btot, making " << btot << endl;
@@ -354,9 +228,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #endif
 
     if (btot > 100*ligand->get_atom_count()) btot = 0;
-    if (differential_dock && (worst_energy > clash_limit_per_aa)) btot = -Avogadro;
 
-    kJmol          = (differential_dock && (worst_energy > clash_limit_per_aa)) ? -Avogadro : btot;
+    kJmol          = btot;
     ikJmol          = 0;
     polsat           = pstot;
     metric            = new char*[metcount+4];
@@ -377,16 +250,13 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #if _dbg_internal_energy
     cout << "Ligand internal = " << ligand_self << endl;
     #endif
-    #if use_trip_switch
-    tripswitch  = tripclash;
-    #endif
     protclash = protein->get_rel_int_clashes();
 
     int itn;
     for (itn=0; itn<_INTER_TYPES_LIMIT; itn++)
     {
         i = itn;
-        bytype[i] = differential_dock ? fin_total_binding_by_type[i] : total_binding_by_type[i];
+        bytype[i] = total_binding_by_type[i];
         ibytype[i] = init_total_binding_by_type[i];
         ikJmol += init_total_binding_by_type[i];
         kJmol += fin_total_binding_by_type[i];
@@ -437,14 +307,7 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
 
     if (dr.out_per_res_e || dr.out_per_btyp_e)
     {
-        if (differential_dock)
-        {
-            output << "# Binding energies: delta = with ligand minus without ligand." << endl;
-        }
-        else
-        {
-            output << "# Binding energies:" << endl;
-        }
+        output << "# Binding energies:" << endl;
     }
 
     if (dr.out_per_res_e)
@@ -463,23 +326,12 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
         {
             if (fabs(dr.mkJmol[l]) < dr.out_itemized_e_cutoff) continue;
 
-            if (differential_dock)
-            {
-                if (dr.metric[l]) output << dr.metric[l]
-                            << ": " << -(dr.mkJmol[l] - dr.imkJmol[l])*dr.energy_mult
-                            << " = " << -dr.mkJmol[l]*dr.energy_mult
-                            << " minus " << -dr.imkJmol[l]*dr.energy_mult
-                            << endl;
-            }
-            else
-            {
-                if (dr.do_output_colors) colorize(dr.mkJmol[l]);
-                output << dr.metric[l] << ": " << -dr.mkJmol[l]*dr.energy_mult;
-                if (dr.display_clash_atom1) output << " " << (dr.m_atom1_name[l] ? dr.m_atom1_name[l] : "-");
-                if (dr.display_clash_atom2) output << " " << (dr.m_atom2_name[l] ? dr.m_atom2_name[l] : "-");
-                output << endl;
-                if (dr.do_output_colors) colorless();
-            }
+            if (dr.do_output_colors) colorize(dr.mkJmol[l]);
+            output << dr.metric[l] << ": " << -dr.mkJmol[l]*dr.energy_mult;
+            if (dr.display_clash_atom1) output << " " << (dr.m_atom1_name[l] ? dr.m_atom1_name[l] : "-");
+            if (dr.display_clash_atom2) output << " " << (dr.m_atom2_name[l] ? dr.m_atom2_name[l] : "-");
+            output << endl;
+            if (dr.do_output_colors) colorless();
         }
         output << endl;
         // output << "Worst energy: " << dr.worst_energy << endl;
@@ -516,37 +368,17 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
                 goto _btyp_unassigned;
         }
 
-        if (differential_dock)
-        {
-            output << lbtyp << -(dr.bytype[l] - dr.ibytype[l])*dr.energy_mult
-                << " = " << -dr.bytype[l]*dr.energy_mult
-                << " minus " << -dr.ibytype[l]*dr.energy_mult
-                << endl;
-        }
-        else
-        {
-            if (dr.do_output_colors) colorize(dr.bytype[l]);
-            output << lbtyp << -dr.bytype[l]*dr.energy_mult << endl;
-            if (dr.do_output_colors) colorless();
-        }
+        if (dr.do_output_colors) colorize(dr.bytype[l]);
+        output << lbtyp << -dr.bytype[l]*dr.energy_mult << endl;
+        if (dr.do_output_colors) colorless();
     }
     output << endl;
 
 _btyp_unassigned:
 
-    if (differential_dock)
-    {
-        output << "Total: " << -(dr.kJmol - dr.ikJmol)*dr.energy_mult
-            << " = " << -dr.kJmol*dr.energy_mult
-            << " minus " << -dr.ikJmol*dr.energy_mult
-            << endl << endl;
-    }
-    else
-    {
-        if (dr.do_output_colors) colorize(dr.kJmol);
-        output << "Total: " << -dr.kJmol*dr.energy_mult << endl << endl;
-        if (dr.do_output_colors) colorless();
-    }
+    if (dr.do_output_colors) colorize(dr.kJmol);
+    output << "Total: " << -dr.kJmol*dr.energy_mult << endl << endl;
+    if (dr.do_output_colors) colorless();
 
     #if include_eclipses
     if (dr.out_lig_int_e) output << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
@@ -569,13 +401,6 @@ _btyp_unassigned:
     if (dr.out_prox) output << "Proximity: " << dr.proximity << endl << endl;
 
     if (dr.out_pro_clash) output << "Protein clashes: " << dr.protclash << endl << endl;
-
-    #if use_trip_switch
-    if (tripswitch_clashables.size())
-    {
-        output << "Trip switch: " << dr.tripswitch << endl << endl;
-    }
-    #endif
 
     #if compute_missed_connections
     if (dr.out_mc)
@@ -615,19 +440,7 @@ _btyp_unassigned:
             )
         {
             if (fabs(dr.mvdWrepl[l]) < dr.out_itemized_e_cutoff) continue;
-
-            if (differential_dock)
-            {
-                if (dr.metric[l]) output << dr.metric[l]
-                    << ": " << (dr.mvdWrepl[l] - dr.imvdWrepl[l])*dr.energy_mult
-                    << " = " << dr.mvdWrepl[l]*dr.energy_mult
-                    << " minus " << dr.imvdWrepl[l]*dr.energy_mult
-                    << endl;
-            }
-            else
-            {
-                if (dr.metric[l]) output << dr.metric[l] << ": " << dr.mvdWrepl[l]*dr.energy_mult << endl;
-            }
+            if (dr.metric[l]) output << dr.metric[l] << ": " << dr.mvdWrepl[l]*dr.energy_mult << endl;
         }
         output << endl;
     }

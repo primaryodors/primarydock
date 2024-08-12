@@ -12,7 +12,7 @@ class DockResult
 {
     public:
     DockResult();
-    DockResult(Protein* prot, Molecule* lig, Point size, int* addl_resno = nullptr, int pose = 1, bool differential_dock = false);
+    DockResult(Protein* prot, Molecule* lig, Point size, int* addl_resno = nullptr, int pose = 1);
 
     int pose = 0;
     float kJmol = 0;
@@ -44,9 +44,6 @@ class DockResult
     float bytype[_INTER_TYPES_LIMIT];
     float ibytype[_INTER_TYPES_LIMIT];
     float proximity = 0;                    // How far the ligand center is from the node's center.
-    #if use_trip_switch
-    float tripswitch = 0;                   // Effect of the ligand on the receptor's trip switch.
-    #endif
     float polsat = 0;
     float protclash = 0;
     float A100 = 0;

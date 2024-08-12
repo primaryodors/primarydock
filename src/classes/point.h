@@ -147,6 +147,7 @@ struct Tug
 };
 
 Point average_of_points(Point* points, int count);
+Point size_of_point_space(Point* points, int count);
 
 float find_angle(float dx, float dy);
 float find_angle_delta(float a1, float a2);

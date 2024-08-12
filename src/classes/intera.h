@@ -76,10 +76,6 @@ extern float minimum_searching_aniso;                       // Should be a small
 extern SCoord missed_connection;
 extern float mc_bpotential;
 
-#if active_persistence
-extern int active_persistence_resno[active_persistence_limit];
-#endif
-
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 
 #if _peratom_audit

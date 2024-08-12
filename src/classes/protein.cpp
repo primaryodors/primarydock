@@ -561,7 +561,7 @@ float Protein::get_internal_binding()
 
 float Protein::get_intermol_clashes(Molecule* ligand)
 {
-    AminoAcid* laminos[100];
+    AminoAcid* laminos[SPHREACH_MAX+4];
     Point size(0,0,0);
     int cres = get_residues_can_clash_ligand(laminos, ligand, ligand->get_barycenter(), size, nullptr);
     if (!cres) return 0;
@@ -576,7 +576,7 @@ float Protein::get_intermol_clashes(Molecule* ligand)
 
 float Protein::get_intermol_binding(Molecule* ligand)
 {
-    AminoAcid** laminos = new AminoAcid*[SPHREACH_MAX];
+    AminoAcid** laminos = new AminoAcid*[SPHREACH_MAX+4];
     Point size(0,0,0);
     int cres = get_residues_can_clash_ligand(laminos, ligand, ligand->get_barycenter(), size, nullptr);
     if (!cres) return 0;
@@ -1160,6 +1160,7 @@ void Protein::add_remark(const char* remark)
         && !strcmp(words[1], "800")
         && words[2]
         && !strcmp(words[2], "SITE")
+        && words[3]
         && !strcmp(words[3], "BW")
         )
     {
@@ -2753,7 +2754,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 
         Molecule::conform_molecules(lmc, 50);
 
-        AminoAcid* can_reach_metal[256];
+        AminoAcid* can_reach_metal[SPHREACH_MAX+4];
         int num_can_reach = get_residues_can_clash_ligand(can_reach_metal, lmc[0], lmtl->get_location(), Point(2.5,2.5,2.5), nullptr);
         bool cr_eq_mc[num_can_reach];
 
@@ -4140,7 +4141,7 @@ void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r,
     strands[0] = this;
     for (i=0; i<j; i++) strands[i+1] = p[i];
     strands[i+1] = nullptr;
-    AminoAcid* reaching[1024];
+    AminoAcid* reaching[SPHREACH_MAX+4];
 
     int resno, divisor = 0;
     x->phi = x->theta = x->r = 0;

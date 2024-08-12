@@ -204,7 +204,20 @@ void Pose::restore_state(Molecule* m)
     }
 }
 
+float Pose::total_atom_motions()
+{
+    if (!saved_from || !saved_from->atoms || !sz) return 0;
+    int i;
+    float result = 0;
 
+    for (i=0; i<sz && saved_from->atoms[i]; i++)
+    {
+        float r = saved_from->atoms[i]->get_location().get_3d_distance(saved_atom_locs[i]);
+        result += r;
+    }
+
+    return result;
+}
 
 void Molecule::delete_atom(Atom* a)
 {
@@ -830,6 +843,20 @@ int Molecule::has_hbond_acceptors()
         if (atoms[i]->get_family() == HALOGEN && atoms[i]->is_bonded_to(TETREL)) continue;
         if (atoms[i]->get_bonded_atoms_count() > 3) continue;
         if (atoms[i]->is_polar() <= -hydrophilicity_cutoff) result++;
+    }
+
+    return result;
+}
+
+int Molecule::has_pi_atoms(bool ib)
+{
+    if (!atoms) return 0;
+
+    int i, result=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (!ib && atoms[i]->is_backbone) continue;
+        if (atoms[i]->is_pi()) result++;
     }
 
     return result;
@@ -2807,6 +2834,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 
     lastshielded = 0;
     clash1 = clash2 = nullptr;
+    float best_atom_energy = 0;
 
     #if _dbg_internal_energy
     cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
@@ -2881,6 +2909,14 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;
                             kJmol += abind;
 
+                            if (abind > best_atom_energy)
+                            {
+                                best_atom_energy = abind;
+                                best_intera = atoms[i];
+                                best_interactor = ligands[l];
+                                best_other_intera = ligands[l]->atoms[j];
+                            }
+
                             atoms[i]->last_bind_energy += abind;
                             if (abind > atoms[i]->strongest_bind_energy)
                             {
@@ -2909,9 +2945,13 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         {
                             Point mc = missed_connection;
                             // cout << mc << endl;
-                            lmx += lmpull * mc.x * mc_bpotential / missed_connection.r / missed_connection.r;
-                            lmy += lmpull * mc.y * mc_bpotential / missed_connection.r / missed_connection.r;
-                            lmz += lmpull * mc.z * mc_bpotential / missed_connection.r / missed_connection.r;
+                            if (ligands[l]->priority) mc_bpotential *= 3.333;
+                            float lc = ligands[l]->atoms[j]->get_charge();
+                            if (lc && sgn(lc) == -sgn(atoms[i]->get_charge())) mc_bpotential *= 3.333;
+                            float mcrr = missed_connection.r * missed_connection.r;
+                            lmx += lmpull * mc.x * mc_bpotential / mcrr;
+                            lmy += lmpull * mc.y * mc_bpotential / mcrr;
+                            lmz += lmpull * mc.z * mc_bpotential / mcrr;
                         }
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
@@ -3238,7 +3278,9 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     return result;
 }
 
-void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**), void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>))
+void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**),
+    void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>),
+    void (*progress)(float))
 {
     int m, n;
 
@@ -3355,7 +3397,9 @@ float Molecule::total_intermol_binding(Molecule** l)
     return f;
 }
 
-void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**), void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>))
+void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**),
+    void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>),
+    void (*progress)(float))
 {
     if (!mm) return;
     int i, j, l, n, iter;
@@ -3378,6 +3422,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         {
             Molecule* a = mm[i];
             bool flipped_rings = false;
+
+            if (!a->iterbegan) a->iterbegan = new Pose(a);
+            a->iterbegan->copy_state(a);
+            if (!iter) a->iters_without_change = 0;
 
             #if _dbg_asunder_atoms
             if (!a->check_Greek_continuity()) throw 0xbadc0de;
@@ -3579,6 +3627,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             {
                 pib.copy_state(a);
                 Point ptrnd(frand(-1,1), frand(-1,1), frand(-1,1));
+                if (frand(0,1) < 0.4 && a->best_intera && a->best_other_intera)
+                {
+                    ptrnd = a->best_other_intera->get_location().subtract(a->best_intera->get_location());
+                }
                 if (ptrnd.magnitude())
                 {
                     LocatedVector axis = (SCoord)ptrnd;
@@ -3769,6 +3821,21 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
 
             if (!a->is_residue() && flipped_rings) a->evolve_structure(100);
+
+            if (!i && !a->is_residue())
+            {
+                float ttl_atom_mtn = a->iterbegan->total_atom_motions() / a->get_heavy_atom_count();
+                if (ttl_atom_mtn < iter_lostreturns_threshold) a->iters_without_change++;
+                else a->iters_without_change = 0;
+                if (a->iters_without_change >= max_iters_without_ligand_change) iter = iters;
+            }
+
+            if (!(i%8) && progress)
+            {
+                float f = (float)i / n;
+                float fiter = (f + iter) / iters * 100;
+                progress(fiter);
+            }
         }       // for i
 
         #if allow_iter_cb
@@ -3787,6 +3854,20 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
     #endif
 
     minimum_searching_aniso = 0;
+}
+
+int Molecule::get_heavy_atom_count() const
+{
+    if (!atoms) return 0;
+
+    int i, result=0;
+    for (i=0; i<atcount; i++)
+    {
+        if (!atoms[i]) break;
+        if (atoms[i]->get_Z() > 1) result++;
+    }
+
+    return result;
 }
 
 #define dbg_optimal_contact 0

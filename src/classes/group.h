@@ -10,7 +10,8 @@
 class AtomGroup
 {
     public:
-    std::vector<Atom*> atoms;
+    Atom* atoms[256];
+    int atct = 0;
     Point get_center();
     float get_pi();
     float get_polarity();
@@ -18,6 +19,7 @@ class AtomGroup
     float get_mcoord();
     float get_sum();
     float get_avg_elecn();
+    float max_potential_binding(intera_type type);
     int contains_element(const char* esym);
     bool contains_atom(Atom* a);
     void remove_atom(Atom* a);
@@ -25,6 +27,7 @@ class AtomGroup
     float bounds();
     bool is_bonded_to(Atom* a);
     Molecule* get_ligand() { return ligand; }
+    void update_atom_pointers(Molecule* new_ligand);
     int intersecting(AtomGroup* compare_with);
     void merge(AtomGroup* merge_with);
     float average_similarity(AtomGroup* compare_with);

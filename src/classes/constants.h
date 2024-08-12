@@ -142,7 +142,7 @@
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 1.0
-#define lmpull 0.4
+#define lmpull 1.0
 #define lmsteps 3
 #define recapture_ejected_ligand 0
 #define summed_missed_connections 1
@@ -152,6 +152,12 @@
 #define priority_weight_group 10
 #define ts_priority_coefficient 10
 
+#define cs_max_tries 10
+#define cs_bondweight_exponent 2.0
+#define cs_360_step M_PI / 6.7
+#define cs_ligand_rotation 0.2
+#define iter_lostreturns_threshold 0.05
+#define max_iters_without_ligand_change 5
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25
@@ -173,10 +179,6 @@
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
 
-// If enabled, the trip switch functionality will have to be moved around in the code.
-// But since we are using an active vs. inactive energy comparison, this feature is obsolete.
-#define use_trip_switch 0
-
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
 
@@ -184,16 +186,6 @@
 #define compute_missed_connections 0
 #define compute_vdw_repulsion 0
 #define compute_clashdirs 0
-
-// If using an activation matrix, active_persistence "rewards" the ligand for keeping
-// bindings to the same residues post-activation as pre-activation. The noflex option
-// prevents rotating the ligand's bonds in the node immediately after activation.
-#define active_persistence 1
-#define active_persistence_follow 1
-#define active_persistence_limit 16
-#define active_persistence_noflex 0
-#define active_persistence_ratio 5
-#define active_persistence_threshold 5
 
 #define redo_tumble_spheres_on_activation 0
 #define redo_tumble_spheres_every_node 0
@@ -206,8 +198,6 @@
 // Also, currently the code interlaces the two datasets which is not ideal.
 #define write_activation_matrix 0
 #define write_active_rotation 1
-
-#define _use_groups 1
 
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through
@@ -268,8 +258,6 @@
 #define pocketcen_is_loneliest 0
 #define pocketcen_from_reach_atoms 0
 
-// Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
-#define default_bestbind 1
 #define preemptively_minimize_intermol_clashes 0
 #define bestbind_springiness 15
 
@@ -278,9 +266,6 @@
 #define hydrophilicity_boost 5
 #define best_binding_stochastic 0.3
 
-// For differential docking, whether to conform_molecules() all the protein's residues into an
-// optimized initial conformation before adding the ligand.
-#define preconform_protein 0
 #define default_pre_ligand_multimol_radius 15
 #define default_pre_ligand_flex_radius 10
 #define pre_ligand_iteration_ratio 1

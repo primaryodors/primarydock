@@ -119,11 +119,12 @@ a.make()
 
 natrixs;
 
-$fp = fopen("hm.py", "w");
+$fp = fopen("$rcpid.hm.py", "w");
 fwrite($fp, $py);
 fclose($fp);
 
-passthru("python3 hm.py | tee hm.out");
+@unlink("hm.out");
+passthru("python3 $rcpid.hm.py | tee hm.out");
 $c = file_get_contents("hm.out");
 $best_energy = 1e9;
 $pyoutfn = false;
@@ -131,6 +132,7 @@ $mode = false;
 foreach (explode("\n", $c) as $ln)
 {
     if (false !== strpos($ln, "Summary of successfully produced models:")) $mode = true;
+    if (false !== strpos($ln, "Summary of successfully produced loop models:")) $mode = true;
     if (!$mode) continue;
 
     $ln = preg_replace("/\\s+/", " ", $ln);
@@ -146,6 +148,10 @@ foreach (explode("\n", $c) as $ln)
 }
 
 if (!$pyoutfn) die("FAIL.\n");
+
+$adjustments = "";
+if ($fam == "OR51" || $fam == "OR52") $adjustments .= "ATOMTO %6.59 EXTENT @4.57\n";
+else if ($rcpid == "OR56B2") $adjustments .= "ATOMTO %6.58 EXTENT @4.57\n";
 
 $pepd = <<<blixtos
 
@@ -174,7 +180,9 @@ DELETE 1 %1.20
 HYDRO
 UPRIGHT A
 BWCENTER
+$adjustments
 MINC
+$adjustments
 
 # LET \$mdlf = "pdbs/" + \$rcpid
 # LET \$mdlf += ".models.pdb"
@@ -189,13 +197,13 @@ SAVE \$outf
 
 blixtos;
 
-$fp = fopen("hm.pepd", "w");
+$fp = fopen("$rcpid.hm.pepd", "w");
 fwrite($fp, $pepd);
 fclose($fp);
 
 chdir(__DIR__);
 chdir("..");
-passthru("./bin/pepteditor hm/hm.pepd");
+passthru("./bin/pepteditor hm/$rcpid.hm.pepd");
 
 chdir(__DIR__);
 foreach (glob("$rcpid.*") as $doomed) unlink($doomed);

@@ -467,6 +467,17 @@ void iteration_callback(int iter, Molecule** mols)
         ligand->rotate(&csrot.v, csrot.a, true);
         float e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         if (e2 < e1) cswas.restore_state(ligand);
+
+        Atom *ra, *la;
+        cs_res[cs_idx]->mutual_closest_atoms(ligand, &ra, &la);
+        SCoord r = ra->get_location().subtract(la->get_location());
+        r.r -= 2.5;
+        r.r *= frand(0,1);
+        cswas.copy_state(ligand);
+        e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+        ligand->move(r);
+        e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+        if (e2 < e1*0.9) cswas.restore_state(ligand);
     }
 
     // Initialization for best-iteration saving for pose output.

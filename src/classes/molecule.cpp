@@ -3828,7 +3828,6 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 if (ttl_atom_mtn < iter_lostreturns_threshold) a->iters_without_change++;
                 else a->iters_without_change = 0;
                 if (a->iters_without_change >= max_iters_without_ligand_change) iter = iters;
-                // cout << "                  " << ttl_atom_mtn << " " << a->iters_without_change << "                   ";
             }
 
             if (!(i%8) && progress)

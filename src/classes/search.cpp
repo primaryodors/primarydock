@@ -351,8 +351,6 @@ void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_
 
         float r12 = grpcen1.get_3d_distance(grpcen2),
             r13 = grpcen1.get_3d_distance(grpcen3);
-        
-        // cout << r12 << " " << r13 << endl;
 
         if (r12 < r13)
         {

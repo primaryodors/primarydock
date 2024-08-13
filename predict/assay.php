@@ -17,7 +17,8 @@ $o = $odor['full_name'];
 
 foreach ($prots as $protid => $p)
 {
-    $cmd = "./run_prediction.sh $protid $o";
+    if (substr($protid, 0, 4) == "MS4A") break;
+    $cmd = "./run_prediction.sh $protid \"$o\"";
     echo "$cmd\n\n";
     passthru($cmd);
 }

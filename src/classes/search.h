@@ -23,7 +23,7 @@ extern std::vector<int> exclusion;
 extern AtomGroup ligand_groups[3];
 extern ResidueGroup sc_groups[3];
 
-#define MAX_CS_RES 1024
+#define MAX_CS_RES 4096
 extern AtomGroup* agc[MAX_CS_RES];
 extern int agqty;
 extern AminoAcid* cs_res[MAX_CS_RES];

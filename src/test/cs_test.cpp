@@ -116,6 +116,7 @@ int main(int argc, char** argv)
 
     std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords.size() > 0);
     agqty = lagc.size();
+    if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
     for (i=0; i<agqty; i++)
         agc[i] = lagc.at(i).get();
     Search::prepare_constrained_search(&p, &m, loneliest);

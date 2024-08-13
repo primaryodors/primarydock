@@ -2076,6 +2076,7 @@ int main(int argc, char** argv)
         ligand = &pose_ligands[1];
         lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
         agqty = lagc.size();
+        if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
         for (i=0; i<agqty; i++)
             agc[i] = lagc.at(i).get();
         Search::prepare_constrained_search(protein, ligand, pocketcen);

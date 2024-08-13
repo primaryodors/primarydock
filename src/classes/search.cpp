@@ -469,7 +469,7 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                 cs_lag[cs_res_qty] = ag;
                 cs_res_qty++;
                 if (baa[i]->priority) any_resnos_priority = true;
-                if (cs_res_qty > MAX_CS_RES-1) return;
+                if (cs_res_qty >= MAX_CS_RES-4) return;
             }
         }
     }

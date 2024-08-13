@@ -506,6 +506,7 @@ void Molecule::hydrogenate(bool steric_only)
         }
 
         int h_to_add = round(valence - bcardsum);
+        if (atoms[i]->aaletter == 'H' && !strcmp(atoms[i]->name, "NE2")) h_to_add++;
         for (j=0; j<h_to_add; j++)
         {
             char hname[15];

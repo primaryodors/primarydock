@@ -686,7 +686,7 @@ heredoc;
         else $iso = "";
 
         $excl = resno_from_bw($protid, "2.37");
-        $soft = $softness ? "SOFT $softness 3 4 45 5 6 7" : "";
+        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 3 4 45 5 6 7" : "";
 
         $configf = <<<heredoc
 

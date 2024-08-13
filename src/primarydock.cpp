@@ -565,9 +565,8 @@ void iteration_callback(int iter, Molecule** mols)
                 else c1 = softrgn_initclash[i];
 
                 protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, rot.a);
-                float new_a100 = protein->A100();
                 float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 20);
-                if (new_a100 < -15 || (c2 > c1 + clash_limit_per_aa*2)) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
+                if (c2 > c1 + clash_limit_per_aa*2) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
             }
         }
     }

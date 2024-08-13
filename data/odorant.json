@@ -11087,6 +11087,11 @@
         },
         "oid": "4c0739eab463fd391644c1017572da30"
     },
+    "4c51c6daf3459d486100bc304f4d626c":
+    {
+        "full_name": "toluene",
+        "smiles": "Cc1ccccc1"
+    },
     "4c6bc1e9680aee29c1f03ee7a3678181":
     {
         "full_name": "labienoxime",
@@ -13446,7 +13451,8 @@
                 "metallic",
                 "fennel"
             ]
-        }
+        },
+        "oid": "5ef83c038980f8a67c2d0c9d1885913e"
     },
     "5f14e9c196635f4b84919ded96c1b71a":
     {

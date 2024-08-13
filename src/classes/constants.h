@@ -107,7 +107,7 @@
 
 #define _MAX_NUM_FORCES 65536
 
-#define SPHREACH_MAX 128
+#define SPHREACH_MAX 256
 
 #define PROT_MAX_RGN 40
 

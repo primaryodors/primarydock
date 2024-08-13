@@ -1548,6 +1548,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         }
 
         aa->reset_conformer_momenta();
+        if (sphres >= SPHREACH_MAX-2) break;
     }
 
     reaches_spheroid[sphres] = NULL;

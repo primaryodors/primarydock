@@ -2,9 +2,14 @@
 
 // Scan all duck_results and rerun their values through the evaluate_result() fuction.
 
+chdir(__DIR__);
 require("../data/protutils.php");
+chdir(__DIR__);
 require("../data/odorutils.php");
-require("dock_eval.php");
+chdir(__DIR__);
+require("algorithm_affinity.php");
+chdir(__DIR__);
+chdir("..");
 
 // Load data
 $dock_results = [];
@@ -17,7 +22,7 @@ if (file_exists($json_file))
 {
 	$dock_results = json_decode(file_get_contents($json_file), true);
 }
-else die("No results to scan. Please run method_combined.php for several empirical pairs and retry.\n");
+else die("No results to scan. Please run predictions for several empirical pairs and retry.\n");
 
 $right = 0;
 $wrong = 0;
@@ -33,6 +38,7 @@ foreach ($dock_results as $protid => $docks)
     	}
 
     	$r = empirical_response($protid, $o);
+		$ligname = $o['full_name'];
 
     	if (!$r)
     		$actual = "(unknown)";
@@ -45,8 +51,8 @@ foreach ($dock_results as $protid => $docks)
     	}
     	$array["Actual"] = $actual;
 
-        $array = evaluate_result($array);
-		$prediction = $array['Prediction'];
+        $array = make_prediction($array);
+		$prediction = $array['Predicted'];
         if ($prediction == $actual) $right++;
         else $wrong++;
 

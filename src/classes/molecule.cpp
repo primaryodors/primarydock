@@ -3330,7 +3330,7 @@ void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void 
     }
 }
 
-void Molecule::conform_atom_to_location(const char* an, Point t, int iters)
+void Molecule::conform_atom_to_location(const char* an, Point t, int iters, float od)
 {
     if (!atoms) return;
     int i;
@@ -3338,7 +3338,7 @@ void Molecule::conform_atom_to_location(const char* an, Point t, int iters)
     {
         if (!strcmp(atoms[i]->name, an))
         {
-            conform_atom_to_location(i, t, iters);
+            conform_atom_to_location(i, t, iters, od);
             return;
         }
     }
@@ -3346,7 +3346,7 @@ void Molecule::conform_atom_to_location(const char* an, Point t, int iters)
 
 #define _dbg_atom_pointing 0
 
-void Molecule::conform_atom_to_location(int i, Point t, int iters)
+void Molecule::conform_atom_to_location(int i, Point t, int iters, float od)
 {
     if (!(movability & MOV_CAN_FLEX)) return;
 
@@ -3368,6 +3368,7 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters)
             {
                 b[j]->rotate(M_PI*2.0/circdiv, false, true);
                 r = a->get_location().get_3d_distance(t);
+                if (od) r = fabs(r-od);
                 float c = get_internal_clashes();
                 if (r < bestr && c < oc+2.5*clash_limit_per_aa)
                 {

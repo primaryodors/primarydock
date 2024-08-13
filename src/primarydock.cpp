@@ -451,7 +451,7 @@ float iter_best_bind;
 void iteration_callback(int iter, Molecule** mols)
 {
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
-    int l;
+    int i, j, l, n;
     float f = 0;
 
     if (pdpst == pst_constrained)
@@ -519,6 +519,61 @@ void iteration_callback(int iter, Molecule** mols)
         iter_best_bind = f;
     }
 
+    // Attempt to connect hydrogen bonds to ligand.
+    if (flex)
+    {
+        n = ligand->get_atom_count();
+        for (l=0; mols[l]; l++)
+        {
+            if (!mols[l]->is_residue()) continue;
+            if (fabs(mols[l]->hydrophilicity()) < hydrophilicity_cutoff) continue;
+            if (mols[l]->movability & MOV_PINNED) continue;
+
+            AminoAcid* hbaa = reinterpret_cast<AminoAcid*>(mols[l]);
+            Atom* reach = hbaa->get_reach_atom();
+            int reachz = reach->get_Z();
+            Atom* target = nullptr;
+            float nearest = Avogadro;
+
+            for (i=0; i<n; i++)
+            {
+                Atom* la = ligand->get_atom(i);
+                if (!la) continue;
+                if (fabs(la->is_polar()) < hydrophilicity_cutoff) continue;
+                if (reachz > 1 && la->get_Z() > 1) continue;
+                float r = la->distance_to(reach);
+                if (r < nearest)
+                {
+                    nearest = r;
+                    target = la;
+                }
+            }
+
+            if (target)
+            {
+                if (reachz == 1 && target->get_Z() == 1)
+                {
+                    if (rand() & 1) reach = reach->get_bond_by_idx(0)->atom2;
+                    else target = target->get_bond_by_idx(0)->atom2;
+                }
+
+                if (target->distance_to(reach) < 3) continue;
+
+                Point pttgt = target->get_location();
+                /*SCoord v = reach->get_location().subtract(pttgt);
+                if (v.r < 3) continue;
+                v.r = 2.5;
+                pttgt = pttgt.add(v);*/
+                Pose hbwas(mols[l]);
+                hbwas.copy_state(mols[l]);
+                float before = ligand->get_intermol_binding(mols);
+                hbaa->conform_atom_to_location(reach->name, pttgt, 10, 2);
+                float after = ligand->get_intermol_binding(mols);
+                if (before > 1.1 * after) hbwas.restore_state(mols[l]);
+            }
+        }
+    }
+
     #if use_best_binding_iteration
     if (iter == iters && iter_best_bind > 0)
     {
@@ -527,8 +582,6 @@ void iteration_callback(int iter, Molecule** mols)
     #endif
 
     if (pivotal_hbond_aaa && pivotal_hbond_la) do_pivotal_hbond_rot_and_scoot();
-    
-    int i, j, n;
 
     Point bary = ligand->get_barycenter();
 

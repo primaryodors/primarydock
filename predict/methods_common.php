@@ -8,7 +8,6 @@ chdir("..");
 require("predict/cputemp.php");
 require("data/protutils.php");
 require("data/odorutils.php");
-require("predict/dock_eval.php");
 require_once("predict/statistics.php");
 
 die_if_too_hot();

@@ -1,6 +1,6 @@
 <?php
 
-// Scan all duck_results and rerun their values through the evaluate_result() fuction.
+// Scan all dock_results and rerun their values through the evaluate_result() fuction.
 
 chdir(__DIR__);
 require("../data/protutils.php");
@@ -14,9 +14,7 @@ chdir("..");
 // Load data
 $dock_results = [];
 $json_file = "predict/dock_results.json";
-
-chdir(__DIR__);
-chdir("..");
+$date_cutoff = 1723400000;
 
 if (file_exists($json_file))
 {
@@ -30,6 +28,13 @@ foreach ($dock_results as $protid => $docks)
 {
     foreach ($docks as $ligand => $array)
     {
+		if (@$array['version'] < $date_cutoff)
+		{
+			unset($dock_results[$protid][$ligand]);
+			if (!count($dock_results[$protid])) unset($dock_results[$protid]);
+			continue;
+		}
+
     	$o = find_odorant($ligand);
     	if (!$o)
     	{

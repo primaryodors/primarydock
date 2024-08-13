@@ -149,8 +149,10 @@ foreach (explode("\n", $c) as $ln)
 
 if (!$pyoutfn) die("FAIL.\n");
 
+$famno = intval(preg_replace("/[^0-9]/", "", $fam));
 $adjustments = "";
-if ($fam == "OR51" || $fam == "OR52") $adjustments .= "ATOMTO %6.59 EXTENT @4.57\n";
+if ($famno < 50) $adjustments .= "ATOMTO %3.37 EXTENT @6.48\n";
+else if ($famno == 51 || $famno == 52) $adjustments .= "ATOMTO %6.59 EXTENT @4.57\n";
 else if ($rcpid == "OR56B2") $adjustments .= "ATOMTO %6.58 EXTENT @4.57\n";
 
 $pepd = <<<blixtos

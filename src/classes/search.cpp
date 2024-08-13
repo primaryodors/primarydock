@@ -510,6 +510,8 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     chose_residue:
     cs_idx = j;
 
+    if 
+
     // Point residue toward where ligand will be, unless using pi stacking.
     if (cs_bt[j] != pi)
     {

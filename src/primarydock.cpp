@@ -490,7 +490,7 @@ void iteration_callback(int iter, Molecule** mols)
     // Stochastically force flexion on some side chains that get clashes.
     for (l=0; mols[l]; l++)
     {
-        float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
+        float lf = mols[l]->get_intermol_binding(mols), lc = mols[l]->get_intermol_clashes(mols), ptnl = mols[l]->get_intermol_potential(mols);
         f += lf;
 
         int lres = mols[l]->is_residue();
@@ -503,7 +503,7 @@ void iteration_callback(int iter, Molecule** mols)
 
         if (flex
             // && iter < 5
-            && (lf < -10 || lf < 0.1 * ptnl)
+            && (lf < -10 || lf < 0.1 * ptnl || (lc > 0 && lf < 5))
             && mols[l]->movability == MOV_FLXDESEL
             && lres
             && frand(0,1) < flexion_probability_multiplier * prob

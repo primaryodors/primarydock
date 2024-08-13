@@ -511,7 +511,13 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     cs_idx = j;
 
     // Point residue toward where ligand will be, unless using pi stacking.
-    if (cs_bt[j] != pi) cs_res[j]->conform_atom_to_location(cs_res[j]->get_reach_atom()->name, loneliest);
+    if (cs_bt[j] != pi)
+    {
+        MovabilityType mt = cs_res[j]->movability;
+        cs_res[j]->movability = MOV_FLEXONLY;
+        cs_res[j]->conform_atom_to_location(cs_res[j]->get_reach_atom()->name, loneliest);
+        cs_res[j]->movability = mt;
+    }
 
     // Place the ligand so that the atom group is centered in the binding pocket.
     ligand->movability = MOV_ALL;

@@ -124,8 +124,8 @@ fwrite($fp, $py);
 fclose($fp);
 
 @unlink("hm.out");
-passthru("python3 $rcpid.hm.py | tee hm.out");
-$c = file_get_contents("hm.out");
+passthru("python3 $rcpid.hm.py | tee $rcpid.hm.out");
+$c = file_get_contents("$rcpid.hm.out");
 $best_energy = 1e9;
 $pyoutfn = false;
 $mode = false;
@@ -133,6 +133,7 @@ foreach (explode("\n", $c) as $ln)
 {
     if (false !== strpos($ln, "Summary of successfully produced models:")) $mode = true;
     if (false !== strpos($ln, "Summary of successfully produced loop models:")) $mode = true;
+    if (preg_match("/Filename\\s+molpdf/i", $ln)) $mode = true;
     if (!$mode) continue;
 
     $ln = preg_replace("/\\s+/", " ", $ln);
@@ -151,7 +152,7 @@ if (!$pyoutfn) die("FAIL.\n");
 
 $famno = intval(preg_replace("/[^0-9]/", "", $fam));
 $adjustments = "";
-if ($famno < 50) $adjustments .= "ATOMTO %3.37 EXTENT @6.48\n";
+if ($famno < 50) $adjustments .= "IF $3.37 != \"G\" THEN ATOMTO %3.37 EXTENT @6.48\n";
 else if ($famno == 51 || $famno == 52) $adjustments .= "ATOMTO %6.59 EXTENT @4.57\n";
 else if ($rcpid == "OR56B2") $adjustments .= "ATOMTO %6.58 EXTENT @4.57\n";
 

@@ -2871,7 +2871,7 @@ _try_again:
                 dr[drcount][nodeno].miscdata += (std::string)"Binding constraint:\n";
                 dr[drcount][nodeno].miscdata += (std::string)cs_res[cs_idx]->get_name() + (std::string)" ~ ";
                 std:stringstream stst;
-                stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl << endl;
+                stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl;
                 dr[drcount][nodeno].miscdata += stst.str();
             }
 

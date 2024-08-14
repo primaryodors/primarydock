@@ -386,7 +386,7 @@ _btyp_unassigned:
 
     if (dr.miscdata.size())
     {
-        output << endl << dr.miscdata << endl;
+        output << dr.miscdata << endl;
     }
 
     output << "A100 score: " << dr.A100 << endl;

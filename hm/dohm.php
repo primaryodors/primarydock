@@ -175,6 +175,13 @@ BWCENTER
 
 STRAND A
 
+IF $5.58 != "Y" GOTO _not_57_hbond
+IF $7.53 != "Y" GOTO _not_57_hbond
+MEASURE %5.58 "OH" %7.53 "OH" &d57
+ECHO "Y5.58 and Y7.53 are " &d57 "A apart."
+IF &d57 > 4.6 DIE "FAIL"
+_not_57_hbond:
+
 A100 &a100
 ECHO "A100 Score: " &a100
 IF &a100 < 10 DIE "FAIL"

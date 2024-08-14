@@ -12,6 +12,7 @@ class Search
     static void do_constrained_search(Protein* protein, Molecule* ligand);
     static void do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_cen, AminoAcid** reaches_spheroid);
     static void do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocket_cen);
+    static void copy_ligand_position_from_file(Protein* protein, Molecule* ligand, const char* filename, const char* ligname, int auth_resno);
 
     protected:
     static bool any_resnos_priority;

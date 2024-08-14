@@ -307,9 +307,6 @@
 #define cond_bas_hbond_energy_threshold 10.0
 #define cond_bas_hbond_distance_threshold 2.9
 
-#define prealign_iters 50
-#define prealign_momenta_mult 0
-
 // Whether to move water molecules around that are clashing or are not forming intermolecular bonds.
 #define _teleport_dissatisfied_waters 1
 // Threshold is positive for binding, negative for clashes.

@@ -150,7 +150,9 @@ std::string optsecho = "";
 
 // Switch to enable "best-binding" algorithm rather than "tumble spheres" algorithm.
 PoseSearchType pdpst = default_search_algorithm;
-std::string prealign_residues = "";
+std::string copyfrom_filename;
+char copyfrom_ligname[5] = {0,0,0,0,0};
+int copyfrom_resno = -1;
 Bond retain_bindings[4];
 std::vector<int> center_resnos;
 std::vector<int> priority_resnos;
@@ -1313,6 +1315,23 @@ int interpret_config_line(char** words)
             pdpst = pst_constrained;
             return 1;
         }
+        else if (!strcmp(words[1], "CP"))
+        {
+            pdpst = pst_copyfrom;
+            if (!words[2])
+            {
+                cout << "ERROR: Search mode CP without source file." << endl;
+                throw 0xbad19b07;
+            }
+            copyfrom_filename = words[2];
+            if (words[3])
+            {
+                if (strlen(words[3]) > 3) words[3][3] = 0;
+                strcpy(copyfrom_ligname, words[3]);
+            }
+            if (words[4]) copyfrom_resno = atoi(words[4]);
+            return 1;
+        }
         else
         {
             cout << "Unknown search method " << words[1] << endl;
@@ -2270,8 +2289,6 @@ _try_again:
             allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && pdpst != pst_best_binding;
             allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true);
 
-            if (pdpst == pst_best_binding) conformer_tumble_multiplier *= prealign_momenta_mult;
-
             if (strlen(protafname) && nodeno == activation_node)
             {
                 #if internode_momentum_only_on_activation 
@@ -2637,6 +2654,10 @@ _try_again:
                         << " ~ " << cs_bt[ultimate_csidx]
                         << " ~ " << *cs_lag[ultimate_csidx] << endl << endl << flush;
                     #endif
+                }
+                else if (pdpst == pst_copyfrom)
+                {
+                    Search::copy_ligand_position_from_file(protein, ligand, copyfrom_filename.c_str(), copyfrom_ligname, copyfrom_resno);
                 }
 
                 // else ligand->recenter(ligcen_target);

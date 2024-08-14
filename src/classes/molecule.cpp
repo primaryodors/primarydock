@@ -574,6 +574,23 @@ void Molecule::hydrogenate(bool steric_only)
     clear_all_bond_caches();
 }
 
+void Molecule::dehydrogenate()
+{
+    if (!atoms) return;
+
+    Atom* tmp[atcount];
+    int i, j=0;
+    for (i=0; i<atcount; i++)
+    {
+        if (!atoms[i]) continue;
+        if (atoms[i]->get_Z() < 2) continue;
+        tmp[j++] = atoms[i];
+    }
+
+    for (i=0; i<j; i++) atoms[i] = tmp[i];
+    atoms[j] = nullptr;
+}
+
 char** Molecule::get_atom_names() const
 {
     int i;

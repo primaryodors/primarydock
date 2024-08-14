@@ -150,6 +150,7 @@ public:
     void delete_all_atoms();
     int get_hydrogen_count();
     virtual void hydrogenate(bool steric_only = false);
+    virtual void dehydrogenate();
     void clear_atom_binding_energies();
     int has_hbond_donors();
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.

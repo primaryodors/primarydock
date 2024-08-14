@@ -580,3 +580,70 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     best.restore_state(ligand);
     ligand->movability = MOV_ALL;
 }
+
+void Search::copy_ligand_position_from_file(Protein* protein, Molecule* ligand, const char* filename, const char* ligname, int resno)
+{
+    char buffer[4096];
+    FILE* fp = fopen(filename, "rb");
+    if (!fp)
+    {
+        cout << "Failed to open " << filename << " for reading." << endl;
+        throw 0xbadf12e;
+    }
+
+    int lused = rand();
+    bool copying = false;
+    while (!feof(fp))
+    {
+        fgets(buffer, 4090, fp);
+        char** words = chop_spaced_words(buffer);
+        if (!words[0] || strcmp(words[0], "HETATM"))
+        {
+            if (copying) break;
+            else continue;
+        }
+        if (ligname && strlen(ligname) && strcmp(ligname, words[3]))
+        {
+            if (copying) break;
+            else continue;
+        }
+        if (resno >= 0 && resno != atoi(words[4]))
+        {
+            if (copying) break;
+            else continue;
+        }
+
+        Atom* a = ligand->get_atom(words[2]);
+        if (!a) continue;
+        Point pt(atof(words[5]), atof(words[6]), atof(words[7]));
+        a->move(pt);
+        a->used = lused;
+        copying = true;
+    }
+
+    fclose(fp);
+
+    int i, n = ligand->get_atom_count();
+    bool any_unmoved = false;
+    for (i=0; i<n; i++)
+    {
+        Atom* a = ligand->get_atom(i);
+        if (!a) continue;
+        if (a->used != lused)
+        {
+            if (a->get_Z() > 1)
+            {
+                cout << "ERROR: Source file does not contain all ligand atoms." << endl;
+                throw 0xbadda7a;
+            }
+            any_unmoved = true;
+            break;
+        }
+    }
+
+    if (any_unmoved)
+    {
+        ligand->dehydrogenate();
+        ligand->hydrogenate();
+    }
+}

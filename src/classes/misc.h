@@ -14,7 +14,8 @@ enum PoseSearchType
 {
     pst_best_binding,
     pst_tumble_spheres,
-    pst_constrained
+    pst_constrained,
+    pst_copyfrom
 };
 
 // Default search algorithm if not specified by config file or command line args.

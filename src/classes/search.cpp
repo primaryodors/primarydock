@@ -599,18 +599,32 @@ void Search::copy_ligand_position_from_file(Protein* protein, Molecule* ligand, 
         char** words = chop_spaced_words(buffer);
         if (!words[0] || strcmp(words[0], "HETATM"))
         {
-            if (copying) break;
-            else continue;
+            if (copying && (resno >= 0 || frand(0,1) < 0.4)) break;
+            else
+            {
+                copying = false;
+                continue;
+            }
         }
         if (ligname && strlen(ligname) && strcmp(ligname, words[3]))
         {
-            if (copying) break;
-            else continue;
+            cout << ligname << " != " << words[3] << endl;
+            if (copying && (resno >= 0 || frand(0,1) < 0.4)) break;
+            else
+            {
+                copying = false;
+                continue;
+            }
         }
         if (resno >= 0 && resno != atoi(words[4]))
         {
-            if (copying) break;
-            else continue;
+            cout << resno << " != " << words[4] << endl;
+            if (copying && (resno >= 0 || frand(0,1) < 0.4)) break;
+            else
+            {
+                copying = false;
+                continue;
+            }
         }
 
         Atom* a = ligand->get_atom(words[2]);
@@ -633,7 +647,7 @@ void Search::copy_ligand_position_from_file(Protein* protein, Molecule* ligand, 
         {
             if (a->get_Z() > 1)
             {
-                cout << "ERROR: Source file does not contain all ligand atoms." << endl;
+                cout << "ERROR: Source file does not contain all ligand atoms (missing " << a->name << ")." << endl;
                 throw 0xbadda7a;
             }
             any_unmoved = true;

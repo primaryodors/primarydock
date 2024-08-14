@@ -1317,6 +1317,7 @@ int interpret_config_line(char** words)
         }
         else if (!strcmp(words[1], "CP"))
         {
+            int lf = 1;
             pdpst = pst_copyfrom;
             if (!words[2])
             {
@@ -1328,9 +1329,14 @@ int interpret_config_line(char** words)
             {
                 if (strlen(words[3]) > 3) words[3][3] = 0;
                 strcpy(copyfrom_ligname, words[3]);
+                lf++;
+                if (words[4])
+                {
+                    copyfrom_resno = atoi(words[4]);
+                    lf++;
+                }
             }
-            if (words[4]) copyfrom_resno = atoi(words[4]);
-            return 1;
+            return lf;
         }
         else
         {
@@ -2920,7 +2926,13 @@ _try_again:
             int offset = n;
             if (out_pdbdat_lig)
             {
-                for (l=0; l<n; l++) ligand->get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
+                for (l=0; l<n; l++)
+                {
+                    Atom* a = ligand->get_atom(l);
+                    if (!a) continue;
+                    a->residue = pose;
+                    a->stream_pdb_line(pdbdat, 9000+l, true);
+                }
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Prepared ligand PDB." << endl;
                 #endif
@@ -2929,7 +2941,13 @@ _try_again:
                 {
                     for (k=0; k<maxh2o; k++)
                     {
-                        for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l+3*k);
+                        for (l=0; l<3; l++)
+                        {
+                            Atom* a = waters[k]->get_atom(l);
+                            if (!a) continue;
+                            a->residue = pose;
+                            a->stream_pdb_line(pdbdat, 9000+offset+l+3*k, true);
+                        }
                     }
                 }
             }
@@ -2993,6 +3011,7 @@ _try_again:
 
             dr[drcount][nodeno].pdbdat = pdbdat.str();
             if (debug) *debug << "Prepared the PDB strings." << endl;
+            dr[drcount][nodeno].auth = pose;
 
             if (!nodeno)
             {
@@ -3087,6 +3106,7 @@ _try_again:
 
     const float energy_mult = kcal ? _kcal_per_kJ : 1;
     pose = 1;
+    std::string auths;
     for (i=1; i<=poses; i++)
     {
         for (j=0; j<poses; j++)
@@ -3100,6 +3120,8 @@ _try_again:
                 {
                     if (dr[j][0].proximity > size.magnitude()) continue;
                     if (dr[j][0].worst_nrg_aa > clash_limit_per_aa) continue;
+
+                    auths += (std::string)" " + std::to_string(dr[j][0].auth);
 
                     for (k=0; k<=pathnodes; k++)
                     {
@@ -3245,6 +3267,9 @@ _exitposes:
         triesleft--;
         goto _try_again;
     }
+
+    /* cout << "AUTH:" << auths << endl << endl;
+    if (output) *output << "AUTH:" << auths << endl << endl; */
 
     cout << found_poses << " pose(s) found." << endl;
     if (output) *output << found_poses << " pose(s) found." << endl;

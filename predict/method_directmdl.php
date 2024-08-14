@@ -70,15 +70,12 @@ chdir("..");
 if (!file_exists("output/$fam")) mkdir("output/$fam");
 if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 
-if (!@$_REQUEST["acvonly"]) $iposes = process_dock("i");
+if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 
-$outifname = $outfname;
 $pdbfname = $pdbfname_active;
 $outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
 $cenres = substr($cenres_active, 8);
 
 prepare_receptor($pdbfname, "$flxr $aflxr");
-
-if (@$iposes) $search = "CP $outifname";
-$aposes = process_dock("a");
+$poses = process_dock("a");

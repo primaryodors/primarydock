@@ -2278,7 +2278,7 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     fprintf(pf, "  1.00001.00           %s%c\n", get_elem_sym(), fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ' );
 }
 
-void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
+void Atom::stream_pdb_line(ostream& os, unsigned int atomno, bool fh)
 {
     if (location.x < -9999.999 || location.x > 9999.999
         || location.y < -9999.999 || location.y > 9999.999
@@ -2286,7 +2286,7 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
         )
         return;
 
-    os << (residue ? "ATOM   " : "HETATM ");
+    os << ((residue && !fh) ? "ATOM   " : "HETATM ");
     os << setw(4) << atomno << " ";
 
     if (strlen(name) < 4)

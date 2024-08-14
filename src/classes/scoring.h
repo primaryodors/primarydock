@@ -15,6 +15,7 @@ class DockResult
     DockResult(Protein* prot, Molecule* lig, Point size, int* addl_resno = nullptr, int pose = 1);
 
     int pose = 0;
+    int auth = 0;
     float kJmol = 0;
     float ikJmol = 0;
     char** metric = nullptr;

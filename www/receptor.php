@@ -271,7 +271,7 @@ function show_dlmenu(e, prot, lig, v, d)
     $("#dl_json")[0].setAttribute("href", "download.php?obj=json&prot="+prot+"&odor="+lig);
 
     var x = e.pageX + 5, y = e.pageY;
-    if (y > window.innerHeight - 350) y = window.innerHeight - 350;
+    if (y > window.innerHeight - 400) y = window.innerHeight - 400;
 
     dlmenu.style.left = `${x}px`;
     dlmenu.style.top = `${y}px`;

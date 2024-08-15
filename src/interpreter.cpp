@@ -2031,6 +2031,51 @@ int main(int argc, char** argv)
                 else script_var[n].value.f = f;
             }	// INTC
 
+            else if (!strcmp(words[0], "INTE"))
+            {
+                l = 1;
+                n = -1;
+                if (!words[l])
+                {
+                    f = -working->get_internal_binding();
+                }
+                else if (words[l][0] >= 'A' && words[l][0] <= 'Z')
+                {
+                    if (!strands[words[l][0]-'A']) raise_error("No strand with specified chain letter.");
+                    else f = -strands[words[l][0]-'A']->get_internal_binding();
+                    l++;
+                }
+                else f = -working->get_internal_binding();
+
+                if (words[l] && (words[l][0] == '&'))
+                {
+                    n = find_var_index(words[l++]);
+                    if (n<0)
+                    {
+                        n = vars++;
+                        script_var[n].name = words[l-1];
+                        script_var[n].vt = type_from_name(words[l-1]);
+                    }
+                }
+
+                if (n < 0)
+                {
+                    bool b = true;
+                    cout << f;
+                    if (words[l])
+                    {
+                        if (words[l][0] == '~')
+                        {
+                            b = false;
+                        }
+                        else raise_error("Unknown argument.");
+                    }
+                    
+                    if (b) cout << endl;
+                }
+                else script_var[n].value.f = f;
+            }	// INTE
+
             else if (!strcmp(words[0], "WORST"))
             {
                 l = 1;

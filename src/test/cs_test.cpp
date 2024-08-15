@@ -119,8 +119,14 @@ int main(int argc, char** argv)
     if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
     for (i=0; i<agqty; i++)
         agc[i] = lagc.at(i).get();
+    int n = p.get_end_resno();
+    for (i=0; i<n; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa) aa->priority = false;
+    }
     Search::prepare_constrained_search(&p, &m, loneliest);
-    int n = cs_res_qty;
+    n = cs_res_qty;
     for (i=0; i<n; i++)
     {
         cout << "Candidate: " << cs_res[i]->get_name() << " ~ " << cs_bt[i] << " ~ " << *cs_lag[i] << endl;

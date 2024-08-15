@@ -729,23 +729,24 @@ float Molecule::total_eclipses()
             {
                 if (!bbt[k]) continue;
                 if (!bbt[k]->atom2) continue;
-                if (bbt[k]->atom2 == atoms[i]) continue;
+                if (bbt[k]->atom2->get_Z() > 1) continue;
+                // if (bbt[k]->atom2 == atoms[i]) continue;
                 for (l=0; l<n; l++)
                 {
                     if (l == j) continue;
                     if (!abt[l]) continue;
                     if (!abt[l]->atom2) continue;
+                    if (abt[l]->atom2->get_Z() > 1) continue;
                     float theta = find_angle_along_vector(bbt[k]->atom2->get_location(), abt[l]->atom2->get_location(), atoms[i]->get_location(), axis);
-                    if (theta >= -hexagonal && theta <= hexagonal)
-                    {
-                        #if _dbg_eclipses
-                        cout << bbt[k]->atom2->name << " is " << (theta*fiftyseven) << "deg from " << abt[l]->atom2->name
-                            << " along the " << atoms[i]->name << " - " << abt[j]->atom2->name << " axis."
-                            << endl;
-                        #endif
-                        theta = hexagonal - fabs(theta);
-                        result += theta;
-                    }
+                    #if _dbg_eclipses
+                    cout << bbt[k]->atom2->name << " is " << (theta*fiftyseven) << "deg from " << abt[l]->atom2->name
+                        << " along the " << atoms[i]->name << " - " << abt[j]->atom2->name << " axis."
+                        << endl;
+                    #endif
+                    theta -= M_PI;
+                    while (theta < -hexagonal) theta += hexagonal;
+                    while (theta > hexagonal) theta -= hexagonal;
+                    result += fabs(theta);
                 }
             }
         }

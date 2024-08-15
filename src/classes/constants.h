@@ -30,8 +30,12 @@
 #define iteration_additional_clash_coefficient 10.0
 #define contact_r_5x58_7x53 3.93
 #define include_eclipses 1
+
+// Difference of ethane's eclipsing vs. staggered energy, converted to kJ/mol, per hydrogen atom.
+// Values from: https://www.sas.upenn.edu/~kimg/mcephome/chem502/ethbutconform/ethbutmm2.html
+#define eclipsing_kJmol_per_radian (3.5803 - 0.818) * 4.184 / hexagonal / 6
 #define include_residue_eclipses 1
-#define eclipsing_kJmol_per_radian 1.86453
+
 #define memsanity 0x10000000
 
 #define pH 6.0

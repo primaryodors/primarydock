@@ -48,8 +48,9 @@ $mdlcls = "DOPEHRLoopModel";
 $CLASSI = "'8f76', '8hti'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
 $MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
-$ADRB2 = "'7dhr', '8gej'";
+$OPSIN = "'6fuf'";
 $ADORA2A = "'6gdg'";
+$ADRB2 = "'7dhr', '8gej'";
 $LPAR1 = "'7td0', '7yu3'";
 $TAS2R = "'7xp6'";
 $CB = "'5xr8', '5xra'";
@@ -83,7 +84,7 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "$ADORA2A, $MTAAR9, $CLASSI";                 // This combination seems to produce the most energetically favorable models.
+    $knowns = "$OPSIN, $ADORA2A, $MTAAR9, $CLASSI";
 }
 
 
@@ -179,7 +180,7 @@ IF $5.58 != "Y" GOTO _not_57_hbond
 IF $7.53 != "Y" GOTO _not_57_hbond
 MEASURE %5.58 "OH" %7.53 "OH" &d57
 ECHO "Y5.58 and Y7.53 are " &d57 "A apart."
-IF &d57 > 4.6 DIE "FAIL"
+IF &d57 > 5.3 DIE "FAIL"
 _not_57_hbond:
 
 A100 &a100

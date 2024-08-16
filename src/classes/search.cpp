@@ -479,6 +479,8 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 {
     int i, j=0, l, n;
 
+    bool ligand_can_hbond = ligand->has_hbond_donors() || ligand->has_hbond_acceptors() || fabs(ligand->get_charge()) > 0.999999999;
+
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     n = cs_res_qty;
     if (!n) return;
@@ -492,6 +494,9 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
         // If any residue is priority, then only a priority residue can be chosen.
         if (any_resnos_priority && !cs_res[j]->priority) continue;
+
+        // If the ligand can form a polar bond, it must form a polar bond.
+        if ((ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
 
         float b;
         switch (cs_bt[j])

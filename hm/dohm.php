@@ -48,9 +48,8 @@ $mdlcls = "DOPEHRLoopModel";
 $CLASSI = "'8f76', '8hti'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
 $MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
-$OPSIN = "'6fuf'";
-$ADORA2A = "'6gdg'";
-$ADRB2 = "'7dhr', '8gej'";
+// $ADORA2A = "'6gdg'";
+// $ADRB2 = "'7dhr', '8gej'";
 $LPAR1 = "'7td0', '7yu3'";
 $TAS2R = "'7xp6'";
 $CB = "'5xr8', '5xra'";
@@ -84,7 +83,7 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "$ADORA2A, $OPSIN"; //, $CLASSI, $MTAAR9";
+    $knowns = "$CLASSI, $MTAAR9, $CB, $LPAR1";
 }
 
 

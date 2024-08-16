@@ -533,6 +533,14 @@ void iteration_callback(int iter, Molecule** mols)
 
             AminoAcid* hbaa = reinterpret_cast<AminoAcid*>(mols[l]);
             Atom* reach = hbaa->get_reach_atom();
+            if (!reach) continue;
+            if (fabs(reach->is_polar()) < hydrophilicity_cutoff) continue;
+            Bond* rapb = reach->get_bond_by_idx(0);
+            if (!rapb) continue;
+            Atom* prev = rapb->atom2;
+            if (!prev) continue;
+            Atom* CB = hbaa->get_atom("CB");
+            if (!CB) continue;
             int reachz = reach->get_Z();
             Atom* target = nullptr;
             float nearest = Avogadro;
@@ -543,7 +551,13 @@ void iteration_callback(int iter, Molecule** mols)
                 if (!la) continue;
                 if (fabs(la->is_polar()) < hydrophilicity_cutoff) continue;
                 if (reachz > 1 && la->get_Z() > 1) continue;
-                float r = la->distance_to(reach);
+                float rCB = la->distance_to(CB);
+                if (rCB > _DEFAULT_INTERA_R_CUTOFF + hbaa->get_reach()) continue;
+                float rCA = la->get_location().get_3d_distance(hbaa->get_CA_location());
+                if (rCB > rCA) continue;
+                float rp = la->distance_to(prev);
+                if (rp > _DEFAULT_INTERA_R_CUTOFF) continue;
+                float r = fmin(rp, rCB/1.25);
                 if (r < nearest)
                 {
                     nearest = r;
@@ -2174,6 +2188,7 @@ _try_again:
         region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
     }
 
+    float best_energy = 0;
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -2847,6 +2862,8 @@ _try_again:
             float pstot = dr[drcount][nodeno].polsat;
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
+            if ((pose==1 && !nodeno) || best_energy > -btot) best_energy = -btot;
+
             #if compute_clashdirs
             n = protein->get_end_resno();
             for (i=1; i<=n; i++)
@@ -3274,6 +3291,10 @@ _exitposes:
     cout << found_poses << " pose(s) found." << endl;
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
+
+    cout << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (output) *output << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (debug) *debug << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
 
     #if compute_clashdirs
     if (regions)

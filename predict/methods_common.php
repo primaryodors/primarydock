@@ -666,9 +666,9 @@ heredoc;
                 {
                     $ln = substr($ln, 4);
                     $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
-                    $sx = floatval($psiz[0]) + 5;
-                    $sy = floatval($psiz[1]) + 5;
-                    $sz = floatval($psiz[2]) + 5;
+                    $sx = floatval($psiz[0])+2;
+                    $sy = floatval($psiz[1])+2;
+                    $sz = floatval($psiz[2])+2;
                     $size = "$sx $sy $sz";
                 }
             }

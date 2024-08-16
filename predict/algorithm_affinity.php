@@ -51,5 +51,7 @@ function make_prediction($data)
         echo "\nResult: " . print_r($data, true) . "\n";
     }
 
+    $data['CalculateDate'] = date('Y-m-d H:i:s');
+
     return $data;
 }

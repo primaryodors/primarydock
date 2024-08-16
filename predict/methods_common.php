@@ -693,10 +693,8 @@ PROT $pdbfname
 LIG sdf/$ligname.sdf
 $iso
 
-# CEN RES $cenres
-CEN 0 0 0
-# SIZE $size
-SIZE 20 35 20
+CEN RES $cenres
+SIZE $size
 # H2O 5
 $mcoord
 $atomto

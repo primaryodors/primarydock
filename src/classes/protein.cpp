@@ -1486,6 +1486,13 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         if (a) pt2 = a->get_location();
         else   pt2 = ligand->get_barycenter();
 
+        if (pt2.get_3d_distance(ca->get_location()) < 4)
+        {
+            reaches_spheroid[sphres++] = aa;
+            resno_already[resno] = true;
+            continue;
+        }
+
         if (cb)
         {
             Point pt1 = pt.subtract(&pt2);
@@ -1515,14 +1522,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
             if (angle > _can_clash_angle) continue;
         }
 
-        if (pt2.get_3d_distance(ca->get_location()) < aa->get_reach())
-        {
-            reaches_spheroid[sphres++] = aa;
-            resno_already[resno] = true;
-            continue;
-        }
-
-        /* pt = pt.subtract(&nodecen);
+        pt = pt.subtract(&nodecen);
         Point pt1 = pt;
         float dist = pt.magnitude();
         pt1.scale(fmax(dist - aa->get_reach(), 0));
@@ -1545,7 +1545,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                 *debug << std::hex << s.n << std::dec << " " << flush;
             }
             #endif
-        } */
+        }
 
         aa->reset_conformer_momenta();
         if (sphres >= SPHREACH_MAX-2) break;

@@ -84,7 +84,7 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "$OPSIN, $ADORA2A, $MTAAR9, $CLASSI";
+    $knowns = "$ADORA2A, $OPSIN"; //, $CLASSI, $MTAAR9";
 }
 
 

@@ -851,7 +851,7 @@ void update_progressbar(float percentage)
     cout << ("|/-\\")[spinchr] << " " << (int)percentage << "%.               " << endl;
     spinchr++;
     if (spinchr >= 4) spinchr = 0;
-    hueoffset += 0.1;
+    hueoffset += 0.3;
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)

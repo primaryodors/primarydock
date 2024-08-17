@@ -767,7 +767,7 @@ heredoc;
             }
         }
 
-        if (!$retvar && $num_poses) unlink($cnfname);
+        if (!$retvar && $num_poses && !file_exists("tmp/nodelete")) unlink($cnfname);
 
         break;
 

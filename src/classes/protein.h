@@ -196,7 +196,7 @@ public:
     void bridge(int resno1, int resno2);
     int replace_side_chains_from_other_protein(Protein* other);
 
-    int* mcoord_resnos = NULL;
+    int mcoord_resnos[32];
 
     SCoord last_uprighted_xform;
     LocRotation last_uprighted_A, last_uprighted_B;
@@ -214,7 +214,7 @@ protected:
     AminoAcid** residues = nullptr;
     AminoAcid*** res_can_clash = nullptr;
     float* res_reach = nullptr;
-    Atom** metals = nullptr;
+    Atom* metals[16];
     int metcount = 0;
     Star aaptrmin, aaptrmax;
     float initial_int_clashes = 0;

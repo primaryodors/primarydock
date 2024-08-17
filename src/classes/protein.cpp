@@ -67,7 +67,6 @@ Protein::Protein()
     sequence = nullptr;
     ca = nullptr;
     res_reach = nullptr;
-    metals = nullptr;
 
     int i;
     for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
@@ -82,7 +81,6 @@ Protein::Protein(const char* lname)
     sequence = nullptr;
     ca = nullptr;
     res_reach = nullptr;
-    metals = nullptr;
 
     int i;
     for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
@@ -694,7 +692,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     if (sequence) delete[] sequence;
     if (ca) delete[] ca;
     // if (res_reach) delete res_reach;         // This was causing a segfault.
-    if (metals) delete[] metals;
 
     origpdb_residues.clear();
     connections.clear();
@@ -778,20 +775,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     }
                 }
 
-                // If no AA, load a metal.
-                if (!metcount % 16)
-                {
-                    Atom** mtmp = new Atom*[metcount+20];
-                    if (metals)
-                    {
-                        for (i=0; metals[i]; i++)
-                            mtmp[i] = metals[i];
-                        mtmp[i] = NULL;
-                        delete metals;
-                    }
-                    metals = mtmp;
-                }
-
                 a = new Atom(is);
                 metals[metcount++] = a;
                 metals[metcount] = NULL;
@@ -853,19 +836,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
             switch (ex)
             {
             case ATOM_NOT_OF_AMINO_ACID:
-                if (!metcount % 16)
-                {
-                    Atom** mtmp = new Atom*[metcount+20];
-                    if (metals)
-                    {
-                        for (i=0; metals[i]; i++)
-                            mtmp[i] = metals[i];
-                        mtmp[i] = NULL;
-                        delete metals;
-                    }
-                    metals = mtmp;
-                }
-
                 a = new Atom(is);
                 metals[metcount++] = a;
                 metals[metcount] = NULL;
@@ -2395,22 +2365,9 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
         m_mcoord = nmc;
     }
 
-    if (!metals)
-    {
-        metals = new Atom*[2];
-        metals[0] = metal;
-        metals[1] = NULL;
-    }
-    else
-    {
-        for (k=0; metals[k]; k++);	// Get count.
-        Atom** nma = new Atom*[k+2];
-        for (i=0; i<k; i++) nma[i] = metals[i];
-        nma[k] = metal;
-        nma[k+1] = NULL;
-        delete[] metals;
-        metals = nma;
-    }
+    for (k=0; metals[k]; k++);	// Get count.
+    metals[k++] = metal;
+    metals[k] = NULL;
 
     m_mcoord[j]->metal = metal;
     m_mcoord[j]->coord_res = new AminoAcid*[residues+2];
@@ -2689,9 +2646,12 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
 std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 {
-    int i, j, l, miter, i2, j1;
+    int i, j, k, l, m, n, miter, i2, j1;
 
-    for (i=0; i<mtlcoords.size(); i++)
+    n = mtlcoords.size();
+
+    k=m=0;
+    for (i=0; i<n; i++)
     {
         m_mcoords.push_back(mtlcoords[i]);
         int charge_left = mtlcoords[i].charge;
@@ -2707,6 +2667,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         }
         else lmc[0]->add_existing_atom(lmtl = mtlcoords[i].mtl);
         lmc[0]->movability = MOV_ALL;
+        metals[m++] = lmtl;
 
         l = 1;
         for (j=0; j<mtlcoords[i].coordres.size(); j++)
@@ -2715,6 +2676,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
             if (aa)
             {
+                mcoord_resnos[k++] = aa->get_residue_no();
                 aa->movability = MOV_FLEXONLY;
                 lmc[l++] = (Molecule*)aa;
                 Atom** Ss = aa->get_most_bindable(1, lmtl);
@@ -2739,6 +2701,8 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                 aa->coordmtl = lmtl;
             }
         }
+        mcoord_resnos[k] = 0;
+
         lmc[l] = nullptr;
         if (l > 1)
         {
@@ -2795,6 +2759,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
             if (aa) aa->movability = MOV_PINNED;
         }
     }
+    metals[m] = nullptr;
 
     return mtlcoords;
 }

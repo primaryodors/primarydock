@@ -104,7 +104,6 @@ Protein* protein;
 Protein* ptemplt;
 Protein* ptplref;
 int seql = 0;
-int mcoord_resno[256];
 int addl_resno[256];
 const Region* regions;
 SCoord region_clashes[85][3];
@@ -1992,10 +1991,7 @@ int main(int argc, char** argv)
 
     pktset = true;
 
-    protein->mcoord_resnos = mcoord_resno;
-
     l=0;
-    for (i=0; mcoord_resno[i]; i++) addl_resno[l++] = mcoord_resno[i];
     addl_resno[l] = 0;
 
     // Load the ligand or return an error.
@@ -2171,6 +2167,23 @@ int main(int argc, char** argv)
         if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
         for (i=0; i<agqty; i++)
             agc[i] = lagc.at(i).get();
+
+        if (mtlcoords.size())
+        {
+            for (i=0; i<mtlcoords.size(); i++)
+            {
+                for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                {
+                    AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                    if (aa)
+                    {
+                        aa->coordmtl = mtlcoords[i].mtl;
+                        aa->priority = true;
+                    }
+                }
+            }
+        }
+
         Search::prepare_constrained_search(protein, ligand, pocketcen);
     }
 

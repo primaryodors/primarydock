@@ -516,8 +516,10 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     chose_residue:
     cs_idx = j;
 
+    Atom* mtl = (cs_bt[j] == mcoord) ? cs_res[j]->coordmtl : nullptr;
+
     // Point residue toward where ligand will be, unless using pi stacking.
-    if (cs_bt[j] != pi)
+    if (cs_bt[j] != pi && cs_bt[j] != mcoord)
     {
         MovabilityType mt = cs_res[j]->movability;
         cs_res[j]->movability = MOV_FLEXONLY;
@@ -532,7 +534,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     ligand->move(mov);
 
     // Rotate the ligand so the atom group faces the chosen residue.
-    Point resca = cs_res[j]->get_CA_location();
+    Point resca = mtl ? mtl->get_location() : cs_res[j]->get_CA_location();
     Point agcen = cs_lag[j]->get_center();
     Rotation rot = align_points_3d(agcen, resca, ligand->get_barycenter());
     LocatedVector lv = rot.v;
@@ -540,10 +542,10 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     ligand->rotate(lv, rot.a);
 
     // Move the ligand so that the atom group is at the optimal distance to the residue.
-    Point resna = cs_res[j]->get_nearest_atom(loneliest)->get_location();
+    Point resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
     agcen = cs_lag[j]->get_center();
     mov = resna.subtract(agcen);
-    mov.r -= 1;
+    mov.r -= mtl ? 2.5 : 1;
     if (mov.r > 0) ligand->move(mov);
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
@@ -554,12 +556,15 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     ligand->rotate(lv, rot.a);
 
     // Conform the side chain and ligand to each other, ignoring other residues.
-    Molecule* mm[3];
-    mm[0] = cs_res[j];
-    mm[1] = ligand;
-    mm[2] = nullptr;
-    ligand->movability = MOV_NORECEN;
-    Molecule::conform_molecules(mm, 200);
+    if (!mtl)
+    {
+        Molecule* mm[3];
+        mm[0] = cs_res[j];
+        mm[1] = ligand;
+        mm[2] = nullptr;
+        ligand->movability = MOV_NORECEN;
+        Molecule::conform_molecules(mm, 200);
+    }
 
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.

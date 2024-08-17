@@ -447,6 +447,39 @@ void do_pivotal_hbond_rot_and_scoot()
     ligand->rotate(lv, theta);
 }
 
+void output_iter(int iter, Molecule** mols)
+{
+    std::string itersfname = (std::string)"tmp/" + (std::string)"_iters.dock";
+    int i, liter = iter + movie_offset;
+    FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
+    if (fp)
+    {
+        if (!liter && (pose == 1))
+        {
+            fprintf(fp, "PDB file: %s\n", protfname);
+        }
+        fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
+        int foff = 0;
+
+        for (i=0; reaches_spheroid[nodeno][i]; i++)
+        {
+            reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
+            foff += reaches_spheroid[nodeno][i]->get_atom_count();
+        }
+
+        for (i=0; mols[i]; i++)
+        {
+            if (mols[i]->is_residue()) continue;
+            mols[i]->save_pdb(fp, foff, false);
+            foff += mols[i]->get_atom_count();
+        }
+
+        protein->end_pdb(fp);
+
+        fclose(fp);
+    }
+}
+
 Pose iter_best_pose[1000];
 float iter_best_bind;
 void iteration_callback(int iter, Molecule** mols)
@@ -810,31 +843,7 @@ void iteration_callback(int iter, Molecule** mols)
     if (r >= recapture_distance) ligand->recenter(ligcen_target);
     #endif
 
-    if (output_each_iter)
-    {
-        std::string itersfname = (std::string)"tmp/" /*+ (std::string)protein->get_name()*/ + (std::string)"_iters.dock";
-        int liter = iter - 1 + movie_offset;
-        FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
-        if (fp)
-        {
-            if (!liter && (pose == 1))
-            {
-                fprintf(fp, "PDB file: %s\n", protfname);
-            }
-            fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
-            int foff = 0;
-
-            for (i=0; reaches_spheroid[nodeno][i]; i++)
-            {
-                reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
-                foff += reaches_spheroid[nodeno][i]->get_atom_count();
-            }
-
-            ligand->save_pdb(fp, foff);
-
-            fclose(fp);
-        }
-    }
+    if (output_each_iter) output_iter(iter, mols);
 }
 
 int spinchr = 0;
@@ -2768,21 +2777,6 @@ _try_again:
                 }
             }
 
-            int mcn;
-            Molecule lm("MTL");
-            if (mcn = mtlcoords.size())         // Assignment, not comparison.
-            {
-                for (i=0; i<mcn; i++)
-                {
-                    if (!mtlcoords[i].mtl) continue;                    
-                    lm.add_existing_atom(mtlcoords[i].mtl);
-                }
-
-                lm.movability = MOV_NONE;
-                cfmols[cfmolqty++] = &lm;
-                cfmols[cfmolqty] = nullptr;
-            }
-
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
 
@@ -2811,6 +2805,7 @@ _try_again:
                 reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
             }
             ligand->agroups = global_pairs;
+            if (output_each_iter) output_iter(0, cfmols);
             Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
 
             if (!nodeno) // && outpdb.length())

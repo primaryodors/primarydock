@@ -1200,7 +1200,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (debug_criteria) cout << endl;
         #endif
 
-
         #if _peratom_audit
         if (interauditing)
         {

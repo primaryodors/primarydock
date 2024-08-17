@@ -181,17 +181,7 @@ N       Mg     coord    0.5   2.1
 # Cannot find good numbers on coordination binding energies,
 # so these energies are based on 970/(vdW_rad(a) ^2) * (elecn(a) - elecn(b) / (vdW_rad(b) ^2).
 N       Mn     coord    0.5   1.86       38.7
-N       Fe     coord    0.5   1.82       33.5
-N       Co     coord    0.5   1.79       33.8
-N       Ni     coord    0.5   1.74       28.6
-N       Cu     coord    0.5   1.76       39.1
-N       Zn     coord    0.5   1.77       48.4
 O       Mn     coord    0.5   1.75       51
-O       Fe     coord    0.5   1.71       46.3
-O       Co     coord    0.5   1.68       47.2
-O       Ni     coord    0.5   1.63       40.3
-O       Cu     coord    0.5   1.65       55.
-O       Zn     coord    0.5   1.66       64.8
 Cl      Mn     coord    0.5   2.12       
 Cl      Fe     coord    0.5   2.08       
 Cl      Co     coord    0.5   2.05       
@@ -203,6 +193,29 @@ Cl      Zn     coord    0.5   2.04
 # More predicted energies.
 S       Cu     coord    0.5   2.29       17.3           1.5
 S       Zn     coord    0.5   2.43       24.0           2.5
+
+# https://pubs.acs.org/doi/10.1021/acs.macromol.1c01028
+# https://www.pnas.org/doi/full/10.1073/pnas.2316914121
+O       Na     coord    0.5   3.2        24.74
+
+# Utter guesswork:
+N       Na     coord    0.5   3.3        10.
+S       Na     coord    0.5   4.2         5.
+
+# http://dx.doi.org/10.3390/pharmaceutics15092180
+N       Ag     coord    0.5   2.14       54.7
+N       Cu     coord    0.5   1.76       54.3
+N       Co     coord    0.5   2.04      117.
+N       Ni     coord    0.5   1.90       74.4
+N       Zn     coord    0.5   1.99       61.5
+N       Cd     coord    0.5   2.3        50.5
+N       Fe     coord    0.5   2.01       80.5
+O       Ag     coord    0.5   2.2?       56.5
+O       Cu     coord    0.5   2.42       57.5
+O       Co     coord    0.5   2.22       30.4
+O       Ni     coord    0.5   2.16       53.
+O       Zn     coord    0.5   2.11       49.1
+O       Cd     coord    0.5   2.3        30.9
 
 # To be expanded later.
 # Keep these last or the code will erroneously add them to the other bindings.

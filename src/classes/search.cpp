@@ -481,10 +481,13 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
     bool ligand_can_hbond = ligand->has_hbond_donors() || ligand->has_hbond_acceptors() || fabs(ligand->get_charge()) > 0.999999999;
 
-    // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     n = cs_res_qty;
+    any_resnos_priority = false;
+    for (l=0; l<n; l++) if (cs_res[l]->priority) any_resnos_priority = true;
+
+    // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     if (!n) return;
-    while (true)
+    for (l=0; l<1e6; l++)
     {
         j = rand() % n;
 
@@ -496,7 +499,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         if (any_resnos_priority && !cs_res[j]->priority) continue;
 
         // If the ligand can form a polar bond, it must form a polar bond.
-        if ((ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
+        if (!cs_res[j]->priority && (ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
 
         float b;
         switch (cs_bt[j])

@@ -1453,6 +1453,7 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
             }
     }
 
+    cout << "No bond definition for " << a->get_elem_sym() << " " << btype << " " << b->get_elem_sym() << ". Please check data/bindings.dat." << endl;
     throw BOND_DEF_NOT_FOUND;
 }
 

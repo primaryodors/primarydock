@@ -156,6 +156,8 @@ if ($famno < 50) $adjustments .= "IF $3.37 != \"G\" THEN ATOMTO %3.37 EXTENT @6.
 else if ($famno == 51 || $famno == 52) $adjustments .= "ATOMTO %6.59 EXTENT @4.57\n";
 else if ($rcpid == "OR56B2") $adjustments .= "ATOMTO %6.58 EXTENT @4.57\n";
 
+$knowns = preg_replace("/[^0-9a-zA-Z_ ]/", "", $knowns);
+
 $pepd = <<<blixtos
 
 LET \$rcpid = "$rcpid"
@@ -167,6 +169,7 @@ LET \$mdld = "hm/$pyoutfn"
 LOAD \$inpf A I
 LOAD \$mdld A A
 
+REMARK 265 HM_TEMPLATES: $knowns
 BWCOPY I A
 
 STRAND I

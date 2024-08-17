@@ -1041,27 +1041,27 @@ $('#skeletal').hide();
     Files:<br>
     <table class="ctxmenu">
         <tr><td>Active model:</td>
-            <td><a href="#" onclick="view_file($('#dl_acv_mdl')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_file($('#dl_acv_mdl')[0].href); $('#dlmenu').hide();">text</a></td>
             <td><a id="vw_acv_mdl_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Inactive model:</td>
-            <td><a href="#" onclick="view_file($('#dl_iacv_mdl')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_file($('#dl_iacv_mdl')[0].href); $('#dlmenu').hide();">text</a></td>
             <td><a id="vw_iacv_mdl_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Active dock:</td>
-            <td><a href="#" onclick="view_html_file($('#dl_acv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_html_file($('#dl_acv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">text</a></td>
             <td><a id="vw_acv_dc_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Inactive dock:</td>
-            <td><a href="#" onclick="view_html_file($('#dl_iacv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_html_file($('#dl_iacv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">text</a></td>
             <td><a id="vw_iacv_dc_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>JSON entry:</td>
-            <td><a href="#" onclick="view_file($('#dl_json')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_file($('#dl_json')[0].href); $('#dlmenu').hide();">text</a></td>
             <td>&nbsp;</td>
             <td><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>

@@ -597,6 +597,8 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
     return potential;
 }
 
+#define _num_force_precedences 6
+const intera_type force_precedence[_num_force_precedences] = {mcoord, ionic, hbond, pi, polarpi, vdW};
 float InteratomicForce::total_binding(Atom* a, Atom* b)
 {
     InteratomicForce* forces[32];
@@ -604,6 +606,28 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     int i, j, k;
     float kJmol = 0;
+    float partial = 0;
+
+    InteratomicForce* forces_by_type[_num_force_precedences];
+    for (i=0; i<_num_force_precedences; i++) forces_by_type[i] = nullptr;
+    for (i=0; forces[i]; i++)
+    {
+        for (j=0; j<_num_force_precedences; j++)
+        {
+            if (force_precedence[j] == forces[i]->type)
+            {
+                forces_by_type[j] = forces[i];
+                break;
+            }
+        }
+    }
+    j=0;
+    for (i=0; i<_num_force_precedences; i++)
+    {
+        if (forces_by_type[i]) forces[j++] = forces_by_type[i];
+    }
+    forces_by_type[j] = nullptr;
+
 
     float r = a->distance_to(b);
     float avdW = a->get_vdW_radius(), bvdW = b->get_vdW_radius();
@@ -655,7 +679,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     }
     #endif
 
-    if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2);
+    if (achg && sgn(achg) == sgn(bchg))
+    {
+        float repulsion = charge_repulsion * achg*bchg / pow(r, 2);
+        kJmol -= repulsion;
+        k = (ionic - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] -= repulsion;
+    }
 
     if (achg) apol += achg;
     if (bchg) bpol += bchg;
@@ -695,6 +725,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         }
 
         kJmol -= pr;
+        k = (hbond - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] -= pr;
     }
 
     no_polar_repuls:
@@ -715,7 +747,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     if (!atoms_are_bonded && achg && bchg && sgn(achg) == -sgn(bchg))
     {
-        kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
+        float pcf = 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
+        kJmol += pcf;
+        k = (ionic - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] += pcf;
     }
     #endif
 
@@ -753,7 +788,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (forces[i]->type == covalent) continue;
         
-        float partial, rdecayed;
+        float rdecayed;
         float asum=0, bsum=0, aniso=1;
         bool stacked_pi_rings = false;
 
@@ -1257,6 +1292,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         {
             break;
         }
+    
+        if (partial) break;
     }
 
     if (rbind < 0.7) rbind = 0.7;
@@ -1289,12 +1326,15 @@ _canstill_clash:
 
     sigma = fmin(rbind, avdW+bvdW) - local_clash_allowance;
 
+    float clash = 0;
     if (r < rbind && !atoms_are_bonded) // && (!achg || !bchg || (sgn(achg) != -sgn(bchg))) )
     {
         // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << achg << " " << bchg << endl;
-        float clash = Lennard_Jones(a, b, sigma);
-        kJmol -= fmax(clash, 0);
-        
+        clash = fmax(Lennard_Jones(a, b, sigma), 0);
+        kJmol -= clash;
+        k = (vdW - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] -= clash;
+
         #if _peratom_audit
         if (interauditing)
         {
@@ -1311,6 +1351,7 @@ _canstill_clash:
     }
 
     _finished_clashing:
+
     return kJmol;
 }
 

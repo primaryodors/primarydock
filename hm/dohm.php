@@ -83,7 +83,7 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "$CLASSI, $MTAAR9, $CB, $LPAR1";      // 
+    $knowns = "$CLASSI, $MTAAR9, $LPAR1";      // 
 }
 
 
@@ -182,12 +182,12 @@ IF $5.58 != "Y" GOTO _not_57_hbond
 IF $7.53 != "Y" GOTO _not_57_hbond
 MEASURE %5.58 "OH" %7.53 "OH" &d57
 ECHO "Y5.58 and Y7.53 are " &d57 "A apart."
-IF &d57 > 5.3 DIE "FAIL"
+IF &d57 > 5.3 FAIL "Y57 distance is too great."
 _not_57_hbond:
 
 A100 &a100
 ECHO "A100 Score: " &a100
-IF &a100 < 10 DIE "FAIL"
+IF &a100 < 10 FAIL "A100 score too low."
 
 DELETE 1 %1.20
 HYDRO

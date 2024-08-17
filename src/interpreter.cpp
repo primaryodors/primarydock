@@ -1607,6 +1607,11 @@ int main(int argc, char** argv)
                 return 0;
             }	// END
 
+            else if (!strcmp(words[0], "ERROR") || !strcmp(words[0], "FAIL"))
+            {
+                raise_error(words[1]);
+            }	// ERROR
+
             else if (!strcmp(words[0], "GEN"))
             {
                 if (!words[1]) raise_error("No sequence given for GEN.");

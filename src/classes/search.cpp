@@ -487,7 +487,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     if (!n) return;
-    for (l=0; l<1e6; l++)
+    for (l=0; l<1e5; l++)
     {
         j = rand() % n;
 
@@ -518,6 +518,33 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     }
     chose_residue:
     cs_idx = j;
+
+    if ((cs_bt[j] == hbond || cs_bt[j] == mcoord || cs_bt[j] == ionic) && cs_lag[j]->heavy_atom_count() > 4 // && cs_lag[j]->get_pi()
+        && (cs_lag[j]->contains_element("N") || cs_lag[j]->contains_element("O") || cs_lag[j]->contains_element("S"))
+        )
+    {
+        n = cs_lag[j]->atct;
+        Atom* candidates[256];
+        i=0;
+        for (l=0; l<n; l++)
+        {
+            Atom* lca = cs_lag[j]->atoms[l];
+            if (lca->get_Z() > 1 && lca->get_family() != TETREL) candidates[i++] = lca;
+        }
+
+        if (i)
+        {
+            cs_res[cs_res_qty] = cs_res[j];
+            cs_bt[cs_res_qty] = cs_bt[j];
+            cs_lag[cs_res_qty] = new AtomGroup();
+            cs_idx = cs_res_qty;
+            cs_res_qty++;
+
+            cs_lag[cs_idx]->atoms[0] = candidates[rand()%i];
+            cs_lag[cs_idx]->atct = 1;
+            j = cs_idx;
+        }
+    }
 
     Atom* mtl = (cs_bt[j] == mcoord) ? cs_res[j]->coordmtl : nullptr;
 

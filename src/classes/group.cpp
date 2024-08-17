@@ -1181,7 +1181,7 @@ float GroupPair::get_potential()
         bool polar_atoms = (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff);
         bool polar_res   = (fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff);
 
-        if (polar_atoms != polar_res) return 0;
+        if (!scg->metallic && polar_atoms != polar_res) return 0;
 
         int i, j, q=0;
         for (i=0; i<m; i++)
@@ -1193,7 +1193,7 @@ float GroupPair::get_potential()
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
 
-                if (polar_atoms && polar_res)
+                if (polar_atoms && polar_res && !aa->coordmtl)
                 {
                     if (!aa->has_hbond_acceptors() && a->is_polar() > 0) continue;
                     if (!aa->has_hbond_donors() && a->is_polar() < 0) continue;

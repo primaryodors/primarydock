@@ -190,17 +190,14 @@ Cl      Cu     coord    0.5   2.03
 Cl      Zn     coord    0.5   2.04       
 
 # https://onlinelibrary.wiley.com/doi/pdf/10.1002/9783527616091.app1
-# More predicted energies.
-S       Cu     coord    0.5   2.29       17.3           1.5
-S       Zn     coord    0.5   2.43       24.0           2.5
+# Cu energy is based on a 600nm absorption band for Cu (II).
+# Zn energy is derived from the ratio of Cu-S : Cu-O.
+S       Cu     coord    0.5   2.29       99.75           1.5
+S       Zn     coord    0.5   2.43       85.18          2.5
 
 # https://pubs.acs.org/doi/10.1021/acs.macromol.1c01028
 # https://www.pnas.org/doi/full/10.1073/pnas.2316914121
 O       Na     coord    0.5   3.2        24.74
-
-# Utter guesswork:
-N       Na     coord    0.5   3.3        10.
-S       Na     coord    0.5   4.2         5.
 
 # http://dx.doi.org/10.3390/pharmaceutics15092180
 N       Ag     coord    0.5   2.14       54.7
@@ -211,7 +208,7 @@ N       Zn     coord    0.5   1.99       61.5
 N       Cd     coord    0.5   2.3        50.5
 N       Fe     coord    0.5   2.01       80.5
 O       Ag     coord    0.5   2.2?       56.5
-O       Cu     coord    0.5   2.42       57.5
+# O       Cu     coord    0.5   2.42       57.5
 O       Co     coord    0.5   2.22       30.4
 O       Ni     coord    0.5   2.16       53.
 O       Zn     coord    0.5   2.11       49.1

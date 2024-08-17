@@ -7,10 +7,13 @@ int main(int argc, char** argv)
     Molecule m("Test Ligand");
     std::vector<BallesterosWeinstein> pocketcen_res;
     std::vector<std::string> atoms_of_interest;
+    bool priorities[256];
 
     bool save_tmp_pdbs = false;
 
     int i;
+    for (i=0; i<256; i++) priorities[i] = false;
+
     FILE* fp;
     char buffer[49152];
     for (i=1; i<argc; i++)
@@ -55,7 +58,11 @@ int main(int argc, char** argv)
             {
                 if (!strcasecmp(argv[i], "nec")) break;
                 else if (!strcasecmp(argv[i], "*")) break;
-                else pocketcen_res.push_back(argv[i]);
+                else
+                {
+                    if (argv[i][strlen(argv[i])-1] == '!') priorities[pocketcen_res.size()] = true;
+                    pocketcen_res.push_back(argv[i]);
+                }
             }
         }
         else if (!strcasecmp(argv[i], "savtmp"))
@@ -102,7 +109,7 @@ int main(int argc, char** argv)
             aa = p.get_residue(pocketcen_res[i]);
             if (aa)
             {
-                aa->priority = true;
+                aa->priority = priorities[i];
                 pt4avg[j++] = aa->get_CA_location();
             }
         }
@@ -120,16 +127,11 @@ int main(int argc, char** argv)
     for (i=0; i<agqty; i++)
         agc[i] = lagc.at(i).get();
     int n = p.get_end_resno();
-    for (i=0; i<n; i++)
-    {
-        AminoAcid* aa = p.get_residue(i);
-        if (aa) aa->priority = false;
-    }
     Search::prepare_constrained_search(&p, &m, loneliest);
     n = cs_res_qty;
     for (i=0; i<n; i++)
     {
-        cout << "Candidate: " << cs_res[i]->get_name() << " ~ " << cs_bt[i] << " ~ " << *cs_lag[i] << endl;
+        cout << "Candidate: " << cs_res[i]->get_name() << (cs_res[i]->priority ? "!" : "") << " ~ " << cs_bt[i] << " ~ " << *cs_lag[i] << endl;
     }
 
     int iter;

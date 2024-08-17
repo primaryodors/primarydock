@@ -1226,7 +1226,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "OUTBBP"))
     {
-        out_bb_pairs = atoi(words[1]);
+        out_bb_pairs = words[1] ? atoi(words[1]) : true;
         return 1;
     }
     else if (!strcmp(words[0], "OUTLPS"))

@@ -264,7 +264,7 @@ function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname, $docker;
     global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
-    global $atomto, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
+    global $atomto, $excl, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
     chdir("..");
@@ -286,6 +286,7 @@ function prepare_outputs()
     $size = "7.5 7.5 7.5";
     $search = "CS";
     $atomto = [];
+    $excl = "";
     $stcr = "";
     $flxr = "";
     $astcr = "";
@@ -366,6 +367,15 @@ function prepare_outputs()
         if (isset($mbp["iflxr"])) $iflxr = "FLXR {$mbp["iflxr"]}";
 
         if (isset($mbp["stddev"])) $num_std_devs = floatval($mbp["stddev"]);
+        if (isset($mbp["excl"]))
+        {
+            $se = explode(" ", trim($mbp["excl"]));
+            if (false !== strpos($se[0], ".")) $sr = resno_from_bw($protid, $se[0]);
+            else $sr = intval($se[0]);
+            if (false !== strpos($se[1], ".")) $er = resno_from_bw($protid, $se[1]);
+            else $er = intval($se[1]);
+            $excl = "EXCL $sr $er\n";
+        }
     
         if (isset($mbp["atomto"]))
         {
@@ -414,7 +424,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 {
     global $ligname, $isomers, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST;
-    global $cenres, $size, $docker, $mcoord, $atomto, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
+    global $cenres, $size, $docker, $mcoord, $atomto, $excl, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 
@@ -649,7 +659,7 @@ heredoc;
             switch (family_from_protid($protid))
             {
                 case "OR":
-                $softness = "5.0";
+                $softness = "1.0";
                 break;
 
                 case "TAAR":
@@ -684,7 +694,7 @@ heredoc;
         }
         else $iso = "";
 
-        $excl = resno_from_bw($protid, "2.37");
+        $excl1 = resno_from_bw($protid, "2.37");
         $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 3 4 45 5 6 7" : "";
 
         $configf = <<<heredoc
@@ -701,7 +711,8 @@ $atomto
 $stcr
 $flxr
 
-EXCL 1 $excl		# Head, TMR1, and CYT1.
+EXCL 1 $excl1		# Head, TMR1, and CYT1.
+$excl
 
 SEARCH $search
 POSE $pose

@@ -548,6 +548,7 @@ SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
 
 float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 {
+    return 1;           // What is this function for???
     float f = (1.0 + 1.0 * cos(fmin(fabs(((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25)*6), M_PI)));
     #if _dbg_groupsel
     // cout << "Metal compatibility for " << *a << "..." << *b << " = " << f << endl;
@@ -639,6 +640,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     float achg = a->get_charge(), bchg = b->get_charge()
         , apol = a->is_polar(), bpol = b->is_polar();
+    int aZ = a->get_Z(), bZ = b->get_Z();
 
     #if auto_pK_protonation
     if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
@@ -777,6 +779,16 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) continue;
             else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
         }
+
+        // https://chemistry.stackexchange.com/questions/42085/can-an-amide-nitrogen-be-a-hydrogen-bond-acceptor
+        if (forces[i]->type == hbond
+            &&  (   (aZ == 1 && b->get_family() == PNICTOGEN && (b->is_pi() && b->get_bonded_atoms_count() > 2) ) 
+                 || (bZ == 1 && a->get_family() == PNICTOGEN && (a->is_pi() && a->get_bonded_atoms_count() > 2) )
+                 || (aZ == 1 && bchg > hydrophilicity_cutoff)
+                 || (bZ == 1 && achg > hydrophilicity_cutoff)
+                )
+            )
+            continue;
 
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
@@ -1138,7 +1150,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
 
             // TODO: Replace this with a more generalized model of competitive h-bonding as well as ionic, mcoord, etc.
-            if (forces[i]->type == hbond && a->is_backbone != b->is_backbone) partial *= 0.5;
+            // if (forces[i]->type == hbond && a->is_backbone != b->is_backbone) partial *= 0.5;
 
             if (forces[i]->type == mcoord)
             {
@@ -1168,18 +1180,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 throw 0xbadf0ace;
             }
 
-            if (forces[i]->type == polarpi || forces[i]->type == mcoord)
+            if (forces[i]->type == polarpi || forces[i]->type == mcoord || forces[i]->type == ionic)
             {
-                if (a->is_metal()) partial *= a->get_charge();
-                if (b->is_metal()) partial *= b->get_charge();
+                partial *= fmax(forces[i]->type == ionic?0:1, fabs(achg)) * fmax(forces[i]->type == ionic?0:1, fabs(bchg));
             }
 
-            if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
-            {
-                partial *= achg * -bchg;
-            }
-
-            if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);
+            // if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);
 
             # if 0
             //if (forces[i]->type == polarpi || forces[i]->type == mcoord)
@@ -1453,8 +1459,9 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
             }
     }
 
-    cout << "No bond definition for " << a->get_elem_sym() << " " << btype << " " << b->get_elem_sym() << ". Please check data/bindings.dat." << endl;
-    throw BOND_DEF_NOT_FOUND;
+    cout << "WARNING: No bond definition for " << a->get_elem_sym() << " " << btype << " " << b->get_elem_sym() << ". Please check data/bindings.dat." << endl;
+    // throw BOND_DEF_NOT_FOUND;
+    return a->get_vdW_radius() + b->get_vdW_radius();
 }
 
 std::string InteratomicForce::get_config_string() const

@@ -487,6 +487,11 @@ bool Atom::move(Point* pt)
         return false;
     }
 
+    if (pt->get_3d_distance(location) > 0.5 && !strcmp(name, "O1") )
+    {
+        geometry_dirty = true;
+    }
+
     location = *pt;
     location.weight = at_wt;
     if (geov) delete[] geov;

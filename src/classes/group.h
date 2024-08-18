@@ -22,6 +22,7 @@ class AtomGroup
     float max_potential_binding(intera_type type);
     int contains_element(const char* esym);
     bool contains_atom(Atom* a);
+    Atom* get_mcoord_atom();
     void remove_atom(Atom* a);
     float distance_to(Point pt);
     float bounds();

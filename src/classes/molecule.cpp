@@ -2609,6 +2609,10 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     #endif
 
     int i;
+    if (fabs(theta) > hexagonal)
+    {
+        i = 0;
+    }
     for (i=0; atoms[i]; i++)
     {
         // if (atoms[i]->residue) return;
@@ -2640,6 +2644,10 @@ void Molecule::rotate(LocatedVector lv, float theta)
     #endif
 
     int i;
+    if (fabs(theta) > hexagonal)
+    {
+        i = 0;
+    }
     for (i=0; atoms[i]; i++)
     {
         // if (atoms[i]->residue) return;
@@ -3438,7 +3446,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
-        bool do_full_rotation = ((iter % _fullrot_every) == 0);
+        bool do_full_rotation = _allow_fullrot && ((iter % _fullrot_every) == 0);
 
         for (i=0; i<n; i++)
         {

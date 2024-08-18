@@ -674,7 +674,19 @@ void iteration_callback(int iter, Molecule** mols)
 
     if (!iter) goto _oei;
     if (iter == (iters-1)) goto _oei;
-    
+
+    if (pdpst == pst_best_binding && ligand_groups[0].atct)
+    {
+        l = 1;
+        Point agcen = global_pairs[l]->ag->get_center();
+        Atom* scgna = global_pairs[l]->scg->get_nearest_atom(agcen);
+        float r = global_pairs[l]->ag->distance_to(scgna->get_location());
+        if (r > 2.5)
+        {
+            ligand->conform_atom_to_location(global_pairs[l]->ag->atoms[0]->name, scgna->get_location(), 10, 2.5);
+        }
+    }
+
     #if enforce_no_bb_pullaway
     if (pdpst == pst_best_binding && ligand_groups[0].atct)
     {
@@ -2329,8 +2341,8 @@ _try_again:
             #endif
             conformer_tumble_multiplier = 1;
 
-            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && pdpst != pst_best_binding;
-            allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true);
+            allow_ligand_360_tumble = nodes_no_ligand_360_tumble && pdpst != pst_best_binding;
+            allow_ligand_360_flex   = nodes_no_ligand_360_flex;
 
             if (strlen(protafname) && nodeno == activation_node)
             {
@@ -2806,6 +2818,7 @@ _try_again:
             }
             ligand->agroups = global_pairs;
             if (output_each_iter) output_iter(0, cfmols);
+            if (pdpst == pst_best_binding) ligand->movability = (MovabilityType)(MOV_CAN_AXIAL | MOV_CAN_RECEN | MOV_CAN_FLEX);
             Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
 
             if (!nodeno) // && outpdb.length())

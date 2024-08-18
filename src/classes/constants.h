@@ -90,6 +90,7 @@
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
+#define _allow_fullrot 0
 #define _fullrot_stepdeg 20
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 7
@@ -239,7 +240,7 @@
 // Extra weight given to sidechain-ligand binding strengths during conformer search.
 #define dock_ligand_bias 1.0
 
-// Turns off the 360 degree rotations for all but the zeroth node of a path.
+// Turns off the 360 degree rotations.
 #define nodes_no_ligand_360_tumble 1
 #define nodes_no_ligand_360_flex 1
 #define prevent_ligand_360_on_activate 1

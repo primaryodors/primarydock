@@ -20,14 +20,14 @@ function make_prediction($data)
             $data['Predicted'] = 'Agonist';
             $data['Affinity'] = round($ascore, 4);
             $data['A100'] = round($aa100, 4);
-            $data['DockScore'] = round(min($ascore, 35) * $aa100 / 100, 4);
+            $data['DockScore'] = round(min($ascore, 50) * $aa100 / 150, 4);
         }
         else if ($iscore > 0)
         {
             $data['Affinity'] = round($iscore, 4);
             $data['A100'] = round($ia100, 4);
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = round(($ia100 - 20) / 100, 4);
+            $data['DockScore'] = round(($ia100 - 20) / 20, 4);
         }
         else
         {

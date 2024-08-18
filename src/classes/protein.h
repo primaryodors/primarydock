@@ -205,6 +205,7 @@ public:
     AminoAcid *stop1, *stop2;
     Atom *stop1a, *stop2a;
     int last_saved_atom_number = 0;
+    Point pocketcen;
 
 protected:
     Atom** ca = nullptr;

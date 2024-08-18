@@ -2651,13 +2651,16 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
 std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 {
-    int i, j, k, l, m, n, miter, i2, j1;
+    int i, j, k, l, m, n, q, miter, i2, j1;
 
     n = mtlcoords.size();
 
     k=m=0;
     for (i=0; i<n; i++)
     {
+        Atom* coord_atoms[mtlcoords[i].coordres.size()+2];
+        q=0;
+
         m_mcoords.push_back(mtlcoords[i]);
         int charge_left = mtlcoords[i].charge;
         Point lpt;
@@ -2702,6 +2705,8 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                         }
                     }
                 }
+
+                coord_atoms[q++] = Ss[0];
 
                 aa->coordmtl = lmtl;
             }
@@ -2758,11 +2763,18 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         }
         Molecule::conform_molecules(lmc, 50);
 
+        coord_atoms[q] = nullptr;
+
         for (j=0; j<mtlcoords[i].coordres.size(); j++)
         {
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
             if (aa) aa->movability = MOV_PINNED;
         }
+
+        Point foravg[q+2];
+        for (j=0; j<q; j++) foravg[j] = coord_atoms[j]->get_location();
+        lmtl->move(average_of_points(foravg, q));
+        // lmtl->move(find_equidistant_point(foravg, q, this->pocketcen.magnitude() ? &this->pocketcen : nullptr));
     }
     metals[m] = nullptr;
 

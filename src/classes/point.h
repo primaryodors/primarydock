@@ -148,6 +148,8 @@ struct Tug
 
 Point average_of_points(Point* points, int count);
 Point size_of_point_space(Point* points, int count);
+float equidistance_anomaly(Point point, Point* refs, int count);
+Point find_equidistant_point(Point* points, int count, Point* bias = nullptr);
 
 float find_angle(float dx, float dy);
 float find_angle_delta(float a1, float a2);

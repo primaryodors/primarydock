@@ -1955,6 +1955,7 @@ int main(int argc, char** argv)
 
     if (mtlcoords.size())
     {
+        protein->pocketcen = pocketcen;
         mtlcoords = protein->coordinate_metal(mtlcoords);
 
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_metal.pdb";
@@ -2222,6 +2223,13 @@ _try_again:
         region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
     }
 
+    n = mtlcoords.size();
+    Point metal_initlocs[n+4];
+    for (i=0; i<n; i++)
+    {
+        metal_initlocs[i] = mtlcoords[i].mtl->get_location();
+    }
+
     float best_energy = 0;
     for (pose = 1; pose <= poses; pose++)
     {
@@ -2288,6 +2296,12 @@ _try_again:
             protein->load_pdb(pf, 0, protstrand ?: 'A');
             fclose(pf);
             apply_protein_specific_settings(protein);
+        }
+
+        n = mtlcoords.size();
+        for (i=0; i<n; i++)
+        {
+            mtlcoords[i].mtl->move(metal_initlocs[i]);
         }
 
         freeze_bridged_residues();

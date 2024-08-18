@@ -98,9 +98,12 @@ switch ($fam)
     else $knowns = "$CLASSI";
     break;
 
+    case 'OR5':
+    if (!file_exists("$pdbname_5k1")) die("Modeling this receptor requires the third party OR5K1 template.\n");
+    else $knowns = "$OR5K1";
+
     default:        // Class II ORs
-    if (!file_exists("$pdbname_5k1")) die("Class II OR modeling requires the third party OR5K1 template.\n");
-    else $knowns = "$CLASSI, $MTAAR9, $OR5K1";      // , $LPAR1
+    $knowns = "$CLASSI";      // , $LPAR1, $MTAAR9
 }
 
 

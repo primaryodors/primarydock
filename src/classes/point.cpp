@@ -260,6 +260,65 @@ Point size_of_point_space(Point* points, int count)
     return Point(x1-x0, y1-y0, z1-z0);
 }
 
+float equidistance_anomaly(Point point, Point* refs, int count)
+{
+    int i;
+    float max, min;
+    for (i=0; i<count; i++)
+    {
+        float r = point.get_3d_distance(refs[i]);
+        if (r<min || !i) min = r;
+        if (r>max || !i) max = r;
+    }
+
+    return max-min;
+}
+
+Point find_equidistant_point(Point* points, int count, Point* bias)
+{
+    Point retval = average_of_points(points, count);
+    float anom = equidistance_anomaly(retval, points, count);
+    if (anom < 0.01) return retval;
+
+    Point lbias;
+    if (bias) lbias = bias->subtract(retval);
+
+    int iter;
+    Point was = retval;
+    for (iter=0; iter<333; iter++)
+    {
+        int xyz = iter % 3;
+
+        float bd;
+        switch (xyz)
+        {
+            case 0: bd = lbias.x; break;
+            case 1: bd = lbias.y; break;
+            default: bd = lbias.z;
+        }
+
+        float f;
+        if (bd < 0) f = frand(-anom, anom/3);
+        else if (bd > 0) f = frand(-anom/3, anom);
+        else bd = frand(-anom, anom);
+
+        switch (xyz)
+        {
+            case 0: retval.x += f; break;
+            case 1: retval.y += f; break;
+            default: retval.z += f;
+        }
+
+        float r = equidistance_anomaly(retval, points, count);
+        if (r < 0.01) return retval;
+
+        if (r < anom) anom = r;
+        else retval = was;
+    }
+
+    return retval;
+}
+
 float find_angle(float dx, float dy)
 {
     float angle = atan2(dy,dx);

@@ -6,18 +6,27 @@ chdir(__DIR__);
 
 $exp = file_get_contents("experimental.ali");
 
+$prevln = "";
 foreach (explode("\n", $exp) as $ln)
 {
-    if (substr($ln, 0, 4) == ">P1;")
+    if (substr($prevln, 0, 4) == ">P1;")
     {
-        $rcsbid = substr($ln, 4);
-        $fn = "$rcsbid.pdb";
-        if (file_exists($fn)) continue;
-        $rcsbidu = strtoupper($rcsbid);
-        $url = "https://files.rcsb.org/download/$rcsbidu.pdb";
-        file_put_contents($fn, file_get_contents($url));
-        if (file_exists($fn)) echo "Downloaded $rcsbid.\n";
+        $pettias = explode(':', $ln);
+        $rcsbid = $pettias[1];
+        if (strlen($rcsbid) == 4)
+        {
+            $fn = "$rcsbid.pdb";
+            if (!file_exists($fn))
+            {
+                $rcsbidu = strtoupper($rcsbid);
+                $url = "https://files.rcsb.org/download/$rcsbidu.pdb";
+                file_put_contents($fn, file_get_contents($url));
+                if (file_exists($fn)) echo "Downloaded $rcsbid.\n";
+            }
+        }
     }
+
+    $prevln = $ln;
 }
 
 $fp = fopen("allgpcr.ali", "w");

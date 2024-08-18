@@ -683,7 +683,7 @@ void iteration_callback(int iter, Molecule** mols)
         float r = global_pairs[l]->ag->distance_to(scgna->get_location());
         if (r > 2.5)
         {
-            ligand->conform_atom_to_location(global_pairs[l]->ag->atoms[0]->name, scgna->get_location(), 10, 2.5);
+            ligand->conform_atom_to_location(global_pairs[l]->ag->atoms[0]->name, scgna->get_location(), 10, frand(2, r));
         }
     }
 

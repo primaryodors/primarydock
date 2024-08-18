@@ -2997,6 +2997,8 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
 {
     save_undo_state();
 
+    int lused = rand();
+
     LocatedVector lv(axis);
     lv.origin = pivot;
     int i;
@@ -3008,6 +3010,12 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
         aa->movability = MOV_ALL;
         aa->rotate(lv, theta);
         aa->ensure_pi_atoms_coplanar();
+        if (aa->coordmtl && aa->coordmtl->used != lused)
+        {
+            Point pt = rotate3D(aa->coordmtl->get_location(), pivot, axis, theta);
+            aa->coordmtl->move(pt);
+            aa->coordmtl->used = lused;
+        }
         aa->movability = mov;
         set_clashables(i);
     }

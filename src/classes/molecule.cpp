@@ -1861,6 +1861,7 @@ void Molecule::identify_acidbase()
 Bond** Molecule::get_rotatable_bonds(bool icf)
 {
     if (noAtoms(atoms)) return 0;
+    if (rotatable_bonds) return rotatable_bonds;
     if (mol_typ == MOLTYP_AMINOACID)
     {
         // TODO: There has to be a better way.
@@ -1872,7 +1873,6 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
-    if (rotatable_bonds) return rotatable_bonds;
 
     Bond* btemp[65536];
 
@@ -2045,6 +2045,8 @@ void Molecule::clear_cache()
 // TODO: There has to be a better way.
 Bond** AminoAcid::get_rotatable_bonds()
 {
+    if (rotatable_bonds) return rotatable_bonds;
+
     // cout << name << " AminoAcid::get_rotatable_bonds()" << endl << flush;
     // Return ONLY side chain bonds, from lower to higher Greek. E.g. CA-CB but NOT CB-CA.
     // Exclude CA-N and CA-C as these will be managed by the Protein class.

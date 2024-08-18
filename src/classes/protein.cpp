@@ -917,6 +917,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     // cout << "Read residue " << *residues[rescount] << endl;
     residues[rescount] = 0;
 
+    if (res_can_clash) delete[] res_can_clash;
     res_can_clash = nullptr;
     set_clashables();
 

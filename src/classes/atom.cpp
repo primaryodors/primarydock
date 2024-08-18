@@ -1774,7 +1774,8 @@ SCoord* Atom::get_basic_geometry()
     {
         for (i=0; i<-geometry; i++)
         {
-            retval[i] = new SCoord(1, 0, M_PI/abs(geometry/2)*i);
+            SCoord v(1, 0, M_PI/abs(geometry/2)*i);
+            retval[i] = v;
         }
     }
     else if (geometry == 1)

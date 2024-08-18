@@ -1880,7 +1880,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
     if (!immobile)
         for (i=0; atoms[i]; i++)
         {
-            Bond* lb[16];
+            Bond* lb[32];
             atoms[i]->fetch_bonds(lb);
             int g = atoms[i]->get_geometry();
             for (j=0; j<g && lb[j]; j++)
@@ -2095,7 +2095,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                              << " and " << aadef->aabonds[i]->bname
                              << endl << flush;
 
-                        Bond* lbb[16];
+                        Bond* lbb[32];
                         la->fetch_bonds(lbb);
                         if (lbb[0])
                         {

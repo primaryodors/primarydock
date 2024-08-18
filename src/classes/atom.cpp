@@ -220,7 +220,7 @@ Atom::Atom(const char* elem_sym)
 
     bonded_to = new Bond[abs(geometry)+4];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
+    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -241,7 +241,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
 
     bonded_to = new Bond[abs(geometry)+4];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
+    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -263,7 +263,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
 
     bonded_to = new Bond[abs(geometry)];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
+    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -335,7 +335,7 @@ Atom::Atom(FILE* is)
 
                     figure_out_valence();
                     bonded_to = new Bond[abs(geometry)];
-                    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
+                    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
 
                     Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
                     location = aloc;

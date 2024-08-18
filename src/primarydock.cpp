@@ -3129,6 +3129,11 @@ _try_again:
             else if (nodeno == pathnodes) drcount++;
         }	// nodeno loop.
     } // pose loop.
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // End main loop.
+    /////////////////////////////////////////////////////////////////////////////////
+
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;
     #endif

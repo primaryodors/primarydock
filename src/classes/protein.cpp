@@ -70,6 +70,8 @@ Protein::Protein()
 
     int i;
     for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
+    for (i=0; i<16; i++) metals[i] = nullptr;
+    for (i=0; i<32; i++) mcoord_resnos[i] = 0;
 }
 
 Protein::Protein(const char* lname)
@@ -84,6 +86,8 @@ Protein::Protein(const char* lname)
 
     int i;
     for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
+    for (i=0; i<16; i++) metals[i] = nullptr;
+    for (i=0; i<32; i++) mcoord_resnos[i] = 0;
 }
 
 Protein::~Protein()

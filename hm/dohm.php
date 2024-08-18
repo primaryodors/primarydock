@@ -45,6 +45,22 @@ if ($disulfs) $disulfs = "    def special_patches(self, aln):\n$disulfs";
 
 $mdlcls = "DOPEHRLoopModel";
 
+$pdbname_5k1 = "1015_MM_1_IFD3_cmpd1_1.pdb";
+
+if (!file_exists("$pdbname_5k1"))
+{
+    $copyfrom = "../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb";
+    if (file_exists($copyfrom))
+    {
+        copy($copyfrom, $pdbname_5k1);
+    }
+    else echo "Warning: Third party OR5K1 model not found. Some olfactory receptors might fail homology modeling.\n"
+        ."Please install https://github.com/dipizio/OR5K1_binding_site and unzip the OR5K1_IFD3_models.zip archive.\n";
+}
+
+exec("php -f build_alignment_file.php");
+
+$OR5K1  = "'1015'";
 $CLASSI = "'8f76', '8hti'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
 $MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
@@ -83,7 +99,8 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "$CLASSI, $MTAAR9, '1015'";      // , $LPAR1
+    if (!file_exists("$pdbname_5k1")) die("Class II OR modeling requires the third party OR5K1 template.\n");
+    else $knowns = "$CLASSI, $MTAAR9, $OR5K1";      // , $LPAR1
 }
 
 

@@ -364,7 +364,7 @@ protected:
     float polarity = 0;					// maximum potential relative to -OH...H-.
     bool polar_calcd = false;
     int thiol = 0;
-    Bond* bonded_to = 0;
+    Bond* bonded_to = nullptr;
     bool reciprocity = false;
     int family=0;
     // InteratomicForce** Zforces;			// Non-covalent bond types where the atom's Z = either Za or Zb.

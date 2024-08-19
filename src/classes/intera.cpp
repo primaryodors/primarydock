@@ -1155,8 +1155,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 // https://www.sciencedirect.com/science/article/abs/pii/S0009261497011172
                 // https://web.archive.org/web/20200305164852id_/https://boris.unibe.ch/134571/1/1NpOH-Hydbond_JCP_resub.pdf
                 // TODO: Replace this with better data in bindings.dat. THE FOLLOWING IS A GROSS OVERSIMPLIFICATION.
-                if (a->is_pi() && !a->is_amide()) partial *= 21.8 / 37.6;
-                if (b->is_pi() && !b->is_amide()) partial *= 21.8 / 37.6;
+                if (a->is_pi() && !a->is_amide() && !b->is_pi()) partial *= 21.8 / 37.6;
+                if (b->is_pi() && !b->is_amide() && !a->is_pi()) partial *= 21.8 / 37.6;
             }
 
             if (forces[i]->type == mcoord)

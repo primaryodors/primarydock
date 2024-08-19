@@ -136,7 +136,7 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
                         for (j=0; j<tsphsz; j++)
                         {
                             worth = 0.4;
-                            if (a->get_charge() && tsphres[j]->get_charge()
+                            if (fabs(a->get_charge()) >= hydrophilicity_cutoff && fabs(tsphres[j]->get_charge()) >= hydrophilicity_cutoff
                                     &&
                                     sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
                             )
@@ -144,7 +144,7 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
                                 it = ionic;
                                 worth = 100;
                             }
-                            else if (a->get_charge() || a->is_polar())
+                            else if (fabs(a->get_charge()) >= hydrophilicity_cutoff || fabs(a->is_polar()) >= hydrophilicity_cutoff)
                             {
                                 it = hbond;
                                 worth = 40;
@@ -168,6 +168,8 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
                                         {
                                             weight = ts_priority_coefficient;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
                                         }
+
+                                        if (tsphres[j]->ring_is_aromatic(0) && fabs(a->is_polar()) >= hydrophilicity_cutoff) weight /= 2;
 
                                         #if !tumble_spheres_include_vdW
                                         if ((worth*weight) < 1) continue;
@@ -430,7 +432,7 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                 break;
 
                 case hbond:
-                if (fabs(baa[i]->hydrophilicity()) >= hydrophilicity_cutoff || baa[i]->is_tyrosine_like())
+                if (fabs(baa[i]->hydrophilicity()) >= hydrophilicity_cutoff /*|| baa[i]->is_tyrosine_like()*/)
                 {
                     if (baa[i]->has_hbond_donors() && ligand->has_hbond_acceptors()) can_bind = res_has_nonvdw = true;
                     else if (baa[i]->has_hbond_acceptors() && ligand->has_hbond_donors()) can_bind = res_has_nonvdw = true;

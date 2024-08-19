@@ -4846,18 +4846,21 @@ Point Molecule::get_bounding_box() const
 bool Molecule::ring_is_coplanar(int ringid)
 {
     if (!rings) return false;
+    if (!rings[ringid]) return false;
     return rings[ringid]->is_coplanar();
 }
 
 bool Molecule::ring_is_aromatic(int ringid) const
 {
     if (!rings) return false;
+    if (!rings[ringid]) return false;
     return rings[ringid]->get_type() == AROMATIC;
 }
 
 Point Molecule::get_ring_center(int ringid)
 {
     if (!rings) return Point(0,0,0);
+    if (!rings[ringid]) return Point(0,0,0);
     return rings[ringid]->get_center();
 }
 

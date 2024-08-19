@@ -1217,8 +1217,9 @@ float GroupPair::get_potential()
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
 
-                if (polar_atoms && polar_res && !aa->coordmtl)
+                if (polar_atoms && !aa->coordmtl)
                 {
+                    if (!polar_res) continue;
                     if (!aa->has_hbond_acceptors() && a->is_polar() > 0) continue;
                     if (!aa->has_hbond_donors() && a->is_polar() < 0) continue;
                 }

@@ -103,7 +103,7 @@ switch ($fam)
     else $knowns = "$OR5K1";
 
     default:        // Class II ORs
-    $knowns = "$CLASSI";      // , $LPAR1, $MTAAR9
+    $knowns = "$CLASSI, $MTAAR9";      // , $LPAR1
 }
 
 

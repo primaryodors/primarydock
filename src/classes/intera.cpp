@@ -1192,7 +1192,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 partial *= fmax(forces[i]->type == ionic?0:1, fabs(achg)) * fmax(forces[i]->type == ionic?0:1, fabs(bchg));
             }
 
-            // if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);
+            if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);
 
             # if 0
             //if (forces[i]->type == polarpi || forces[i]->type == mcoord)

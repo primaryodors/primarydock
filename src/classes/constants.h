@@ -41,7 +41,7 @@
 #define pH 6.0
 #define auto_pK_protonation 0
 #define hydrophilicity_cutoff 0.25
-#define group_simil_threshold 0.8
+#define group_simil_threshold 0.83
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
 #define intermol_ESP 0.05

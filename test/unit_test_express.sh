@@ -10,7 +10,7 @@ cd ..
 
 make
 
-for i in {1..5}
+for i in {1..10}
 do
     REPORT="testdata/molecule_test1.approved.txt"
     ./test/molecule_test 'CCO' 'CCO' | sed '/^#/d' >testdata/received/molecule_test1.received.txt
@@ -353,7 +353,7 @@ fi
 
 
 
-test/cs_test pdbs/OR51/OR51E2.8f76.pdb sdf/propionic_acid.sdf cen 3.33 45.52 5.39 6.55 6.59 nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e2_propa.received.txt
+test/cs_test pdbs/OR51/OR51E2.8f76.pdb sdf/propionic_acid.sdf cen 3.33 45.52 5.39 6.55! 6.59! nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e2_propa.received.txt
 RESULT=$(cat testdata/received/cs_51e2_propa.received.txt | grep "Chose: Arg262 ~ ionic")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (OR51E2 propionic acid) FAILED bad chosen.${NC}\n"
@@ -368,7 +368,7 @@ else
     fi
 fi
 
-test/cs_test pdbs/OR51/OR51E1.active.pdb sdf/caprylic_acid.sdf cen 45.52 5.39 6.59 nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e1_octa.received.txt
+test/cs_test pdbs/OR51/OR51E1.active.pdb sdf/caprylic_acid.sdf cen 45.52 5.39 6.59! nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e1_octa.received.txt
 RESULT=$(cat testdata/received/cs_51e1_octa.received.txt | grep "Chose: Arg264 ~ ionic")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (OR51E1 caprylic acid) FAILED bad chosen.${NC}\n"
@@ -383,7 +383,7 @@ else
     fi
 fi
 
-test/cs_test pdbs/TAAR/TAAR5.active.pdb sdf/trimethylamine.sdf cen 3.32 6.48 nec | sed '/^#/d' > testdata/received/cs_taar5_tma.received.txt
+test/cs_test pdbs/TAAR/TAAR5.active.pdb sdf/trimethylamine.sdf cen 3.32! 6.48! nec | sed '/^#/d' > testdata/received/cs_taar5_tma.received.txt
 RESULT=$(cat testdata/received/cs_taar5_tma.received.txt | grep "Chose: Asp114 ~ ionic")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (TAAR5 trimethylamine) FAILED.${NC}\n"
@@ -392,7 +392,7 @@ else
     printf "${GRN}\u2588${NC}"
 fi
 
-test/cs_test pdbs/TAAR/TAAR8.active.pdb sdf/cadaverine.sdf cen 3.32 5.43 6.48 nec aoi N1 N7 ioa | sed '/^#/d' > testdata/received/cs_taar8_cad.received.txt
+test/cs_test pdbs/TAAR/TAAR8.active.pdb sdf/cadaverine.sdf cen 3.32! 5.43! 6.48 nec aoi N1 N7 ioa | sed '/^#/d' > testdata/received/cs_taar8_cad.received.txt
 RESULT=$(cat testdata/received/cs_taar8_cad.received.txt | grep -E "Chose: Asp(11|20)1 ~ ionic")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (TAAR8 cadaverine) FAILED bad chosen.${NC}\n"
@@ -409,7 +409,7 @@ else
     fi
 fi
 
-test/cs_test pdbs/OR1/OR1A1.active.pdb sdf/3-octanone.sdf cen 3.37 4.56 6.48 nec aoi O7 ioa | sed '/^#/d' > testdata/received/cs_1a1_3octon.received.txt
+test/cs_test pdbs/OR1/OR1A1.active.pdb sdf/3-octanone.sdf cen 3.37! 4.56 6.48 nec aoi O7 ioa | sed '/^#/d' > testdata/received/cs_1a1_3octon.received.txt
 RESULT=$(cat testdata/received/cs_1a1_3octon.received.txt | grep -E " near O7:.* Asn1(09|55)")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (OR1A1 3-octanone) FAILED.${NC}\n"
@@ -418,7 +418,7 @@ else
     printf "${GRN}\u2588${NC}"
 fi
 
-test/cs_test pdbs/ADORA2A.active.pdb sdf/adenosine.sdf cen 5.29 6.51 7.39 nec aoi O2 O3 O4 ioa | sed '/^#/d' > testdata/received/cs_adora2a_adsn.received.txt
+test/cs_test pdbs/ADORA2A.active.pdb sdf/adenosine.sdf cen 5.29! 6.51! 7.39! nec aoi O2 O3 O4 ioa | sed '/^#/d' > testdata/received/cs_adora2a_adsn.received.txt
 RESULT=$(cat testdata/received/cs_adora2a_adsn.received.txt | grep -E "Chose: (Phe168 ~ pi ~ atom_group[[] N5 C15 C17 C18 N6 C16 H28 []]|Glu169 ~ ionic ~ atom_group[[] N7 N8 C19 H30 []])")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (ADORA2A adenosine) FAILED bad chosen.${NC}\n"

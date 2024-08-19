@@ -487,11 +487,6 @@ bool Atom::move(Point* pt)
         return false;
     }
 
-    if (pt->get_3d_distance(location) > 0.5 && !strcmp(name, "O1") )
-    {
-        geometry_dirty = true;
-    }
-
     location = *pt;
     location.weight = at_wt;
     if (geov) delete[] geov;
@@ -601,7 +596,11 @@ float Atom::hydrophilicity_rule()
 {
     float total = 0;
 
-    if (is_polar()) total += fabs(is_polar());
+    if (is_polar())
+    {
+        if (is_amide()) total += 1.5 * fabs(is_polar());
+        else total += fabs(is_polar());
+    }
     else if (Z == 7 || Z == 8) total += 1;
     else if (Z == 15) total += 0.666;
     else if (Z == 16 && is_bonded_to("H")) total += 0.5;

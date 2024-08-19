@@ -2727,6 +2727,16 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         strcpy(lmtl->aa3let, "MTL");
         lmtl->residue = 0;
 
+        for (j=0; j<mtlcoords[i].coordres.size(); j++)
+        {
+            AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
+            if (aa)
+            {
+                aa->conform_atom_to_location(coord_atoms[i]->name, pocketcen);
+                aa->movability = MOV_FLEXONLY;
+            }
+        }
+
         Molecule::conform_molecules(lmc, 50);
 
         AminoAcid* can_reach_metal[SPHREACH_MAX+4];
@@ -2765,16 +2775,31 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 
         coord_atoms[q] = nullptr;
 
+        Point foravg[q+2];
+        Point target;
+        /*for (j=0; j<mtlcoords[i].coordres.size(); j++)
+        {
+            AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
+            if (aa)
+            {
+                foravg[i] = aa->get_CA_location();
+            }
+        }
+        target = average_of_points(foravg, i);*/
+
         for (j=0; j<mtlcoords[i].coordres.size(); j++)
         {
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
-            if (aa) aa->movability = MOV_PINNED;
+            if (aa)
+            {
+                // aa->conform_atom_to_location(coord_atoms[i]->name, pocketcen);
+                aa->movability = MOV_PINNED;
+            }
         }
 
-        Point foravg[q+2];
         for (j=0; j<q; j++) foravg[j] = coord_atoms[j]->get_location();
-        lmtl->move(average_of_points(foravg, q));
-        // lmtl->move(find_equidistant_point(foravg, q, this->pocketcen.magnitude() ? &this->pocketcen : nullptr));
+        target = find_equidistant_point(foravg, q, this->pocketcen.magnitude() ? &this->pocketcen : nullptr);
+        //lmtl->move(target);
     }
     metals[m] = nullptr;
 

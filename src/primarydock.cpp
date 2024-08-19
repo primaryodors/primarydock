@@ -683,7 +683,10 @@ void iteration_callback(int iter, Molecule** mols)
         float r = global_pairs[l]->ag->distance_to(scgna->get_location());
         if (r > 2.5)
         {
+            Pose was(ligand);
+            was.copy_state(ligand);
             ligand->conform_atom_to_location(global_pairs[l]->ag->atoms[0]->name, scgna->get_location(), 10, frand(2, r));
+            if (was.total_atom_motions() > 3.5*ligand->get_heavy_atom_count()) was.restore_state(ligand);
         }
     }
 

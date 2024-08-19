@@ -103,7 +103,7 @@ switch ($fam)
     else $knowns = "$OR5K1";
 
     default:        // Class II ORs
-    $knowns = "$CLASSI, $MTAAR9";      // , $LPAR1
+    $knowns = "$CLASSI, $MTAAR9, $TAAR1";      // , $LPAR1
 }
 
 
@@ -189,7 +189,6 @@ LET \$mdld = "hm/$pyoutfn"
 LOAD \$inpf A I
 LOAD \$mdld A A
 
-REMARK 265 HM_TEMPLATES: $knowns
 BWCOPY I A
 
 STRAND I
@@ -197,6 +196,7 @@ UPRIGHT I
 BWCENTER
 
 STRAND A
+REMARK 265 HM_TEMPLATES: $knowns
 
 IF $5.58 != "Y" GOTO _not_57_hbond
 IF $7.53 != "Y" GOTO _not_57_hbond

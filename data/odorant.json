@@ -3575,6 +3575,14 @@
                     "type": "vwa",
                     "adjusted_curve_top": "0.30000001192093"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.snb.2024.136337":
+            {
+                "OR1D5":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
             }
         },
         "oid": "152d2ffbc0e5d88d52d468a2c666fa81"
@@ -10073,6 +10081,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.snb.2024.136337":
+            {
+                "OR1D5":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
             }
         },
         "oid": "42177fdcfe55d1a4f535b94d92bcdaa7"
@@ -14666,6 +14682,14 @@
                     "adjusted_curve_top": "7.9",
                     "ec50": "-4.17"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.snb.2024.136337":
+            {
+                "OR1D5":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
             }
         },
         "oid": "65ea33a3f24ba7e85758516edec26283"
@@ -15802,6 +15826,14 @@
             {
                 "OR2M3":
                 {
+                    "adjusted_curve_top": "0"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.snb.2024.136337":
+            {
+                "OR1D5":
+                {
+                    "type": "na",
                     "adjusted_curve_top": "0"
                 }
             }
@@ -18786,6 +18818,15 @@
                     "type": "ma",
                     "ec50": "-4.3",
                     "adjusted_curve_top": "6.6666665077209"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.snb.2024.136337":
+            {
+                "OR1D5":
+                {
+                    "type": "sa",
+                    "ec50": "-6.1",
+                    "adjusted_curve_top": "10"
                 }
             }
         },

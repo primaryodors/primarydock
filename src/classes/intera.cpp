@@ -781,14 +781,15 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         }
 
         // https://chemistry.stackexchange.com/questions/42085/can-an-amide-nitrogen-be-a-hydrogen-bond-acceptor
-        if (forces[i]->type == hbond
-            &&  (   (aZ == 1 && b->get_family() == PNICTOGEN && (b->is_pi() && b->get_bonded_atoms_count() > 2) ) 
+        if (forces[i]->type == hbond)
+        {
+            if  (   (aZ == 1 && b->get_family() == PNICTOGEN && (b->is_pi() && b->get_bonded_atoms_count() > 2) ) 
                  || (bZ == 1 && a->get_family() == PNICTOGEN && (a->is_pi() && a->get_bonded_atoms_count() > 2) )
                  || (aZ == 1 && bchg > hydrophilicity_cutoff)
                  || (bZ == 1 && achg > hydrophilicity_cutoff)
                 )
-            )
-            continue;
+                continue;
+        }
 
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
@@ -1149,8 +1150,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 partial = aniso * forces[i]->kJ_mol - Lennard_Jones(a, b, forces[i]->get_distance());
             }
 
-            // TODO: Replace this with a more generalized model of competitive h-bonding as well as ionic, mcoord, etc.
-            // if (forces[i]->type == hbond && a->is_backbone != b->is_backbone) partial *= 0.5;
+            if (forces[i]->type == hbond)
+            {
+                // https://www.sciencedirect.com/science/article/abs/pii/S0009261497011172
+                // https://web.archive.org/web/20200305164852id_/https://boris.unibe.ch/134571/1/1NpOH-Hydbond_JCP_resub.pdf
+                // TODO: Replace this with better data in bindings.dat. THE FOLLOWING IS A GROSS OVERSIMPLIFICATION.
+                if (a->is_pi() && !a->is_amide()) partial *= 21.8 / 37.6;
+                if (b->is_pi() && !b->is_amide()) partial *= 21.8 / 37.6;
+            }
 
             if (forces[i]->type == mcoord)
             {

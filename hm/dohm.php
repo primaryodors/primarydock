@@ -98,9 +98,18 @@ switch ($fam)
     else $knowns = "$CLASSI";
     break;
 
+    case 'OR1':
+    $knowns = "$CLASSI, $MTAAR9";
+    break;
+
+    case 'OR2':
+    $knowns = "$CLASSI, $MTAAR9, $TAAR1";       // Seems to work for OR2W1 - hexenol.
+    break;
+
     case 'OR5':
     if (!file_exists("$pdbname_5k1")) die("Modeling this receptor requires the third party OR5K1 template.\n");
     else $knowns = "$OR5K1";
+    break;
 
     default:        // Class II ORs
     $knowns = "$CLASSI, $MTAAR9, $TAAR1";      // , $LPAR1

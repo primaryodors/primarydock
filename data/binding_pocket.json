@@ -88,8 +88,8 @@
         {
             "S":
             {
-                "mcoord": "Cu +1 5.43 5.42  # These are processed sequentially, so the first Cys will become the charged thiolate.",
-                "stcr": "5.42 5.43"
+                "mcoord": "Cu +1 5.43 5.42 5.46  # These are processed sequentially, so the first Cys will become the charged thiolate.",
+                "stcr": "5.42 5.43 5.46"
             }
         },
         "pocket": "3.33 5.39 5.42! 5.43 5.46 6.55"

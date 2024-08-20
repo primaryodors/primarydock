@@ -2720,6 +2720,45 @@ int main(int argc, char** argv)
                 // TODO: Option to include ligand in motion.
             }	// MOVEREL
 
+            else if (!strcmp(words[0], "PATCH"))
+            {
+                l = 1;
+                if (!words[l]) raise_error("Not enough parameters given for PATCH.");
+                if (words[l][0] < 'A' || words[l][0] > 'Z') raise_error("Bad strand ID.");
+                Protein* source_strand = strands[words[l++][0] - 'A'];
+
+                if (!words[l]) raise_error("Not enough parameters given for PATCH.");
+                int sr = interpret_single_int(words[l++]);
+
+                if (!words[l]) raise_error("Not enough parameters given for PATCH.");
+                int er = interpret_single_int(words[l++]);
+
+                if (!words[l]) raise_error("Not enough parameters given for PATCH.");
+                if (words[l][0] < 'A' || words[l][0] > 'Z') raise_error("Bad strand ID.");
+                Protein* dest_strand = strands[words[l++][0] - 'A'];
+
+                if (words[l]) raise_error("Too many parameters given for PATCH.");
+
+                for (i=sr; i<=er; i++)
+                {
+                    AminoAcid* aafrom = source_strand->get_residue(i);
+                    if (!aafrom) continue;
+                    AminoAcid* aato = dest_strand->get_residue(i);
+                    if (!aato) continue;
+
+                    Pose patch((Molecule*)aafrom);
+                    patch.copy_state(aafrom);
+                    try
+                    {
+                        patch.restore_state(aato);
+                    }
+                    catch (const std::exception& e)
+                    {
+                        raise_error("Sequence mismatch.");
+                    }                    
+                }
+            }	// PATCH
+
             else if (!strcmp(words[0], "PTALIGN"))
             {
                 Point point, align, center;

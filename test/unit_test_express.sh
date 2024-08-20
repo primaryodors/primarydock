@@ -107,6 +107,17 @@ else
 fi
 
 
+REPORT="testdata/patch_test.approved.txt"
+bin/pepteditor test/patch_test.pepd | sed '/^#/d' >testdata/received/patch_test.received.txt
+RESULT=$(diff --unified $REPORT testdata/received/patch_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}\u2588${NC}"
+else
+    printf "\n${RED}Patch test FAILED.${NC}\n"
+    diff --color --unified $REPORT testdata/received/patch_test.received.txt
+fi
+
+
 MOLECULE="benzaldehyde"
 test/bond_rotation_test "c1ccccc1C=O" | sed '/^#/d' > testdata/received/brot.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/brot.$MOLECULE.approved.txt testdata/received/brot.$MOLECULE.received.txt)

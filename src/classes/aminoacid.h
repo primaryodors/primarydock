@@ -167,6 +167,7 @@ public:
     bool is_alpha_helix();
     bool is_helix(int periodicity);
     void set_conditional_basicity(Molecule** nearby_mols);
+    Atom* get_one_most_bindable(intera_type bond_type);
 
     // Misc.
     Protein* get_parent() const { return protein; }

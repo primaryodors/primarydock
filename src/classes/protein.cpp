@@ -2658,9 +2658,6 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
     k=m=0;
     for (i=0; i<n; i++)
     {
-        Atom* coord_atoms[mtlcoords[i].coordres.size()+2];
-        q=0;
-
         m_mcoords.push_back(mtlcoords[i]);
         int charge_left = mtlcoords[i].charge;
         Point lpt;
@@ -2688,7 +2685,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                 aa->movability = MOV_FLEXONLY;
                 lmc[l++] = (Molecule*)aa;
                 Atom** Ss = aa->get_most_bindable(1, lmtl);
-                lpt = lpt.add((Ss && Ss[0]) ? Ss[0]->get_location() : aa->get_barycenter());
+                lpt = lpt.add(aa->get_CA_location());
 
                 // If cysteine, make thiolate form.
                 if (aa->is_thiol() && charge_left)
@@ -2706,8 +2703,6 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                     }
                 }
 
-                coord_atoms[q++] = Ss[0];
-
                 aa->coordmtl = lmtl;
             }
         }
@@ -2719,6 +2714,10 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
             l--;
             lpt.x /= l; lpt.y /= l; lpt.z /= l;
             l++;
+
+            SCoord tocen = pocketcen.subtract(lpt);
+            tocen.r = 5;
+            lpt = lpt.add(tocen);
 
             lmtl->move(lpt);
         }
@@ -2732,48 +2731,14 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
             if (aa)
             {
-                aa->conform_atom_to_location(coord_atoms[i]->name, pocketcen);
+                Atom* most_coordable = aa->get_one_most_bindable(mcoord);
                 aa->movability = MOV_FLEXONLY;
+                aa->conform_atom_to_location(most_coordable->name, pocketcen.add(pocketcen.subtract(aa->get_CA_location())));
+                aa->conform_atom_to_location(most_coordable->name, lmtl->get_location(), 20, 2.5);
             }
         }
 
         Molecule::conform_molecules(lmc, 50);
-
-        AminoAcid* can_reach_metal[SPHREACH_MAX+4];
-        int num_can_reach = get_residues_can_clash_ligand(can_reach_metal, lmc[0], lmtl->get_location(), Point(2.5,2.5,2.5), nullptr);
-        bool cr_eq_mc[num_can_reach];
-
-        for (miter=0; miter<20; miter++)
-        {
-            for (j1=0; j1<num_can_reach; j1++)
-            {
-                bool found = false;
-                if (!miter)
-                {
-                    for (i2=0; i2<mtlcoords[i].coordres.size(); i2++)
-                    {
-                        if (mtlcoords[i].coordres[i2].resno == can_reach_metal[j1]->get_residue_no()) found = true;
-                    }
-                    cr_eq_mc[j1] = found;
-                }
-                else found = cr_eq_mc[j1];
-
-                if (found) continue;
-
-                Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
-                float r = a->distance_to(lmtl);
-                float vdW = lmtl->get_vdW_radius() + a->get_vdW_radius();
-                if (r < vdW)
-                {
-                    SCoord to_move = lmtl->get_location().subtract(a->get_location());
-                    to_move.r = vdW - r;
-                    lmtl->move_rel(&to_move);
-                }
-            }
-        }
-        Molecule::conform_molecules(lmc, 50);
-
-        coord_atoms[q] = nullptr;
 
         for (j=0; j<mtlcoords[i].coordres.size(); j++)
         {
@@ -2783,6 +2748,8 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                 aa->movability = MOV_PINNED;
             }
         }
+
+        lmc[0]->movability = MOV_PINNED;
     }
     metals[m] = nullptr;
 

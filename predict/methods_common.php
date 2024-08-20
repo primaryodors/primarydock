@@ -128,6 +128,9 @@ else
 	$ligname = @$_REQUEST['lig'] ?: "geraniol";
 }
 
+$odor = find_odorant($ligname);
+$ligname = $odor['full_name'];
+
 
 ensure_sdf_exists($ligname);
 

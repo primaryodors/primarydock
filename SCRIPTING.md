@@ -332,7 +332,7 @@ Unlike the `LET` command, `ECHO` does not require a plus sign for concatenation.
 If a tilde `~` occurs at the end of the statement, no newline will be output. Otherwise, a newline will be added to whatever was echoed.
 
 
-# END / EXIT / QUIT
+# END / EXIT / QUIT / DIE
 Examples:
 ```
 END
@@ -420,8 +420,6 @@ loop:
 ECHO %iter
 LET %iter ++
 IF %iter <= 10 GOTO loop
-
-IF EXISTS $filename ECHO "File exists."
 ```
 
 The `IF` command evaluates a conditional expression and, if true, executes another command. Currently, only simple A = B type expressions are
@@ -448,6 +446,30 @@ to write a series of `ELSE IF`s, or to combine `IF`s, e.g. `IF &var1 > 0 IF &var
 in exactly this way by transparently replacing `AND` with `IF` behind the scenes.
 
 When using `IF` with `GOTO`, it is possible to create loops as seen in the last example above.
+
+
+# IF EXISTS
+Examples:
+```
+IF EXISTS $filename ECHO "File exists."
+IF NOT EXISTS "bin/primarydock" DIE "Please compile PrimaryDock."
+```
+
+Checks whether a file exists. Otherwise works the same as `IF`.
+
+
+# IF HELIX
+Examples:
+```
+IF HELIX 104 ECHO "Residue 104 is part of a helix."
+IF HELIX %6.59 ECHO "BW number 6.59 is part of a helix."
+IF NOT HELIX %6.48 DIE "Not a valid GPCR!"
+```
+
+Checks whether a given residue is part of a helix. If it fits the parameters of an alpha helix, a 3.10 helix, or a polyproline helix,
+then the rest of the line is executed. Otherwise works the same as `IF`.
+
+Note: This command is only capable of checking the current strand. If you write for example `IF HELIX %R.6.59`, unexpected behavior may occur.
 
 
 # LET

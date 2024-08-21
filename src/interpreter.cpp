@@ -1868,6 +1868,16 @@ int main(int argc, char** argv)
                     else goto _evaluated_false;
                 }
 
+                if (!strcmp(words[l-1], "HELIX"))
+                {
+                    int resno = interpret_single_int(words[l]);
+                    l--;
+                    AminoAcid* aa = working->get_residue(resno);
+                    if (!aa) goto _evaluated_false;
+                    if (aa->is_helix(4) || aa->is_helix(3) || aa->is_helix(5)) goto _evaluated_true;
+                    else goto _evaluated_false;
+                }
+
                 // TODO: IF %var GOTO blah.
                 // If the operator is =, and both l-value and r-value are strings, do a direct comparison.
                 if (!words[l]) raise_error("Insufficient parameters given for IF.");

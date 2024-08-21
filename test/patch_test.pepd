@@ -18,3 +18,5 @@ LET @r = @A5 - @B5
 LET &r = @r
 ECHO &r
 
+IF NOT HELIX 5 ECHO "Not helixed."
+

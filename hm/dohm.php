@@ -20,6 +20,13 @@ foreach ($p["region"] as $rgname => $rgnse)
     $helices .= "        rsr.add(secondary_structure.Alpha(self.residue_range('$rgs:A', '$rge:A')))\n";
 }
 
+if (substr($rcpid, 0, 2) == "OR")
+{
+    $rgs = resno_from_bw($rcpid, "45.52");
+    $rge = resno_from_bw($rcpid, "45.58");
+    $helices .= "        rsr.add(secondary_structure.Alpha(self.residue_range('$rgs:A', '$rge:A')))\n";
+}
+
 $disulfs = "";
 $xlinx = [ ["3.25", "45.62"] ];
 foreach ($xlinx as $xl)
@@ -217,6 +224,8 @@ _not_57_hbond:
 A100 &a100
 ECHO "A100 Score: " &a100
 IF &a100 < 10 FAIL "A100 score too low."
+
+IF NOT HELIX %45.53 FAIL "No EXR2 helix."
 
 DELETE 1 %1.20
 HYDRO

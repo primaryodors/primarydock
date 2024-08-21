@@ -1160,6 +1160,7 @@ int interpret_config_line(char** words)
         for (; words[i]; i++)
         {
             if (words[i][0] == '-' && words[i][1] == '-') break;
+            if (words[i][0] == '#') break;
             ResiduePlaceholder rp;
             rp.set(words[i]);
             mcr.coordres.push_back(rp);

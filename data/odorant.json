@@ -26,6 +26,13 @@
                     "type": "ma",
                     "ec50": "-4.44"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.376"
+                }
             }
         },
         "oid": "002b93555eda9fd94ede39aa646b854e"
@@ -1568,6 +1575,13 @@
                 {
                     "type": "ma",
                     "ec50": "-4.21"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.336"
                 }
             }
         },
@@ -3639,7 +3653,8 @@
                     "ec50": "-3.977"
                 }
             }
-        }
+        },
+        "oid": "153a9041ac8e4d224c0b5698c6c53c78"
     },
     "15afef1a4430f3bae7c7b4fcdd701a88":
     {
@@ -10675,6 +10690,13 @@
                     "type": "ma",
                     "ec50": "-4.78"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-5.013"
+                }
             }
         },
         "oid": "4886631ab1c8f80bcdab809b2df16287"
@@ -11186,6 +11208,30 @@
             }
         },
         "oid": "4c0739eab463fd391644c1017572da30"
+    },
+    "4c41c22bd06e831ad7483488a59403c6":
+    {
+        "full_name": "3-mercapto-3-methylbutyl formate",
+        "smiles": "CC(C)(CCOC=O)S",
+        "aroma":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            [
+                "catty",
+                "blackcurrant"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.358"
+                }
+            }
+        },
+        "oid": "4c41c22bd06e831ad7483488a59403c6"
     },
     "4c51c6daf3459d486100bc304f4d626c":
     {
@@ -23962,6 +24008,30 @@
         },
         "oid": "a276ab392949e6a20f3aeeebbc9ebb92"
     },
+    "a2b4ae017fb1c8aa47ead17507cb185d":
+    {
+        "full_name": "2-methylbutyl acetate",
+        "smiles": "CCC(C)COC(=O)C",
+        "aroma":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            [
+                "sweet",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.243"
+                }
+            }
+        },
+        "oid": "a2b4ae017fb1c8aa47ead17507cb185d"
+    },
     "a3229d0c17fdce0c53dc5f6fa8207690":
     {
         "full_name": "caryophyllene",
@@ -25352,6 +25422,13 @@
                 {
                     "type": "ma",
                     "adjusted_curve_top": "3.9240506738424"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.268"
                 }
             }
         },
@@ -34503,6 +34580,29 @@
             }
         },
         "oid": "ed63ea395381cf765bc75d9c5d035db5"
+    },
+    "eddf384587f05eaca75a72a4b0ec1afb":
+    {
+        "full_name": "ethyl 3-methylthiopropionate",
+        "smiles": "CCOC(=O)CCS",
+        "aroma":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            [
+                "sulfurous",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-2.817"
+                }
+            }
+        }
     },
     "ee116e1d8732c25404f39475759958da":
     {

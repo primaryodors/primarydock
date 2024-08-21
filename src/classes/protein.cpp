@@ -2675,6 +2675,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         metals[m++] = lmtl;
 
         l = 1;
+        Atom* coord_atoms[mtlcoords[i].coordres.size()+2];
         for (j=0; j<mtlcoords[i].coordres.size(); j++)
         {
             mtlcoords[i].coordres[j].resolve_resno(this);
@@ -2684,6 +2685,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                 mcoord_resnos[k++] = aa->get_residue_no();
                 aa->movability = MOV_FLEXONLY;
                 lmc[l++] = (Molecule*)aa;
+                coord_atoms[j] = aa->get_one_most_bindable(mcoord);
                 Atom** Ss = aa->get_most_bindable(1, lmtl);
                 lpt = lpt.add(aa->get_CA_location());
 
@@ -2738,7 +2740,27 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
             }
         }
 
+        lmc[0]->movability = MOV_ALL;
         Molecule::conform_molecules(lmc, 50);
+
+        for (l=0; l<30; l++)
+        {
+            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            {
+                if (coord_atoms[j])
+                {
+                    SCoord v = coord_atoms[j]->get_location().subtract(lmtl->get_location());
+                    if (v.r > 2.5)
+                    {
+                        v.r -= 2.5;
+                        v.r *= 0.666;
+                        lmtl->move_rel(v);
+                    }
+                }
+            }
+
+            Molecule::conform_molecules(lmc, 20);
+        }
 
         for (j=0; j<mtlcoords[i].coordres.size(); j++)
         {

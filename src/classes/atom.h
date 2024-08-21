@@ -280,6 +280,7 @@ public:
         return move(&pt);
     }
     bool move_rel(SCoord* v);
+    bool move_rel(SCoord v) { return move_rel(&v); }
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
     SCoord* get_basic_geometry();
     SCoord* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);

@@ -364,7 +364,7 @@ fi
 
 
 
-test/cs_test pdbs/OR51/OR51E2.8f76.pdb sdf/propionic_acid.sdf cen 3.33 45.52 5.39 6.55! 6.59! nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e2_propa.received.txt
+test/cs_test pdbs/OR51/OR51E2.8f76.pdb sdf/propionic_acid.sdf cen 3.33 3.37 45.52 5.39 5.47 6.55 6.59! nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e2_propa.received.txt
 RESULT=$(cat testdata/received/cs_51e2_propa.received.txt | grep "Chose: Arg262 ~ ionic")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (OR51E2 propionic acid) FAILED bad chosen.${NC}\n"
@@ -379,7 +379,7 @@ else
     fi
 fi
 
-test/cs_test pdbs/OR51/OR51E1.active.pdb sdf/caprylic_acid.sdf cen 45.52 5.39 6.59! nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e1_octa.received.txt
+test/cs_test pdbs/OR51/OR51E1.active.pdb sdf/caprylic_acid.sdf cen 3.33 3.37 45.52 5.39 5.47 6.55 6.59! nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e1_octa.received.txt
 RESULT=$(cat testdata/received/cs_51e1_octa.received.txt | grep "Chose: Arg264 ~ ionic")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (OR51E1 caprylic acid) FAILED bad chosen.${NC}\n"

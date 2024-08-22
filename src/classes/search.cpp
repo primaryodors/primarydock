@@ -469,6 +469,13 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
 
                 cs_res[cs_res_qty] = baa[i];
                 cs_bt[cs_res_qty] = allowed_types[j];
+
+                if (cs_bt[cs_res_qty] == hbond)
+                {
+                    rc = baa[i]->get_charge();
+                    lc = ag->get_ionic();
+                    if (rc && lc && sgn(rc) == -sgn(lc)) cs_bt[cs_res_qty] = ionic;
+                }
                 cs_lag[cs_res_qty] = ag;
                 cs_res_qty++;
                 if (baa[i]->priority) any_resnos_priority = true;

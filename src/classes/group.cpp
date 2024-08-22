@@ -1534,7 +1534,6 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     {
         #if enable_bb_scooch
         // Scooch.
-        // float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
         float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center());
         float r1 = 0;
         try
@@ -1568,8 +1567,6 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         {
             if (rel.magnitude() > speed_limit*100) throw 0xbad;
             #if _dbg_groupsel || _dbg_groupsalign
-            // cout << "Atom group is " << gp[0]->scg->distance_to(gp[0]->ag->get_center()) << "A from side chain group. ";
-            // cout << "Side chain group reach is " << gp[0]->scg->group_reach() << "A." << endl;
             int dowhich = do1 ? 1 : 0;
             cout << "Ia. Scooching " << *gp[dowhich]->ag << " " << rel.magnitude() << "Å into the reach of ";
             cout << *gp[dowhich]->scg << " " << endl;

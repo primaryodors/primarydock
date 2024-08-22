@@ -548,8 +548,15 @@ SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
 
 float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 {
-    return 1;           // What is this function for???
-    float f = (1.0 + 1.0 * cos(fmin(fabs(((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25)*6), M_PI)));
+    // This metal compatibility estimate is based on the electronegativity of the metal and that of the coordinating atom.
+    // It is designed to preferentially pair e.g. K/Na/Ca with O, Mg/Zn/Fe with N, Cu/Zn with S/N, Ag with S, but not e.g. Cu with O or Na with S.
+    // Real world chelates, including metal binding sites in proteins, show a strong tendency to match electronegativities in this way.
+    float ea = a->get_electronegativity();
+    float eb = b->get_electronegativity();
+    float sum = ea + eb;
+    float delta = fabs(4.5 - sum);
+    float f = fmax(0, 1.0 - delta);
+
     #if _dbg_groupsel
     // cout << "Metal compatibility for " << *a << "..." << *b << " = " << f << endl;
     #endif

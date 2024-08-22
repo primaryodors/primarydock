@@ -496,6 +496,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     for (l=0; l<n; l++) if (cs_res[l]->priority) any_resnos_priority = true;
 
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
+    n = cs_res_qty;
     if (!n) return;
     for (l=0; l<1e5; l++)
     {
@@ -511,10 +512,25 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         // If the ligand can form a polar bond, it must form a polar bond.
         if (!cs_res[j]->priority && (ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
 
-        float b;
+        int li, ln;
+        float b, lmcb, bmcb = 0;
+        Atom *ligmc, *rmet;
         switch (cs_bt[j])
         {
-            case mcoord: b = 200; break;
+            case mcoord:
+            b = 200;
+            rmet = cs_res[j]->coordmtl;
+            ln = cs_lag[j]->atct;
+            for (li=0; li<ln; li++)
+            {
+                Atom* mca = cs_lag[j]->atoms[li];
+                if (mca->get_family() != PNICTOGEN && mca->get_family() != CHALCOGEN && !mca->is_pi()) continue;
+                lmcb = InteratomicForce::metal_compatibility(mca, rmet);
+                if (lmcb > bmcb) bmcb = lmcb;
+            }
+            b *= bmcb;
+            break;
+
             case ionic: b = 60; break;
             case hbond:
             b = 25;

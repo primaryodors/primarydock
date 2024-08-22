@@ -362,6 +362,15 @@ else
     diff --color --unified testdata/moiety.amine.approved.txt testdata/received/moiety.amine.received.txt
 fi
 
+test/mcoord_test | sed '/^#/d' > testdata/received/mcoord_test.received.txt
+RESULT=$(diff --unified testdata/mcoord_test.approved.txt testdata/received/mcoord_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}\u2588${NC}"
+else
+    printf "\n${RED}Metal compatibility test FAILED.${NC}\n"
+    diff --color --unified testdata/mcoord_test.approved.txt testdata/received/mcoord_test.received.txt
+fi
+
 
 
 test/cs_test pdbs/OR51/OR51E2.8f76.pdb sdf/propionic_acid.sdf cen 3.33 3.37 45.52 5.39 5.47 6.55 6.59! nec aoi C1 ioa | sed '/^#/d' > testdata/received/cs_51e2_propa.received.txt

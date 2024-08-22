@@ -208,7 +208,7 @@ N       Zn     coord    0.5   1.99       61.5
 N       Cd     coord    0.5   2.3        50.5
 N       Fe     coord    0.5   2.01       80.5
 O       Ag     coord    0.5   2.2?       56.5
-# O       Cu     coord    0.5   2.42       57.5
+O       Cu     coord    0.5   2.42       57.5
 O       Co     coord    0.5   2.22       30.4
 O       Ni     coord    0.5   2.16       53.
 O       Zn     coord    0.5   2.11       49.1

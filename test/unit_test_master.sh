@@ -53,6 +53,24 @@ fi
 printf "${CYN}Running prediction tests and docking tests; these will take some time. Please wait.${NC}\n"
 
 
+bin/primarydock tmp/prediction.OR2M3_a.3-mercapto-2-methylpentan-1-ol.config > testdata/received/2M3_docktest.received.txt
+THR105=$( cat "output/OR2/OR2M3/OR2M3.3-mercapto-2-methylpentan-1-ol.active.dock" | grep -m 1 "Thr105(3.33): " )
+THR105="${THR105/THR105(3.33): /}"
+THR105="${THR105/[.][0-9]*/}"
+MCOORD=$( cat "output/OR2/OR2M3/OR2M3.3-mercapto-2-methylpentan-1-ol.active.dock" | grep -m 1 "Total metal coordination: " )
+MCOORD="${MCOORD/Total metal coordination: /}"
+MCOORD="${MCOORD/[.][0-9]*/}"
+if [ -z "$THR105" ] || [ -z "$MCOORD" ]; then
+    printf "${RED}OR2M3 test FAILED: no poses.${NC}\n"
+else
+    if [[ $THR105 -gt "-5"  ]] || [[ $MCOORD -gt "-50"  ]]; then
+        printf "${RED}OR2M3 test FAILED: bad contacts.${NC}\n"
+    else
+        printf "${GRN}OR2M3 test succeeded.${NC}\n"
+    fi
+fi
+
+
 REPORT="testdata/OR51E2_propionate_pred.approved.txt"
 php -f predict/method_directmdl.php prot=OR51E2 lig=propionic_acid | grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/OR51E2_propionate_pred.received.txt)

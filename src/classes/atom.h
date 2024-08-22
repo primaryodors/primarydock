@@ -271,7 +271,7 @@ public:
 
     // Serialization
     void save_pdb_line(FILE* pf, unsigned int atomno);
-    void stream_pdb_line(ostream& os, unsigned int atomno, bool force_hetatm = false);
+    void stream_pdb_line(ostream& os, unsigned int atomno, bool force_hetatm = false);              // Atoms can be forced het, unlike humans.
 
     // Spatial functions.
     bool move(Point* pt);

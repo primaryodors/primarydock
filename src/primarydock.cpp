@@ -608,10 +608,6 @@ void iteration_callback(int iter, Molecule** mols)
                 if (target->distance_to(reach) < 3) continue;
 
                 Point pttgt = target->get_location();
-                /*SCoord v = reach->get_location().subtract(pttgt);
-                if (v.r < 3) continue;
-                v.r = 2.5;
-                pttgt = pttgt.add(v);*/
                 Pose hbwas(mols[l]);
                 hbwas.copy_state(mols[l]);
                 float before = ligand->get_intermol_binding(mols);
@@ -3328,9 +3324,6 @@ _exitposes:
         triesleft--;
         goto _try_again;
     }
-
-    /* cout << "AUTH:" << auths << endl << endl;
-    if (output) *output << "AUTH:" << auths << endl << endl; */
 
     cout << found_poses << " pose(s) found." << endl;
     if (output) *output << found_poses << " pose(s) found." << endl;

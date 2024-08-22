@@ -55,7 +55,7 @@ printf "${CYN}Running prediction tests and docking tests; these will take some t
 
 bin/primarydock tmp/prediction.OR2M3_a.3-mercapto-2-methylpentan-1-ol.config > testdata/received/2M3_docktest.received.txt
 THR105=$( cat "output/OR2/OR2M3/OR2M3.3-mercapto-2-methylpentan-1-ol.active.dock" | grep -m 1 "Thr105(3.33): " )
-THR105="${THR105/THR105(3.33): /}"
+THR105="${THR105/Thr105(3.33): /}"
 THR105="${THR105/[.][0-9]*/}"
 MCOORD=$( cat "output/OR2/OR2M3/OR2M3.3-mercapto-2-methylpentan-1-ol.active.dock" | grep -m 1 "Total metal coordination: " )
 MCOORD="${MCOORD/Total metal coordination: /}"

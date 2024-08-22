@@ -643,6 +643,13 @@
                     "type": "na",
                     "adjusted_curve_top": "0"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.796"
+                }
             }
         },
         "oid": "01ff53bccb8a2adb613efbbfcfeb21b8"
@@ -2833,7 +2840,8 @@
                     "ec50": "-2.971"
                 }
             }
-        }
+        },
+        "oid": "0d24bc7973e9178611bef12d26ee4cb2"
     },
     "0d93161dac3d4d72075415be1bc94e75":
     {
@@ -4194,6 +4202,13 @@
                     "type": "vsa",
                     "ec50": "-3.2",
                     "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.450"
                 }
             }
         },
@@ -8339,6 +8354,13 @@
                     "type": "ma",
                     "ec50": "-4.7"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-4.034"
+                }
             }
         },
         "oid": "31b1f546e0cadb59998f95ac11edec80"
@@ -8895,6 +8917,13 @@
                 "OR1A2":
                 {
                     "adjusted_curve_top": "7"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.881"
                 }
             }
         },
@@ -11251,6 +11280,26 @@
         },
         "oid": "4bbf4ab9cd90fef6ca37eef548c89f14"
     },
+    "4bc893e60312d1c2b82187ebd1b3738d":
+    {
+        "full_name": "4-ethylphenol",
+        "smiles": "CCc1ccc(cc1)O",
+        "aroma":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            [
+                "phenolic"
+            ]
+        },
+        "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+        {
+            "OR2W1":
+            {
+                "ec50": "-3.480"
+            }
+        },
+        "oid": "4bc893e60312d1c2b82187ebd1b3738d"
+    },
     "4c0739eab463fd391644c1017572da30":
     {
         "full_name": "pyrazine",
@@ -11667,6 +11716,13 @@
                 "OR2M3":
                 {
                     "adjusted_curve_top": "0"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-4.091"
                 }
             }
         },
@@ -12325,6 +12381,16 @@
                 "celery",
                 "carrot"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.290"
+                }
+            }
         },
         "oid": "53debd97098d3b4e8eef7391d2992f6c"
     },
@@ -13652,6 +13718,7 @@
     "5edab60160a0153687127fee995daae4":
     {
         "full_name": "d-limonene",
+        "name1": "(R)-(+)-limonene",
         "smiles": "CC1=CC[C@@H](CC1)C(=C)C",
         "aroma":
         {
@@ -13809,6 +13876,13 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.983"
+                }
             }
         },
         "oid": "5edab60160a0153687127fee995daae4"
@@ -13834,6 +13908,21 @@
             ]
         },
         "oid": "5ef83c038980f8a67c2d0c9d1885913e"
+    },
+    "5f12e00aaedb41f574e8dfc007ff9693":
+    {
+        "full_name": "(+)-sabinene",
+        "smiles": "CC(C)[C@]12CCC(=C)[C@H]1C2",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.427"
+                }
+            }
+        }
     },
     "5f14e9c196635f4b84919ded96c1b71a":
     {
@@ -15728,6 +15817,7 @@
     "680ecc2c5062a1f51464d5542a9e25bc":
     {
         "full_name": "cuminaldehyde",
+        "iupac": "4-isopropylbenzaldehyde",
         "smiles": "CC(C)c1ccc(C=O)cc1",
         "aroma":
         {
@@ -15747,6 +15837,13 @@
                 {
                     "type": "ia",
                     "adjusted_curve_top": "-0.90909093618393"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-4.509"
                 }
             }
         },
@@ -15870,6 +15967,16 @@
                 "woody",
                 "black_pepper"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.708"
+                }
+            }
         },
         "oid": "6920ed5b25266278939fcc3fec0e8fdb"
     },
@@ -17668,6 +17775,13 @@
                     "type": "sa",
                     "ec50": "-5.52"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-4.213"
+                }
             }
         },
         "oid": "74c2ae7b4e4756f4ff4c58920598a79a"
@@ -18565,6 +18679,31 @@
             }
         },
         "oid": "78d8c9f7033f0e64cc71c0742e63467f"
+    },
+    "79316e5e45726cf4de3cd3978870a738":
+    {
+        "full_name": "5-methyl guaiacol",
+        "iupac": "2-methoxy-5-methylphenol",
+        "smiles": "Oc1c(OC)ccc(C)c1",
+        "aroma":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            [
+                "smoky",
+                "clove"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.289"
+                }
+            }
+        },
+        "oid": "79316e5e45726cf4de3cd3978870a738"
     },
     "7989b000c9c5b1e098038703c60f4b61":
     {
@@ -20960,6 +21099,13 @@
                 {
                     "type": "ma",
                     "ec50": "-4.79"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.833"
                 }
             }
         },
@@ -31807,6 +31953,13 @@
                     "type": "ma",
                     "adjusted_curve_top": "3.8"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.930"
+                }
             }
         },
         "oid": "d644ce426eb9b78f103cd652bae6a5b7"
@@ -32786,6 +32939,30 @@
             }
         },
         "oid": "dbc9897b5c3672016ab752b68fa7ab5c"
+    },
+    "dc0cd808cff7f6e33c50742cc470cf40":
+    {
+        "full_name": "3-ethyl phenol",
+        "smiles": "Oc1cc(CC)ccc1",
+        "aroma":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            [
+                "phenolic",
+                "leathery"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.289"
+                }
+            }
+        },
+        "oid": "dc0cd808cff7f6e33c50742cc470cf40"
     },
     "dce6fdfa30906995022c843d5568a9fe":
     {
@@ -34740,6 +34917,13 @@
                 "OR11A1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+            {
+                "OR2W1":
+                {
+                    "ec50": "-3.443"
                 }
             }
         },

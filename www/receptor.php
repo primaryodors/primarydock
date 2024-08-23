@@ -271,7 +271,7 @@ function show_dlmenu(e, prot, lig, v, d)
     $("#dl_json")[0].setAttribute("href", "download.php?obj=json&prot="+prot+"&odor="+lig);
 
     var x = e.pageX + 5, y = e.pageY;
-    if (y > window.innerHeight - 350) y = window.innerHeight - 350;
+    if (y > window.innerHeight - 400) y = window.innerHeight - 400;
 
     dlmenu.style.left = `${x}px`;
     dlmenu.style.top = `${y}px`;
@@ -424,11 +424,15 @@ else
     $bold = 0;
     for ($i=0; $i<$sl; $i++)
     {
+        $aaletter = substr($seq,$i,1);
+
+        if (@$_REQUEST["abc"]) $lc = chr(65+strpos("ARNDCEQGHILKMFPSTWYV", $aaletter));
+        else $lc = $aaletter;
+
         if (!($i % 10)) $nums .= str_pad($i+10, 10, ' ', STR_PAD_LEFT).' ';
         if ($nxtmr > 7)
         {
-            if (@$_REQUEST["abc"]) $lets .= chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
-            else $lets .= substr($seq,$i,1);
+            $lets .= $lc;
             goto _tail;
         }
 
@@ -445,14 +449,11 @@ else
             ( isset($prots[$rcpid]["bw"][$between]) && ($i+1) == resno_from_bw($rcpid, $between) )
             )
         {
-            if (@$_REQUEST["abc"]) $lc = chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
-            else $lc = substr($seq,$i,1);
             $lets .= "<span style=\"background-color: #ddd; color: #000;\">$lc</span>";
         }
         else
         {
-            if (@$_REQUEST["abc"]) $lets .= chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
-            else $lets .= substr($seq,$i,1);
+            $lets .= $lc;
         }
 
         if (($i+1) == $receptor['region']["TMR$nxtmr"]['end']) 
@@ -1040,27 +1041,27 @@ $('#skeletal').hide();
     Files:<br>
     <table class="ctxmenu">
         <tr><td>Active model:</td>
-            <td><a href="#" onclick="view_file($('#dl_acv_mdl')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_file($('#dl_acv_mdl')[0].href); $('#dlmenu').hide();">text</a></td>
             <td><a id="vw_acv_mdl_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Inactive model:</td>
-            <td><a href="#" onclick="view_file($('#dl_iacv_mdl')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_file($('#dl_iacv_mdl')[0].href); $('#dlmenu').hide();">text</a></td>
             <td><a id="vw_iacv_mdl_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Active dock:</td>
-            <td><a href="#" onclick="view_html_file($('#dl_acv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_html_file($('#dl_acv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">text</a></td>
             <td><a id="vw_acv_dc_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Inactive dock:</td>
-            <td><a href="#" onclick="view_html_file($('#dl_iacv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_html_file($('#dl_iacv_dc')[0].href.replace('download.php','tabbed.php')); $('#dlmenu').hide();">text</a></td>
             <td><a id="vw_iacv_dc_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>JSON entry:</td>
-            <td><a href="#" onclick="view_file($('#dl_json')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a href="#" onclick="view_file($('#dl_json')[0].href); $('#dlmenu').hide();">text</a></td>
             <td>&nbsp;</td>
             <td><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>

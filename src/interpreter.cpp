@@ -1607,6 +1607,11 @@ int main(int argc, char** argv)
                 return 0;
             }	// END
 
+            else if (!strcmp(words[0], "ERROR") || !strcmp(words[0], "FAIL"))
+            {
+                raise_error(words[1]);
+            }	// ERROR
+
             else if (!strcmp(words[0], "GEN"))
             {
                 if (!words[1]) raise_error("No sequence given for GEN.");
@@ -1863,6 +1868,16 @@ int main(int argc, char** argv)
                     else goto _evaluated_false;
                 }
 
+                if (!strcmp(words[l-1], "HELIX"))
+                {
+                    int resno = interpret_single_int(words[l]);
+                    l--;
+                    AminoAcid* aa = working->get_residue(resno);
+                    if (!aa) goto _evaluated_false;
+                    if (aa->is_helix(4) || aa->is_helix(3) || aa->is_helix(5)) goto _evaluated_true;
+                    else goto _evaluated_false;
+                }
+
                 // TODO: IF %var GOTO blah.
                 // If the operator is =, and both l-value and r-value are strings, do a direct comparison.
                 if (!words[l]) raise_error("Insufficient parameters given for IF.");
@@ -2030,6 +2045,51 @@ int main(int argc, char** argv)
                 }
                 else script_var[n].value.f = f;
             }	// INTC
+
+            else if (!strcmp(words[0], "INTE"))
+            {
+                l = 1;
+                n = -1;
+                if (!words[l])
+                {
+                    f = -working->get_internal_binding();
+                }
+                else if (words[l][0] >= 'A' && words[l][0] <= 'Z')
+                {
+                    if (!strands[words[l][0]-'A']) raise_error("No strand with specified chain letter.");
+                    else f = -strands[words[l][0]-'A']->get_internal_binding();
+                    l++;
+                }
+                else f = -working->get_internal_binding();
+
+                if (words[l] && (words[l][0] == '&'))
+                {
+                    n = find_var_index(words[l++]);
+                    if (n<0)
+                    {
+                        n = vars++;
+                        script_var[n].name = words[l-1];
+                        script_var[n].vt = type_from_name(words[l-1]);
+                    }
+                }
+
+                if (n < 0)
+                {
+                    bool b = true;
+                    cout << f;
+                    if (words[l])
+                    {
+                        if (words[l][0] == '~')
+                        {
+                            b = false;
+                        }
+                        else raise_error("Unknown argument.");
+                    }
+                    
+                    if (b) cout << endl;
+                }
+                else script_var[n].value.f = f;
+            }	// INTE
 
             else if (!strcmp(words[0], "WORST"))
             {
@@ -2669,6 +2729,45 @@ int main(int argc, char** argv)
 
                 // TODO: Option to include ligand in motion.
             }	// MOVEREL
+
+            else if (!strcmp(words[0], "PATCH"))
+            {
+                l = 1;
+                if (!words[l]) raise_error("Not enough parameters given for PATCH.");
+                if (words[l][0] < 'A' || words[l][0] > 'Z') raise_error("Bad strand ID.");
+                Protein* source_strand = strands[words[l++][0] - 'A'];
+
+                if (!words[l]) raise_error("Not enough parameters given for PATCH.");
+                int sr = interpret_single_int(words[l++]);
+
+                if (!words[l]) raise_error("Not enough parameters given for PATCH.");
+                int er = interpret_single_int(words[l++]);
+
+                if (!words[l]) raise_error("Not enough parameters given for PATCH.");
+                if (words[l][0] < 'A' || words[l][0] > 'Z') raise_error("Bad strand ID.");
+                Protein* dest_strand = strands[words[l++][0] - 'A'];
+
+                if (words[l]) raise_error("Too many parameters given for PATCH.");
+
+                for (i=sr; i<=er; i++)
+                {
+                    AminoAcid* aafrom = source_strand->get_residue(i);
+                    if (!aafrom) continue;
+                    AminoAcid* aato = dest_strand->get_residue(i);
+                    if (!aato) continue;
+
+                    Pose patch((Molecule*)aafrom);
+                    patch.copy_state(aafrom);
+                    try
+                    {
+                        patch.restore_state(aato);
+                    }
+                    catch (const std::exception& e)
+                    {
+                        raise_error("Sequence mismatch.");
+                    }                    
+                }
+            }	// PATCH
 
             else if (!strcmp(words[0], "PTALIGN"))
             {

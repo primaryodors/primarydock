@@ -54,27 +54,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
     ligand->clear_atom_binding_energies();
 
-    if (met)
-    {
-        mc_bpotential = 0;
-        met->clear_atom_binding_energies();
-        float lb = ligand->get_intermol_binding(met);
-        strcpy(metrics[metcount], "Metals");
-        lmkJmol[metcount] = lb;
-        limkJmol[metcount] = 0;								// TODO
-        lmc[metcount] = -mc_bpotential / missed_connection.r;
-
-        #if compute_vdw_repulsion
-        lmvdWrepl[metcount] = 0;
-        lmvdWrepl[metcount] += ligand->get_vdW_repulsion(met);		// TODO: Include repulsions with non-mcoord side chains.
-        limvdWrepl[metcount] = 0;							// TODO
-        #endif
-
-        metcount++;
-
-        btot += lb;
-        // cout << "Metal adds " << lb << " to btot, making " << btot << endl;
-    }
 
     float final_binding[end1];
     #if compute_vdw_repulsion
@@ -208,6 +187,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     int mcn;
     if (mcn = mtlcoords.size())         // Assignment, not comparison.
     {
+        strcpy(metrics[metcount], "Metals");
+        float lmb = 0;
+
         for (i=0; i<mcn; i++)
         {
             if (!mtlcoords[i].mtl) continue;
@@ -215,7 +197,10 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             lm.add_existing_atom(mtlcoords[i].mtl);
             float f = ligand->get_intermol_binding(&lm);
             btot += f;
+            lmb += f;
         }
+
+        lmkJmol[metcount] = lmb;
     }
 
     #if _peratom_audit
@@ -386,7 +371,7 @@ _btyp_unassigned:
 
     if (dr.miscdata.size())
     {
-        output << endl << dr.miscdata << endl;
+        output << dr.miscdata << endl;
     }
 
     output << "A100 score: " << dr.A100 << endl;

@@ -8,7 +8,6 @@ chdir("..");
 require("predict/cputemp.php");
 require("data/protutils.php");
 require("data/odorutils.php");
-require("predict/dock_eval.php");
 require_once("predict/statistics.php");
 
 die_if_too_hot();
@@ -128,6 +127,9 @@ else
 	$protid = @$_REQUEST['prot'] ?: "OR1A1";
 	$ligname = @$_REQUEST['lig'] ?: "geraniol";
 }
+
+$odor = find_odorant($ligname);
+$ligname = $odor['full_name'];
 
 
 ensure_sdf_exists($ligname);
@@ -265,7 +267,7 @@ function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname, $docker;
     global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
-    global $atomto, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
+    global $atomto, $excl, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
     chdir("..");
@@ -287,6 +289,7 @@ function prepare_outputs()
     $size = "7.5 7.5 7.5";
     $search = "CS";
     $atomto = [];
+    $excl = "";
     $stcr = "";
     $flxr = "";
     $astcr = "";
@@ -367,6 +370,15 @@ function prepare_outputs()
         if (isset($mbp["iflxr"])) $iflxr = "FLXR {$mbp["iflxr"]}";
 
         if (isset($mbp["stddev"])) $num_std_devs = floatval($mbp["stddev"]);
+        if (isset($mbp["excl"]))
+        {
+            $se = explode(" ", trim($mbp["excl"]));
+            if (false !== strpos($se[0], ".")) $sr = resno_from_bw($protid, $se[0]);
+            else $sr = intval($se[0]);
+            if (false !== strpos($se[1], ".")) $er = resno_from_bw($protid, $se[1]);
+            else $er = intval($se[1]);
+            $excl = "EXCL $sr $er\n";
+        }
     
         if (isset($mbp["atomto"]))
         {
@@ -415,7 +427,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 {
     global $ligname, $isomers, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST;
-    global $cenres, $size, $docker, $mcoord, $atomto, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
+    global $cenres, $size, $docker, $mcoord, $atomto, $excl, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 
@@ -650,7 +662,7 @@ heredoc;
             switch (family_from_protid($protid))
             {
                 case "OR":
-                $softness = "5.0";
+                $softness = "1.0";
                 break;
 
                 case "TAAR":
@@ -667,9 +679,9 @@ heredoc;
                 {
                     $ln = substr($ln, 4);
                     $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
-                    $sx = floatval($psiz[0]) + 5;
-                    $sy = floatval($psiz[1]) + 5;
-                    $sz = floatval($psiz[2]) + 5;
+                    $sx = floatval($psiz[0])+2;
+                    $sy = floatval($psiz[1])+2;
+                    $sz = floatval($psiz[2])+2;
                     $size = "$sx $sy $sz";
                 }
             }
@@ -685,8 +697,8 @@ heredoc;
         }
         else $iso = "";
 
-        $excl = resno_from_bw($protid, "2.37");
-        $soft = $softness ? "SOFT $softness 3 4 45 5 6 7" : "";
+        $excl1 = resno_from_bw($protid, "2.37");
+        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 3 4 45 5 6 7" : "";
 
         $configf = <<<heredoc
 
@@ -702,7 +714,8 @@ $atomto
 $stcr
 $flxr
 
-EXCL 1 $excl		# Head, TMR1, and CYT1.
+EXCL 1 $excl1		# Head, TMR1, and CYT1.
+$excl
 
 SEARCH $search
 POSE $pose
@@ -768,7 +781,9 @@ heredoc;
             }
         }
 
-        if (!$retvar && $num_poses) unlink($cnfname);
+        if (!$retvar && $num_poses && !file_exists("tmp/nodelete")) unlink($cnfname);
+        else echo "WARNING: Not deleting a temporary config file in tmp/ because you have selected the debug \"nodelete\" behavior.\n"
+            ."You should check the tmp/ folder periodically and clean out old files manually.\n";
 
         break;
 

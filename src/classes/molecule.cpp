@@ -506,6 +506,7 @@ void Molecule::hydrogenate(bool steric_only)
         }
 
         int h_to_add = round(valence - bcardsum);
+        if (atoms[i]->aaletter == 'H' && !strcmp(atoms[i]->name, "NE2")) h_to_add++;
         for (j=0; j<h_to_add; j++)
         {
             char hname[15];
@@ -571,6 +572,23 @@ void Molecule::hydrogenate(bool steric_only)
     for (atcount=0; atoms[atcount]; atcount++);     // Update count.
 
     clear_all_bond_caches();
+}
+
+void Molecule::dehydrogenate()
+{
+    if (!atoms) return;
+
+    Atom* tmp[atcount];
+    int i, j=0;
+    for (i=0; i<atcount; i++)
+    {
+        if (!atoms[i]) continue;
+        if (atoms[i]->get_Z() < 2) continue;
+        tmp[j++] = atoms[i];
+    }
+
+    for (i=0; i<j; i++) atoms[i] = tmp[i];
+    atoms[j] = nullptr;
 }
 
 char** Molecule::get_atom_names() const
@@ -711,23 +729,24 @@ float Molecule::total_eclipses()
             {
                 if (!bbt[k]) continue;
                 if (!bbt[k]->atom2) continue;
-                if (bbt[k]->atom2 == atoms[i]) continue;
+                if (bbt[k]->atom2->get_Z() > 1) continue;
+                // if (bbt[k]->atom2 == atoms[i]) continue;
                 for (l=0; l<n; l++)
                 {
                     if (l == j) continue;
                     if (!abt[l]) continue;
                     if (!abt[l]->atom2) continue;
+                    if (abt[l]->atom2->get_Z() > 1) continue;
                     float theta = find_angle_along_vector(bbt[k]->atom2->get_location(), abt[l]->atom2->get_location(), atoms[i]->get_location(), axis);
-                    if (theta >= -hexagonal && theta <= hexagonal)
-                    {
-                        #if _dbg_eclipses
-                        cout << bbt[k]->atom2->name << " is " << (theta*fiftyseven) << "deg from " << abt[l]->atom2->name
-                            << " along the " << atoms[i]->name << " - " << abt[j]->atom2->name << " axis."
-                            << endl;
-                        #endif
-                        theta = hexagonal - fabs(theta);
-                        result += theta;
-                    }
+                    #if _dbg_eclipses
+                    cout << bbt[k]->atom2->name << " is " << (theta*fiftyseven) << "deg from " << abt[l]->atom2->name
+                        << " along the " << atoms[i]->name << " - " << abt[j]->atom2->name << " axis."
+                        << endl;
+                    #endif
+                    theta -= M_PI;
+                    while (theta < -hexagonal) theta += hexagonal;
+                    while (theta > hexagonal) theta -= hexagonal;
+                    result += fabs(theta);
                 }
             }
         }
@@ -1842,6 +1861,7 @@ void Molecule::identify_acidbase()
 Bond** Molecule::get_rotatable_bonds(bool icf)
 {
     if (noAtoms(atoms)) return 0;
+    if (rotatable_bonds) return rotatable_bonds;
     if (mol_typ == MOLTYP_AMINOACID)
     {
         // TODO: There has to be a better way.
@@ -1853,7 +1873,6 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
-    if (rotatable_bonds) return rotatable_bonds;
 
     Bond* btemp[65536];
 
@@ -1861,7 +1880,7 @@ Bond** Molecule::get_rotatable_bonds(bool icf)
     if (!immobile)
         for (i=0; atoms[i]; i++)
         {
-            Bond* lb[16];
+            Bond* lb[32];
             atoms[i]->fetch_bonds(lb);
             int g = atoms[i]->get_geometry();
             for (j=0; j<g && lb[j]; j++)
@@ -2026,6 +2045,8 @@ void Molecule::clear_cache()
 // TODO: There has to be a better way.
 Bond** AminoAcid::get_rotatable_bonds()
 {
+    if (rotatable_bonds) return rotatable_bonds;
+
     // cout << name << " AminoAcid::get_rotatable_bonds()" << endl << flush;
     // Return ONLY side chain bonds, from lower to higher Greek. E.g. CA-CB but NOT CB-CA.
     // Exclude CA-N and CA-C as these will be managed by the Protein class.
@@ -2074,7 +2095,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                              << " and " << aadef->aabonds[i]->bname
                              << endl << flush;
 
-                        Bond* lbb[16];
+                        Bond* lbb[32];
                         la->fetch_bonds(lbb);
                         if (lbb[0])
                         {
@@ -2588,6 +2609,10 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     #endif
 
     int i;
+    if (fabs(theta) > hexagonal)
+    {
+        i = 0;
+    }
     for (i=0; atoms[i]; i++)
     {
         // if (atoms[i]->residue) return;
@@ -2619,6 +2644,10 @@ void Molecule::rotate(LocatedVector lv, float theta)
     #endif
 
     int i;
+    if (fabs(theta) > hexagonal)
+    {
+        i = 0;
+    }
     for (i=0; atoms[i]; i++)
     {
         // if (atoms[i]->residue) return;
@@ -3329,7 +3358,7 @@ void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void 
     }
 }
 
-void Molecule::conform_atom_to_location(const char* an, Point t, int iters)
+void Molecule::conform_atom_to_location(const char* an, Point t, int iters, float od)
 {
     if (!atoms) return;
     int i;
@@ -3337,7 +3366,7 @@ void Molecule::conform_atom_to_location(const char* an, Point t, int iters)
     {
         if (!strcmp(atoms[i]->name, an))
         {
-            conform_atom_to_location(i, t, iters);
+            conform_atom_to_location(i, t, iters, od);
             return;
         }
     }
@@ -3345,7 +3374,7 @@ void Molecule::conform_atom_to_location(const char* an, Point t, int iters)
 
 #define _dbg_atom_pointing 0
 
-void Molecule::conform_atom_to_location(int i, Point t, int iters)
+void Molecule::conform_atom_to_location(int i, Point t, int iters, float od)
 {
     if (!(movability & MOV_CAN_FLEX)) return;
 
@@ -3367,6 +3396,7 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters)
             {
                 b[j]->rotate(M_PI*2.0/circdiv, false, true);
                 r = a->get_location().get_3d_distance(t);
+                if (od) r = fabs(r-od);
                 float c = get_internal_clashes();
                 if (r < bestr && c < oc+2.5*clash_limit_per_aa)
                 {
@@ -3416,7 +3446,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
-        bool do_full_rotation = ((iter % _fullrot_every) == 0);
+        bool do_full_rotation = _allow_fullrot && ((iter % _fullrot_every) == 0);
 
         for (i=0; i<n; i++)
         {
@@ -4816,18 +4846,21 @@ Point Molecule::get_bounding_box() const
 bool Molecule::ring_is_coplanar(int ringid)
 {
     if (!rings) return false;
+    if (!rings[ringid]) return false;
     return rings[ringid]->is_coplanar();
 }
 
 bool Molecule::ring_is_aromatic(int ringid) const
 {
     if (!rings) return false;
+    if (!rings[ringid]) return false;
     return rings[ringid]->get_type() == AROMATIC;
 }
 
 Point Molecule::get_ring_center(int ringid)
 {
     if (!rings) return Point(0,0,0);
+    if (!rings[ringid]) return Point(0,0,0);
     return rings[ringid]->get_center();
 }
 

@@ -2,6 +2,10 @@
 STRAND K
 LOAD pdbs/OR5/OR5K1.upright.pdb
 
+IF NOT HELIX %6.48 DIE "Not a valid GPCR!"
+IF HELIX %3.33 ECHO "Good."
+IF NOT HELIX %45.40 ECHO "Even better."
+
 ECHO %1.50
 ECHO %2.50
 ECHO @6.48

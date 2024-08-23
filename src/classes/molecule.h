@@ -150,6 +150,7 @@ public:
     void delete_all_atoms();
     int get_hydrogen_count();
     virtual void hydrogenate(bool steric_only = false);
+    virtual void dehydrogenate();
     void clear_atom_binding_energies();
     int has_hbond_donors();
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
@@ -212,8 +213,8 @@ public:
         );
     
     // static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
-    void conform_atom_to_location(int atom_idx, Point target, int iterations = 50);
-    void conform_atom_to_location(const char* atom_name, Point target, int iterations = 50);
+    void conform_atom_to_location(int atom_idx, Point target, int iterations = 50, float optimal_distance = 0);
+    void conform_atom_to_location(const char* atom_name, Point target, int iterations = 20, float optimal_distance = 0);
     SCoord motion_to_optimal_contact(Molecule* ligand);
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.

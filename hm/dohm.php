@@ -20,6 +20,13 @@ foreach ($p["region"] as $rgname => $rgnse)
     $helices .= "        rsr.add(secondary_structure.Alpha(self.residue_range('$rgs:A', '$rge:A')))\n";
 }
 
+if (substr($rcpid, 0, 2) == "OR")
+{
+    $rgs = resno_from_bw($rcpid, "45.52");
+    $rge = resno_from_bw($rcpid, "45.58");
+    $helices .= "        rsr.add(secondary_structure.Alpha(self.residue_range('$rgs:A', '$rge:A')))\n";
+}
+
 $disulfs = "";
 $xlinx = [ ["3.25", "45.62"] ];
 foreach ($xlinx as $xl)
@@ -45,11 +52,27 @@ if ($disulfs) $disulfs = "    def special_patches(self, aln):\n$disulfs";
 
 $mdlcls = "DOPEHRLoopModel";
 
+$pdbname_5k1 = "1015_MM_1_IFD3_cmpd1_1.pdb";
+
+if (!file_exists("$pdbname_5k1"))
+{
+    $copyfrom = "../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb";
+    if (file_exists($copyfrom))
+    {
+        copy($copyfrom, $pdbname_5k1);
+    }
+    else echo "Warning: Third party OR5K1 model not found. Some olfactory receptors might fail homology modeling.\n"
+        ."Please install https://github.com/dipizio/OR5K1_binding_site and unzip the OR5K1_IFD3_models.zip archive.\n";
+}
+
+exec("php -f build_alignment_file.php");
+
+$OR5K1  = "'1015'";
 $CLASSI = "'8f76', '8hti'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
 $MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
-$ADRB2 = "'7dhr', '8gej'";
-$ADORA2A = "'6gdg'";
+// $ADORA2A = "'6gdg'";
+// $ADRB2 = "'7dhr', '8gej'";
 $LPAR1 = "'7td0', '7yu3'";
 $TAS2R = "'7xp6'";
 $CB = "'5xr8', '5xra'";
@@ -82,8 +105,21 @@ switch ($fam)
     else $knowns = "$CLASSI";
     break;
 
+    case 'OR1':
+    $knowns = "$CLASSI, $MTAAR9";
+    break;
+
+    case 'OR2':
+    $knowns = "$CLASSI, $MTAAR9, $TAAR1";       // Seems to work for OR2W1 - hexenol.
+    break;
+
+    case 'OR5':
+    if (!file_exists("$pdbname_5k1")) die("Modeling this receptor requires the third party OR5K1 template.\n");
+    else $knowns = "$OR5K1";
+    break;
+
     default:        // Class II ORs
-    $knowns = "$ADORA2A, $MTAAR9, $CLASSI";                 // This combination seems to produce the most energetically favorable models.
+    $knowns = "$CLASSI, $MTAAR9, $TAAR1";      // , $LPAR1
 }
 
 
@@ -124,8 +160,8 @@ fwrite($fp, $py);
 fclose($fp);
 
 @unlink("hm.out");
-passthru("python3 $rcpid.hm.py | tee hm.out");
-$c = file_get_contents("hm.out");
+passthru("python3 $rcpid.hm.py | tee $rcpid.hm.out");
+$c = file_get_contents("$rcpid.hm.out");
 $best_energy = 1e9;
 $pyoutfn = false;
 $mode = false;
@@ -133,6 +169,7 @@ foreach (explode("\n", $c) as $ln)
 {
     if (false !== strpos($ln, "Summary of successfully produced models:")) $mode = true;
     if (false !== strpos($ln, "Summary of successfully produced loop models:")) $mode = true;
+    if (preg_match("/Filename\\s+molpdf/i", $ln)) $mode = true;
     if (!$mode) continue;
 
     $ln = preg_replace("/\\s+/", " ", $ln);
@@ -149,9 +186,13 @@ foreach (explode("\n", $c) as $ln)
 
 if (!$pyoutfn) die("FAIL.\n");
 
+$famno = intval(preg_replace("/[^0-9]/", "", $fam));
 $adjustments = "";
-if ($fam == "OR51" || $fam == "OR52") $adjustments .= "ATOMTO %6.59 EXTENT @4.57\n";
+if ($famno < 50) $adjustments .= "IF $3.37 != \"G\" THEN ATOMTO %3.37 EXTENT @6.48\n";
+else if ($famno == 51 || $famno == 52) $adjustments .= "ATOMTO %6.59 EXTENT @4.57\n";
 else if ($rcpid == "OR56B2") $adjustments .= "ATOMTO %6.58 EXTENT @4.57\n";
+
+$knowns = preg_replace("/[^0-9a-zA-Z_ ]/", "", $knowns);
 
 $pepd = <<<blixtos
 
@@ -171,10 +212,20 @@ UPRIGHT I
 BWCENTER
 
 STRAND A
+REMARK 265 HM_TEMPLATES: $knowns
+
+IF $5.58 != "Y" GOTO _not_57_hbond
+IF $7.53 != "Y" GOTO _not_57_hbond
+MEASURE %5.58 "OH" %7.53 "OH" &d57
+ECHO "Y5.58 and Y7.53 are " &d57 "A apart."
+IF &d57 > 5.3 FAIL "Y57 distance is too great."
+_not_57_hbond:
 
 A100 &a100
 ECHO "A100 Score: " &a100
-IF &a100 < 10 DIE "FAIL"
+IF &a100 < 10 FAIL "A100 score too low."
+
+IF NOT HELIX %45.53 FAIL "No EXR2 helix."
 
 DELETE 1 %1.20
 HYDRO

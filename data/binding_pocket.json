@@ -23,14 +23,15 @@
     },
     "OR1E*":
     {
-        "pocket": "4.56 45.52! 5.43 6.55"
+        "pocket": "45.52! 5.43 6.55"
     },
     "OR1G1":
     {
-        "pocket": "3.33 3.37 4.56 45.53! 5.43 6.55",
+        "pocket": "3.32 3.40 4.60 5.46 6.51 7.42",
         "refs":
         [
-            "https://doi.org/10.1093/protein/gzs037"
+            "https://doi.org/10.1093/protein/gzs037",
+            "https://doi.org/10.1002/chem.201402486"
         ]
     },
     "OR2F*":
@@ -43,7 +44,12 @@
     },
     "OR2J*":
     {
-        "pocket": "3.33 5.43! 6.51"
+        "pocket": "3.33 3.37 3.39! 4.57 5.42! 5.43! 6.51 6.55 7.42!",
+        "atomto":
+        [
+            "4.57 EXTENT 6.55",
+            "5.43 EXTENT 3.33"
+        ]
     },
     "OR2L*":
     {
@@ -55,17 +61,19 @@
         {
             "S":
             {
-                "mcoord": "Cu +1 5.43 5.42",
-                "stcr": "5.42 5.43"
+                "mcoord": "Cu +1 5.43 5.42 5.46",
+                "stcr": "5.42 5.43 5.46",
+                "flxr": "3.33"
             }
         },
-        "pocket": "3.33! 5.41 5.42 6.55",
+        "pocket": "3.33 5.46 5.41 5.42 6.55",
+        "excl": "4.56 4.60",
+        "search": "BB",
         "atomto":
         [
-            "3.33 OG2 5.43"
+            "3.33 OG2 6.55"
         ],
         "#mcoord": "Na +1 4.56 4.60",
-        "stcr": "3.33 6.55",
         "refs":
         [
             "https://doi.org/10.1007/s00018-019-03279-y"
@@ -81,8 +89,8 @@
         {
             "S":
             {
-                "mcoord": "Cu +1 5.43 5.42  # These are processed sequentially, so the first Cys will become the charged thiolate.",
-                "stcr": "5.42 5.43"
+                "mcoord": "Cu +1 5.43 5.42 5.46  # These are processed sequentially, so the first Cys will become the charged thiolate.",
+                "stcr": "5.42 5.43 5.46"
             }
         },
         "pocket": "3.33 5.39 5.42! 5.43 5.46 6.55"
@@ -101,15 +109,19 @@
     },
     "OR2AG*":
     {
-        "pocket": "3.32 3.37! 4.56! 5.46 6.47! 6.59! 7.42",
-        "refs":
-        [
-            "https://doi.org/10.1002/anie.201103980"
-        ]
+        "pocket": "3.32 3.37! 4.60 5.43 6.55"
     },
     "OR2AT4":
     {
         "pocket": "3.36 5.47 6.47!"
+    },
+    "OR4S*":
+    {
+        "pocket": "3.37 5.42! 6.55 7.41",
+        "atomto":
+        [
+            "5.42 EXTENT 3.33"
+        ]
     },
     "OR5B[0-9]+":
     {
@@ -163,7 +175,7 @@
     },
     "OR51*":
     {
-        "active_pocket": "3.33 45.52 5.39 6.55 6.59!",
+        "active_pocket": "3.33 3.37 45.52 5.39 5.47 6.55 6.59!",
         "inactive_pocket": "3.33 45.52 5.39",
         "odorophores":
         {

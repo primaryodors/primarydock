@@ -271,7 +271,7 @@ public:
 
     // Serialization
     void save_pdb_line(FILE* pf, unsigned int atomno);
-    void stream_pdb_line(ostream& os, unsigned int atomno);
+    void stream_pdb_line(ostream& os, unsigned int atomno, bool force_hetatm = false);              // Atoms can be forced het, unlike humans.
 
     // Spatial functions.
     bool move(Point* pt);
@@ -280,6 +280,7 @@ public:
         return move(&pt);
     }
     bool move_rel(SCoord* v);
+    bool move_rel(SCoord v) { return move_rel(&v); }
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
     SCoord* get_basic_geometry();
     SCoord* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);
@@ -364,7 +365,7 @@ protected:
     float polarity = 0;					// maximum potential relative to -OH...H-.
     bool polar_calcd = false;
     int thiol = 0;
-    Bond* bonded_to = 0;
+    Bond* bonded_to = nullptr;
     bool reciprocity = false;
     int family=0;
     // InteratomicForce** Zforces;			// Non-covalent bond types where the atom's Z = either Za or Zb.

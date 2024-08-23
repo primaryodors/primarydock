@@ -29,15 +29,19 @@
 #define clash_limit_per_atom 6.0
 #define iteration_additional_clash_coefficient 10.0
 #define contact_r_5x58_7x53 3.93
+
+// Difference of ethane's eclipsing vs. staggered energy, converted to kJ/mol, per outside bond.
+// Values from: https://www.sas.upenn.edu/~kimg/mcephome/chem502/ethbutconform/ethbutmm2.html
+#define eclipsing_kJmol_per_radian (3.5803 - 0.818) * 4.184 / hexagonal / 6
 #define include_eclipses 0
 #define include_residue_eclipses 0
-#define eclipsing_kJmol_per_radian 1.86453
+
 #define memsanity 0x10000000
 
 #define pH 6.0
 #define auto_pK_protonation 0
 #define hydrophilicity_cutoff 0.25
-#define group_simil_threshold 0.8
+#define group_simil_threshold 0.83
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
 #define intermol_ESP 0.05
@@ -86,6 +90,7 @@
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
+#define _allow_fullrot 0
 #define _fullrot_stepdeg 20
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 7
@@ -107,7 +112,7 @@
 
 #define _MAX_NUM_FORCES 65536
 
-#define SPHREACH_MAX 128
+#define SPHREACH_MAX 256
 
 #define PROT_MAX_RGN 40
 
@@ -155,7 +160,8 @@
 #define cs_max_tries 10
 #define cs_bondweight_exponent 2.0
 #define cs_360_step M_PI / 6.7
-#define cs_ligand_rotation 0.2
+#define cs_ligand_rotation 0.333
+#define cs_keep_ratio 0.8
 #define iter_lostreturns_threshold 0.05
 #define max_iters_without_ligand_change 5
 #define _enhanced_pi_stacking 0
@@ -235,7 +241,7 @@
 // Extra weight given to sidechain-ligand binding strengths during conformer search.
 #define dock_ligand_bias 1.0
 
-// Turns off the 360 degree rotations for all but the zeroth node of a path.
+// Turns off the 360 degree rotations.
 #define nodes_no_ligand_360_tumble 1
 #define nodes_no_ligand_360_flex 1
 #define prevent_ligand_360_on_activate 1
@@ -306,9 +312,6 @@
 #define _allow_conditional_basicity_with_acid_ligand 0
 #define cond_bas_hbond_energy_threshold 10.0
 #define cond_bas_hbond_distance_threshold 2.9
-
-#define prealign_iters 50
-#define prealign_momenta_mult 0
 
 // Whether to move water molecules around that are clashing or are not forming intermolecular bonds.
 #define _teleport_dissatisfied_waters 1

@@ -71,10 +71,34 @@ float AtomGroup::get_mcoord()
     float result = 0;
     for (i=0; i<atct; i++)
     {
-        if (atoms[i]->get_family() == PNICTOGEN && atoms[i]->get_charge() <= 0) result += 1;
+        if (atoms[i]->get_family() == PNICTOGEN && atoms[i]->get_bonded_atoms_count() < 3 && atoms[i]->get_charge() <= 0) result += 1;
         if (atoms[i]->get_family() == CHALCOGEN) result += 1;
     }
     return result;
+}
+
+Atom* AtomGroup::get_mcoord_atom()
+{
+    if (!atct) return 0;
+    float rbest = 0;
+    int i;
+    Atom* result = nullptr;
+    for (i=0; i<atct; i++)
+    {
+        if (
+                (atoms[i]->get_family() == PNICTOGEN && atoms[i]->get_bonded_atoms_count() < 3 && atoms[i]->get_charge() <= 0)
+            ||  (atoms[i]->get_family() == CHALCOGEN)
+           )
+        {
+            float r = atoms[i]->get_location().get_3d_distance(ligand->get_barycenter());
+            if (r > rbest)
+            {
+                rbest = r;
+                result = atoms[i];
+            }
+        }
+    }
+    return result;    
 }
 
 float AtomGroup::get_sum()
@@ -1181,7 +1205,7 @@ float GroupPair::get_potential()
         bool polar_atoms = (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff);
         bool polar_res   = (fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff);
 
-        if (polar_atoms != polar_res) return 0;
+        if (!scg->metallic && polar_atoms != polar_res) return 0;
 
         int i, j, q=0;
         for (i=0; i<m; i++)
@@ -1193,8 +1217,9 @@ float GroupPair::get_potential()
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
 
-                if (polar_atoms && polar_res)
+                if (polar_atoms && !aa->coordmtl)
                 {
+                    if (!polar_res) continue;
                     if (!aa->has_hbond_acceptors() && a->is_polar() > 0) continue;
                     if (!aa->has_hbond_donors() && a->is_polar() < 0) continue;
                 }
@@ -1459,57 +1484,103 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         if (rot.a >= bb_realign_threshold_angle) lig->rotate(lv, rot.a*amount);
     }
 
-    #if enable_bb_scooch
-    // Scooch.
-    // float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
-    float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center());
-    float r1 = 0;
-    try
+    if (gp[0]->scg->metallic)
     {
-        if (n > 1 && gp.at(1) && gp[1]->scg && gp[1]->ag
-            && abs((long)gp[1]->ag.get() - (long)gp[1]->scg.get()) < memsanity)
-            r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
-    }
-    catch (...)
-    {
-        ;
-    }
+        int i;
+        n = gp[0]->scg->aminos.size();
+        Point foravg[n+2];
+        Point mloc = gp[0]->scg->metal->get_location();
+        for (i=0; i<n; i++)
+        {
+            Atom* a = gp[0]->scg->aminos[i]->get_nearest_atom(mloc);
+            foravg[i] = a->get_location();
+            // cout << i << " " << a->residue << ":" << a->name << " @ " << foravg[i] << endl << flush;
+        }
 
-    bool do0 = false, do1 = false;
-    Point rel(0,0,0);
-    if (r0 > bb_scooch_threshold_distance && r1 <= bb_scooch_threshold_distance)
-    {
-        Point pt = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        pt.scale((r0-bb_scooch_threshold_distance) *amount/2);
-        rel = rel.add(pt);
-        do0 = true;
+        Point opposite = average_of_points(foravg, n);
+        // cout << opposite << endl << flush;
+        SCoord v = mloc.subtract(opposite);
+        v.r = 2.5;
+        Point target = mloc.add(v);
+
+        Atom* a = gp[0]->ag->get_mcoord_atom();
+        SCoord mov_amt = target.subtract(a->get_location());
+        mov_amt.r *= amount;
+        lig->move(mov_amt);
+
+        Atom* H = a->is_bonded_to("H");
+        Bond* b = a->get_bond_by_idx(0);
+        Atom* second = b->atom2;
+
+        if (second)
+        {
+            rot = align_points_3d(second->get_location(), target.add(v), target);
+            LocatedVector lv = rot.v;
+            lv.origin = target;
+            lig->rotate(lv, rot.a*amount);
+        }
+
+        if (H)
+        {
+            if (b && b->atom2 && b->can_rotate)
+            {
+                v = a->get_location().subtract(b->atom2->get_location());
+                float theta = find_angle_along_vector(mloc, H->get_location(), a->get_location(), v);
+                b->get_reversed()->rotate(M_PI-theta, false, true);
+            }
+        }
     }
-    else if (r1 > bb_scooch_threshold_distance)
+    else
     {
-        Point pt = gp[1]->scg->get_center().subtract(gp[1]->ag->get_center());
-        pt.scale((r1-bb_scooch_threshold_distance) *amount/2);
-        rel = rel.add(pt);
-        do1 = true;
-    }
-    if (rel.magnitude())
-    {
-        if (rel.magnitude() > speed_limit*100) throw 0xbad;
-        #if _dbg_groupsel || _dbg_groupsalign
-        // cout << "Atom group is " << gp[0]->scg->distance_to(gp[0]->ag->get_center()) << "A from side chain group. ";
-        // cout << "Side chain group reach is " << gp[0]->scg->group_reach() << "A." << endl;
-        int dowhich = do1 ? 1 : 0;
-        cout << "Ia. Scooching " << *gp[dowhich]->ag << " " << rel.magnitude() << "Å into the reach of ";
-        cout << *gp[dowhich]->scg << " " << endl;
-        cout << "Groups are now " << gp[dowhich]->ag->distance_to(gp[dowhich]->scg->get_nearest_atom(gp[dowhich]->ag->get_center())->get_location()) << "A apart." << endl;
+        #if enable_bb_scooch
+        // Scooch.
+        float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center());
+        float r1 = 0;
+        try
+        {
+            if (n > 1 && gp.at(1) && gp[1]->scg && gp[1]->ag
+                && abs((long)gp[1]->ag.get() - (long)gp[1]->scg.get()) < memsanity)
+                r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
+        }
+        catch (...)
+        {
+            ;
+        }
+
+        bool do0 = false, do1 = false;
+        Point rel(0,0,0);
+        if (r0 > bb_scooch_threshold_distance && r1 <= bb_scooch_threshold_distance)
+        {
+            Point pt = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
+            pt.scale((r0-bb_scooch_threshold_distance) *amount/2);
+            rel = rel.add(pt);
+            do0 = true;
+        }
+        else if (r1 > bb_scooch_threshold_distance)
+        {
+            Point pt = gp[1]->scg->get_center().subtract(gp[1]->ag->get_center());
+            pt.scale((r1-bb_scooch_threshold_distance) *amount/2);
+            rel = rel.add(pt);
+            do1 = true;
+        }
+        if (rel.magnitude())
+        {
+            if (rel.magnitude() > speed_limit*100) throw 0xbad;
+            #if _dbg_groupsel || _dbg_groupsalign
+            int dowhich = do1 ? 1 : 0;
+            cout << "Ia. Scooching " << *gp[dowhich]->ag << " " << rel.magnitude() << "Å into the reach of ";
+            cout << *gp[dowhich]->scg << " " << endl;
+            cout << "Groups are now " << gp[dowhich]->ag->distance_to(gp[dowhich]->scg->get_nearest_atom(gp[dowhich]->ag->get_center())->get_location()) << "A apart." << endl;
+            #endif
+
+            #if _dbg_improvements_only_rule
+            excuse_deterioration = true;
+            #endif
+
+            lig->move(rel);
+        }
         #endif
-
-        #if _dbg_improvements_only_rule
-        excuse_deterioration = true;
-        #endif
-
-        lig->move(rel);
     }
-    #endif
 
     if (do_conforms) gp[0]->scg->conform_to(lig);
 

@@ -548,7 +548,15 @@ SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
 
 float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 {
-    float f = (1.0 + 1.0 * cos(fmin(fabs(((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25)*6), M_PI)));
+    // This metal compatibility estimate is based on the electronegativity of the metal and that of the coordinating atom.
+    // It is designed to preferentially pair e.g. K/Na/Ca with O, Mg/Zn/Fe with N, Cu/Zn with S/N, Ag with S, but not e.g. Cu with O or Na with S.
+    // Real world chelates, including metal binding sites in proteins, show a strong tendency to match electronegativities in this way.
+    float ea = a->get_electronegativity();
+    float eb = b->get_electronegativity();
+    float sum = ea + eb;
+    float delta = fabs(4.5 - sum);
+    float f = fmax(0, 1.0 - delta);
+
     #if _dbg_groupsel
     // cout << "Metal compatibility for " << *a << "..." << *b << " = " << f << endl;
     #endif
@@ -597,6 +605,8 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
     return potential;
 }
 
+#define _num_force_precedences 6
+const intera_type force_precedence[_num_force_precedences] = {mcoord, ionic, hbond, pi, polarpi, vdW};
 float InteratomicForce::total_binding(Atom* a, Atom* b)
 {
     InteratomicForce* forces[32];
@@ -604,6 +614,28 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     int i, j, k;
     float kJmol = 0;
+    float partial = 0;
+
+    InteratomicForce* forces_by_type[_num_force_precedences];
+    for (i=0; i<_num_force_precedences; i++) forces_by_type[i] = nullptr;
+    for (i=0; forces[i]; i++)
+    {
+        for (j=0; j<_num_force_precedences; j++)
+        {
+            if (force_precedence[j] == forces[i]->type)
+            {
+                forces_by_type[j] = forces[i];
+                break;
+            }
+        }
+    }
+    j=0;
+    for (i=0; i<_num_force_precedences; i++)
+    {
+        if (forces_by_type[i]) forces[j++] = forces_by_type[i];
+    }
+    forces_by_type[j] = nullptr;
+
 
     float r = a->distance_to(b);
     float avdW = a->get_vdW_radius(), bvdW = b->get_vdW_radius();
@@ -615,6 +647,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     float achg = a->get_charge(), bchg = b->get_charge()
         , apol = a->is_polar(), bpol = b->is_polar();
+    int aZ = a->get_Z(), bZ = b->get_Z();
 
     #if auto_pK_protonation
     if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
@@ -655,7 +688,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     }
     #endif
 
-    if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2);
+    if (achg && sgn(achg) == sgn(bchg))
+    {
+        float repulsion = charge_repulsion * achg*bchg / pow(r, 2);
+        kJmol -= repulsion;
+        k = (ionic - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] -= repulsion;
+    }
 
     if (achg) apol += achg;
     if (bchg) bpol += bchg;
@@ -695,6 +734,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         }
 
         kJmol -= pr;
+        k = (hbond - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] -= pr;
     }
 
     no_polar_repuls:
@@ -715,7 +756,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     if (!atoms_are_bonded && achg && bchg && sgn(achg) == -sgn(bchg))
     {
-        kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
+        float pcf = 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
+        kJmol += pcf;
+        k = (ionic - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] += pcf;
     }
     #endif
 
@@ -743,6 +787,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
         }
 
+        // https://chemistry.stackexchange.com/questions/42085/can-an-amide-nitrogen-be-a-hydrogen-bond-acceptor
+        if (forces[i]->type == hbond)
+        {
+            if  (   (aZ == 1 && b->get_family() == PNICTOGEN && (b->is_pi() && b->get_bonded_atoms_count() > 2) ) 
+                 || (bZ == 1 && a->get_family() == PNICTOGEN && (a->is_pi() && a->get_bonded_atoms_count() > 2) )
+                 || (aZ == 1 && bchg > hydrophilicity_cutoff)
+                 || (bZ == 1 && achg > hydrophilicity_cutoff)
+                )
+                continue;
+        }
+
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
 
@@ -753,7 +808,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (forces[i]->type == covalent) continue;
         
-        float partial, rdecayed;
+        float rdecayed;
         float asum=0, bsum=0, aniso=1;
         bool stacked_pi_rings = false;
 
@@ -1102,8 +1157,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 partial = aniso * forces[i]->kJ_mol - Lennard_Jones(a, b, forces[i]->get_distance());
             }
 
-            // TODO: Replace this with a more generalized model of competitive h-bonding as well as ionic, mcoord, etc.
-            if (forces[i]->type == hbond && a->is_backbone != b->is_backbone) partial *= 0.5;
+            if (forces[i]->type == hbond)
+            {
+                // https://www.sciencedirect.com/science/article/abs/pii/S0009261497011172
+                // https://web.archive.org/web/20200305164852id_/https://boris.unibe.ch/134571/1/1NpOH-Hydbond_JCP_resub.pdf
+                // TODO: Replace this with better data in bindings.dat. THE FOLLOWING IS A GROSS OVERSIMPLIFICATION.
+                if (a->is_pi() && !a->is_amide() && !b->is_pi()) partial *= 21.8 / 37.6;
+                if (b->is_pi() && !b->is_amide() && !a->is_pi()) partial *= 21.8 / 37.6;
+            }
 
             if (forces[i]->type == mcoord)
             {
@@ -1133,15 +1194,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 throw 0xbadf0ace;
             }
 
-            if (forces[i]->type == polarpi || forces[i]->type == mcoord)
+            if (forces[i]->type == polarpi || forces[i]->type == mcoord || forces[i]->type == ionic)
             {
-                if (a->is_metal()) partial *= a->get_charge();
-                if (b->is_metal()) partial *= b->get_charge();
-            }
-
-            if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
-            {
-                partial *= achg * -bchg;
+                partial *= fmax(forces[i]->type == ionic?0:1, fabs(achg)) * fmax(forces[i]->type == ionic?0:1, fabs(bchg));
             }
 
             if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);
@@ -1200,7 +1255,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (debug_criteria) cout << endl;
         #endif
 
-
         #if _peratom_audit
         if (interauditing)
         {
@@ -1258,6 +1312,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         {
             break;
         }
+    
+        if (partial) break;
     }
 
     if (rbind < 0.7) rbind = 0.7;
@@ -1290,12 +1346,15 @@ _canstill_clash:
 
     sigma = fmin(rbind, avdW+bvdW) - local_clash_allowance;
 
+    float clash = 0;
     if (r < rbind && !atoms_are_bonded) // && (!achg || !bchg || (sgn(achg) != -sgn(bchg))) )
     {
         // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << achg << " " << bchg << endl;
-        float clash = Lennard_Jones(a, b, sigma);
-        kJmol -= fmax(clash, 0);
-        
+        clash = fmax(Lennard_Jones(a, b, sigma), 0);
+        kJmol -= clash;
+        k = (vdW - covalent) % _INTER_TYPES_LIMIT;
+        total_binding_by_type[k] -= clash;
+
         #if _peratom_audit
         if (interauditing)
         {
@@ -1312,6 +1371,7 @@ _canstill_clash:
     }
 
     _finished_clashing:
+
     return kJmol;
 }
 
@@ -1413,7 +1473,10 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
             }
     }
 
-    throw BOND_DEF_NOT_FOUND;
+    cout << "WARNING: No bond definition for " << a->get_elem_sym() << " " << btype
+        << " " << b->get_elem_sym() << ". Please check data/bindings.dat." << endl << endl;
+    // throw BOND_DEF_NOT_FOUND;
+    return a->get_vdW_radius() + b->get_vdW_radius();
 }
 
 std::string InteratomicForce::get_config_string() const

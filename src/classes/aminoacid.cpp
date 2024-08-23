@@ -2328,6 +2328,57 @@ bool AminoAcid::is_helix(int p)
     return false;
 }
 
+Atom* AminoAcid::get_one_most_bindable(intera_type bt)
+{
+    if (!atoms) return nullptr;
+    int i, Z;
+    float bestscore = 0;
+    Atom* retval = nullptr;
+    Point caloc = this->get_CA_location();
+    for (i=0; i<atcount; i++)
+    {
+        if (!atoms[i]) continue;
+        if (atoms[i]->is_backbone) continue;
+        float potential = 0;
+        switch (bt)
+        {
+            case mcoord:
+            Z = atoms[i]->get_Z();
+            if (Z == 7 || Z == 8 || Z == 15 || Z == 16 || Z == 34) potential = 100;
+            break;
+
+            case ionic:
+            potential = fabs(atoms[i]->get_charge()) * 60;
+            break;
+
+            case hbond:
+            potential = fabs(atoms[i]->is_polar()) * 25;
+            break;
+
+            case pi:
+            potential = atoms[i]->is_pi() ? 12 : 0;
+            break;
+
+            case vdW:
+            default:
+            potential = (fabs(atoms[i]->is_polar()) < hydrophilicity_cutoff) ? 4 : 0;
+        }
+
+        if (!potential) continue;
+
+        float r = atoms[i]->get_location().get_3d_distance(caloc);
+        potential *= r;
+
+        if (potential > bestscore)
+        {
+            bestscore = potential;
+            retval = atoms[i];
+        }
+    }       // for i
+
+    return retval;
+}
+
 float AminoAcid::hydrophilicity() const
 {
     int i, count=0;

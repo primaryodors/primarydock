@@ -335,14 +335,19 @@
         "short_name": "Gu et al (2014)",
         "citation": "Gu, X., Karp, P. H., Brody, S. L., Pierce, R. A., Welsh, M. J., Holtzman, M. J., & Ben-Shahar, Y. (2014). Chemosensory functions for pulmonary neuroendocrine cells. American journal of respiratory cell and molecular biology, 50(3), 637-646."
     },
+    "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
+    {
+        "short_name": "Haag, Di Pizio, Krautwurst (2022)",
+        "citation": "Franziska Haag, Antonella Di Pizio, Dietmar Krautwurst, The key food odorant receptive range of broadly tuned receptor OR2W1. Food Chemistry 375 (2022) 131680"
+    },
     "https:\/\/doi.org\/10.1021\/acs.jafc.3c08230":
     {
-        "short_name": "Haag Frey Ball Hoffmann Krautwurst (2024)",
+        "short_name": "Haag, Frey, Ball, Hoffmann, Krautwurst (2024)",
         "citation": "Franziska Haag, Tim Frey, Lena Ball, Sandra Hoffmann, and Dietmar Krautwurst\r\nPetrol Note in Riesling − 1,1,6-Trimethyl-1,2-dihydronaphthalene (TDN) Selectively Activates Human Odorant Receptor OR8H1\r\nJournal of Agricultural and Food Chemistry virtual special issue \"13th Wartburg Symposium on Flavor Chemistry and Biology\" (2024)\r\nhttps://doi.org/10.1021/acs.jafc.3c08230"
     },
     "https:\/\/pubs.acs.org\/doi\/abs\/10.1021\/acs.jafc.1c03314":
     {
-        "short_name": "Haag Hoffmann Krautwurst (2021)",
+        "short_name": "Haag, Hoffmann, Krautwurst (2021)",
         "citation": "HAAG, Franziska, HOFFMANN, Sandra, et KRAUTWURST, Dietmar. Key Food Furanones Furaneol and Sotolone Specifically Activate Distinct Odorant Receptors. Journal of Agricultural and Food Chemistry, 2021, vol. 69, no 37, p. 10999-11005."
     },
     "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
@@ -364,6 +369,11 @@
     {
         "short_name": "Huang et al (2020)",
         "citation": "Huang, J., Lam, H., Koziol-White, C., Limjunyawong, N., Kim, D., Kim, N., ... & An, S. S. (2020). The odorant receptor OR2W3 on airway smooth muscle evokes bronchodilation via a cooperative chemosensory tradeoff between TMEM16A and CFTR. Proceedings of the National Academy of Sciences, 117(45), 28485-28495."
+    },
+    "http:\/\/dx.doi.org\/10.1021\/acs.jcim.9b00604":
+    {
+        "short_name": "Ibrahim et al (2019)",
+        "citation": "Ibrahim, P., Wifling, D., Clark, T. Universal Activation Index for Class A GPCRs. J. Chem. Inf. Model. 2019, 59, 3938−3945"
     },
     "https:\/\/doi.org\/10.1371\/journal.pone.0267356":
     {
@@ -465,9 +475,14 @@
         "short_name": "Kim et al (2022)",
         "citation": "Ji Min Kim, Sina Dziobaka, Ye Eun Yoon, et al. OR2H2 Activation Suppresses Cellular Senescence and Aging by Activating AMPK and Inducing Senolysis in VK2\/E6E7 Cells, 23 September 2022, PREPRINT (Version 1) available at Research Square [https:\/\/doi.org\/10.21203\/rs.3.rs-2020909\/v1]"
     },
+    "https:\/\/doi.org\/10.1016\/j.snb.2024.136337":
+    {
+        "short_name": "Kim et al (2023)",
+        "citation": "Kyung Ho Kim, Jai Eun An, Myoungjoo Riu, Jin-Soo Son, Sung Eun Seo, Hongki Kim, Gyeong-Ji Kim, Soohyun Lee, Jin Yoo, Tae Shin Park, Yong Hwan Lee, Tai Hyun Park, Choong-Min Ryu, Oh Seok Kwon. Receptonics-based real-time monitoring of bacterial volatiles for onsite fire blight diagnosis. Sensors & Actuators: B. Chemical 419 (2024) 136337"
+    },
     "https:\/\/doi.org\/10.3390\/cimb46080510":
     {
-        "short_name": "Kim, Bae, Park, et al (2024)",
+        "short_name": "Kim et al (2024)",
         "citation": "Joon Bum Kim, Ji-Eun Bae, Na Yeon Park, Yong Hwan Kim, Seong Hyun Kim, Hyejin Hyung, Eunbyul Yeom, Dong Kyu Choi, Kwiwan Jeong, Dong-Hyung Cho. TAAR8 Mediates Increased Migrasome Formation by Cadaverine in RPE Cells. Curr. Issues Mol. Biol. 2024, 46(8), 8658-8664"
     },
     "https:\/\/doi.org\/10.1002\/anie.202202866":

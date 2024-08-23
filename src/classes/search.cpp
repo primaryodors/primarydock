@@ -136,7 +136,7 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
                         for (j=0; j<tsphsz; j++)
                         {
                             worth = 0.4;
-                            if (a->get_charge() && tsphres[j]->get_charge()
+                            if (fabs(a->get_charge()) >= hydrophilicity_cutoff && fabs(tsphres[j]->get_charge()) >= hydrophilicity_cutoff
                                     &&
                                     sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
                             )
@@ -144,7 +144,7 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
                                 it = ionic;
                                 worth = 100;
                             }
-                            else if (a->get_charge() || a->is_polar())
+                            else if (fabs(a->get_charge()) >= hydrophilicity_cutoff || fabs(a->is_polar()) >= hydrophilicity_cutoff)
                             {
                                 it = hbond;
                                 worth = 40;
@@ -168,6 +168,8 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
                                         {
                                             weight = ts_priority_coefficient;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
                                         }
+
+                                        if (tsphres[j]->ring_is_aromatic(0) && fabs(a->is_polar()) >= hydrophilicity_cutoff) weight /= 2;
 
                                         #if !tumble_spheres_include_vdW
                                         if ((worth*weight) < 1) continue;
@@ -430,7 +432,8 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
                 break;
 
                 case hbond:
-                if (fabs(baa[i]->hydrophilicity()) >= hydrophilicity_cutoff)
+                // if (fabs(baa[i]->hydrophilicity()) >= hydrophilicity_cutoff /*|| baa[i]->is_tyrosine_like()*/)
+                if (1)
                 {
                     if (baa[i]->has_hbond_donors() && ligand->has_hbond_acceptors()) can_bind = res_has_nonvdw = true;
                     else if (baa[i]->has_hbond_acceptors() && ligand->has_hbond_donors()) can_bind = res_has_nonvdw = true;
@@ -466,10 +469,17 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
 
                 cs_res[cs_res_qty] = baa[i];
                 cs_bt[cs_res_qty] = allowed_types[j];
+
+                if (cs_bt[cs_res_qty] == hbond)
+                {
+                    rc = baa[i]->get_charge();
+                    lc = ag->get_ionic();
+                    if (rc && lc && sgn(rc) == -sgn(lc)) cs_bt[cs_res_qty] = ionic;
+                }
                 cs_lag[cs_res_qty] = ag;
                 cs_res_qty++;
                 if (baa[i]->priority) any_resnos_priority = true;
-                if (cs_res_qty > MAX_CS_RES-1) return;
+                if (cs_res_qty >= MAX_CS_RES-4) return;
             }
         }
     }
@@ -479,9 +489,16 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 {
     int i, j=0, l, n;
 
+    bool ligand_can_hbond = ligand->has_hbond_donors() || ligand->has_hbond_acceptors() || fabs(ligand->get_charge()) > 0.999999999;
+
+    n = cs_res_qty;
+    any_resnos_priority = false;
+    for (l=0; l<n; l++) if (cs_res[l]->priority) any_resnos_priority = true;
+
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     n = cs_res_qty;
-    while (true)
+    if (!n) return;
+    for (l=0; l<1e5; l++)
     {
         j = rand() % n;
 
@@ -492,23 +509,87 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         // If any residue is priority, then only a priority residue can be chosen.
         if (any_resnos_priority && !cs_res[j]->priority) continue;
 
-        float b;
+        // If the ligand can form a polar bond, it must form a polar bond.
+        if (!cs_res[j]->priority && (ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
+
+        int li, ln;
+        float b, lmcb, bmcb = 0;
+        Atom *ligmc, *rmet;
         switch (cs_bt[j])
         {
-            case mcoord: b = 200; break;
+            case mcoord:
+            b = 200;
+            rmet = cs_res[j]->coordmtl;
+            ln = cs_lag[j]->atct;
+            for (li=0; li<ln; li++)
+            {
+                Atom* mca = cs_lag[j]->atoms[li];
+                if (mca->get_family() != PNICTOGEN && mca->get_family() != CHALCOGEN && !mca->is_pi()) continue;
+                lmcb = InteratomicForce::metal_compatibility(mca, rmet);
+                if (lmcb > bmcb) bmcb = lmcb;
+            }
+            b *= bmcb;
+            break;
+
             case ionic: b = 60; break;
-            case hbond: b = 25; break;
+            case hbond:
+            b = 25;
+            if (cs_res[j]->has_pi_atoms() && cs_lag[j]->get_pi()) b *= 2;
+            break;
             case pi: b = 12; break;
             case vdW: default: b = 4;
         }
 
-        float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach()/2);
-        float w = pow(b/500, cs_bondweight_exponent) / pow(r, 3) * 100000;
-        if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 2.5;
+        // float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach()/2);
+        Point caloc = cs_res[j]->get_CA_location();
+        float alphaC = cs_lag[j]->get_center().get_3d_distance(caloc);
+        float GC = ligand->get_barycenter().get_3d_distance(cs_lag[j]->get_center());
+        float r = fmax(0, fabs(alphaC - GC - 3) - cs_res[j]->get_reach());
+
+        float w = pow(b/500, cs_bondweight_exponent) / pow(r, 2) * 100000;
+        if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 10;
         if (frand(0,1) < w) goto chose_residue;
     }
     chose_residue:
     cs_idx = j;
+
+    if ((cs_bt[j] == hbond || cs_bt[j] == mcoord || cs_bt[j] == ionic) && cs_lag[j]->heavy_atom_count() > 4 // && cs_lag[j]->get_pi()
+        && (cs_lag[j]->contains_element("N") || cs_lag[j]->contains_element("O") || cs_lag[j]->contains_element("S"))
+        )
+    {
+        n = cs_lag[j]->atct;
+        Atom* candidates[256];
+        i=0;
+        for (l=0; l<n; l++)
+        {
+            Atom* lca = cs_lag[j]->atoms[l];
+            if (lca->get_Z() > 1 && lca->get_family() != TETREL) candidates[i++] = lca;
+        }
+
+        if (i)
+        {
+            cs_res[cs_res_qty] = cs_res[j];
+            cs_bt[cs_res_qty] = cs_bt[j];
+            cs_lag[cs_res_qty] = new AtomGroup();
+            cs_idx = cs_res_qty;
+            cs_res_qty++;
+
+            cs_lag[cs_idx]->atoms[0] = candidates[rand()%i];
+            cs_lag[cs_idx]->atct = 1;
+            j = cs_idx;
+        }
+    }
+
+    Atom* mtl = (cs_bt[j] == mcoord) ? cs_res[j]->coordmtl : nullptr;
+
+    // Point residue toward where ligand will be, unless using pi stacking.
+    if (cs_bt[j] != pi && cs_bt[j] != mcoord)
+    {
+        MovabilityType mt = cs_res[j]->movability;
+        cs_res[j]->movability = MOV_FLEXONLY;
+        cs_res[j]->conform_atom_to_location(cs_res[j]->get_reach_atom()->name, loneliest);
+        cs_res[j]->movability = mt;
+    }
 
     // Place the ligand so that the atom group is centered in the binding pocket.
     ligand->movability = MOV_ALL;
@@ -517,7 +598,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     ligand->move(mov);
 
     // Rotate the ligand so the atom group faces the chosen residue.
-    Point resca = cs_res[j]->get_CA_location();
+    Point resca = mtl ? mtl->get_location() : cs_res[j]->get_CA_location();
     Point agcen = cs_lag[j]->get_center();
     Rotation rot = align_points_3d(agcen, resca, ligand->get_barycenter());
     LocatedVector lv = rot.v;
@@ -525,10 +606,10 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     ligand->rotate(lv, rot.a);
 
     // Move the ligand so that the atom group is at the optimal distance to the residue.
-    Point resna = cs_res[j]->get_nearest_atom(loneliest)->get_location();
+    Point resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
     agcen = cs_lag[j]->get_center();
     mov = resna.subtract(agcen);
-    mov.r -= 1;
+    mov.r -= mtl ? 2.5 : 1;
     if (mov.r > 0) ligand->move(mov);
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
@@ -539,12 +620,15 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     ligand->rotate(lv, rot.a);
 
     // Conform the side chain and ligand to each other, ignoring other residues.
-    Molecule* mm[3];
-    mm[0] = cs_res[j];
-    mm[1] = ligand;
-    mm[2] = nullptr;
-    ligand->movability = MOV_NORECEN;
-    Molecule::conform_molecules(mm, 200);
+    if (!mtl)
+    {
+        Molecule* mm[3];
+        mm[0] = cs_res[j];
+        mm[1] = ligand;
+        mm[2] = nullptr;
+        ligand->movability = MOV_NORECEN;
+        Molecule::conform_molecules(mm, 200);
+    }
 
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.
@@ -570,4 +654,85 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
     best.restore_state(ligand);
     ligand->movability = MOV_ALL;
+}
+
+void Search::copy_ligand_position_from_file(Protein* protein, Molecule* ligand, const char* filename, const char* ligname, int resno)
+{
+    char buffer[4096];
+    FILE* fp = fopen(filename, "rb");
+    if (!fp)
+    {
+        cout << "Failed to open " << filename << " for reading." << endl;
+        throw 0xbadf12e;
+    }
+
+    int lused = rand();
+    bool copying = false;
+    while (!feof(fp))
+    {
+        fgets(buffer, 4090, fp);
+        char** words = chop_spaced_words(buffer);
+        if (!words[0] || strcmp(words[0], "HETATM"))
+        {
+            if (copying && (resno >= 0 || frand(0,1) < 0.4)) break;
+            else
+            {
+                copying = false;
+                continue;
+            }
+        }
+        if (ligname && strlen(ligname) && strcmp(ligname, words[3]))
+        {
+            cout << ligname << " != " << words[3] << endl;
+            if (copying && (resno >= 0 || frand(0,1) < 0.4)) break;
+            else
+            {
+                copying = false;
+                continue;
+            }
+        }
+        if (resno >= 0 && resno != atoi(words[4]))
+        {
+            cout << resno << " != " << words[4] << endl;
+            if (copying && (resno >= 0 || frand(0,1) < 0.4)) break;
+            else
+            {
+                copying = false;
+                continue;
+            }
+        }
+
+        Atom* a = ligand->get_atom(words[2]);
+        if (!a) continue;
+        Point pt(atof(words[5]), atof(words[6]), atof(words[7]));
+        a->move(pt);
+        a->used = lused;
+        copying = true;
+    }
+
+    fclose(fp);
+
+    int i, n = ligand->get_atom_count();
+    bool any_unmoved = false;
+    for (i=0; i<n; i++)
+    {
+        Atom* a = ligand->get_atom(i);
+        if (!a) continue;
+        if (a->used != lused)
+        {
+            if (a->get_Z() > 1)
+            {
+                cout << "ERROR: Source file does not contain all ligand atoms (missing " << a->name << ")." << endl;
+                throw 0xbadda7a;
+            }
+            any_unmoved = true;
+            break;
+        }
+    }
+
+    if (any_unmoved)
+    {
+        ligand->dehydrogenate();
+        ligand->hydrogenate();
+    }
 }

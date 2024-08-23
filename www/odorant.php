@@ -28,6 +28,7 @@ else
 }
 
 $predictions = [];
+$predvals = [];
 chdir(__DIR__);
 $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
 $odorname_under = str_replace(' ', '_', $odor["full_name"]);
@@ -36,6 +37,11 @@ foreach ($dock_results as $protid => $dr)
     if (isset($dr[$odorname_under]))
     {
         $predictions[$protid] = $dr[$odorname_under]["DockScore"];
+        $predvals[$protid] =
+        [
+            "Affinity" => $dr[$odorname_under]["Affinity"],
+            "A100" => $dr[$odorname_under]["A100"]
+        ];
     }
 }
 
@@ -315,12 +321,14 @@ foreach (array_keys($sorted) as $rcpid)
 </p>
 
 <div class="box" style="height: auto!important;">
-<div class="row content scrollh">
+<div class="row content scrollh50">
 <table class="rcplist">
 
 <tr>
     <th>Receptor</th>
-    <th>Docking Score</th>
+    <th>Dock Score</th>
+    <th>Affinity</th>
+    <th>A100</th>
     <th>Correlated Perceptual Qualities</th>
 </tr>
 
@@ -333,7 +341,12 @@ foreach ($predictions as $rcpid => $score)
     echo "<tr>\n";
     echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
 
+    $aff = $predvals[$rcpid]["Affinity"];
+    $a100 = $predvals[$rcpid]["A100"];
+
     echo "<td style=\"white-space: nowrap;\">$score</td>\n";
+    echo "<td style=\"white-space: nowrap;\">$aff</td>\n";
+    echo "<td style=\"white-space: nowrap;\">$a100</td>\n";
 
     if ($score > 0)
     {
@@ -359,7 +372,13 @@ foreach ($predictions as $rcpid => $score)
 </div>
 </div>
 
+<p class="small">
+Dock Score: This is a measure of whether the algorithm thinks the odorant is an agonist of the receptor.<br>
+Affinity: The binding affinity, in kJ/mol, of the ligand docked in the active or inactive model, whichever is greater.<br>
+A100: A measure of the degree of activation of the receptor. See
+<a href="http://dx.doi.org/10.1021/acs.jcim.9b00604">Ibrahim et al (2019)</a>.
 </div>
+</p>
 
 <div id="Refs" class="tabcontent">
 <div class="box">

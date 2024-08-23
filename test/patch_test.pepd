@@ -1,0 +1,22 @@
+
+STRAND A
+GEN "AEILQRVWY"
+HELIX ALPHA 1 9
+LET @A5 = 5
+
+STRAND B
+GEN "AEILQRVWY"
+LET @B5 = 5
+
+LET @r = @A5 - @B5
+LET &r = @r
+ECHO "# " &r
+
+PATCH A 1 9 B
+LET @B5 = 5
+LET @r = @A5 - @B5
+LET &r = @r
+ECHO &r
+
+IF NOT HELIX 5 ECHO "Not helixed."
+

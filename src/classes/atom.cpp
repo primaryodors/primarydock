@@ -220,7 +220,7 @@ Atom::Atom(const char* elem_sym)
 
     bonded_to = new Bond[abs(geometry)+4];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
+    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -241,7 +241,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
 
     bonded_to = new Bond[abs(geometry)+4];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
+    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -263,7 +263,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
 
     bonded_to = new Bond[abs(geometry)];
     int i;
-    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
+    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -335,7 +335,7 @@ Atom::Atom(FILE* is)
 
                     figure_out_valence();
                     bonded_to = new Bond[abs(geometry)];
-                    for (i=0; i<geometry; i++) bonded_to[i].atom2 = nullptr;
+                    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
 
                     Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
                     location = aloc;
@@ -596,7 +596,11 @@ float Atom::hydrophilicity_rule()
 {
     float total = 0;
 
-    if (is_polar()) total += fabs(is_polar());
+    if (is_polar())
+    {
+        if (is_amide()) total += 1.5 * fabs(is_polar());
+        else total += fabs(is_polar());
+    }
     else if (Z == 7 || Z == 8) total += 1;
     else if (Z == 15) total += 0.666;
     else if (Z == 16 && is_bonded_to("H")) total += 0.5;
@@ -1774,7 +1778,8 @@ SCoord* Atom::get_basic_geometry()
     {
         for (i=0; i<-geometry; i++)
         {
-            retval[i] = new SCoord(1, 0, M_PI/abs(geometry/2)*i);
+            SCoord v(1, 0, M_PI/abs(geometry/2)*i);
+            retval[i] = v;
         }
     }
     else if (geometry == 1)
@@ -2278,7 +2283,7 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     fprintf(pf, "  1.00001.00           %s%c\n", get_elem_sym(), fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ' );
 }
 
-void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
+void Atom::stream_pdb_line(ostream& os, unsigned int atomno, bool fh)
 {
     if (location.x < -9999.999 || location.x > 9999.999
         || location.y < -9999.999 || location.y > 9999.999
@@ -2286,7 +2291,7 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
         )
         return;
 
-    os << (residue ? "ATOM   " : "HETATM ");
+    os << ((residue && !fh) ? "ATOM   " : "HETATM ");
     os << setw(4) << atomno << " ";
 
     if (strlen(name) < 4)

@@ -207,6 +207,7 @@ int main(int argc, char** argv)
     m->name = esym;
     strcpy(m->aa3let, "MTL");
     m->increment_charge(charge);
+    protein->pocketcen = pocketcen;
     p.coordinate_metal(m, numres, mcoordres, mcoorda);
     save_transitional_pdb(&p);
     mtgt.y = pocketcen.y + 15;

@@ -130,7 +130,7 @@ function empirical_response($protein, $odorobj)
 	global $sepyt;
 	
 	$retval = false;
-	foreach ($odorobj['activity'] as $ref => $acv)
+	if (isset($odorobj['activity'])) foreach ($odorobj['activity'] as $ref => $acv)
 	{
 		if (isset($acv[$protein]))
 		{

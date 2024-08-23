@@ -7,10 +7,13 @@ int main(int argc, char** argv)
     Molecule m("Test Ligand");
     std::vector<BallesterosWeinstein> pocketcen_res;
     std::vector<std::string> atoms_of_interest;
+    bool priorities[256];
 
     bool save_tmp_pdbs = false;
 
     int i;
+    for (i=0; i<256; i++) priorities[i] = false;
+
     FILE* fp;
     char buffer[49152];
     for (i=1; i<argc; i++)
@@ -55,7 +58,11 @@ int main(int argc, char** argv)
             {
                 if (!strcasecmp(argv[i], "nec")) break;
                 else if (!strcasecmp(argv[i], "*")) break;
-                else pocketcen_res.push_back(argv[i]);
+                else
+                {
+                    if (argv[i][strlen(argv[i])-1] == '!') priorities[pocketcen_res.size()] = true;
+                    pocketcen_res.push_back(argv[i]);
+                }
             }
         }
         else if (!strcasecmp(argv[i], "savtmp"))
@@ -102,7 +109,7 @@ int main(int argc, char** argv)
             aa = p.get_residue(pocketcen_res[i]);
             if (aa)
             {
-                aa->priority = true;
+                aa->priority = priorities[i];
                 pt4avg[j++] = aa->get_CA_location();
             }
         }
@@ -116,13 +123,15 @@ int main(int argc, char** argv)
 
     std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords.size() > 0);
     agqty = lagc.size();
+    if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
     for (i=0; i<agqty; i++)
         agc[i] = lagc.at(i).get();
+    int n = p.get_end_resno();
     Search::prepare_constrained_search(&p, &m, loneliest);
-    int n = cs_res_qty;
+    n = cs_res_qty;
     for (i=0; i<n; i++)
     {
-        cout << "Candidate: " << cs_res[i]->get_name() << " ~ " << cs_bt[i] << " ~ " << *cs_lag[i] << endl;
+        cout << "Candidate: " << cs_res[i]->get_name() << (cs_res[i]->priority ? "!" : "") << " ~ " << cs_bt[i] << " ~ " << *cs_lag[i] << endl;
     }
 
     int iter;

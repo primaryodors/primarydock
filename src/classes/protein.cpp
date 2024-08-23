@@ -67,10 +67,11 @@ Protein::Protein()
     sequence = nullptr;
     ca = nullptr;
     res_reach = nullptr;
-    metals = nullptr;
 
     int i;
     for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
+    for (i=0; i<16; i++) metals[i] = nullptr;
+    for (i=0; i<32; i++) mcoord_resnos[i] = 0;
 }
 
 Protein::Protein(const char* lname)
@@ -82,10 +83,11 @@ Protein::Protein(const char* lname)
     sequence = nullptr;
     ca = nullptr;
     res_reach = nullptr;
-    metals = nullptr;
 
     int i;
     for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
+    for (i=0; i<16; i++) metals[i] = nullptr;
+    for (i=0; i<32; i++) mcoord_resnos[i] = 0;
 }
 
 Protein::~Protein()
@@ -694,7 +696,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     if (sequence) delete[] sequence;
     if (ca) delete[] ca;
     // if (res_reach) delete res_reach;         // This was causing a segfault.
-    if (metals) delete[] metals;
 
     origpdb_residues.clear();
     connections.clear();
@@ -778,20 +779,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     }
                 }
 
-                // If no AA, load a metal.
-                if (!metcount % 16)
-                {
-                    Atom** mtmp = new Atom*[metcount+20];
-                    if (metals)
-                    {
-                        for (i=0; metals[i]; i++)
-                            mtmp[i] = metals[i];
-                        mtmp[i] = NULL;
-                        delete metals;
-                    }
-                    metals = mtmp;
-                }
-
                 a = new Atom(is);
                 metals[metcount++] = a;
                 metals[metcount] = NULL;
@@ -853,19 +840,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
             switch (ex)
             {
             case ATOM_NOT_OF_AMINO_ACID:
-                if (!metcount % 16)
-                {
-                    Atom** mtmp = new Atom*[metcount+20];
-                    if (metals)
-                    {
-                        for (i=0; metals[i]; i++)
-                            mtmp[i] = metals[i];
-                        mtmp[i] = NULL;
-                        delete metals;
-                    }
-                    metals = mtmp;
-                }
-
                 a = new Atom(is);
                 metals[metcount++] = a;
                 metals[metcount] = NULL;
@@ -947,6 +921,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     // cout << "Read residue " << *residues[rescount] << endl;
     residues[rescount] = 0;
 
+    if (res_can_clash) delete[] res_can_clash;
     res_can_clash = nullptr;
     set_clashables();
 
@@ -1548,6 +1523,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         }
 
         aa->reset_conformer_momenta();
+        if (sphres >= SPHREACH_MAX-2) break;
     }
 
     reaches_spheroid[sphres] = NULL;
@@ -2394,22 +2370,9 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
         m_mcoord = nmc;
     }
 
-    if (!metals)
-    {
-        metals = new Atom*[2];
-        metals[0] = metal;
-        metals[1] = NULL;
-    }
-    else
-    {
-        for (k=0; metals[k]; k++);	// Get count.
-        Atom** nma = new Atom*[k+2];
-        for (i=0; i<k; i++) nma[i] = metals[i];
-        nma[k] = metal;
-        nma[k+1] = NULL;
-        delete[] metals;
-        metals = nma;
-    }
+    for (k=0; metals[k]; k++);	// Get count.
+    metals[k++] = metal;
+    metals[k] = NULL;
 
     m_mcoord[j]->metal = metal;
     m_mcoord[j]->coord_res = new AminoAcid*[residues+2];
@@ -2688,9 +2651,12 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
 std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 {
-    int i, j, l, miter, i2, j1;
+    int i, j, k, l, m, n, q, miter, i2, j1;
 
-    for (i=0; i<mtlcoords.size(); i++)
+    n = mtlcoords.size();
+
+    k=m=0;
+    for (i=0; i<n; i++)
     {
         m_mcoords.push_back(mtlcoords[i]);
         int charge_left = mtlcoords[i].charge;
@@ -2706,18 +2672,22 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         }
         else lmc[0]->add_existing_atom(lmtl = mtlcoords[i].mtl);
         lmc[0]->movability = MOV_ALL;
+        metals[m++] = lmtl;
 
         l = 1;
+        Atom* coord_atoms[mtlcoords[i].coordres.size()+2];
         for (j=0; j<mtlcoords[i].coordres.size(); j++)
         {
             mtlcoords[i].coordres[j].resolve_resno(this);
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
             if (aa)
             {
+                mcoord_resnos[k++] = aa->get_residue_no();
                 aa->movability = MOV_FLEXONLY;
                 lmc[l++] = (Molecule*)aa;
+                coord_atoms[j] = aa->get_one_most_bindable(mcoord);
                 Atom** Ss = aa->get_most_bindable(1, lmtl);
-                lpt = lpt.add((Ss && Ss[0]) ? Ss[0]->get_location() : aa->get_barycenter());
+                lpt = lpt.add(aa->get_CA_location());
 
                 // If cysteine, make thiolate form.
                 if (aa->is_thiol() && charge_left)
@@ -2738,12 +2708,18 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                 aa->coordmtl = lmtl;
             }
         }
+        mcoord_resnos[k] = 0;
+
         lmc[l] = nullptr;
         if (l > 1)
         {
             l--;
             lpt.x /= l; lpt.y /= l; lpt.z /= l;
             l++;
+
+            SCoord tocen = pocketcen.subtract(lpt);
+            tocen.r = 5;
+            lpt = lpt.add(tocen);
 
             lmtl->move(lpt);
         }
@@ -2752,48 +2728,52 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         strcpy(lmtl->aa3let, "MTL");
         lmtl->residue = 0;
 
-        Molecule::conform_molecules(lmc, 50);
-
-        AminoAcid* can_reach_metal[SPHREACH_MAX+4];
-        int num_can_reach = get_residues_can_clash_ligand(can_reach_metal, lmc[0], lmtl->get_location(), Point(2.5,2.5,2.5), nullptr);
-        bool cr_eq_mc[num_can_reach];
-
-        for (miter=0; miter<20; miter++)
+        for (j=0; j<mtlcoords[i].coordres.size(); j++)
         {
-            for (j1=0; j1<num_can_reach; j1++)
+            AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
+            if (aa)
             {
-                bool found = false;
-                if (!miter)
-                {
-                    for (i2=0; i2<mtlcoords[i].coordres.size(); i2++)
-                    {
-                        if (mtlcoords[i].coordres[i2].resno == can_reach_metal[j1]->get_residue_no()) found = true;
-                    }
-                    cr_eq_mc[j1] = found;
-                }
-                else found = cr_eq_mc[j1];
-
-                if (found) continue;
-
-                Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
-                float r = a->distance_to(lmtl);
-                float vdW = lmtl->get_vdW_radius() + a->get_vdW_radius();
-                if (r < vdW)
-                {
-                    SCoord to_move = lmtl->get_location().subtract(a->get_location());
-                    to_move.r = vdW - r;
-                    lmtl->move_rel(&to_move);
-                }
+                Atom* most_coordable = aa->get_one_most_bindable(mcoord);
+                aa->movability = MOV_FLEXONLY;
+                aa->conform_atom_to_location(most_coordable->name, pocketcen.add(pocketcen.subtract(aa->get_CA_location())));
+                aa->conform_atom_to_location(most_coordable->name, lmtl->get_location(), 20, 2.5);
             }
         }
+
+        lmc[0]->movability = MOV_ALL;
         Molecule::conform_molecules(lmc, 50);
+
+        for (l=0; l<30; l++)
+        {
+            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            {
+                if (coord_atoms[j])
+                {
+                    SCoord v = coord_atoms[j]->get_location().subtract(lmtl->get_location());
+                    if (v.r > 2.5)
+                    {
+                        v.r -= 2.5;
+                        v.r *= 0.666;
+                        lmtl->move_rel(v);
+                    }
+                }
+            }
+
+            Molecule::conform_molecules(lmc, 20);
+        }
 
         for (j=0; j<mtlcoords[i].coordres.size(); j++)
         {
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
-            if (aa) aa->movability = MOV_PINNED;
+            if (aa)
+            {
+                aa->movability = MOV_PINNED;
+            }
         }
+
+        lmc[0]->movability = MOV_PINNED;
     }
+    metals[m] = nullptr;
 
     return mtlcoords;
 }
@@ -3030,6 +3010,8 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
 {
     save_undo_state();
 
+    int lused = rand();
+
     LocatedVector lv(axis);
     lv.origin = pivot;
     int i;
@@ -3041,6 +3023,12 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
         aa->movability = MOV_ALL;
         aa->rotate(lv, theta);
         aa->ensure_pi_atoms_coplanar();
+        if (aa->coordmtl && aa->coordmtl->used != lused)
+        {
+            Point pt = rotate3D(aa->coordmtl->get_location(), pivot, axis, theta);
+            aa->coordmtl->move(pt);
+            aa->coordmtl->used = lused;
+        }
         aa->movability = mov;
         set_clashables(i);
     }

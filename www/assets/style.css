@@ -266,6 +266,13 @@ table.rcplist tr:nth-of-type(odd), table.liglist tr:nth-of-type(odd)
     display: block;
 }
 
+.scrollh50
+{
+    height: 420px;
+    overflow-y: auto;
+    display: block;
+}
+
 .rcplist, .liglist
 {
     width: 95%;

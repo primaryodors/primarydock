@@ -104,7 +104,6 @@ Protein* protein;
 Protein* ptemplt;
 Protein* ptplref;
 int seql = 0;
-int mcoord_resno[256];
 int addl_resno[256];
 const Region* regions;
 SCoord region_clashes[85][3];
@@ -150,7 +149,9 @@ std::string optsecho = "";
 
 // Switch to enable "best-binding" algorithm rather than "tumble spheres" algorithm.
 PoseSearchType pdpst = default_search_algorithm;
-std::string prealign_residues = "";
+std::string copyfrom_filename;
+char copyfrom_ligname[5] = {0,0,0,0,0};
+int copyfrom_resno = -1;
 Bond retain_bindings[4];
 std::vector<int> center_resnos;
 std::vector<int> priority_resnos;
@@ -446,12 +447,45 @@ void do_pivotal_hbond_rot_and_scoot()
     ligand->rotate(lv, theta);
 }
 
+void output_iter(int iter, Molecule** mols)
+{
+    std::string itersfname = (std::string)"tmp/" + (std::string)"_iters.dock";
+    int i, liter = iter + movie_offset;
+    FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
+    if (fp)
+    {
+        if (!liter && (pose == 1))
+        {
+            fprintf(fp, "PDB file: %s\n", protfname);
+        }
+        fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
+        int foff = 0;
+
+        for (i=0; reaches_spheroid[nodeno][i]; i++)
+        {
+            reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
+            foff += reaches_spheroid[nodeno][i]->get_atom_count();
+        }
+
+        for (i=0; mols[i]; i++)
+        {
+            if (mols[i]->is_residue()) continue;
+            mols[i]->save_pdb(fp, foff, false);
+            foff += mols[i]->get_atom_count();
+        }
+
+        protein->end_pdb(fp);
+
+        fclose(fp);
+    }
+}
+
 Pose iter_best_pose[1000];
 float iter_best_bind;
 void iteration_callback(int iter, Molecule** mols)
 {
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
-    int l;
+    int i, j, l, n;
     float f = 0;
 
     if (pdpst == pst_constrained)
@@ -466,7 +500,7 @@ void iteration_callback(int iter, Molecule** mols)
         float e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->rotate(&csrot.v, csrot.a, true);
         float e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < e1) cswas.restore_state(ligand);
+        if (e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
 
         Atom *ra, *la;
         cs_res[cs_idx]->mutual_closest_atoms(ligand, &ra, &la);
@@ -477,7 +511,7 @@ void iteration_callback(int iter, Molecule** mols)
         e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->move(r);
         e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < e1*0.9) cswas.restore_state(ligand);
+        if (e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
     }
 
     // Initialization for best-iteration saving for pose output.
@@ -490,7 +524,7 @@ void iteration_callback(int iter, Molecule** mols)
     // Stochastically force flexion on some side chains that get clashes.
     for (l=0; mols[l]; l++)
     {
-        float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
+        float lf = mols[l]->get_intermol_binding(mols), lc = mols[l]->get_intermol_clashes(mols), ptnl = mols[l]->get_intermol_potential(mols);
         f += lf;
 
         int lres = mols[l]->is_residue();
@@ -503,7 +537,7 @@ void iteration_callback(int iter, Molecule** mols)
 
         if (flex
             // && iter < 5
-            && (lf < -10 || lf < 0.1 * ptnl)
+            && (lf < -10 || lf < 0.1 * ptnl || (lc > 0 && lf < 5))
             && mols[l]->movability == MOV_FLXDESEL
             && lres
             && frand(0,1) < flexion_probability_multiplier * prob
@@ -519,6 +553,71 @@ void iteration_callback(int iter, Molecule** mols)
         iter_best_bind = f;
     }
 
+    // Attempt to connect hydrogen bonds to ligand.
+    if (flex)
+    {
+        n = ligand->get_atom_count();
+        for (l=0; mols[l]; l++)
+        {
+            if (!mols[l]->is_residue()) continue;
+            if (fabs(mols[l]->hydrophilicity()) < hydrophilicity_cutoff) continue;
+            if (mols[l]->movability & MOV_PINNED) continue;
+
+            AminoAcid* hbaa = reinterpret_cast<AminoAcid*>(mols[l]);
+            Atom* reach = hbaa->get_reach_atom();
+            if (!reach) continue;
+            if (fabs(reach->is_polar()) < hydrophilicity_cutoff) continue;
+            Bond* rapb = reach->get_bond_by_idx(0);
+            if (!rapb) continue;
+            Atom* prev = rapb->atom2;
+            if (!prev) continue;
+            Atom* CB = hbaa->get_atom("CB");
+            if (!CB) continue;
+            int reachz = reach->get_Z();
+            Atom* target = nullptr;
+            float nearest = Avogadro;
+
+            for (i=0; i<n; i++)
+            {
+                Atom* la = ligand->get_atom(i);
+                if (!la) continue;
+                if (fabs(la->is_polar()) < hydrophilicity_cutoff) continue;
+                if (reachz > 1 && la->get_Z() > 1) continue;
+                float rCB = la->distance_to(CB);
+                if (rCB > _DEFAULT_INTERA_R_CUTOFF + hbaa->get_reach()) continue;
+                float rCA = la->get_location().get_3d_distance(hbaa->get_CA_location());
+                if (rCB > rCA) continue;
+                float rp = la->distance_to(prev);
+                if (rp > _DEFAULT_INTERA_R_CUTOFF) continue;
+                float r = fmin(rp, rCB/1.25);
+                if (r < nearest)
+                {
+                    nearest = r;
+                    target = la;
+                }
+            }
+
+            if (target)
+            {
+                if (reachz == 1 && target->get_Z() == 1)
+                {
+                    if (rand() & 1) reach = reach->get_bond_by_idx(0)->atom2;
+                    else target = target->get_bond_by_idx(0)->atom2;
+                }
+
+                if (target->distance_to(reach) < 3) continue;
+
+                Point pttgt = target->get_location();
+                Pose hbwas(mols[l]);
+                hbwas.copy_state(mols[l]);
+                float before = ligand->get_intermol_binding(mols);
+                hbaa->conform_atom_to_location(reach->name, pttgt, 10, 2);
+                float after = ligand->get_intermol_binding(mols);
+                if (before > 1.1 * after) hbwas.restore_state(mols[l]);
+            }
+        }
+    }
+
     #if use_best_binding_iteration
     if (iter == iters && iter_best_bind > 0)
     {
@@ -527,8 +626,6 @@ void iteration_callback(int iter, Molecule** mols)
     #endif
 
     if (pivotal_hbond_aaa && pivotal_hbond_la) do_pivotal_hbond_rot_and_scoot();
-    
-    int i, j, n;
 
     Point bary = ligand->get_barycenter();
 
@@ -573,7 +670,22 @@ void iteration_callback(int iter, Molecule** mols)
 
     if (!iter) goto _oei;
     if (iter == (iters-1)) goto _oei;
-    
+
+    if (pdpst == pst_best_binding && ligand_groups[0].atct)
+    {
+        l = 1;
+        Point agcen = global_pairs[l]->ag->get_center();
+        Atom* scgna = global_pairs[l]->scg->get_nearest_atom(agcen);
+        float r = global_pairs[l]->ag->distance_to(scgna->get_location());
+        if (r > 2.5)
+        {
+            Pose was(ligand);
+            was.copy_state(ligand);
+            ligand->conform_atom_to_location(global_pairs[l]->ag->atoms[0]->name, scgna->get_location(), 10, frand(2, r));
+            if (was.total_atom_motions() > 3.5*ligand->get_heavy_atom_count()) was.restore_state(ligand);
+        }
+    }
+
     #if enforce_no_bb_pullaway
     if (pdpst == pst_best_binding && ligand_groups[0].atct)
     {
@@ -742,31 +854,7 @@ void iteration_callback(int iter, Molecule** mols)
     if (r >= recapture_distance) ligand->recenter(ligcen_target);
     #endif
 
-    if (output_each_iter)
-    {
-        std::string itersfname = (std::string)"tmp/" /*+ (std::string)protein->get_name()*/ + (std::string)"_iters.dock";
-        int liter = iter - 1 + movie_offset;
-        FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
-        if (fp)
-        {
-            if (!liter && (pose == 1))
-            {
-                fprintf(fp, "PDB file: %s\n", protfname);
-            }
-            fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
-            int foff = 0;
-
-            for (i=0; reaches_spheroid[nodeno][i]; i++)
-            {
-                reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
-                foff += reaches_spheroid[nodeno][i]->get_atom_count();
-            }
-
-            ligand->save_pdb(fp, foff);
-
-            fclose(fp);
-        }
-    }
+    if (output_each_iter) output_iter(iter, mols);
 }
 
 int spinchr = 0;
@@ -796,7 +884,7 @@ void update_progressbar(float percentage)
     cout << ("|/-\\")[spinchr] << " " << (int)percentage << "%.               " << endl;
     spinchr++;
     if (spinchr >= 4) spinchr = 0;
-    hueoffset += 0.1;
+    hueoffset += 0.3;
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
@@ -1068,6 +1156,7 @@ int interpret_config_line(char** words)
         for (; words[i]; i++)
         {
             if (words[i][0] == '-' && words[i][1] == '-') break;
+            if (words[i][0] == '#') break;
             ResiduePlaceholder rp;
             rp.set(words[i]);
             mcr.coordres.push_back(rp);
@@ -1149,7 +1238,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "OUTBBP"))
     {
-        out_bb_pairs = atoi(words[1]);
+        out_bb_pairs = words[1] ? atoi(words[1]) : true;
         return 1;
     }
     else if (!strcmp(words[0], "OUTLPS"))
@@ -1259,6 +1348,29 @@ int interpret_config_line(char** words)
         {
             pdpst = pst_constrained;
             return 1;
+        }
+        else if (!strcmp(words[1], "CP"))
+        {
+            int lf = 1;
+            pdpst = pst_copyfrom;
+            if (!words[2])
+            {
+                cout << "ERROR: Search mode CP without source file." << endl;
+                throw 0xbad19b07;
+            }
+            copyfrom_filename = words[2];
+            if (words[3])
+            {
+                if (strlen(words[3]) > 3) words[3][3] = 0;
+                strcpy(copyfrom_ligname, words[3]);
+                lf++;
+                if (words[4])
+                {
+                    copyfrom_resno = atoi(words[4]);
+                    lf++;
+                }
+            }
+            return lf;
         }
         else
         {
@@ -1843,6 +1955,7 @@ int main(int argc, char** argv)
 
     if (mtlcoords.size())
     {
+        protein->pocketcen = pocketcen;
         mtlcoords = protein->coordinate_metal(mtlcoords);
 
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_metal.pdb";
@@ -1900,10 +2013,7 @@ int main(int argc, char** argv)
 
     pktset = true;
 
-    protein->mcoord_resnos = mcoord_resno;
-
     l=0;
-    for (i=0; mcoord_resno[i]; i++) addl_resno[l++] = mcoord_resno[i];
     addl_resno[l] = 0;
 
     // Load the ligand or return an error.
@@ -2076,8 +2186,26 @@ int main(int argc, char** argv)
         ligand = &pose_ligands[1];
         lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
         agqty = lagc.size();
+        if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
         for (i=0; i<agqty; i++)
             agc[i] = lagc.at(i).get();
+
+        if (mtlcoords.size())
+        {
+            for (i=0; i<mtlcoords.size(); i++)
+            {
+                for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                {
+                    AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                    if (aa)
+                    {
+                        aa->coordmtl = mtlcoords[i].mtl;
+                        aa->priority = true;
+                    }
+                }
+            }
+        }
+
         Search::prepare_constrained_search(protein, ligand, pocketcen);
     }
 
@@ -2095,6 +2223,14 @@ _try_again:
         region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
     }
 
+    n = mtlcoords.size();
+    Point metal_initlocs[n+4];
+    for (i=0; i<n; i++)
+    {
+        metal_initlocs[i] = mtlcoords[i].mtl->get_location();
+    }
+
+    float best_energy = 0;
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -2162,6 +2298,12 @@ _try_again:
             apply_protein_specific_settings(protein);
         }
 
+        n = mtlcoords.size();
+        for (i=0; i<n; i++)
+        {
+            mtlcoords[i].mtl->move(metal_initlocs[i]);
+        }
+
         freeze_bridged_residues();
 
         ligand->recenter(pocketcen);
@@ -2213,10 +2355,8 @@ _try_again:
             #endif
             conformer_tumble_multiplier = 1;
 
-            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && pdpst != pst_best_binding;
-            allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true);
-
-            if (pdpst == pst_best_binding) conformer_tumble_multiplier *= prealign_momenta_mult;
+            allow_ligand_360_tumble = nodes_no_ligand_360_tumble && pdpst != pst_best_binding;
+            allow_ligand_360_flex   = nodes_no_ligand_360_flex;
 
             if (strlen(protafname) && nodeno == activation_node)
             {
@@ -2584,6 +2724,10 @@ _try_again:
                         << " ~ " << *cs_lag[ultimate_csidx] << endl << endl << flush;
                     #endif
                 }
+                else if (pdpst == pst_copyfrom)
+                {
+                    Search::copy_ligand_position_from_file(protein, ligand, copyfrom_filename.c_str(), copyfrom_ligname, copyfrom_resno);
+                }
 
                 // else ligand->recenter(ligcen_target);
 
@@ -2659,21 +2803,6 @@ _try_again:
                 }
             }
 
-            int mcn;
-            Molecule lm("MTL");
-            if (mcn = mtlcoords.size())         // Assignment, not comparison.
-            {
-                for (i=0; i<mcn; i++)
-                {
-                    if (!mtlcoords[i].mtl) continue;                    
-                    lm.add_existing_atom(mtlcoords[i].mtl);
-                }
-
-                lm.movability = MOV_NONE;
-                cfmols[cfmolqty++] = &lm;
-                cfmols[cfmolqty] = nullptr;
-            }
-
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
 
@@ -2702,6 +2831,8 @@ _try_again:
                 reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
             }
             ligand->agroups = global_pairs;
+            if (output_each_iter) output_iter(0, cfmols);
+            if (pdpst == pst_best_binding) ligand->movability = (MovabilityType)(MOV_CAN_AXIAL | MOV_CAN_RECEN | MOV_CAN_FLEX);
             Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
 
             if (!nodeno) // && outpdb.length())
@@ -2766,6 +2897,8 @@ _try_again:
             float pstot = dr[drcount][nodeno].polsat;
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
+            if ((pose==1 && !nodeno) || best_energy > -btot) best_energy = -btot;
+
             #if compute_clashdirs
             n = protein->get_end_resno();
             for (i=1; i<=n; i++)
@@ -2817,7 +2950,7 @@ _try_again:
                 dr[drcount][nodeno].miscdata += (std::string)"Binding constraint:\n";
                 dr[drcount][nodeno].miscdata += (std::string)cs_res[cs_idx]->get_name() + (std::string)" ~ ";
                 std:stringstream stst;
-                stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl << endl;
+                stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl;
                 dr[drcount][nodeno].miscdata += stst.str();
             }
 
@@ -2845,7 +2978,13 @@ _try_again:
             int offset = n;
             if (out_pdbdat_lig)
             {
-                for (l=0; l<n; l++) ligand->get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
+                for (l=0; l<n; l++)
+                {
+                    Atom* a = ligand->get_atom(l);
+                    if (!a) continue;
+                    a->residue = pose;
+                    a->stream_pdb_line(pdbdat, 9000+l, true);
+                }
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Prepared ligand PDB." << endl;
                 #endif
@@ -2854,7 +2993,13 @@ _try_again:
                 {
                     for (k=0; k<maxh2o; k++)
                     {
-                        for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l+3*k);
+                        for (l=0; l<3; l++)
+                        {
+                            Atom* a = waters[k]->get_atom(l);
+                            if (!a) continue;
+                            a->residue = pose;
+                            a->stream_pdb_line(pdbdat, 9000+offset+l+3*k, true);
+                        }
                     }
                 }
             }
@@ -2918,6 +3063,7 @@ _try_again:
 
             dr[drcount][nodeno].pdbdat = pdbdat.str();
             if (debug) *debug << "Prepared the PDB strings." << endl;
+            dr[drcount][nodeno].auth = pose;
 
             if (!nodeno)
             {
@@ -2997,6 +3143,11 @@ _try_again:
             else if (nodeno == pathnodes) drcount++;
         }	// nodeno loop.
     } // pose loop.
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // End main loop.
+    /////////////////////////////////////////////////////////////////////////////////
+
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;
     #endif
@@ -3012,6 +3163,7 @@ _try_again:
 
     const float energy_mult = kcal ? _kcal_per_kJ : 1;
     pose = 1;
+    std::string auths;
     for (i=1; i<=poses; i++)
     {
         for (j=0; j<poses; j++)
@@ -3025,6 +3177,8 @@ _try_again:
                 {
                     if (dr[j][0].proximity > size.magnitude()) continue;
                     if (dr[j][0].worst_nrg_aa > clash_limit_per_aa) continue;
+
+                    auths += (std::string)" " + std::to_string(dr[j][0].auth);
 
                     for (k=0; k<=pathnodes; k++)
                     {
@@ -3174,6 +3328,10 @@ _exitposes:
     cout << found_poses << " pose(s) found." << endl;
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
+
+    cout << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (output) *output << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (debug) *debug << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
 
     #if compute_clashdirs
     if (regions)

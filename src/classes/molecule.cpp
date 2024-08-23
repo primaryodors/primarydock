@@ -2924,7 +2924,6 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                     {
                         missed_connection.r = -Avogadro;
                         mc_bpotential = 0;
-                        // cout << ligands[l]->atoms[j]->get_location().subtract(atoms[i]->get_location()) << ": ";
                         float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                         #if _dbg_internal_energy
                         if (ligands[l] == this)

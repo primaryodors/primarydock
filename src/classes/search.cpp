@@ -414,7 +414,8 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
         {
             // If other binding types have already been found for this residue, skip vdW.
             if (allowed_types[j] == vdW && res_has_nonvdw) continue;
-        
+            if (allowed_types[j] == ionic && baa[i]->coordmtl) continue;
+
             // Can the residue's side chain form this type of bond with the ligand?
             bool can_bind = false;
             float lc, rc;

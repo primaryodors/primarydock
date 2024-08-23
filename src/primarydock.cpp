@@ -2900,8 +2900,6 @@ _try_again:
             float pstot = dr[drcount][nodeno].polsat;
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
-            if ((pose==1 && !nodeno) || best_energy > -btot) best_energy = -btot;
-
             #if compute_clashdirs
             n = protein->get_end_resno();
             for (i=1; i<=n; i++)
@@ -3214,7 +3212,7 @@ _try_again:
                         dr[j][k].do_output_colors = false;
                         dr[j][k].include_pdb_data = true;
                         if (output) *output << dr[j][k];
-
+                        if ((pose==1 && !nodeno) || best_energy > dr[j][k].kJmol) best_energy = dr[j][k].kJmol;
 
                         if (!k && outpdb.length() && pose <= outpdb_poses)
                         {

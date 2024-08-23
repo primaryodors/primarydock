@@ -565,6 +565,9 @@ float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 
 float InteratomicForce::potential_binding(Atom* a, Atom* b)
 {
+    if (a->coordmtl && a->coordmtl != b) return 0;
+    if (b->coordmtl && b->coordmtl != a) return 0;
+
     InteratomicForce* forces[32];
     fetch_applicable(a, b, forces);
 
@@ -609,6 +612,10 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
 const intera_type force_precedence[_num_force_precedences] = {mcoord, ionic, hbond, pi, polarpi, vdW};
 float InteratomicForce::total_binding(Atom* a, Atom* b)
 {
+    bool amet = a->is_metal(), bmet = b->is_metal();
+    if (a->coordmtl && !bmet) return 0;
+    if (b->coordmtl && !amet) return 0;
+
     InteratomicForce* forces[32];
     fetch_applicable(a, b, forces);
 
@@ -648,6 +655,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float achg = a->get_charge(), bchg = b->get_charge()
         , apol = a->is_polar(), bpol = b->is_polar();
     int aZ = a->get_Z(), bZ = b->get_Z();
+
+    if (amet && !achg) achg = 0.5;
+    if (bmet && !bchg) bchg = 0.5;
+
+    if (amet && bchg > 0.5) return 0;
+    if (bmet && achg > 0.5) return 0;
 
     #if auto_pK_protonation
     if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
@@ -776,6 +789,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     for (i=0; forces[i]; i++)
     {
+        if (a->coordmtl && a->coordmtl != b) continue;
+        if (b->coordmtl && b->coordmtl != a) continue;
+
         if (forces[i]->type == ionic)
         {
             if (a->conjugation && b->conjugation)
@@ -785,9 +801,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
             else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) continue;
             else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
-
-            if (a->coordmtl && a->coordmtl != b) continue;
-            if (b->coordmtl && b->coordmtl != a) continue;
         }
 
         // https://chemistry.stackexchange.com/questions/42085/can-an-amide-nitrogen-be-a-hydrogen-bond-acceptor
@@ -799,6 +812,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                  || (bZ == 1 && achg > hydrophilicity_cutoff)
                 )
                 continue;
+        }
+
+        if (forces[i]->type == mcoord)
+        {
+            if (achg && sgn(achg) == sgn(bchg)) continue;
         }
 
         if (!forces[i]->distance) continue;
@@ -1308,8 +1326,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         }
         #endif
 
-        k = (forces[i]->type - covalent) % _INTER_TYPES_LIMIT;
-        total_binding_by_type[k] += partial;
+        if ((a->residue && !b->residue && !b->is_metal()) || (b->residue && !a->residue && !a->is_metal()))
+        {
+            k = (forces[i]->type - covalent) % _INTER_TYPES_LIMIT;
+            total_binding_by_type[k] += partial;
+        }
 
         if (forces[i]->type == ionic && achg && bchg)
         {

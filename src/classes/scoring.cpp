@@ -201,6 +201,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
 
         lmkJmol[metcount] = lmb;
+        metcount++;
     }
 
     #if _peratom_audit

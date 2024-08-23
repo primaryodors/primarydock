@@ -70,6 +70,8 @@ chdir("..");
 if (!file_exists("output/$fam")) mkdir("output/$fam");
 if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 
+$acv_mcoord = $mcoord;
+$mcoord = "";
 if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 
@@ -78,4 +80,5 @@ $outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
 $cenres = substr($cenres_active, 8);
 
 prepare_receptor($pdbfname, "$flxr $aflxr");
+$mcoord = $acv_mcoord;
 $poses = process_dock("a");

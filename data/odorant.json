@@ -10470,9 +10470,14 @@
     "43ba55863f1ec011d729ce8c93e9e504":
     {
         "full_name": "2-furfurylthiol",
-        "smiles": "C1=COC(=C1)CS",
+        "name1": "(furan-2-yl)methanethiol",
+        "smiles": "SCc1ccco1",
         "aroma":
         {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "coffee"
+            ],
             "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
             [
                 "sulfurous",
@@ -10481,6 +10486,13 @@
         },
         "activity":
         {
+            "https:\/\/doi.org\/10.1093\/chemse\/bjw118":
+            {
+                "OR2M3":
+                {
+                    "adjusted_curve_top": "0"
+                }
+            },
             "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
             {
                 "OR2W1":
@@ -25232,29 +25244,6 @@
             ]
         },
         "oid": "a79baa2ec07741d850812f503e1bcb21"
-    },
-    "a7df03e9e964ac51ca75a2670cfdd559":
-    {
-        "full_name": "(furan-2-yl)methanethiol",
-        "smiles": "SCc1ccco1",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "coffee"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1093\/chemse\/bjw118":
-            {
-                "OR2M3":
-                {
-                    "adjusted_curve_top": "0"
-                }
-            }
-        },
-        "oid": "a7df03e9e964ac51ca75a2670cfdd559"
     },
     "a8528269b879add154348c3a5583a480":
     {

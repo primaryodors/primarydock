@@ -2647,7 +2647,12 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
     // Set the coordinating residues' sidechains to immovable.
     for (i=0; m_mcoord[j]->coord_res[i]; i++)
-        m_mcoord[j]->coord_res[i]->movability = MOV_NONE;
+    {
+        AminoAcid* aa = m_mcoord[j]->coord_res[i];
+        aa->movability = MOV_NONE;
+        aa->coordmtl = metal;
+        aa->get_one_most_bindable(mcoord)->coordmtl = aa->coordmtl;
+    }
 
     m_mcoord[j]->locked = true;
     return m_mcoord[j];

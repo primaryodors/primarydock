@@ -127,7 +127,7 @@ public:
     // Metrics functions.
     float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false, int repack_iters = 10);
     float get_rel_int_clashes();
-    float get_internal_binding();
+    float get_internal_binding(int start_resno = 0, int end_resno = 0);             // Default = without beginning and without end.
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_binding(Molecule* ligand);
     AminoAcid** get_residues_can_clash(int resno);

@@ -2005,18 +2005,37 @@ int main(int argc, char** argv)
             {
                 l = 1;
                 n = -1;
+                Protein* p = nullptr;
+                int sr=1, er;
                 if (!words[l])
                 {
-                    f = working->get_internal_clashes(1, working->get_end_resno());
+                    p = working;
+                    er = working->get_end_resno();
                 }
                 else if (words[l][0] >= 'A' && words[l][0] <= 'Z')
                 {
                     if (!strands[words[l][0]-'A']) raise_error("No strand with specified chain letter.");
-                    else f = strands[words[l][0]-'A']->get_internal_clashes(1, strands[words[l][0]-'A']->get_end_resno());
+                    p = strands[words[l][0]-'A'];
+                    er = p->get_end_resno();
                     l++;
                 }
-                else f = working->get_internal_clashes(1, working->get_end_resno());
 
+                n = interpret_single_int(words[l]);
+                if (n)
+                {
+                    sr = n;
+                    l++;
+                }
+                n = interpret_single_int(words[l]);
+                if (n)
+                {
+                    er = n;
+                    l++;
+                }
+                
+                f = p->get_internal_clashes(sr, er);
+
+                n = -1;
                 if (words[l] && (words[l][0] == '&'))
                 {
                     n = find_var_index(words[l++]);
@@ -2050,18 +2069,37 @@ int main(int argc, char** argv)
             {
                 l = 1;
                 n = -1;
+                Protein* p = nullptr;
+                int sr=1, er;
                 if (!words[l])
                 {
-                    f = -working->get_internal_binding();
+                    p = working;
+                    er = working->get_end_resno();
                 }
                 else if (words[l][0] >= 'A' && words[l][0] <= 'Z')
                 {
                     if (!strands[words[l][0]-'A']) raise_error("No strand with specified chain letter.");
-                    else f = -strands[words[l][0]-'A']->get_internal_binding();
+                    p = strands[words[l][0]-'A'];
+                    er = p->get_end_resno();
                     l++;
                 }
-                else f = -working->get_internal_binding();
 
+                n = interpret_single_int(words[l]);
+                if (n)
+                {
+                    sr = n;
+                    l++;
+                }
+                n = interpret_single_int(words[l]);
+                if (n)
+                {
+                    er = n;
+                    l++;
+                }
+                
+                f = p->get_internal_binding(sr, er);
+
+                n = -1;
                 if (words[l] && (words[l][0] == '&'))
                 {
                     n = find_var_index(words[l++]);

@@ -1680,6 +1680,7 @@ void apply_protein_specific_settings(Protein* p)
             // TODO: This should not be hard coded to 6.48-6.59, and it should not depend on the protein having BW numbers.
             BallesterosWeinstein bw = protein->get_bw_from_resno(aa->is_residue());
             if (bw.helix_no == 6 && bw.member_no >= 48 && bw.member_no <= 59) continue;
+            if (bw.helix_no < 10 || bw.helix_no == 45) continue;
 
             if (aa->is_alpha_helix()) helixed = true;
             else for (j=i-2; j<=i+2; j++)

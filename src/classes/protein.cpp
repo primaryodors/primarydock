@@ -544,17 +544,21 @@ float Protein::get_rel_int_clashes()
     return get_internal_clashes(0, 0, false) - initial_int_clashes;
 }
 
-float Protein::get_internal_binding()
+float Protein::get_internal_binding(int sr, int er)
 {
     if (!residues) return 0;
     int i, j;
     float result = 0;
     for (i=0; residues[i]; i++)
     {
+        if (sr && er)
+        {
+            int resno = residues[i]->get_residue_no();
+            if (resno < sr || resno > er) continue;
+        }
         for (j=i; residues[j]; j++)
         {
-            /*if (j==i) result += residues[i]->get_internal_binding();
-            else*/ result += residues[i]->get_intermol_binding(residues[j]);
+            result += residues[i]->get_intermol_binding(residues[j]);
         }
     }
     result += initial_int_clashes;              // Compensate for AminoAcid::get_intermol_binding() which factors in clashes.

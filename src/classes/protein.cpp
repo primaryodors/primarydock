@@ -2710,6 +2710,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                 }
 
                 aa->coordmtl = lmtl;
+                aa->get_one_most_bindable(mcoord)->coordmtl = aa->coordmtl;
             }
         }
         mcoord_resnos[k] = 0;

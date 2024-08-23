@@ -785,6 +785,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
             else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) continue;
             else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
+
+            if (a->coordmtl && a->coordmtl != b) continue;
+            if (b->coordmtl && b->coordmtl != a) continue;
         }
 
         // https://chemistry.stackexchange.com/questions/42085/can-an-amide-nitrogen-be-a-hydrogen-bond-acceptor

@@ -340,6 +340,7 @@ public:
     char pdbchain = ' ';
     bool doing_ring_closure = false;
     Conjugation* conjugation = nullptr;
+    Atom* coordmtl = nullptr;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.

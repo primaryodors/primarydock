@@ -2201,6 +2201,7 @@ int main(int argc, char** argv)
                     if (aa)
                     {
                         aa->coordmtl = mtlcoords[i].mtl;
+                        aa->get_one_most_bindable(mcoord)->coordmtl = aa->coordmtl;
                         aa->priority = true;
                     }
                 }
@@ -2286,6 +2287,7 @@ _try_again:
                         if (aa)
                         {
                             aa->coordmtl = mtlcoords[i].mtl;
+                            aa->get_one_most_bindable(mcoord)->coordmtl = aa->coordmtl;
                         }
                     }
                 }

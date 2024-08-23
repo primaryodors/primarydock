@@ -20,11 +20,16 @@ if ($prot && substr($prot['id'], 0, 4) == "MS4A") die("No prediction method exis
 
 if ($odor)
 {
-    foreach ($prots as $protid => $p)
+    $o = $odor['full_name'];
+    $protlist = [];
+    foreach ($odor['activity'] as $ref => $ac)
     {
-        if (substr($protid, 0, 4) == "MS4A") break;
-        if ($protid == $startat) $started = true;
-        if (!$started) continue;
+        foreach ($ac as $rcpid => $vals) $protlist[$rcpid] = $rcpid;
+    }
+
+    foreach ($protlist as $protid)
+    {
+        if (substr($protid, 0, 4) == "MS4A") continue;
         $cmd = "./run_prediction.sh $protid \"$o\"";
         echo "$cmd\n\n";
         passthru($cmd);
@@ -32,8 +37,12 @@ if ($odor)
 }
 else if ($prot)
 {
+    $protid = $prot['id'];
     foreach (all_empirical_pairs_for_receptor($prot['id'], true, false) as $oid => $acv)
     {
-        //
+        $o = $odors[$oid]['full_name'];
+        $cmd = "./run_prediction.sh $protid \"$o\"";
+        echo "$cmd\n\n";
+        passthru($cmd);
     }
 }

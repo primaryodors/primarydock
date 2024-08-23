@@ -3257,9 +3257,9 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     float clashes = get_intermol_clashes(om);
     lbind -= clashes * iteration_additional_clash_coefficient;
 
+    int i, j, m, n;
     if (mandatory_connection && rawbind >= 0)                   // Allow pullaway if mols are clashing.
     {
-        int i;
         if (!last_mc_binding)
         {
             for (i=0; mandatory_connection[i]; i++);            // Get count.
@@ -3276,6 +3276,47 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
                 }
                 else last_mc_binding[i] = lbind;
             }
+        }
+    }
+
+    n = atcount;
+    m = om->atcount;
+    for (i=0; i<n; i++)
+    {
+        if (atoms[i]->get_Z() > 0) continue;
+        if (fabs(atoms[i]->is_polar()) < hydrophilicity_cutoff) continue;
+        Bond* b = atoms[i]->get_bond_by_idx(0);
+        if (!b) continue;
+        if (!b->atom2) continue;
+        if (!b->can_rotate && !b->can_flip) continue;
+        b = b->atom2->get_bond_by_idx(0);
+        if (!b) continue;
+        b = b->get_reversed();
+        if (!b) continue;
+        if (!b->atom2) continue;
+
+        for (j=0; j<m; j++)
+        {
+            if (om->atoms[j]->get_Z() < 2) continue;
+            if (fabs(om->atoms[j]->is_polar()) < hydrophilicity_cutoff) continue;
+            float r = om->atoms[j]->distance_to(atoms[i]);
+            if (r > 4) continue;
+
+            Atom* H = om->atoms[j]->is_bonded_to("H");
+            if (H && atoms[i]->distance_to(H) < r) continue;
+
+            float theta = find_angle_along_vector(atoms[i]->get_location(),
+                om->atoms[j]->get_location(), b->atom2->get_location(), b->get_axis());
+            if (b->can_rotate)
+            {
+                b->rotate(theta, false, true);
+            }
+            else
+            {
+                if (fabs(theta) > square) b->rotate(M_PI);
+            }
+
+            break;
         }
     }
 

@@ -519,7 +519,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         switch (cs_bt[j])
         {
             case mcoord:
-            b = 200;
+            b = 100;
             rmet = cs_res[j]->coordmtl;
             ln = cs_lag[j]->atct;
             for (li=0; li<ln; li++)

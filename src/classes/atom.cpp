@@ -456,6 +456,12 @@ Point Atom::get_location()
     return pt;
 }
 
+SCoord Bond::get_axis()
+{
+    if (!atom1 || !atom2) return SCoord(0,0,0);
+    return atom2->get_location().subtract(atom1->get_location());
+}
+
 void Bond::fetch_moves_with_atom2(Atom** result)
 {
     int i;

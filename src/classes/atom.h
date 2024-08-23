@@ -49,6 +49,7 @@ public:
     intera_type type = covalent;
     float optimal_radius = 1;
     bond_rotation_fail_reason last_fail = bf_none;
+    SCoord get_axis();
 
     #if _debug_active_bond_rot
     bool echo_on_rotate = false;

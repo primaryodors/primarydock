@@ -107,7 +107,7 @@ switch ($fam)
     break;
 
     case 'OR1':
-    $knowns = "$CLASSI, $CLASSII, $MTAAR9";
+    $knowns = "$CLASSI, $CLASSII";
     break;
 
     case 'OR2':

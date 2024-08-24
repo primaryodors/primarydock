@@ -3342,7 +3342,8 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 
 float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 {
-    static int nearbyr[256];
+    static int nearbya[256];
+    static float nearbyr[256];
     int lused = rand();
 
     a->tightness = 0;
@@ -3356,7 +3357,11 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     {
         float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
         result += f;
-        if (nearest_local_aidx < 256) nearbyr[nearest_local_aidx] = lused;
+        if (nearest_local_aidx < 256)
+        {
+            nearbya[nearest_local_aidx] = lused;
+            nearbyr[nearest_local_aidx] = nearest_r;
+        }
     }
     if (a->mclashables)
     {
@@ -3367,7 +3372,7 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
         }
     }
 
-    for (j=0; j<a->atcount; j++) if (nearbyr[j] == lused) a->tightness += 1;
+    for (j=0; j<a->atcount; j++) if (nearbya[j] == lused) a->tightness += 1.0 / fmax(1, nearbyr[j]/4);
     a->tightness /= max(a->get_heavy_atom_count(), 1);
 
     return result;

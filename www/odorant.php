@@ -228,7 +228,8 @@ if (@$odor['activity']) foreach ($odor['activity'] as $refurl => $acv)
     foreach (array_keys($maxcurvtop) as $rcpid)
     {
         if ($maxcurvtop[$rcpid] > 0) $agonist[$rcpid] = true;
-        if ($maxcurvtop[$rcpid] >= 0 && $minec50[$rcpid] < 0) $agonist[$rcpid] = true;
+        else if ($maxcurvtop[$rcpid] >= 0 && $minec50[$rcpid] < 0) $agonist[$rcpid] = true;
+        else if (!isset($agonist[$rcpid]) && (isset($maxcurvtop[$rcpid]) || isset($minec50[$rcpid]))) $agonist[$rcpid] = false;
     }
 }
 

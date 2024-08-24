@@ -342,25 +342,35 @@ $fn = 0;
 
 foreach ($predictions as $rcpid => $score)
 {
-    echo "<tr>\n";
-    echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
-
-    $aff = $predvals[$rcpid]["Affinity"];
-    $a100 = $predvals[$rcpid]["A100"];
-
+    $trcls = "";
     if (isset($agonist[$rcpid]))
     {
         if ($score > 0)
         {
             if ($agonist[$rcpid]) $correct++;
-            else $fp++;
+            else
+            {
+                $fp++;
+                $trcls = "wrong";
+            }
         }
         else
         {
             if (!$agonist[$rcpid]) $correct++;
-            else $fn++;
+            else
+            {
+                $fn++;
+                $trcls = "wrong";
+            }
         }
     }
+    if ($trcls) $trcls = " class=\"$trcls\"";
+
+    echo "<tr$trcls>\n";
+    echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
+
+    $aff = $predvals[$rcpid]["Affinity"];
+    $a100 = $predvals[$rcpid]["A100"];
 
     echo "<td style=\"white-space: nowrap;\">$score</td>\n";
     echo "<td style=\"white-space: nowrap;\">$aff</td>\n";

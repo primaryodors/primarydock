@@ -107,11 +107,11 @@ switch ($fam)
     break;
 
     case 'OR1':
-    $knowns = "$CLASSI, $MTAAR9";
+    $knowns = "$CLASSI, $CLASSII, $MTAAR9";
     break;
 
     case 'OR2':
-    $knowns = "$CLASSI, $MTAAR9, $TAAR1";       // Seems to work for OR2W1 - hexenol.
+    $knowns = "$CLASSI, $CLASSII, $MTAAR9, $TAAR1";       // Seems to work for OR2W1 - hexenol.
     break;
 
     case 'OR5':

@@ -69,6 +69,7 @@ exec("php -f build_alignment_file.php");
 
 $OR5K1  = "'1015'";
 $CLASSI = "'8f76', '8hti'";
+$CLASSII = "'OR1B1', 'OR1G1', 'OR2J2', 'OR2M7', 'OR2T11'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
 $MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
 // $ADORA2A = "'6gdg'";
@@ -115,11 +116,11 @@ switch ($fam)
 
     case 'OR5':
     if (!file_exists("$pdbname_5k1")) die("Modeling this receptor requires the third party OR5K1 template.\n");
-    else $knowns = "$OR5K1";
+    else $knowns = "$OR5K1, $CLASSII";
     break;
 
     default:        // Class II ORs
-    $knowns = "$CLASSI, $MTAAR9, $TAAR1";      // , $LPAR1
+    $knowns = "$CLASSI, $CLASSII, $MTAAR9, $TAAR1";      // , $LPAR1
 }
 
 

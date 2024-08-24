@@ -4,7 +4,7 @@ chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir(__DIR__);
 
-$exp = file_get_contents("experimental.ali");
+$exp = file_get_contents("experimental.ali")."\n\n".file_get_contents("hm.ali");
 
 $prevln = "";
 foreach (explode("\n", $exp) as $ln)

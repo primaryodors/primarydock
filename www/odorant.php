@@ -390,7 +390,14 @@ foreach ($predictions as $rcpid => $score)
 
 <?php 
 $ttl = $correct + $fp + $fn;
-if ($ttl) echo "<p>".round(100.0*$correct/$ttl,2)."% correct agonist/non-agonist predictions; $fp false positives; $fn false negatives.</p>";
+if ($ttl)
+{
+    echo "<p>".round(100.0*$correct/$ttl,2)."% correct agonist/non-agonist predictions; $fp false positive";
+    if ($fp != 1) echo "s";
+    echo "; $fn false negative";
+    if ($fn != 1) echo "s";
+    echo ".</p>";
+}
 ?>
 </div>
 </div>

@@ -347,5 +347,5 @@ table.rcplist tr:nth-of-type(odd), table.liglist tr:nth-of-type(odd)
 
 .wrong
 {
-    background-color: rgba(255, 64, 0, 0.1);
+    background-color: rgba(255, 64, 0, 0.1)!important;
 }

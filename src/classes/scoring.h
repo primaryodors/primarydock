@@ -48,7 +48,7 @@ class DockResult
     float polsat = 0;
     float protclash = 0;
     float A100 = 0;
-    float lig_tightness = 0;
+    float lig_occlusion = 0;
     bool do_output_colors = false;
     bool include_pdb_data = true;
     bool display_clash_atom1 = false;

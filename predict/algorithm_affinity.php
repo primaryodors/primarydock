@@ -14,8 +14,8 @@ function make_prediction($data)
 
         $aa100 = floatval(@$data['a_A100']);
         $ia100 = floatval(@$data['i_A100']);
-        $attns = floatval(@$data['a_tightness'] ?: 1);
-        $ittns = floatval(@$data['i_tightness'] ?: 1);
+        $attns = floatval(@$data['a_occlusion'] ?: 1);
+        $ittns = floatval(@$data['i_occlusion'] ?: 1);
 
         if ($ascore > 0 && $aa100 > 0 && $ascore > $iscore)
         {

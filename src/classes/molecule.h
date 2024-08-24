@@ -260,7 +260,7 @@ public:
     float clash_worst = 0;
     Atom *best_intera = nullptr, *best_other_intera = nullptr;
     Molecule* best_interactor = nullptr;
-    float tightness = 0;                                // A measure of how many heavy atoms are closer to at least one residue than any other heavy atom.
+    float occlusion = 0;                                // A measure of how many heavy atoms are closer to at least one residue than any other heavy atom.
 
 protected:
 

@@ -3346,7 +3346,7 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     static float nearbyr[256];
     int lused = rand();
 
-    a->tightness = 0;
+    a->occlusion = 0;
     if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic()) ((AminoAcid*)a)->set_conditional_basicity(nearby);
 
     float result = -a->total_eclipses();
@@ -3372,8 +3372,8 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
         }
     }
 
-    for (j=0; j<a->atcount; j++) if (nearbya[j] == lused) a->tightness += 1.0 / fmax(1, nearbyr[j]/4);
-    a->tightness /= max(a->get_heavy_atom_count(), 1);
+    for (j=0; j<a->atcount; j++) if (nearbya[j] == lused) a->occlusion += 1.0 / fmax(1, nearbyr[j]/4);
+    a->occlusion /= max(a->get_heavy_atom_count(), 1);
 
     return result;
 }

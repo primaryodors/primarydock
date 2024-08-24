@@ -998,9 +998,9 @@ heredoc;
                     }
                     continue;
                 }
-                else if ($coldiv[0] == "Ligand tightness")
+                else if ($coldiv[0] == "Ligand occlusion")
                 {
-                    $mode = "tightness";
+                    $mode = "occlusion";
                     if (isset($metrics_to_process[$mode]))
                     {
                         $wmode = $metrics_to_process[$mode];

@@ -3129,7 +3129,7 @@ Atom* Protein::region_pivot_atom(Region rgn)
     return retval;
 }
 
-Point Protein::find_loneliest_point(Point cen, Point sz)
+Point Protein::find_loneliest_point(Point cen, Point sz, Point bias, float bd)
 {
     if (!residues) return cen;
 
@@ -3165,17 +3165,26 @@ Point Protein::find_loneliest_point(Point cen, Point sz)
 
                 Point maybe(xa, ya, za);
                 float minr = Avogadro;
+                int minres = 0;
 
                 for (i=0; residues[i]; i++)
                 {
+                    r = residues[i]->get_CA_location().get_3d_distance(maybe);
+                    if (r > 10) continue;
+                    
                     Atom* a = residues[i]->get_nearest_atom(maybe);
                     if (a)
                     {
                         r = a->get_location().get_3d_distance(maybe);
-                        if (r < minr) minr = r;
+                        if (r < minr && (!bd || maybe.get_3d_distance(bias) <= bd))
+                        {
+                            minr = r;
+                            minres = residues[i]->get_residue_no();
+                        }
                     }
                 }
 
+                // if (minr > 3) cout << maybe << " " << minr << " " << minres << endl;
                 if (minr < 1e9 && minr > bestr)
                 {
                     retval = maybe;

@@ -147,7 +147,7 @@ public:
     Point get_region_center(int startres, int endres);
     SCoord get_region_axis(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
-    Point find_loneliest_point(Point search_center, Point spheroid_size);
+    Point find_loneliest_point(Point search_center, Point spheroid_size, Point bias = Point(0,0,0), float bias_distance = 0);
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
     float binding_to_nearby_residues(int resno);
     void minimize_residue_clashes(int resno);

@@ -599,7 +599,6 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     // Place the ligand so that the atom group is centered in the binding pocket.
     ligand->movability = MOV_ALL;
     ligand->recenter(loneliest);
-    return;
     Point agp = cs_lag[j]->get_center();
     SCoord mov = loneliest.subtract(agp);
     ligand->move(mov);
@@ -612,13 +611,11 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     lv.origin = ligand->get_barycenter();
     ligand->rotate(lv, rot.a);
 
-    return;
-
     // Move the ligand so that the atom group is at the optimal distance to the residue.
     Point resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
     agcen = cs_lag[j]->get_center();
     mov = resna.subtract(agcen);
-    mov.r -= mtl ? 2.5 : 1;
+    mov.r -= mtl ? 2 : 1;
     if (mov.r > 0) ligand->move(mov);
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.

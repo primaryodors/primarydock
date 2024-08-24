@@ -638,33 +638,53 @@ void iteration_callback(int iter, Molecule** mols)
     n = softrgns.size();
     if (n && iter>8) for (i=0; i<n; i++)
     {
+        float thetamin = -0.1*softness*fiftyseventh, thetamax = 0.1*softness*fiftyseventh;
+        Rotation rot;
+        Point rotcen;
+        float lf = 0;
+
         for (j=softrgns[i].start; j<=softrgns[i].end; j++)
         {
             AminoAcid* aa = protein->get_residue(j);
+            if (aa->get_nearest_atom(ligand->get_barycenter())->distance_to(ligand->get_nearest_atom(aa->get_CA_location())) > 4) continue;
             if (!aa) continue;
-            float c = aa->get_intermol_clashes(ligand);
-            if (c > clash_limit_per_aa)
+            float f = reinterpret_cast<Molecule*>(aa)->get_intermol_binding(ligand);
+            if (f < -clash_limit_per_aa || f > 0)
             {
                 Point A = aa->get_CA_location();
                 SCoord AB = ligand->get_nearest_atom(A)->get_location().subtract(A);
-                AB.r = pow(c, 1.0/3);
+                AB.r = (f<0) ? pow(-f, 1.0/3) : AB.r / 2;
                 Point B = A.subtract(AB);
                 Point C = softrgpiva[i]->get_location();
-                Rotation rot = align_points_3d(A, B, C);
-                rot.a = fmin(rot.a, 0.1*softness*fiftyseventh);
 
-                float c1;
-                if (i >= softrgn_initclash.size())
+                if (fabs(f) > fabs(lf) || f < fmin(0, lf))
                 {
-                    c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
-                    softrgn_initclash.push_back(c1);
+                    rot = align_points_3d(A, B, C);
+                    thetamax = fmin(rot.a, thetamax);
+                    if (f < 0) thetamin = 0;
+                    else thetamin = -thetamax;
+                    rotcen = C;
                 }
-                else c1 = softrgn_initclash[i];
-
-                protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, rot.a);
-                float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 20);
-                if (c2 > c1 + clash_limit_per_aa*2) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
             }
+        }
+
+        if (thetamax > thetamin)
+        {
+            rot.a = frand(thetamin, thetamax);
+
+            float c1;
+            if (i >= softrgn_initclash.size())
+            {
+                c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                softrgn_initclash.push_back(c1);
+            }
+            else c1 = softrgn_initclash[i];
+            float a100b4 = protein->A100();
+
+            protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, rot.a);
+            float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 20);
+            if ((c2 > c1 + clash_limit_per_aa*2) || (protein->A100() < 0.95 * a100b4))
+                protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, -rot.a);
         }
     }
 

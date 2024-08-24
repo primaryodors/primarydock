@@ -513,6 +513,8 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         // If the ligand can form a polar bond, it must form a polar bond.
         if (!cs_res[j]->priority && (ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
 
+        if (cs_res[j]->coordmtl && cs_bt[j] != mcoord) continue;
+
         int li, ln;
         float b, lmcb, bmcb = 0;
         Atom *ligmc, *rmet;

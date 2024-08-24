@@ -232,6 +232,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #endif
     ligand_self = ligand->get_intermol_binding(ligand) - ligand->total_eclipses();
     A100 = protein->A100();
+    lig_tightness = ligand->tightness;
     kJmol += ligand_self;
     #if _dbg_internal_energy
     cout << "Ligand internal = " << ligand_self << endl;
@@ -376,6 +377,7 @@ _btyp_unassigned:
     }
 
     output << "A100 score: " << dr.A100 << endl;
+    output << "Ligand tightness: " << dr.lig_tightness << endl;
     output << endl;
 
     if (dr.out_lig_pol_sat)

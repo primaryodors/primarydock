@@ -15,6 +15,11 @@
 
 using namespace std;
 
+Atom* Molecule::nearest_local_atom = nullptr;
+Atom* Molecule::nearest_remote_atom = nullptr;
+int Molecule::nearest_local_aidx = 0;
+float Molecule::nearest_r = 0;
+
 float conformer_momenta_multiplier = 1;
 float conformer_tumble_multiplier = 1;
 
@@ -2860,6 +2865,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     float kJmol = 0;
     if (!atoms) return 0;
     if (subtract_clashes) kJmol -= get_internal_clashes();
+    nearest_r = Avogadro;
+    nearest_local_aidx = 0;
 
     lastshielded = 0;
     clash1 = clash2 = nullptr;
@@ -2880,6 +2887,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
+        int Z = atoms[i]->get_Z();
         for (l=0; ligands[l]; l++)
         {
             #if _dbg_51e2_ionic
@@ -2915,6 +2923,15 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         )
                     )) continue;			// kludge to prevent adjacent residue false clashes.
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
+
+                if (Z>0 && r<nearest_r)
+                {
+                    nearest_r = r;
+                    nearest_local_aidx = i;
+                    nearest_local_atom = atoms[i];
+                    nearest_remote_atom = ligands[l]->atoms[j];
+                }
+
                 if (r < _INTERA_R_CUTOFF)
                 {
                     if (	!shielded(atoms[i], ligands[l]->atoms[j])
@@ -3325,6 +3342,10 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 
 float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 {
+    static int nearbyr[256];
+    int lused = rand();
+
+    a->tightness = 0;
     if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic()) ((AminoAcid*)a)->set_conditional_basicity(nearby);
 
     float result = -a->total_eclipses();
@@ -3335,6 +3356,7 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     {
         float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
         result += f;
+        if (nearest_local_aidx < 256) nearbyr[nearest_local_aidx] = lused;
     }
     if (a->mclashables)
     {
@@ -3344,6 +3366,10 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
             result += f;
         }
     }
+
+    for (j=0; j<a->atcount; j++) if (nearbyr[j] == lused) a->tightness += 1;
+    a->tightness /= max(a->get_heavy_atom_count(), 1);
+
     return result;
 }
 

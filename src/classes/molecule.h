@@ -260,6 +260,7 @@ public:
     float clash_worst = 0;
     Atom *best_intera = nullptr, *best_other_intera = nullptr;
     Molecule* best_interactor = nullptr;
+    float tightness = 0;                                // A measure of how many heavy atoms are closer to at least one residue than any other heavy atom.
 
 protected:
 
@@ -312,6 +313,10 @@ protected:
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
     static float cfmol_multibind(Molecule* mol, Molecule** nearby_mols);
+
+    static Atom *nearest_local_atom, *nearest_remote_atom;
+    static int nearest_local_aidx;
+    static float nearest_r;
 };
 
 extern float conformer_momenta_multiplier;

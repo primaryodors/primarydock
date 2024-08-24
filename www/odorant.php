@@ -336,6 +336,10 @@ foreach (array_keys($sorted) as $rcpid)
 
 arsort($predictions);
 
+$correct = 0;
+$fp = 0;
+$fn = 0;
+
 foreach ($predictions as $rcpid => $score)
 {
     echo "<tr>\n";
@@ -343,6 +347,20 @@ foreach ($predictions as $rcpid => $score)
 
     $aff = $predvals[$rcpid]["Affinity"];
     $a100 = $predvals[$rcpid]["A100"];
+
+    if (isset($agonist[$rcpid]))
+    {
+        if ($score > 0)
+        {
+            if ($agonist[$rcpid]) $correct++;
+            else $fp++;
+        }
+        else
+        {
+            if (!$agonist[$rcpid]) $correct++;
+            else $fn++;
+        }
+    }
 
     echo "<td style=\"white-space: nowrap;\">$score</td>\n";
     echo "<td style=\"white-space: nowrap;\">$aff</td>\n";
@@ -369,6 +387,11 @@ foreach ($predictions as $rcpid => $score)
 
 ?>
 </table>
+
+<?php 
+$ttl = $correct + $fp + $fn;
+if ($ttl) echo "<p>".round(100.0*$correct/$ttl,2)."% correct agonist/non-agonist predictions; $fp false positives; $fn false negatives.</p>";
+?>
 </div>
 </div>
 

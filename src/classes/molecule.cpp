@@ -3315,6 +3315,11 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     m = om->atcount;
     for (i=0; i<n; i++)
     {
+        if (!atoms[i])
+        {
+            atcount = i;
+            break;
+        }
         if (atoms[i]->get_Z() > 0) continue;
         if (fabs(atoms[i]->is_polar()) < hydrophilicity_cutoff) continue;
         Bond* b = atoms[i]->get_bond_by_idx(0);

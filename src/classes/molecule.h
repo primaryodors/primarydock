@@ -260,6 +260,7 @@ public:
     float clash_worst = 0;
     Atom *best_intera = nullptr, *best_other_intera = nullptr;
     Molecule* best_interactor = nullptr;
+    int iters_without_change = 0;
     float occlusion = 0;                                // A measure of how many heavy atoms are closer to at least one residue than any other heavy atom.
 
 protected:
@@ -279,7 +280,6 @@ protected:
     float* last_mc_binding = nullptr;
     Atom** most_bindable = nullptr;
     Pose* iterbegan = nullptr;
-    int iters_without_change = 0;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

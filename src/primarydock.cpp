@@ -135,6 +135,7 @@ bool append_pdb = false;
 bool do_output_colors = false;
 
 bool softdock = false;
+bool malleable = false;
 float softness = 0;
 std::vector<Region> softrgns;
 std::vector<Atom*> softrgpiva;
@@ -695,9 +696,20 @@ void iteration_callback(int iter, Molecule** mols)
             float a100b4 = protein->A100();
 
             protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, rot.a);
-            float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 5);
-            if ((lf < 0 && c2 > c1 + clash_limit_per_aa*2) || (lf > 0 && protein->A100() < 0.95 * a100b4))
-                protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, -rot.a);
+
+            if (malleable)
+            {
+                if (protein->A100() < a100b4)
+                    protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, -rot.a);
+                else ligand->iters_without_change = 0;
+            }
+            else
+            {
+                float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 5);
+                if ((lf < 0 && c2 > c1 + clash_limit_per_aa*2) || (lf > 0 && protein->A100() < 0.95 * a100b4))
+                    protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, -rot.a);
+                else ligand->iters_without_change = 0;
+            }
         }
     }
 
@@ -1449,6 +1461,7 @@ int interpret_config_line(char** words)
                 cout << "Softness: " << softness << endl;
                 #endif
             }
+            else if (!strcmp(words[i], "M")) malleable = true;
             else
             {
                 int j = atoi(words[i]);

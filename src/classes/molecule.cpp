@@ -2040,6 +2040,21 @@ void Molecule::crumple(float theta)
             }
         }
     }
+
+    int j;
+    if (rings) for (i=0; rings[i]; i++)
+    {
+        if (rings[i]->is_conjugated() || rings[i]->is_coplanar()) continue;
+        int n = rings[i]->get_atom_count();
+        for (j=0; j<n; j++)
+        {
+            if (frand(0,1) > 0.333) continue;
+            Atom* a = rings[i]->get_atom(j);
+            if (a->is_pi()) continue;
+            float f = rings[i]->flip_atom(a);
+            if (f) break;
+        }
+    }
 }
 
 void Molecule::clear_cache()

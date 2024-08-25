@@ -1215,9 +1215,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 throw 0xbadf0ace;
             }
 
-            if (forces[i]->type == polarpi || forces[i]->type == mcoord || forces[i]->type == ionic)
+            if (forces[i]->type == polarpi)
             {
                 partial *= fmax(forces[i]->type == ionic?0:1, fabs(achg)) * fmax(forces[i]->type == ionic?0:1, fabs(bchg));
+            }
+            if (forces[i]->type == mcoord || forces[i]->type == ionic)
+            {
+                partial *= fmax(forces[i]->type == ionic?0:1, fabs(achg)) * fmax(forces[i]->type == ionic?0:1, fabs(bchg)) * sgn(achg) * -sgn(bchg);
             }
 
             if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);

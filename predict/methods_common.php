@@ -447,7 +447,8 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         {
             foreach (explode(" ", $cenres) as $bw)
             {
-                $cenresno[] = resno_from_bw($protid, $bw);
+                $resno = resno_from_bw($protid, $bw);
+                if ($resno) $cenresno[] = $resno;
             }
 
             $cenresno = implode(" ", $cenresno);
@@ -650,7 +651,8 @@ heredoc;
         {
             foreach (explode(" ", $cenres) as $bw)
             {
-                $cenresno[] = resno_from_bw($protid, $bw);
+                $resno = resno_from_bw($protid, $bw);
+                if ($resno) $cenresno[] = $resno;
             }
 
             $cenresno = implode(" ", $cenresno);

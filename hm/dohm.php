@@ -41,6 +41,8 @@ foreach ($xlinx as $xl)
         continue;
     }
 
+    if (!$rno1 || !$rno2) continue;
+
     $raa1 = substr($p['sequence'], $rno1-1, 1);
     $raa2 = substr($p['sequence'], $rno2-1, 1);
     if ($raa1 == 'C' && $raa2 == 'C') $disulfs .=

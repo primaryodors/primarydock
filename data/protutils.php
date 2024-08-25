@@ -44,6 +44,10 @@ function resno_from_bw($protid, $bw)
 {
 	global $prots;
 	if (!isset($prots[$protid])) die("Protein not found: $protid.\n");
+
+	$bwraw = preg_replace("/^[A-Z]*/", "", $bw);
+	$aminos = substr($bw, 0, strlen($bw)-strlen($bwraw));
+	$bw = $bwraw;
 	
 	$pettia = explode(".", $bw);
 	$tmrno = intval($pettia[0]);
@@ -54,7 +58,14 @@ function resno_from_bw($protid, $bw)
 	$res50 = intval(@$prots[$protid]["bw"]["$tmrno.50"]);
 	if (!$res50) throw new Exception("Unknown Ballesteros-Weinstein number $bw");
 	
-	return $res50 + $offset - 50 + $insdel;
+	$retval = $res50 + $offset - 50 + $insdel;
+	if ($aminos)
+	{
+		$c = substr($prots[$protid]['sequence'], $retval-1, 1);
+		if (false===strpos($aminos, $c)) return 0;
+	}
+
+	return $retval;
 }
 
 function bw_from_resno($protid, $resno)

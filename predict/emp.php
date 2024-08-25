@@ -40,6 +40,8 @@ else if ($prot)
     $protid = $prot['id'];
     foreach (all_empirical_pairs_for_receptor($prot['id'], true, false) as $oid => $acv)
     {
+        if (substr($protid, 0, 4) == "MS4A") continue;
+        if (!isset($prots[$protid])) continue;
         $o = $odors[$oid]['full_name'];
         $cmd = "./run_prediction.sh $protid \"$o\"";
         echo "$cmd\n\n";

@@ -499,6 +499,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     n = cs_res_qty;
     if (!n) return;
+    float bthreshold = 0;
     for (l=0; l<1e5; l++)
     {
         j = rand() % n;
@@ -543,6 +544,9 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
             case vdW: default: b = 4;
         }
 
+        if (b > bthreshold) bthreshold = b;
+        else if (b < bthreshold) continue;
+
         // float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach()/2);
         Point caloc = cs_res[j]->get_CA_location();
         float alphaC = cs_lag[j]->get_center().get_3d_distance(caloc);
@@ -555,6 +559,9 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     }
     chose_residue:
     cs_idx = j;
+
+    if (cs_bt[j] == pi && fabs(cs_lag[j]->get_polarity()) > hydrophilicity_cutoff && fabs(cs_res[j]->hydrophilicity()) > hydrophilicity_cutoff)
+        cs_bt[j] = hbond;
 
     if ((cs_bt[j] == hbond || cs_bt[j] == mcoord || cs_bt[j] == ionic) && cs_lag[j]->heavy_atom_count() > 4 // && cs_lag[j]->get_pi()
         && (cs_lag[j]->contains_element("N") || cs_lag[j]->contains_element("O") || cs_lag[j]->contains_element("S"))
@@ -585,7 +592,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
     Atom* mtl = (cs_bt[j] == mcoord) ? cs_res[j]->coordmtl : nullptr;
 
-    loneliest = protein->find_loneliest_point(loneliest, Point(13,13,13), cs_res[j]->get_reach_atom_location(), 7);
+    loneliest = protein->find_loneliest_point(loneliest, Point(15,15,15), cs_res[j]->get_reach_atom_location(), 7);
 
     // Point residue toward where ligand will be, unless using pi stacking.
     if (cs_bt[j] != pi && cs_bt[j] != mcoord)

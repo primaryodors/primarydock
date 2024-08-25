@@ -511,7 +511,7 @@ void iteration_callback(int iter, Molecule** mols)
         e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->move(r);
         e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
+        if (e2 < 0 || e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
     }
 
     // Initialization for best-iteration saving for pose output.
@@ -682,7 +682,7 @@ void iteration_callback(int iter, Molecule** mols)
             float a100b4 = protein->A100();
 
             protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, rot.a);
-            float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 20);
+            float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 5);
             if ((lf < 0 && c2 > c1 + clash_limit_per_aa*2) || (lf > 0 && protein->A100() < 0.95 * a100b4))
                 protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, -rot.a);
         }
@@ -2723,16 +2723,16 @@ _try_again:
                 else if (pdpst == pst_constrained)
                 {
                     int csiter, ultimate_csidx=0;
-                    float best_energy;
+                    float lbest_energy;
                     Pose best_cslig;
                     best_cslig.copy_state(ligand);
                     for (csiter=0; csiter<5; csiter++)
                     {
                         Search::do_constrained_search(protein, ligand);
                         float cse = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                        if (!csiter || cse > best_energy)
+                        if (!csiter || cse > lbest_energy)
                         {
-                            best_energy = cse;
+                            lbest_energy = cse;
                             best_cslig.copy_state(ligand);
                             ultimate_csidx = cs_idx;
                         }
@@ -3232,7 +3232,7 @@ _try_again:
                         dr[j][k].do_output_colors = false;
                         dr[j][k].include_pdb_data = true;
                         if (output) *output << dr[j][k];
-                        if ((pose==1 && !nodeno) || best_energy > dr[j][k].kJmol) best_energy = dr[j][k].kJmol;
+                        if ((pose==1 && !nodeno) || best_energy < dr[j][k].kJmol) best_energy = dr[j][k].kJmol;
 
                         if (!k && outpdb.length() && pose <= outpdb_poses)
                         {

@@ -3893,7 +3893,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
                             {
                                 benerg = tryenerg;
-                                pib.copy_state(a);
+                                // pib.copy_state(a);
                                 a->been_flexed = true;
 
                                 #if _dbg_mol_flexion
@@ -3908,9 +3908,21 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 if (is_flexion_dbg_mol_bond) cout << " energy from " << -benerg << " to " << -tryenerg << ", reverting." << endl << endl;
                                 #endif
                             }
+                        }       // full rotation else
+                    }       // each rotatable bond
+
+                    int ii;
+                    if (a->is_residue()) for (ii=0; mm[ii]; ii++)
+                    {
+                        if (!mm[ii]->is_residue()) continue;
+                        if (mm[ii] == a) continue;
+                        float aaclash = mm[ii]->get_intermol_clashes(a);
+                        if (aaclash > clash_limit_per_aa)
+                        {
+                            pib.restore_state(a);
                         }
                     }
-                }       // Rotatable bonds.
+                }       // if rotatable bonds.
                 #endif
 
                 #if _dbg_fitness_plummet

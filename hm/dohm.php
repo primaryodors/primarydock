@@ -69,7 +69,8 @@ exec("php -f build_alignment_file.php");
 
 $OR5K1  = "'1015'";
 $CLASSI = "'8f76', '8hti'";
-$CLASSII = "'OR1B1', 'OR1G1', 'OR2J2', 'OR2M7', 'OR2T11'";
+$CLASSII = "'OR1B1', 'OR1G1', 'OR2J2', 'OR5AC2', 'OR6C70', 'OR8D1', 'OR14J1'";
+$CLASSII_tight = "'OR2M7', 'OR2T11'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
 $MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
 // $ADORA2A = "'6gdg'";
@@ -111,7 +112,8 @@ switch ($fam)
     break;
 
     case 'OR2':
-    $knowns = "$CLASSI, $CLASSII, $MTAAR9, $TAAR1";       // Seems to work for OR2W1 - hexenol.
+    if (substr($rcpid, 0, 4) == "OR2M" || substr($rcpid, 0, 4) == "OR2T" || substr($rcpid, 0, 4) == "OR2V") $knowns = $CLASSII_tight;
+    else $knowns = $CLASSII;
     break;
 
     case 'OR5':

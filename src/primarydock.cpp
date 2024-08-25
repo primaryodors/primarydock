@@ -270,21 +270,34 @@ int interpret_resno(const char* field)
 {
     char buffer[strlen(field)+4];
     strcpy(buffer, field);
-    char* dot = strchr(buffer, '.');
+
+    char* offset = buffer;
+    while (*offset >= 'A' && *offset <= 'Z') offset++;
+
+    int retval = 0;
+    char* dot = strchr(offset, '.');
     if (dot)
     {
         *(dot++) = 0;
-        int b = atoi(buffer);
+        int b = atoi(offset);
         int w = atoi(dot);
         int _50 = protein->get_bw50(b);
-        if (_50 < 1)
-        {
-            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
-            throw 0xbad12e5;
-        }
-        return _50 + w - 50;
+        if (_50 < 1) return 0;
+        else retval = _50 + w - 50;
     }
-    else return atoi(buffer);
+    else retval = atoi(offset);
+
+    if (offset == buffer) return retval;
+
+    AminoAcid* aa = protein->get_residue(retval);
+    if (!aa) return 0;
+
+    int i;
+    for (i=0; buffer[i] >= 'A' && buffer[i] <= 'Z'; i++)
+    {
+        if (buffer[i] == aa->get_letter()) return retval;
+    }
+    return 0;
 }
 
 void freeze_bridged_residues()
@@ -909,31 +922,38 @@ void update_progressbar(float percentage)
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
 {
-    int i=1;
+    int i=1, l, n;
     Point local_pocketcen;
     if (!strcmp(words[i], "RES"))
     {
         i++;
         for (; words[i]; i++)
         {
-            bool priority = false;
+            bool lpriority = false;
             int n = strlen(words[i]);
             if (words[i][n-1] == '!')
             {
-                priority = true;
+                lpriority = true;
                 words[i][n-1] = 0;
             }
 
             int j = interpret_resno(words[i]);
-            if (!j) break;
+            if (!j) continue;
 
-            center_resnos.push_back(j);
             AminoAcid* aa = protein->get_residue(j);
-            if (priority)
+            if (lpriority)
             {
                 priority_resnos.push_back(j);
                 if (aa) aa->priority = true;
             }
+
+            n = center_resnos.size();
+            for (l=0; l<n; l++) if (center_resnos[l] == j) goto _next_cfg_res;
+
+            center_resnos.push_back(j);
+
+            _next_cfg_res:
+            ;
         }
 
         int sz = center_resnos.size(), div=0;
@@ -3232,7 +3252,7 @@ _try_again:
                         dr[j][k].do_output_colors = false;
                         dr[j][k].include_pdb_data = true;
                         if (output) *output << dr[j][k];
-                        if ((pose==1 && !nodeno) || best_energy < dr[j][k].kJmol) best_energy = dr[j][k].kJmol;
+                        if ((pose==1 && !nodeno) || -best_energy < dr[j][k].kJmol) best_energy = -dr[j][k].kJmol;
 
                         if (!k && outpdb.length() && pose <= outpdb_poses)
                         {

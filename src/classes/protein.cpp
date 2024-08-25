@@ -3164,6 +3164,11 @@ Point Protein::find_loneliest_point(Point cen, Point sz, Point bias, float bd)
                 if (r > 1) continue;
 
                 Point maybe(xa, ya, za);
+                r = maybe.get_3d_distance(cen);
+                if (r > 7) continue;
+                float rbiased;
+                if (bd) rbiased = maybe.get_3d_distance(bias);
+
                 float minr = Avogadro;
                 int minres = 0;
 
@@ -3176,7 +3181,8 @@ Point Protein::find_loneliest_point(Point cen, Point sz, Point bias, float bd)
                     if (a)
                     {
                         r = a->get_location().get_3d_distance(maybe);
-                        if (r < minr && (!bd || maybe.get_3d_distance(bias) <= bd))
+                        if (bd) r += rbiased * 2.0 / bd;
+                        if (r < minr && (!bd || rbiased <= bd))
                         {
                             minr = r;
                             minres = residues[i]->get_residue_no();

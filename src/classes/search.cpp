@@ -409,6 +409,15 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
     {
         bool res_has_nonvdw = false;
 
+        Atom* N = baa[i]->get_atom("N");
+        Atom* C = baa[i]->get_atom("C");
+        if (!N || !C) continue;
+
+        Point ptNC = N->get_location().add(C->get_location());
+        ptNC.multiply(0.5);
+
+        if (l_pocket_cen.get_3d_distance(ptNC) < l_pocket_cen.get_3d_distance(baa[i]->get_CA_location())) continue;
+
         // For each of the binding types: mcoord, ionic, hbond, pi, vdW:
         for (j=0; j<num_allowed_type; j++)
         {

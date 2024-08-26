@@ -3384,8 +3384,8 @@ _exitposes:
     if (debug) *debug << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
 
     cout << "Repeatability: " << repeatability << endl;
-    if (output) *output << repeatability << endl;
-    if (debug) *debug << repeatability << endl;
+    if (output) *output << "Repeatability: " << repeatability << endl;
+    if (debug) *debug << "Repeatability: " << repeatability << endl;
 
     #if compute_clashdirs
     if (regions)

@@ -14674,7 +14674,8 @@
     },
     "628f0b25c6ed66360638c6491f25e145":
     {
-        "full_name": "(-)-menthol",
+        "full_name": "(1R,2S,5R)-(-)-menthol",
+        "name1": "(-)-menthol",
         "smiles": "C[C@@H]1CC[C@H]([C@@H](C1)O)C(C)C",
         "aroma":
         {
@@ -33286,7 +33287,8 @@
     },
     "e079ad580bd31e3912ac91ee1128f734":
     {
-        "full_name": "(+)-menthol",
+        "full_name": "(1S,2R,5S)-(+)-menthol",
+        "name1": "(+)-menthol",
         "smiles": "C[C@H]1CC[C@@H]([C@H](C1)O)C(C)C",
         "aroma":
         {

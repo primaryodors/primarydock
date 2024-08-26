@@ -3206,6 +3206,8 @@ _try_again:
 
     const float energy_mult = kcal ? _kcal_per_kJ : 1;
     pose = 1;
+    float repeatability = 0;
+    Pose ligsim;
     std::string auths;
     for (i=1; i<=poses; i++)
     {
@@ -3222,6 +3224,11 @@ _try_again:
                     if (dr[j][0].worst_nrg_aa > clash_limit_per_aa) continue;
 
                     auths += (std::string)" " + std::to_string(dr[j][0].auth);
+                    if (pose == 1) ligsim.copy_state(ligand);
+                    else
+                    {
+                        repeatability += dr[j][0].kJmol / pow(ligsim.total_atom_motions(ligand)/10, 2);
+                    }
 
                     for (k=0; k<=pathnodes; k++)
                     {
@@ -3375,6 +3382,10 @@ _exitposes:
     cout << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
     if (output) *output << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
     if (debug) *debug << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+
+    cout << "Repeatability: " << repeatability << endl;
+    if (output) *output << repeatability << endl;
+    if (debug) *debug << repeatability << endl;
 
     #if compute_clashdirs
     if (regions)

@@ -16,20 +16,22 @@ function make_prediction($data)
         $ia100 = floatval(@$data['i_A100']);
         $attns = floatval(@$data['a_occlusion'] ?: 1);
         $ittns = floatval(@$data['i_occlusion'] ?: 1);
+        $arpt  = floatval(@$data['a_Repeatability'] ?: 1);
+        $irpt  = floatval(@$data['i_Repeatability'] ?: 1);
 
         if ($ascore > 0 && $aa100 > 0 && $ascore > $iscore)
         {
             $data['Predicted'] = 'Agonist';
             $data['Affinity'] = round($ascore, 4);
             $data['A100'] = round($aa100, 4);
-            $data['DockScore'] = round(min($ascore, 150) * $attns * $aa100 / 100, 4);
+            $data['DockScore'] = round(min($ascore, 150) * $attns * $arpt * $aa100 / 100, 4);
         }
         else if ($iscore > 0)
         {
             $data['Affinity'] = round($iscore, 4);
             $data['A100'] = round($ia100, 4);
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = round(min($iscore-$ascore, 150) * $ittns * ($ia100 - 20) / 100, 4);
+            $data['DockScore'] = round(min($iscore-$ascore, 150) * $ittns * $irpt * ($ia100 - 20) / 100, 4);
         }
         else
         {

@@ -62,6 +62,7 @@ public:
     void copy_state(Molecule* from_mol);
     void restore_state(Molecule* to_mol);
     float total_atom_motions();
+    float total_atom_motions(Molecule* to_mol);
     void reset();
 
 protected:

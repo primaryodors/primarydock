@@ -224,6 +224,21 @@ float Pose::total_atom_motions()
     return result;
 }
 
+float Pose::total_atom_motions(Molecule* to_mol)
+{
+    if (!saved_from || !saved_from->atoms || !sz) return 0;
+    int i;
+    float result = 0;
+
+    for (i=0; i<sz && saved_from->atoms[i]; i++)
+    {
+        float r = to_mol->atoms[i]->get_location().get_3d_distance(saved_atom_locs[i]);
+        result += r;
+    }
+
+    return result;
+}
+
 void Molecule::delete_atom(Atom* a)
 {
     if (!a) return;

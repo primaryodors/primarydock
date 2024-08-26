@@ -518,13 +518,13 @@ void iteration_callback(int iter, Molecule** mols)
         Atom *ra, *la;
         cs_res[cs_idx]->mutual_closest_atoms(ligand, &ra, &la);
         SCoord r = ra->get_location().subtract(la->get_location());
-        r.r -= 2.5;
-        r.r *= frand(0.333,0.666);
+        r.r -= 2;
+        r.r *= frand(0.1,0.666);
         cswas.copy_state(ligand);
         e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->move(r);
         e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < 0 || e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
+        if (e2 < fmin(e1, e1*cs_keep_ratio)) cswas.restore_state(ligand);
     }
 
     // Initialization for best-iteration saving for pose output.
@@ -699,7 +699,7 @@ void iteration_callback(int iter, Molecule** mols)
             float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 5);
             if ((lf < 0 && c2 > c1 + clash_limit_per_aa*2) || (lf > 0 && protein->A100() < 0.95 * a100b4))
                 protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, -rot.a);
-            else ligand->iters_without_change = 0;
+            else if (lf < -clash_limit_per_aa) ligand->iters_without_change = 0;
         }
     }
 
@@ -3227,7 +3227,7 @@ _try_again:
                     if (pose == 1) ligsim.copy_state(ligand);
                     else
                     {
-                        repeatability += dr[j][0].kJmol / pow(ligsim.total_atom_motions(ligand)/10, 2);
+                        repeatability += dr[j][0].kJmol / ligsim.total_atom_motions(ligand)/poses;
                     }
 
                     for (k=0; k<=pathnodes; k++)

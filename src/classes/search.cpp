@@ -628,11 +628,14 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     ligand->rotate(lv, rot.a);
 
     // Move the ligand so that the atom group is at the optimal distance to the residue.
-    Point resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
+    Point resna;
+    
+    resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
     agcen = cs_lag[j]->get_center();
     mov = resna.subtract(agcen);
     mov.r -= mtl ? 2 : 1;
-    if (mov.r > 0) ligand->move(mov);
+    ligand->move(mov);
+    resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
     agcen = cs_lag[j]->get_center();
@@ -648,7 +651,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         mm[0] = cs_res[j];
         mm[1] = ligand;
         mm[2] = nullptr;
-        ligand->movability = MOV_NORECEN;
+        ligand->movability = MOV_NONE;
         Molecule::conform_molecules(mm, 200);
     }
 

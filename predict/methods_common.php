@@ -1013,19 +1013,6 @@ heredoc;
                     }
                     continue;
                 }
-                else if ($coldiv[0] == "Repeatability")
-                {
-                    $mode = "Repeatability";
-                    if (isset($metrics_to_process[$mode]))
-                    {
-                        $wmode = $metrics_to_process[$mode];
-                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
-                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
-                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
-                    }
-                    continue;
-                }
                 else if ($coldiv[0] == "Protein clashes")
                 {
                     $mode = "PCLASH";
@@ -1059,6 +1046,16 @@ heredoc;
         if (false !== strpos($ln, "pose(s) found"))
         {
             $mode = "POSES";
+            if (isset($metrics_to_process[$mode]))
+            {
+                $wmode = $metrics_to_process[$mode];
+                $outdata[$metrics_prefix.$wmode] = intval($ln);
+            }
+            continue;
+        }
+        else if (false !== strpos($ln, "Repeatability"))
+        {
+            $mode = "Repeatability";
             if (isset($metrics_to_process[$mode]))
             {
                 $wmode = $metrics_to_process[$mode];

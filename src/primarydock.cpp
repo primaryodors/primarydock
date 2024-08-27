@@ -513,9 +513,9 @@ void iteration_callback(int iter, Molecule** mols)
         float e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->rotate(&csrot.v, csrot.a, true);
         float e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
+        if (e2 < e1*cs_keep_ratio || !ligand->contact_maintained()) cswas.restore_state(ligand);
 
-        Atom *ra, *la;
+        /*Atom *ra, *la;
         cs_res[cs_idx]->mutual_closest_atoms(ligand, &ra, &la);
         SCoord r = ra->get_location().subtract(la->get_location());
         r.r -= 2;
@@ -524,7 +524,7 @@ void iteration_callback(int iter, Molecule** mols)
         e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->move(r);
         e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < fmin(e1, e1*cs_keep_ratio)) cswas.restore_state(ligand);
+        if (e2 < fmin(e1, e1*cs_keep_ratio) || !ligand->contact_maintained()) cswas.restore_state(ligand);*/
     }
 
     // Initialization for best-iteration saving for pose output.
@@ -626,7 +626,7 @@ void iteration_callback(int iter, Molecule** mols)
                 float before = ligand->get_intermol_binding(mols);
                 hbaa->conform_atom_to_location(reach->name, pttgt, 10, 2);
                 float after = ligand->get_intermol_binding(mols);
-                if (before > 1.1 * after) hbwas.restore_state(mols[l]);
+                if (before > 1.1 * after || !ligand->contact_maintained()) hbwas.restore_state(mols[l]);
             }
         }
     }
@@ -717,7 +717,7 @@ void iteration_callback(int iter, Molecule** mols)
             Pose was(ligand);
             was.copy_state(ligand);
             ligand->conform_atom_to_location(global_pairs[l]->ag->atoms[0]->name, scgna->get_location(), 10, frand(2, r));
-            if (was.total_atom_motions() > 3.5*ligand->get_heavy_atom_count()) was.restore_state(ligand);
+            if (was.total_atom_motions() > 3.5*ligand->get_heavy_atom_count() || !ligand->contact_maintained()) was.restore_state(ligand);
         }
     }
 
@@ -811,6 +811,7 @@ void iteration_callback(int iter, Molecule** mols)
             }
 
             ligand->recenter(bary);
+            if (!ligand->contact_maintained()) predrift.restore_state(ligand);
         }
 
         #endif
@@ -2866,7 +2867,6 @@ _try_again:
             ligand->agroups = global_pairs;
             if (output_each_iter) output_iter(0, cfmols);
             if (pdpst == pst_best_binding) ligand->movability = (MovabilityType)(MOV_CAN_AXIAL | MOV_CAN_RECEN | MOV_CAN_FLEX);
-            if (pdpst == pst_constrained) ligand->movability = MOV_NORECEN;
             Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
 
             if (!nodeno) // && outpdb.length())
@@ -3210,7 +3210,11 @@ _try_again:
                 if (dr[j][0].kJmol >= kJmol_cutoff)
                 {
                     if (dr[j][0].proximity > size.magnitude()) continue;
-                    if (dr[j][0].worst_nrg_aa > clash_limit_per_aa) continue;
+                    if (dr[j][0].worst_nrg_aa > clash_limit_per_aa)
+                    {
+                        cout << "A pose exceeds per-residue clash limit at " << dr[j][0].worst_nrg_aa << ", skipping." << endl;
+                        continue;
+                    }
 
                     auths += (std::string)" " + std::to_string(dr[j][0].auth);
                     if (pose == 1) ligsim.copy_state(ligand);

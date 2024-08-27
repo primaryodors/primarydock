@@ -16,8 +16,8 @@ function make_prediction($data)
         $ia100 = floatval(@$data['i_A100']);
         $attns = floatval(@$data['a_occlusion'] ?: 1);
         $ittns = floatval(@$data['i_occlusion'] ?: 1);
-        $arpt  = floatval(@$data['a_Repeatability'] ?: 1);
-        $irpt  = floatval(@$data['i_Repeatability'] ?: 1);
+        $arpt  = 1.0+floatval(@$data['a_Repeatability'] ?: 0);
+        $irpt  = 1.0+floatval(@$data['i_Repeatability'] ?: 0);
 
         if ($ascore > 0 && $aa100 > 0 && $ascore > $iscore)
         {

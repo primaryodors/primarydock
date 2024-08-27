@@ -184,6 +184,7 @@ public:
     bool is_amide();
     bool is_aldehyde();
     int get_Greek();
+    Atom* get_heavy_atom();
 
     // Setters.
     void set_aa_properties();

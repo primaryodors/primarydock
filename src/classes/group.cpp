@@ -101,6 +101,56 @@ Atom* AtomGroup::get_mcoord_atom()
     return result;    
 }
 
+Atom* AtomGroup::one_best_binding_atom(intera_type bt)
+{
+    if (!atoms) return nullptr;
+    int i, Z;
+    float bestscore = 0;
+    Atom* retval = nullptr;
+    Point bary = ligand->get_barycenter();
+    for (i=0; i<atct; i++)
+    {
+        if (!atoms[i]) continue;
+        float potential = 0;
+        switch (bt)
+        {
+            case mcoord:
+            Z = atoms[i]->get_Z();
+            if (Z == 7 || Z == 8 || Z == 15 || Z == 16 || Z == 34) potential = 100;
+            break;
+
+            case ionic:
+            potential = fabs(atoms[i]->get_charge()) * 60;
+            break;
+
+            case hbond:
+            potential = fabs(atoms[i]->is_polar()) * 25;
+            break;
+
+            case pi:
+            potential = atoms[i]->is_pi() ? 12 : 0;
+            break;
+
+            case vdW:
+            default:
+            potential = (fabs(atoms[i]->is_polar()) < hydrophilicity_cutoff) ? 4 : 0;
+        }
+
+        if (!potential) continue;
+
+        float r = atoms[i]->get_location().get_3d_distance(bary);
+        potential *= r;
+
+        if (potential > bestscore)
+        {
+            bestscore = potential;
+            retval = atoms[i];
+        }
+    }       // for i
+
+    return retval;
+}
+
 float AtomGroup::get_sum()
 {
     float retval = fabs(get_ionic()*60) + get_polarity()*25 + get_pi()*2;
@@ -1658,4 +1708,6 @@ void AtomGroup::update_atom_pointers(Molecule* nl)
         if (!a) throw 0xbadda7a;
         atoms[i] = a;
     }
+
+    ligand = nl;
 }

@@ -456,6 +456,14 @@ Point Atom::get_location()
     return pt;
 }
 
+Atom* Atom::get_heavy_atom()
+{
+    if (Z > 1) return this;
+    if (!bonded_to) return this;
+    if (!bonded_to[0].atom2) return this;
+    return bonded_to[0].atom2;
+}
+
 SCoord Bond::get_axis()
 {
     if (!atom1 || !atom2) return SCoord(0,0,0);

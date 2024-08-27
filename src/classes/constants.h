@@ -163,7 +163,7 @@
 #define cs_ligand_rotation 0.333
 #define cs_keep_ratio 0.9
 #define iter_lostreturns_threshold 0.05
-#define max_iters_without_ligand_change 5
+#define max_iters_without_ligand_change 10
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25

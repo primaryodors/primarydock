@@ -192,6 +192,8 @@ public:
     float get_intermol_polar_sat(Molecule* ligand);
     float get_intermol_contact_area(Molecule* ligand, bool hydrophobic_only = false);
     void mutual_closest_atoms(Molecule* mol2, Atom** atom1, Atom** atom2);
+    void maintain_contact(Atom* my_atom, Atom* other_atom);
+    bool contact_maintained();
 
     #if compute_vdw_repulsion
     float get_vdW_repulsion(Molecule* ligand);
@@ -281,6 +283,9 @@ protected:
     float* last_mc_binding = nullptr;
     Atom** most_bindable = nullptr;
     Pose* iterbegan = nullptr;
+    Atom* dlt1 = nullptr;               // Don't Lose Touch.
+    Atom* dlt2 = nullptr;
+    float dltr = 0;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

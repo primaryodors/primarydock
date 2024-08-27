@@ -474,6 +474,14 @@ void output_iter(int iter, Molecule** mols)
         fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
         int foff = 0;
 
+        DockResult ldr(protein, ligand, size, nullptr, pose);
+        ldr.include_pdb_data = false;
+        ldr.display_clash_atom1 = true;
+        ldr.display_clash_atom2 = true;
+        std::stringstream stst;
+        stst << ldr;
+        fprintf(fp, "%s\n", stst.str().c_str());
+
         for (i=0; reaches_spheroid[nodeno][i]; i++)
         {
             reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
@@ -2981,7 +2989,7 @@ _try_again:
             {
                 dr[drcount][nodeno].miscdata += (std::string)"Binding constraint:\n";
                 dr[drcount][nodeno].miscdata += (std::string)cs_res[cs_idx]->get_name() + (std::string)" ~ ";
-                std:stringstream stst;
+                std::stringstream stst;
                 stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl;
                 dr[drcount][nodeno].miscdata += stst.str();
             }
@@ -3212,7 +3220,7 @@ _try_again:
                     if (dr[j][0].proximity > size.magnitude()) continue;
                     if (dr[j][0].worst_nrg_aa > clash_limit_per_aa)
                     {
-                        cout << "A pose exceeds per-residue clash limit at " << dr[j][0].worst_nrg_aa << ", skipping." << endl;
+                        // cout << "A pose exceeds per-residue clash limit at " << dr[j][0].worst_nrg_aa << ", skipping." << endl;
                         continue;
                     }
 

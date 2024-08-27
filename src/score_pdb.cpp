@@ -84,6 +84,7 @@ int main(int argc, char** argv)
     }
 
     m.identify_acidbase();
+    m.identify_rings();
     m.hydrogenate();
 
     fp = fopen("tmp/scored_ligand.sdf", "w");

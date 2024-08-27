@@ -1383,6 +1383,7 @@ _return_added:
                 {
                     lra[j] = new Atom(ringa[j]->get_elem_sym());
                     lra[j]->name = new char[8];
+                    lra[j]->mol = this;
                     strcpy(lra[j]->name, ringa[j]->name);
                 }
             }

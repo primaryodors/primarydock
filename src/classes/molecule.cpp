@@ -52,6 +52,10 @@ Molecule::Molecule(char const* lname)
     reset_conformer_momenta();
     rotatable_bonds = nullptr;
 
+    rotaxes[0] = (SCoord)Point(1,0,0);
+    rotaxes[1] = (SCoord)Point(0,1,0);
+    rotaxes[2] = (SCoord)Point(0,0,1);
+
     int j;
     for (j=0; j<10; j++) lastbind_history[j] = 0;
 }
@@ -65,6 +69,10 @@ Molecule::Molecule()
     reset_conformer_momenta();
     rotatable_bonds = 0;
     paren = nullptr;
+
+    rotaxes[0] = (SCoord)Point(1,0,0);
+    rotaxes[1] = (SCoord)Point(0,1,0);
+    rotaxes[2] = (SCoord)Point(0,0,1);
 
     int j;
     for (j=0; j<10; j++) lastbind_history[j] = 0;
@@ -114,6 +122,10 @@ Molecule::Molecule(char const* lname, Atom** collection)
         atoms[j] = collection[j];
     atoms[numAtoms] = 0;
     atcount = numAtoms;
+
+    rotaxes[0] = (SCoord)Point(1,0,0);
+    rotaxes[1] = (SCoord)Point(0,1,0);
+    rotaxes[2] = (SCoord)Point(0,0,1);
 
     name = new char[strlen(lname)+1];
     strcpy(name, lname);
@@ -353,6 +365,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* lo
 
     Atom* a = new Atom(elemsym, location, charge);
     a->name = new char[strlen(aname)+1];
+    a->mol = this;
     a->residue = 0;
     strcpy(a->name, aname);
     if (bond_to && bcard) a->bond_to(bond_to, bcard);
@@ -379,6 +392,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
     Atom* a = new Atom(elemsym);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
+    a->mol = this;
     strcpy(a->name, aname);
 
     try
@@ -960,6 +974,7 @@ int Molecule::from_sdf(char const* sdf_dat)
             a->name = new char[16];
             sprintf(a->name, "%s%d", words[3], added+1);
             a->residue = 0;
+            a->mol = this;
             atoms[atcount++] = a;
             atoms[atcount] = nullptr;
             added++;
@@ -2521,15 +2536,92 @@ void Molecule::maintain_contact(Atom* my_atom, Atom* other_atom)
     if (i < 0) throw 0xbadda7a;
     dlt1 = my_atom;
     dlt2 = other_atom;
-    dltr = dlt1->distance_to(dlt2);
+    dltr = InteratomicForce::optimal_distance(dlt1, dlt2);
 }
 
 bool Molecule::contact_maintained()
 {
     if (!dlt1 || !dlt2) return true;
+
     float r = dlt1->distance_to(dlt2);
+    float vdwr = dlt1->get_vdW_radius() + dlt2->get_vdW_radius();
+    if (dlt1->mol && dlt2->mol && r < 0.75*vdwr)
+    {
+        float c = dlt1->mol->get_intermol_clashes(dlt2->mol);
+        if (c > clash_limit_per_aa) dltr *= 1.5;
+    }
+    else if (r < 0.75*vdwr)
+    {
+        float e = InteratomicForce::total_binding(dlt1, dlt2);
+        if (e > clash_limit_per_atom) dltr *= 1.5;
+    }
+
+    if (dltr > 0.75*vdwr) dltr = 0.75*vdwr;
+
     // cout << dlt1->name << " ~ " << dlt2->name << " are " << r << "A apart, limit " << dltr << endl << endl;
     return r <= dltr*1.5;
+}
+
+void Molecule::compute_lm_from_recent_clashes()
+{
+    if (noAtoms(atoms)) return;
+
+    int i, j;
+    Point bary = get_barycenter();
+    Point llm(0,0,0), lpush;
+    Point llmpera[atcount+2];
+    for (i=0; atoms[i]; i++)
+    {
+        lpush = Point(0,0,0);
+        if (atoms[i]->last_bind_energy < -clash_limit_per_atom)
+        {
+            Atom* aisca = atoms[i]->strongest_clash_atom;
+            if (aisca)
+            {
+                Point pt = aisca->get_location().subtract(atoms[i]->get_location());
+                lpush = pt;
+            }
+        }
+        else
+        {
+            lpush = Point(0,0,0);
+        }
+
+        llmpera[i] = lpush;
+    }
+
+    Point maybedir;
+    Point ptdlt(0,0,0);
+    float theta = 0;
+
+    if (dlt1 && dlt2) ptdlt = dlt2->get_location().subtract(dlt1->get_location());
+
+    for (j=0; j<30; j++)
+    {
+        maybedir = Point(frand(-1, 1), frand(-1, 1), frand(-1, 1));
+
+        if (ptdlt.magnitude() && find_3d_angle(maybedir, ptdlt, Point(0,0,0)) < triangular) continue;
+
+        for (i=0; atoms[i]; i++)
+        {
+            if (!llmpera[i].magnitude()) continue;
+            float lth = find_3d_angle(maybedir, llmpera[i], Point(0,0,0));
+            if (!i || lth < theta) theta = lth;
+        }
+        if (frand(0,1) < theta/M_PI) break;
+    };
+    if (j == 30)
+    {
+        lmx = lmy = lmz = 0;
+        return;
+    }
+
+    llm = maybedir;
+
+    if (llm.magnitude()) llm.scale(lmpush);
+    lmx = llm.x;
+    lmy = llm.y;
+    lmz = llm.z;
 }
 
 void Molecule::move(SCoord move_amt, bool override_residue)
@@ -2930,6 +3022,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
         atoms[i]->last_bind_energy = 0;
         atoms[i]->strongest_bind_energy = 0;
         atoms[i]->strongest_bind_atom = nullptr;
+        atoms[i]->strongest_clash_energy = 0;
+        atoms[i]->strongest_clash_atom = nullptr;
     }
 
     clash_worst = 0;
@@ -3017,6 +3111,11 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 atoms[i]->strongest_bind_energy = abind;
                                 atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
                             }
+                            else if (abind < -atoms[i]->strongest_clash_energy)
+                            {
+                                atoms[i]->strongest_clash_energy = -abind;
+                                atoms[i]->strongest_clash_atom = ligands[l]->atoms[j];
+                            }
 
                             if (abind < 0 && -abind > clash_worst)
                             {
@@ -3025,14 +3124,15 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 clash2 = ligands[l]->atoms[j];
                             }
 
-                            if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
+                            /*if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
                                 ptd.multiply(fmin(fabs(-abind) / 1000, 1));
                                 lmx += lmpush * sgn(ptd.x);
                                 lmy += lmpush * sgn(ptd.y);
                                 lmz += lmpush * sgn(ptd.z);
-                            }
+                            }*/
+                            if (movability >= MOV_ALL) compute_lm_from_recent_clashes();
                         }
 
                         if (missed_connection.r > 0)
@@ -3781,8 +3881,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if ((a->movability & MOV_CAN_AXIAL) && !(a->movability & MOV_FORBIDDEN))
             {
                 pib.copy_state(a);
-                Point ptrnd(frand(-1,1), frand(-1,1), frand(-1,1));
-                if (frand(0,1) < 0.4 && a->best_intera && a->best_other_intera)
+                // Point ptrnd(frand(-1,1), frand(-1,1), frand(-1,1));
+                Point ptrnd = a->rotaxes[rand()%3];
+                if (a->best_intera && a->best_other_intera && frand(0,1) < 0.4)
                 {
                     ptrnd = a->best_other_intera->get_location().subtract(a->best_intera->get_location());
                 }

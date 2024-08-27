@@ -322,6 +322,7 @@ public:
     static float electronegativity_from_Z(int atom_Z) { return electronegativities[atom_Z]; }
 
     // Public member vars.
+    Molecule* mol = nullptr;
     float pK = nanf("n/a");         // To be managed and used by external classes.
     int pdbidx=0;                   // "
     int residue=0;					// "
@@ -338,6 +339,8 @@ public:
     float last_bind_energy = 0;
     float strongest_bind_energy = 0;
     Atom* strongest_bind_atom = nullptr;
+    float strongest_clash_energy = 0;
+    Atom* strongest_clash_atom = nullptr;
     float shielding_angle = 0;
     char pdbchain = ' ';
     bool doing_ring_closure = false;

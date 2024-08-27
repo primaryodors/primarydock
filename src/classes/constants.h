@@ -159,7 +159,7 @@
 
 #define cs_max_tries 10
 #define cs_bondweight_exponent 2.0
-#define cs_360_step M_PI / 6.7
+#define cs_360_step M_PI / 16.7
 #define cs_ligand_rotation 0.333
 #define cs_keep_ratio 0.9
 #define iter_lostreturns_threshold 0.05

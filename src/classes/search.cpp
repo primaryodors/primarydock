@@ -696,7 +696,11 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     resna = resbba->get_location();
     rot = align_points_3d(axes[2], agcen.subtract(resna), agcen);
 
-    for (j=0; j<3; j++) axes[j] = rotate3D(&axes[j], &agcen, &rot);
+    for (j=0; j<3; j++)
+    {
+        axes[j] = rotate3D(&axes[j], &agcen, &rot);
+        ligand->rotaxes[j] = axes[j];
+    }
 
     Pose best(ligand);
     best.copy_state(ligand);

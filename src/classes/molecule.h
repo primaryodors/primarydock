@@ -133,6 +133,7 @@ public:
     std::vector<Atom*> longest_dimension();
     float get_atom_bond_length_anomaly(Atom* atom, Atom* ignore = nullptr);
     float evolve_structure(int generations = _evolution_default_generations, float mutation_rate = _default_mutation_rate, int pop_size = _default_population_size);
+    void compute_lm_from_recent_clashes();
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -265,6 +266,7 @@ public:
     Molecule* best_interactor = nullptr;
     int iters_without_change = 0;
     float occlusion = 0;                                // A measure of how many heavy atoms are closer to at least one residue than any other heavy atom.
+    SCoord rotaxes[3];
 
 protected:
 

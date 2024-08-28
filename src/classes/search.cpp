@@ -456,7 +456,8 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
 
                 case vdW:
                 default:
-                if (baa[i]->hydrophilicity() < 1.5*hydrophilicity_cutoff && ligand->hydrophilicity() < 1.5*hydrophilicity_cutoff) can_bind = true;
+                // if (baa[i]->hydrophilicity() < 1.5*hydrophilicity_cutoff && ligand->hydrophilicity() < 1.5*hydrophilicity_cutoff)
+                can_bind = true;
             }
             
             if (can_bind)

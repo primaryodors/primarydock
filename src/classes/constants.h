@@ -184,8 +184,9 @@
 #define flexion_probability_multiplier 0.3
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
+#define ridiculous_5k1_pipe_dream 0
 
-// Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
+// Mandatory coordination bindings (REQSR) that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
 
 // Obsolete stuff.

@@ -2590,6 +2590,7 @@ void Molecule::compute_lm_from_recent_clashes()
         llmpera[i] = lpush;
     }
 
+    #if ridiculous_5k1_pipe_dream
     Point maybedir;
     Point ptdlt(0,0,0);
     float theta = 0;
@@ -2617,6 +2618,9 @@ void Molecule::compute_lm_from_recent_clashes()
     }
 
     llm = maybedir;
+    #else
+    llm = average_of_points(llmpera, atcount);
+    #endif
 
     if (llm.magnitude()) llm.scale(lmpush);
     lmx = llm.x;
@@ -3094,7 +3098,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         #endif
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
-                            if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;
+                            if (abind > 0 /*&& minimum_searching_aniso*/ && ligands[l]->priority) abind *= 3.333;
                             kJmol += abind;
 
                             if (abind > best_atom_energy)

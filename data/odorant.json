@@ -2843,6 +2843,12 @@
         },
         "oid": "0d24bc7973e9178611bef12d26ee4cb2"
     },
+    "0d693c7bae7ca65e29c636a8b003e5bb":
+    {
+        "full_name": "(1R,2S,5S)-(-)-isomenthol",
+        "smiles": "C[C@H]1CC[C@H]([C@@H](C1)O)C(C)C",
+        "oid": "0d693c7bae7ca65e29c636a8b003e5bb"
+    },
     "0d93161dac3d4d72075415be1bc94e75":
     {
         "full_name": "gamma-caprolactone",
@@ -13934,7 +13940,8 @@
                     "ec50": "-3.427"
                 }
             }
-        }
+        },
+        "oid": "5f12e00aaedb41f574e8dfc007ff9693"
     },
     "5f14e9c196635f4b84919ded96c1b71a":
     {
@@ -22985,6 +22992,12 @@
         },
         "oid": "9374d0d9c132647f38c6d00e4afa01e0"
     },
+    "93831581fc102ec5220635097e6f4505":
+    {
+        "full_name": "(1R,2R,5R)-(+)-neoisomenthol",
+        "smiles": "C[C@@H]1CC[C@@H]([C@@H](C1)O)C(C)C",
+        "oid": "93831581fc102ec5220635097e6f4505"
+    },
     "93d2e6e26ccdba43664e2a19a2c31194":
     {
         "full_name": "2,3,5-trimethylpyrazine",
@@ -25789,6 +25802,11 @@
         },
         "oid": "ac35ffb2ee7416888479094607d05069"
     },
+    "ac432d37485b7f0ec9f7410b8f97b316":
+    {
+        "full_name": "(1S,2S,5S)-(-)-neoisomenthol",
+        "smiles": "C[C@H]1CC[C@H]([C@H](C1)O)C(C)C"
+    },
     "ac49f0276a3cff303482b7a25c47aebb":
     {
         "full_name": "isopropanethiol",
@@ -27164,6 +27182,12 @@
             }
         },
         "oid": "b271d50ac6a40859d13043bf804c4dfb"
+    },
+    "b2960e5069eedc62a664ce4822b365f0":
+    {
+        "full_name": "(1S,2S,5R)-(+)-neomenthol",
+        "smiles": "C[C@@H]1CC[C@H]([C@H](C1)O)C(C)C",
+        "oid": "b2960e5069eedc62a664ce4822b365f0"
     },
     "b34ca7b041c2c7a844406f2d99a49016":
     {
@@ -30338,6 +30362,12 @@
         },
         "oid": "cbe4ba6b6396ce481ca25ffd88246dcc"
     },
+    "cbee2b2e50169c0c4e4798ff9db7240e":
+    {
+        "full_name": "(1S,2R,5R)-(+)-isomenthol",
+        "smiles": "C[C@@H]1CC[C@@H]([C@H](C1)O)C(C)C",
+        "oid": "cbee2b2e50169c0c4e4798ff9db7240e"
+    },
     "cc2cf68861f527bf30390cb049cea5e5":
     {
         "full_name": "acetophenone",
@@ -30972,6 +31002,12 @@
             }
         },
         "oid": "d187dbf0112107d2183cccbb9c47742b"
+    },
+    "d1f19050bc676e963d06a4d19e6d4309":
+    {
+        "full_name": "(1R,2R,5S)-(-)-neomenthol",
+        "smiles": "C[C@H]1CC[C@@H]([C@@H](C1)O)C(C)C",
+        "oid": "d1f19050bc676e963d06a4d19e6d4309"
     },
     "d28ba1d810c7bc8b1e99081eb0763c27":
     {

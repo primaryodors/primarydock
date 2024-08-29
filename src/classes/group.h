@@ -37,6 +37,7 @@ class AtomGroup
     bool has_hbond_donors();
 
     int heavy_atom_count();
+    Atom* one_best_binding_atom(intera_type btype);
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol, bool separate_metal_coord = false);
     static std::vector<std::shared_ptr<AtomGroup>> make_hbond_subgroups(std::shared_ptr<AtomGroup> from_group);
     void remove_duplicates();

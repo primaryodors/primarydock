@@ -3634,7 +3634,7 @@ function loadFile(fileData, fileName = "")
 						for (i++; i<lln; i++) pdbdat += lines[i] + "\n";
 						apply_pdb(pdbdat);
 					}
-					else if (lines[i].substr(0, 7) == "ATOM   " || lines[i].substr(0, 7) == "HETATM ")
+					else if (lines[i].substr(0, 7) == "ATOM   " || lines[i].substr(0, 7) == "HETATM " || lines[i] == "# PDB Data" || lines[i] == "PDBDAT:")
 					{
 						lpose = lnode = -1;
 					}

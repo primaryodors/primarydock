@@ -270,11 +270,16 @@ int interpret_resno(const char* field)
 {
     char buffer[strlen(field)+4];
     strcpy(buffer, field);
+
+    char* offset = buffer;
+    while (*offset >= 'A' && *offset <= 'Z') offset++;
+
+    int retval = 0;
     char* dot = strchr(buffer, '.');
     if (dot)
     {
         *(dot++) = 0;
-        int b = atoi(buffer);
+        int b = atoi(offset);
         int w = atoi(dot);
         int _50 = protein->get_bw50(b);
         if (_50 < 1)
@@ -282,9 +287,22 @@ int interpret_resno(const char* field)
             cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
             throw 0xbad12e5;
         }
-        return _50 + w - 50;
+        if (_50 < 1) return 0;
+        else retval = _50 + w - 50;
     }
-    else return atoi(buffer);
+    else retval = atoi(offset);
+
+    if (offset == buffer) return retval;
+
+    AminoAcid* aa = protein->get_residue(retval);
+    if (!aa) return 0;
+
+    int i;
+    for (i=0; buffer[i] >= 'A' && buffer[i] <= 'Z'; i++)
+    {
+        if (buffer[i] == aa->get_letter()) return retval;
+    }
+    return 0;
 }
 
 void freeze_bridged_residues()
@@ -925,7 +943,7 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
             }
 
             int j = interpret_resno(words[i]);
-            if (!j) break;
+            if (!j) continue;
 
             center_resnos.push_back(j);
             AminoAcid* aa = protein->get_residue(j);

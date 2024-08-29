@@ -159,11 +159,11 @@
 
 #define cs_max_tries 10
 #define cs_bondweight_exponent 2.0
-#define cs_360_step M_PI / 6.7
+#define cs_360_step M_PI / 16.7
 #define cs_ligand_rotation 0.333
-#define cs_keep_ratio 0.8
+#define cs_keep_ratio 0.9
 #define iter_lostreturns_threshold 0.05
-#define max_iters_without_ligand_change 5
+#define max_iters_without_ligand_change 10
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25
@@ -184,8 +184,11 @@
 #define flexion_probability_multiplier 0.3
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
+#define ridiculous_5k1_pipe_dream 0
+#define contact_maintenance_allowance 1.333
+#define contact_maintenance_creep 1.2
 
-// Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
+// Mandatory coordination bindings (REQSR) that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
 
 // Obsolete stuff.

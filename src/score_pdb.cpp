@@ -67,6 +67,7 @@ int main(int argc, char** argv)
     fseek(fp, 0, 0);
     m.from_pdb(fp, true);
     fclose(fp);
+    cout << "Read " << m.get_atom_count() << " ligand atoms." << endl;
 
     AminoAcid* aa = p.get_residue_bw(3, 50);
     if (!aa) aa = p.get_residue_bw(6, 48);

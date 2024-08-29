@@ -185,6 +185,8 @@
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
 #define ridiculous_5k1_pipe_dream 0
+#define contact_maintenance_allowance 1.333
+#define contact_maintenance_creep 1.2
 
 // Mandatory coordination bindings (REQSR) that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5

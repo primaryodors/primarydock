@@ -482,7 +482,7 @@ void output_iter(int iter, Molecule** mols)
         stst << ldr;
         fprintf(fp, "%s\n", stst.str().c_str());
 
-        fprintf(fp, "\nPDBDAT:\n", pose, liter);
+        fprintf(fp, "\nPDBDAT:\n");
 
         for (i=0; reaches_spheroid[nodeno][i]; i++)
         {
@@ -3314,6 +3314,12 @@ _try_again:
                             if (r > size.magnitude()/2) goto _next_pose;
                             #endif
 
+                            n1 = ligand->get_atom_count();
+                            for (j1=0; j1<n1; j1++)
+                            {
+                                Atom* lla = ligand->get_atom(j1);
+                                if (lla) lla->residue = 0;
+                            }
                             protein->save_pdb(pfout, ligand);
 
                             int atno_offset = protein->last_saved_atom_number;
@@ -3337,8 +3343,8 @@ _try_again:
                             protein->end_pdb(pfout);
 
                             fclose(pfout);
+                            cout << "Saved " << out_pdb_fn << " with energy " << -dr[j][k].kJmol << endl;
                         }
-
 
                         if (!k) found_poses++;
                     }

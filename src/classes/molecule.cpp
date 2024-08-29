@@ -2547,16 +2547,16 @@ bool Molecule::contact_maintained()
     if (dlt1->mol && dlt2->mol)
     {
         float c = dlt1->mol->get_intermol_clashes(dlt2->mol);
-        if (c > clash_limit_per_aa) dltr *= 1.1;
+        if (c > clash_limit_per_aa) dltr *= contact_maintenance_creep;
     }
     else
     {
         float e = InteratomicForce::total_binding(dlt1, dlt2);
-        if (e > clash_limit_per_atom) dltr *= 1.1;
+        if (e > clash_limit_per_atom) dltr *= contact_maintenance_creep;
     }
 
     // cout << dlt1->name << " ~ " << dlt2->name << " are " << r << "A apart, limit " << dltr << endl << endl;
-    return r <= dltr*1.25;
+    return r <= dltr*contact_maintenance_allowance;
 }
 
 void Molecule::compute_lm_from_recent_clashes()

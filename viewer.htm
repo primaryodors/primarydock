@@ -2157,7 +2157,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
             }
 
         	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x3300FF);
-        	case 'O': return (born || sksea) ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
+        	case 'O': return (born || sksea) ? (atom.isBackbone() ? 0x004466 : 0x00AAFF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xffaa00;
@@ -2241,7 +2241,7 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
             }
 
         	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x3300FF);
-        	case 'O': return (born || sksea) ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
+        	case 'O': return (born || sksea) ? (atom.isBackbone() ? 0x004466 : 0x00AAFF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -2280,7 +2280,7 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
 			case 'He': return 0xfcaa93;
         	case 'C': return whtbk ? 0x333741 : 0xa7ada4;
         	case 'N': return born ? 0xFF3300 : 0x5533FF;
-        	case 'O': return (born || sksea) ? 0x0099FF : 0xFF2222;
+        	case 'O': return (born || sksea) ? 0x00AAFF : 0xFF2222;
 			case 'Ne': return 0xff4e00;
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
@@ -3344,6 +3344,7 @@ function loadFile(fileData, fileName = "")
             {
 		        case 'sdf':
 		        case 'pdb':
+				$("#vstats").hide();
                 stage.removeAllComponents();
                 window.result = fileData;
                 cen_ligand = false;
@@ -3591,6 +3592,7 @@ function loadFile(fileData, fileName = "")
 
             	case 'txt':
             	case 'dock':
+				dock_result_txt = [];
                 stage.removeAllComponents();
                 var lines = fileData.split("\n");
                 cen_ligand = true;
@@ -3632,7 +3634,7 @@ function loadFile(fileData, fileName = "")
 						for (i++; i<lln; i++) pdbdat += lines[i] + "\n";
 						apply_pdb(pdbdat);
 					}
-					else if (lines[i].substr(0, 6) == "ATOM  ")
+					else if (lines[i].substr(0, 7) == "ATOM   " || lines[i].substr(0, 7) == "HETATM ")
 					{
 						lpose = lnode = -1;
 					}

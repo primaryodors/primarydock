@@ -218,6 +218,7 @@ function load_viewer(obj)
                         try
                         {
                             $resno = resno_from_bw($rcpid, $bw);
+                            if (!$resno) continue;
                             echo "window.setTimeout( function()\n";
                             echo "{\n";
                             echo "embdd.contentWindow.showSideChain($resno);\n";
@@ -490,6 +491,7 @@ else
             if (substr($bw, 0, 2) == "$i.")
             {
                 $resno = resno_from_bw($rcpid, $bw);
+                if (!$resno) continue;
                 $offset = $resno - intval($receptor['region']["TMR$i"]['start']);
                 $angle = (pi()*4 / 7 * $offset) % (pi()*2);
                 $x += sin($angle);
@@ -547,6 +549,7 @@ foreach ($cub as $bw => $allowed)
 {
 	$res = "<span title=\"$bw\">";
 	$resno = resno_from_bw($rcpid, $bw);
+    if (!$resno) continue;
 	$c = substr($seq, $resno-1, 1);
 	if (false !== strpos($allowed, $c))
 	{

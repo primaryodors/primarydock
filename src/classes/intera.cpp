@@ -792,7 +792,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (a->coordmtl && a->coordmtl != b) continue;
         if (b->coordmtl && b->coordmtl != a) continue;
 
-        if (forces[i]->type == ionic)
+        /*if (forces[i]->type == ionic)
         {
             if (a->conjugation && b->conjugation)
             {
@@ -801,7 +801,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
             else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) continue;
             else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
-        }
+        }*/
 
         // https://chemistry.stackexchange.com/questions/42085/can-an-amide-nitrogen-be-a-hydrogen-bond-acceptor
         if (forces[i]->type == hbond)
@@ -967,12 +967,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (forces[i]->type == ionic || forces[i]->type == hbond || forces[i]->type == mcoord)
             {
-                if (a->is_polar() < 0 && b->is_polar() >= 0)
+                if (apol < 0 && bpol >= 0)
                 {
                     dpa = dp;
                     dpb = (forces[i]->type == hbond) ? 3 : 1;
                 }
-                else if (b->is_polar() < 0 && a->is_polar() >= 0)
+                else if (bpol < 0 && apol >= 0)
                 {
                     dpb = dp;
                     dpa = (forces[i]->type == hbond) ? 3 : 1;
@@ -1215,9 +1215,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 throw 0xbadf0ace;
             }
 
-            if (forces[i]->type == polarpi || forces[i]->type == mcoord || forces[i]->type == ionic)
+            if (forces[i]->type == polarpi)
             {
-                partial *= fmax(forces[i]->type == ionic?0:1, fabs(achg)) * fmax(forces[i]->type == ionic?0:1, fabs(bchg));
+                partial *= fmax(forces[i]->type == ionic?0:1, fabs(ahcg)) * fmax(forces[i]->type == ionic?0:1, fabs(bhcg));
+            }
+            if (forces[i]->type == mcoord || forces[i]->type == ionic)
+            {
+                partial *= fmax(forces[i]->type == ionic?0:1, fabs(ahcg)) * fmax(forces[i]->type == ionic?0:1, fabs(bhcg)) * sgn(ahcg) * -sgn(bchg);
             }
 
             if (forces[i]->type == hbond && fabs(apol) && fabs(bpol)) partial *= fabs(apol) * fabs(bpol);
@@ -1411,6 +1415,26 @@ float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
     return Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
 }
 
+float InteratomicForce::optimal_distance(Atom* a, Atom* b)
+{
+    InteratomicForce* forces[32];
+    fetch_applicable(a, b, forces);
+
+    int i;
+    float strongest = 0, optimal = -1;
+    for (i=0; forces[i]; i++)
+    {
+        if (!forces[i]->distance) continue;
+        if (forces[i]->kJ_mol > strongest)
+        {
+            strongest = forces[i]->kJ_mol;
+            optimal = forces[i]->distance;
+        }
+    }
+
+    if (optimal < 0) optimal = a->get_vdW_radius() + b->get_vdW_radius();
+    return optimal;
+}
 
 float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 {

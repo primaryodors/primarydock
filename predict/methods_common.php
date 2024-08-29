@@ -447,7 +447,8 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         {
             foreach (explode(" ", $cenres) as $bw)
             {
-                $cenresno[] = resno_from_bw($protid, $bw);
+                $resno = resno_from_bw($protid, $bw);
+                if ($resno) $cenresno[] = $resno;
             }
 
             $cenresno = implode(" ", $cenresno);
@@ -650,7 +651,8 @@ heredoc;
         {
             foreach (explode(" ", $cenres) as $bw)
             {
-                $cenresno[] = resno_from_bw($protid, $bw);
+                $resno = resno_from_bw($protid, $bw);
+                if ($resno) $cenresno[] = $resno;
             }
 
             $cenresno = implode(" ", $cenresno);
@@ -781,7 +783,7 @@ heredoc;
             }
         }
 
-        if (!$retvar && $num_poses && !file_exists("tmp/nodelete")) unlink($cnfname);
+        if (!file_exists("tmp/nodelete")) unlink($cnfname);
         else echo "WARNING: Not deleting a temporary config file in tmp/ because you have selected the debug \"nodelete\" behavior.\n"
             ."You should check the tmp/ folder periodically and clean out old files manually.\n";
 
@@ -1044,6 +1046,16 @@ heredoc;
         if (false !== strpos($ln, "pose(s) found"))
         {
             $mode = "POSES";
+            if (isset($metrics_to_process[$mode]))
+            {
+                $wmode = $metrics_to_process[$mode];
+                $outdata[$metrics_prefix.$wmode] = intval($ln);
+            }
+            continue;
+        }
+        else if (false !== strpos($ln, "Repeatability"))
+        {
+            $mode = "Repeatability";
             if (isset($metrics_to_process[$mode]))
             {
                 $wmode = $metrics_to_process[$mode];

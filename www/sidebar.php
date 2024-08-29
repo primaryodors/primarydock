@@ -16,6 +16,7 @@ chdir($cwd);
     <li><a href="refs.php">References</a></li>
     <li><a href="viewer.php" target="_VIEWER">3D Viewer</a></li>
     <li><a href="smiles_view.php" target="_VIEWER">SMILES Viewer</a></li>
+    <li><a href="https://github.com/primaryodors/primarydock.git">Repository</a></li>
 
     <?php
     foreach ($sidelinks as $sl)

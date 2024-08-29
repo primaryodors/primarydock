@@ -471,7 +471,7 @@ void output_iter(int iter, Molecule** mols)
         {
             fprintf(fp, "PDB file: %s\n", protfname);
         }
-        fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
+        fprintf(fp, "Pose: %d\nNode: %d\n\n", pose, liter);
         int foff = 0;
 
         DockResult ldr(protein, ligand, size, nullptr, pose);
@@ -481,6 +481,8 @@ void output_iter(int iter, Molecule** mols)
         std::stringstream stst;
         stst << ldr;
         fprintf(fp, "%s\n", stst.str().c_str());
+
+        fprintf(fp, "\nPDBDAT:\n", pose, liter);
 
         for (i=0; reaches_spheroid[nodeno][i]; i++)
         {

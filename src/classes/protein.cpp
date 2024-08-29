@@ -1512,7 +1512,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         SCoord dir(&pt1);
 
-        if (dir.r <= 0.5)
+        if (dir.r <= 0.7)
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;

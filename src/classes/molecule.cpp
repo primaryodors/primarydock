@@ -2544,22 +2544,19 @@ bool Molecule::contact_maintained()
     if (!dlt1 || !dlt2) return true;
 
     float r = dlt1->distance_to(dlt2);
-    float vdwr = dlt1->get_vdW_radius() + dlt2->get_vdW_radius();
-    if (dlt1->mol && dlt2->mol && r < 0.75*vdwr)
+    if (dlt1->mol && dlt2->mol)
     {
         float c = dlt1->mol->get_intermol_clashes(dlt2->mol);
-        if (c > clash_limit_per_aa) dltr *= 1.5;
+        if (c > clash_limit_per_aa) dltr *= 1.1;
     }
-    else if (r < 0.75*vdwr)
+    else
     {
         float e = InteratomicForce::total_binding(dlt1, dlt2);
-        if (e > clash_limit_per_atom) dltr *= 1.5;
+        if (e > clash_limit_per_atom) dltr *= 1.1;
     }
 
-    if (dltr > 0.75*vdwr) dltr = 0.75*vdwr;
-
     // cout << dlt1->name << " ~ " << dlt2->name << " are " << r << "A apart, limit " << dltr << endl << endl;
-    return r <= dltr*1.5;
+    return r <= dltr*1.25;
 }
 
 void Molecule::compute_lm_from_recent_clashes()

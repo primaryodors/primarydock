@@ -296,52 +296,50 @@ function ensure_sdf_exists($ligname)
 	chdir(__DIR__);
 	chdir("..");
 	$sdfname = str_replace(" ", "_", "sdf/$lignamei.sdf");
-	if (!file_exists($sdfname) || filesize($sdfname) < 20)
+	if (isset($o["isomers"]))
 	{
-		if (isset($o["isomers"]))
+		$fullname = str_replace(" ", "_", $o["full_name"]);
+		$first = true;
+		foreach ($o["isomers"] as $iso => $ismiles)
 		{
-			$fullname = str_replace(" ", "_", $o["full_name"]);
-			$first = true;
-			foreach ($o["isomers"] as $iso => $ismiles)
+			$parts = explode("|", $ismiles);
+			$ismiles = $parts[0];
+			$isofname = escapeshellarg("sdf/$iso-$fullname.sdf");
+			exec("obabel -:\"$ismiles\" --gen3D -osdf -O$isofname");
+			if (@$parts[1])
 			{
-				$parts = explode("|", $ismiles);
-				$ismiles = $parts[0];
-				$isofname = escapeshellarg("sdf/$iso-$fullname.sdf");
-				exec("obabel -:\"$ismiles\" --gen3D -osdf -O$isofname");
-				if (@$parts[1])
+				$sub4 = substr($parts[1], 0, 4);
+				$rest = substr($parts[1], 4);
+				switch ($sub4)
 				{
-					$sub4 = substr($parts[1], 0, 4);
-					$rest = substr($parts[1], 4);
-					switch ($sub4)
-					{
-						case "rflp":
-						$cmd = "bin/ringflip $isofname $rest";
-						// echo "$cmd\n";
-						exec($cmd);
-						break;
+					case "rflp":
+					$cmd = "bin/ringflip $isofname $rest";
+					// echo "$cmd\n";
+					exec($cmd);
+					break;
 
-						default:
-						die("Unknown modifier $sub4.\n");
-					}
-				}
-
-				if ($first)
-				{
-					copy("sdf/$iso-$fullname.sdf", "sdf/$fullname.sdf");
-					$first = false;
+					default:
+					die("Unknown modifier $sub4.\n");
 				}
 			}
-		}
-		else
-		{
-			$smiles = $o["smiles"];
-			$fullname = str_replace(" ", "_", $o["full_name"]);
-			$ffname = escapeshellarg("sdf/$fullname.sdf");
-			$cmd = "obabel -:\"$smiles\" --gen3D -osdf -O$ffname";
-			// echo "$cmd\n";
-			exec($cmd);
+
+			if ($first)
+			{
+				copy("sdf/$iso-$fullname.sdf", "sdf/$fullname.sdf");
+				$first = false;
+			}
 		}
 	}
+	else if (!file_exists($sdfname) || filesize($sdfname) < 20)
+	{
+		$smiles = $o["smiles"];
+		$fullname = str_replace(" ", "_", $o["full_name"]);
+		$ffname = escapeshellarg("sdf/$fullname.sdf");
+		$cmd = "obabel -:\"$smiles\" --gen3D -osdf -O$ffname";
+		// echo "$cmd\n";
+		exec($cmd);
+	}
+
 	chdir($pwd);
 	return;	
 }

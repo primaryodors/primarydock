@@ -216,6 +216,8 @@ public:
     void conform_atom_to_location(int atom_idx, Point target, int iterations = 50, float optimal_distance = 0);
     void conform_atom_to_location(const char* atom_name, Point target, int iterations = 20, float optimal_distance = 0);
     SCoord motion_to_optimal_contact(Molecule* ligand);
+    void maintain_contact(Atom* my_atom, Atom* other_atom);
+    bool contact_maintained();
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);

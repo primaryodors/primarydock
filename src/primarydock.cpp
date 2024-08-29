@@ -446,7 +446,6 @@ void do_pivotal_hbond_rot_and_scoot()
 
     ligand->rotate(lv, theta);
 }
-
 void output_iter(int iter, Molecule** mols)
 {
     std::string itersfname = (std::string)"tmp/" + (std::string)"_iters.dock";
@@ -458,8 +457,18 @@ void output_iter(int iter, Molecule** mols)
         {
             fprintf(fp, "PDB file: %s\n", protfname);
         }
-        fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
+        fprintf(fp, "Pose: %d\nNode: %d\n\n", pose, liter);
         int foff = 0;
+
+        DockResult ldr(protein, ligand, size, nullptr, pose);
+        ldr.include_pdb_data = false;
+        ldr.display_clash_atom1 = true;
+        ldr.display_clash_atom2 = true;
+        std::stringstream stst;
+        stst << ldr;
+        fprintf(fp, "%s\n", stst.str().c_str());
+
+        fprintf(fp, "\nPDBDAT:\n");
 
         for (i=0; reaches_spheroid[nodeno][i]; i++)
         {
@@ -501,17 +510,6 @@ void iteration_callback(int iter, Molecule** mols)
         ligand->rotate(&csrot.v, csrot.a, true);
         float e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         if (e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
-
-        Atom *ra, *la;
-        cs_res[cs_idx]->mutual_closest_atoms(ligand, &ra, &la);
-        SCoord r = ra->get_location().subtract(la->get_location());
-        r.r -= 2.5;
-        r.r *= frand(0.333,0.666);
-        cswas.copy_state(ligand);
-        e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        ligand->move(r);
-        e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < 0 || e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
     }
 
     // Initialization for best-iteration saving for pose output.
@@ -682,9 +680,11 @@ void iteration_callback(int iter, Molecule** mols)
             float a100b4 = protein->A100();
 
             protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, rot.a);
+
             float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 5);
             if ((lf < 0 && c2 > c1 + clash_limit_per_aa*2) || (lf > 0 && protein->A100() < 0.95 * a100b4))
                 protein->rotate_piece(softrgns[i].start, softrgns[i].end, rotcen, rot.v, -rot.a);
+            else if (lf < -clash_limit_per_aa) ligand->iters_without_change = 0;
         }
     }
 

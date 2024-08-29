@@ -3300,6 +3300,11 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     m = om->atcount;
     for (i=0; i<n; i++)
     {
+        if (!atoms[i])
+        {
+            atcount = i;
+            break;
+        }
         if (atoms[i]->get_Z() > 0) continue;
         if (fabs(atoms[i]->is_polar()) < hydrophilicity_cutoff) continue;
         Bond* b = atoms[i]->get_bond_by_idx(0);
@@ -3441,6 +3446,35 @@ void Molecule::conform_atom_to_location(const char* an, Point t, int iters, floa
             return;
         }
     }
+}
+    
+void Molecule::maintain_contact(Atom* my_atom, Atom* other_atom)
+{
+    int i = atom_idx_from_ptr(my_atom);
+    if (i < 0) throw 0xbadda7a;
+    dlt1 = my_atom;
+    dlt2 = other_atom;
+    dltr = InteratomicForce::optimal_distance(dlt1, dlt2);
+}
+
+bool Molecule::contact_maintained()
+{
+    if (!dlt1 || !dlt2) return true;
+
+    float r = dlt1->distance_to(dlt2);
+    if (dlt1->mol && dlt2->mol)
+    {
+        float c = dlt1->mol->get_intermol_clashes(dlt2->mol);
+        if (c > clash_limit_per_aa) dltr *= contact_maintenance_creep;
+    }
+    else
+    {
+        float e = InteratomicForce::total_binding(dlt1, dlt2);
+        if (e > clash_limit_per_atom) dltr *= contact_maintenance_creep;
+    }
+
+    // cout << dlt1->name << " ~ " << dlt2->name << " are " << r << "A apart, limit " << dltr << endl << endl;
+    return r <= dltr*contact_maintenance_allowance;
 }
 
 #define _dbg_atom_pointing 0
@@ -3587,7 +3621,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
                         tryenerg = cfmol_multibind(a, nearby);
 
-                        if (tryenerg > benerg)
+                        if (tryenerg > benerg && a->contact_maintained())
                         {
                             benerg = tryenerg;
                             pib.copy_state(a);
@@ -3630,7 +3664,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     if (!i) cout << "(linear motion try " << -tryenerg << ") ";
                     #endif
 
-                    if (tryenerg > benerg)
+                    if (tryenerg > benerg && a->contact_maintained())
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
@@ -3658,7 +3692,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                         tryenerg = cfmol_multibind(a, nearby);
 
-                        if (tryenerg > benerg)
+                        if (tryenerg > benerg && a->contact_maintained())
                         {
                             benerg = tryenerg;
                             pib.copy_state(a);
@@ -3706,7 +3740,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                     tryenerg = cfmol_multibind(a, nearby);
 
-                    if (tryenerg > benerg)
+                    if (tryenerg > benerg && a->contact_maintained())
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
@@ -3748,7 +3782,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     a->rotate(&axis, theta);
                     tryenerg = cfmol_multibind(a, nearby);
 
-                    if (tryenerg > benerg)
+                    if (tryenerg > benerg && a->contact_maintained())
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
@@ -3819,7 +3853,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;
                                 #endif
 
-                                if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
+                                if (tryenerg > benerg && a->contact_maintained() && a->get_internal_clashes() <= self_clash)
                                 {
                                     benerg = tryenerg;
                                     best_theta = theta;
@@ -3875,10 +3909,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             if (is_flexion_dbg_mol_bond) cout << "Trying " << (theta*fiftyseven) << "deg rotation...";
                             #endif
 
-                            if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
+                            if (tryenerg > benerg && a->contact_maintained() && a->get_internal_clashes() <= self_clash)
                             {
                                 benerg = tryenerg;
-                                pib.copy_state(a);
+                                // pib.copy_state(a);
                                 a->been_flexed = true;
 
                                 #if _dbg_mol_flexion
@@ -3893,6 +3927,18 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 if (is_flexion_dbg_mol_bond) cout << " energy from " << -benerg << " to " << -tryenerg << ", reverting." << endl << endl;
                                 #endif
                             }
+                        }       // full rotation else
+                    }       // each rotatable bond
+
+                    int ii;
+                    if (a->is_residue()) for (ii=0; mm[ii]; ii++)
+                    {
+                        if (!mm[ii]->is_residue()) continue;
+                        if (mm[ii] == a) continue;
+                        float aaclash = mm[ii]->get_intermol_clashes(a);
+                        if (aaclash > clash_limit_per_aa)
+                        {
+                            pib.restore_state(a);
                         }
                     }
                 }       // Rotatable bonds.

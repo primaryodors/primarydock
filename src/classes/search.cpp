@@ -590,82 +590,100 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         }
     }
 
-    Atom* mtl = (cs_bt[j] == mcoord) ? cs_res[j]->coordmtl : nullptr;
+    Atom* mtl = (cs_bt[cs_idx] == mcoord) ? cs_res[cs_idx]->coordmtl : nullptr;
+    Atom* resbba = mtl ? mtl : cs_res[cs_idx]->get_one_most_bindable(cs_bt[cs_idx]);
+    Atom* ligbba = cs_lag[cs_idx]->one_best_binding_atom(cs_bt[cs_idx]);
 
-    loneliest = protein->find_loneliest_point(loneliest, Point(15,15,15), cs_res[j]->get_reach_atom_location(), 7);
+    loneliest = protein->find_loneliest_point(loneliest, Point(15,15,15), cs_res[cs_idx]->get_reach_atom_location(), 7);
 
     // Point residue toward where ligand will be, unless using pi stacking.
-    if (cs_bt[j] != pi && cs_bt[j] != mcoord)
+    if (cs_bt[cs_idx] != pi && cs_bt[cs_idx] != mcoord)
     {
-        MovabilityType mt = cs_res[j]->movability;
-        cs_res[j]->movability = MOV_FLEXONLY;
-        cs_res[j]->conform_atom_to_location(cs_res[j]->get_reach_atom()->name, loneliest);
-        cs_res[j]->movability = mt;
+        MovabilityType mt = cs_res[cs_idx]->movability;
+        cs_res[cs_idx]->movability = MOV_FLEXONLY;
+        cs_res[cs_idx]->conform_atom_to_location(cs_res[cs_idx]->get_reach_atom()->name, loneliest);
+        cs_res[cs_idx]->movability = mt;
     }
 
     // Place the ligand so that the atom group is centered in the binding pocket.
     ligand->movability = MOV_ALL;
     ligand->recenter(loneliest);
-    Point agp = cs_lag[j]->get_center();
+    Point agp = cs_lag[cs_idx]->get_center();
     SCoord mov = loneliest.subtract(agp);
     ligand->move(mov);
 
     // Rotate the ligand so the atom group faces the chosen residue.
-    Point resca = mtl ? mtl->get_location() : cs_res[j]->get_CA_location();
-    Point agcen = cs_lag[j]->get_center();
+    Point resca = mtl ? mtl->get_location() : cs_res[cs_idx]->get_CA_location();
+    Point agcen = cs_lag[cs_idx]->get_center();
     Rotation rot = align_points_3d(agcen, resca, ligand->get_barycenter());
     LocatedVector lv = rot.v;
     lv.origin = ligand->get_barycenter();
     ligand->rotate(lv, rot.a);
 
     // Move the ligand so that the atom group is at the optimal distance to the residue.
-    Point resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
-    agcen = cs_lag[j]->get_center();
+    Point resna = mtl ? mtl->get_location() : cs_res[cs_idx]->get_nearest_atom(loneliest)->get_location();
+    agcen = cs_lag[cs_idx]->get_center();
     mov = resna.subtract(agcen);
     mov.r -= mtl ? 2 : 1;
     if (mov.r > 0) ligand->move(mov);
 
+    if (cs_bt[cs_idx] != pi)
+    {
+        ligand->maintain_contact(ligbba, resbba);
+        cs_res[cs_idx]->maintain_contact(resbba, ligbba);
+    }
+
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
-    agcen = cs_lag[j]->get_center();
+    agcen = cs_lag[cs_idx]->get_center();
     rot = align_points_3d(ligand->get_barycenter(), loneliest, agcen);
     lv = rot.v;
     lv.origin = agcen;
     ligand->rotate(lv, rot.a);
 
-    // Conform the side chain and ligand to each other, ignoring other residues.
-    if (!mtl)
+
+    // Perform 360° rotations about the residue and look for the rotamer with the smallest clash total.
+    Point axes[3];
+    axes[0] = Point(1,0,0);
+    axes[1] = Point(0,1,0);
+    axes[2] = Point(0,0,1);
+
+    agcen = cs_lag[cs_idx]->get_center();
+    resna = resbba->get_location();
+    rot = align_points_3d(axes[2], agcen.subtract(resna), agcen);
+
+    for (j=0; j<3; j++)
     {
-        Molecule* mm[3];
-        mm[0] = cs_res[j];
-        mm[1] = ligand;
-        mm[2] = nullptr;
-        ligand->movability = MOV_NORECEN;
-        Molecule::conform_molecules(mm, 200);
+        axes[j] = rotate3D(&axes[j], &agcen, &rot);
+        ligand->rotaxes[j] = axes[j];
     }
 
-    // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
-    // and look for the rotamer with the smallest clash total.
-    lv = (SCoord)resna.subtract(ligand->get_barycenter());
-    lv.origin = agcen;
     Pose best(ligand);
     best.copy_state(ligand);
     float least_clash;
     float theta = 0;
-    for (; theta < M_PI*2; theta += cs_360_step)
+    for (l=0; l<10; l++)
     {
-        AminoAcid* cc[SPHREACH_MAX+4];
-        protein->get_residues_can_clash_ligand(cc, ligand, ligand->get_barycenter(), size, nullptr);
-        float f = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(cc));
-        if (!theta || f < least_clash)
+        for (j=0; j<3; j++)
         {
-            least_clash = f;
-            best.copy_state(ligand);
-        }
+            for (; theta < M_PI*2; theta += cs_360_step)
+            {
+                AminoAcid* cc[SPHREACH_MAX+4];
+                protein->get_residues_can_clash_ligand(cc, ligand, ligand->get_barycenter(), size, nullptr);
+                float f = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(cc))
+                    - 100.0*ligand->get_intermol_binding(reinterpret_cast<Molecule**>(cc), false)
+                    ;
+                if (!theta || f < least_clash)
+                {
+                    least_clash = f;
+                    best.copy_state(ligand);
+                }
 
-        ligand->rotate(lv, cs_360_step);
+                ligand->rotate(lv, cs_360_step);
+            }
+            best.restore_state(ligand);
+        }
     }
 
-    best.restore_state(ligand);
     ligand->movability = MOV_ALL;
 }
 

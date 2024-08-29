@@ -1176,16 +1176,15 @@ void Protein::set_clashables(int resno, bool recursed)
 {
     int i, j, k;
 
-    // cout << "Setting clashables." << endl;
-
-    int maxres = get_end_resno();
-    if (!res_can_clash)
-    {
-        res_can_clash = new AminoAcid**[maxres+8];
-        for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
-    }
+    // cout << "Setting clashables for " << resno << " recursed = " << (recursed ? "yes" : "no" ) << endl;
 
     int sr = get_start_resno(), er = get_end_resno();
+    if (!recursed && !res_can_clash)
+    {
+        res_can_clash = new AminoAcid**[er+8];
+        for (i=0; i<=er; i++) res_can_clash[i] = nullptr;
+    }
+
     int sr1 = sr, er1 = er;
     if (resno > 0) sr = er = resno;
     for (i=sr; i<=er; i++)
@@ -1194,8 +1193,8 @@ void Protein::set_clashables(int resno, bool recursed)
         if (!resi) continue;
 
         if (debug) *debug << endl << "Testing residue " << resi->get_residue_no() << endl;
-        AminoAcid* temp[maxres+1];
-        for (j=0; j<=maxres; j++) temp[j] = nullptr;
+        AminoAcid* temp[er+1];
+        for (j=0; j<=er; j++) temp[j] = nullptr;
         k=0;
         for (j=sr1; j<=er1; j++)
         {
@@ -1209,7 +1208,7 @@ void Protein::set_clashables(int resno, bool recursed)
             }
         }
 
-        res_can_clash[i] = new AminoAcid*[maxres+8];
+        if (!res_can_clash[i]) res_can_clash[i] = new AminoAcid*[er+8];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];
@@ -1222,18 +1221,9 @@ void Protein::set_clashables(int resno, bool recursed)
             	 << res_can_clash[i][j]->get_aa_definition()->_3let << res_can_clash[i][j]->get_residue_no()
             	 << endl;*/
         }
-        res_can_clash[i][k] = 0;
+        res_can_clash[i][k] = nullptr;
     }
-
-    res_can_clash[maxres+1] = 0;
-
-    /*for (i=0; i<=maxres; i++)
-    {
-    	cout << i << ": ";
-    	for (j=0; res_can_clash[i][j]; j++)
-    		cout << *res_can_clash[i][j] << " ";
-    	cout << endl;
-    }*/
+    if (!recursed) res_can_clash[er+1] = nullptr;
 }
 
 void Protein::set_conditional_basicities()

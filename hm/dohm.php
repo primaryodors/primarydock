@@ -230,7 +230,10 @@ A100 &a100
 ECHO "A100 Score: " &a100
 IF &a100 < 10 FAIL "A100 score too low."
 
-IF NOT HELIX %45.51 AND NOT HELIX %45.52 AND NOT HELIX %45.53 AND NOT HELIX %45.54 AND NOT HELIX %45.55 AND NOT HELIX %45.56 AND NOT HELIX %45.57 FAIL "No EXR2 helix."
+IF HELIX %45.51 OR HELIX %45.52 OR HELIX %45.53 OR HELIX %45.54 OR HELIX %45.55 OR HELIX %45.56 OR HELIX %45.57 GOTO _exr2_helix_ok
+SAVE "hm/failed.pdb"
+FAIL "No EXR2 helix."
+_exr2_helix_ok:
 
 DELETE 1 %1.20
 HYDRO
@@ -262,4 +265,4 @@ chdir("..");
 passthru("./bin/pepteditor hm/$rcpid.hm.pepd");
 
 chdir(__DIR__);
-// foreach (glob("$rcpid.*") as $doomed) unlink($doomed);
+foreach (glob("$rcpid.*") as $doomed) unlink($doomed);

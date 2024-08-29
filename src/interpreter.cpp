@@ -2366,11 +2366,11 @@ int main(int argc, char** argv)
                     }
                     else
                     {
-                        delete psz_orig;
+                        delete[] psz_orig;
                         raise_error( (std::string)"Unimplemented operator " + (std::string)words[2] + (std::string)" for string assignment.");
                         return 0x51974c5;		// If you use your imagination, that says "syntax".
                     }
-                    delete psz_orig;
+                    delete[] psz_orig;
                     break;
 
                 default:

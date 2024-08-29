@@ -1179,13 +1179,14 @@ void Protein::set_clashables(int resno, bool recursed)
     // cout << "Setting clashables for " << resno << " recursed = " << (recursed ? "yes" : "no" ) << endl;
 
     int sr = get_start_resno(), er = get_end_resno();
-    if (!recursed && !res_can_clash)
+    if (!res_can_clash)
     {
         res_can_clash = new AminoAcid**[er+8];
         for (i=0; i<=er; i++) res_can_clash[i] = nullptr;
     }
 
     int sr1 = sr, er1 = er;
+    if (resno > er1) return;
     if (resno > 0) sr = er = resno;
     for (i=sr; i<=er; i++)
     {
@@ -1193,8 +1194,8 @@ void Protein::set_clashables(int resno, bool recursed)
         if (!resi) continue;
 
         if (debug) *debug << endl << "Testing residue " << resi->get_residue_no() << endl;
-        AminoAcid* temp[er+1];
-        for (j=0; j<=er; j++) temp[j] = nullptr;
+        AminoAcid* temp[er1+1];
+        for (j=0; j<=er1; j++) temp[j] = nullptr;
         k=0;
         for (j=sr1; j<=er1; j++)
         {
@@ -1208,7 +1209,7 @@ void Protein::set_clashables(int resno, bool recursed)
             }
         }
 
-        if (!res_can_clash[i]) res_can_clash[i] = new AminoAcid*[er+8];
+        if (!res_can_clash[i]) res_can_clash[i] = new AminoAcid*[er1+8];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];
@@ -1216,14 +1217,10 @@ void Protein::set_clashables(int resno, bool recursed)
             {
                 set_clashables(temp[j]->get_residue_no(), true);
             }
-            /*cout << residues[i]->get_aa_definition()->_3let << residues[i]->get_residue_no()
-            	 << " can clash with "
-            	 << res_can_clash[i][j]->get_aa_definition()->_3let << res_can_clash[i][j]->get_residue_no()
-            	 << endl;*/
         }
         res_can_clash[i][k] = nullptr;
     }
-    if (!recursed) res_can_clash[er+1] = nullptr;
+    if (!recursed) res_can_clash[er1+1] = nullptr;
 }
 
 void Protein::set_conditional_basicities()

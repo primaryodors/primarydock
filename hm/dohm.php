@@ -262,7 +262,7 @@ SAVE \$outf
 
 blixtos;
 
-$fp = fopen("$rcpid.hm.pepd", "w");
+$fp = fopen("$rcpid.hm.pepd", "w") or die("FAILED to open $rcpid.hm.pepd for writing.");
 fwrite($fp, $pepd);
 fclose($fp);
 

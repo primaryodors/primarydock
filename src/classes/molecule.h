@@ -62,6 +62,7 @@ public:
     void copy_state(Molecule* from_mol);
     void restore_state(Molecule* to_mol);
     float total_atom_motions();
+    float total_atom_motions(Molecule* to_mol);
     void reset();
 
 protected:
@@ -132,6 +133,7 @@ public:
     std::vector<Atom*> longest_dimension();
     float get_atom_bond_length_anomaly(Atom* atom, Atom* ignore = nullptr);
     float evolve_structure(int generations = _evolution_default_generations, float mutation_rate = _default_mutation_rate, int pop_size = _default_population_size);
+    void compute_lm_from_recent_clashes();
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -191,6 +193,8 @@ public:
     float get_intermol_polar_sat(Molecule* ligand);
     float get_intermol_contact_area(Molecule* ligand, bool hydrophobic_only = false);
     void mutual_closest_atoms(Molecule* mol2, Atom** atom1, Atom** atom2);
+    void maintain_contact(Atom* my_atom, Atom* other_atom);
+    bool contact_maintained();
 
     #if compute_vdw_repulsion
     float get_vdW_repulsion(Molecule* ligand);
@@ -216,8 +220,6 @@ public:
     void conform_atom_to_location(int atom_idx, Point target, int iterations = 50, float optimal_distance = 0);
     void conform_atom_to_location(const char* atom_name, Point target, int iterations = 20, float optimal_distance = 0);
     SCoord motion_to_optimal_contact(Molecule* ligand);
-    void maintain_contact(Atom* my_atom, Atom* other_atom);
-    bool contact_maintained();
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
@@ -262,7 +264,9 @@ public:
     float clash_worst = 0;
     Atom *best_intera = nullptr, *best_other_intera = nullptr;
     Molecule* best_interactor = nullptr;
+    int iters_without_change = 0;
     float occlusion = 0;                                // A measure of how many heavy atoms are closer to at least one residue than any other heavy atom.
+    SCoord rotaxes[3];
 
 protected:
 
@@ -281,7 +285,9 @@ protected:
     float* last_mc_binding = nullptr;
     Atom** most_bindable = nullptr;
     Pose* iterbegan = nullptr;
-    int iters_without_change = 0;
+    Atom* dlt1 = nullptr;               // Don't Lose Touch.
+    Atom* dlt2 = nullptr;
+    float dltr = 0;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

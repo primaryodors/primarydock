@@ -7,10 +7,13 @@ chdir(__DIR__);
 $exp = file_get_contents("experimental.ali")."\n\n".file_get_contents("hm.ali");
 
 $prevln = "";
+$already = [];
 foreach (explode("\n", $exp) as $ln)
 {
     if (substr($prevln, 0, 4) == ">P1;")
     {
+        $rcpid = trim(substr($prevln, 4));
+        $already[$rcpid] = $rcpid;
         $pettias = explode(':', $ln);
         $rcsbid = $pettias[1];
         if (strlen($rcsbid) == 4)
@@ -37,6 +40,7 @@ fwrite($fp, "\n\n");
 foreach ($prots as $rcpid => $p)
 {
     if (!isset($p['aligned'])) continue;
+    if (@$already[$rcpid]) continue;
 
     $p1row = ">P1;$rcpid";
     fwrite($fp, "$p1row\n");

@@ -141,13 +141,13 @@
 #define charge_attraction 60.0
 
 #define global_clash_allowance 0.4
-#define double_hydrogen_clash_allowance_multiplier 1.5
+#define double_hydrogen_clash_allowance_multiplier 0
 #define ignore_double_hydrogen_clashes 0
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 1.0
-#define lmpull 1.0
+#define lmpull 0.1
 #define lmsteps 3
 #define recapture_ejected_ligand 0
 #define summed_missed_connections 1
@@ -366,6 +366,7 @@
 #define _dbg_cond_basic_acd_lig 0
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
+#define _dbg_constrained_search 0
 #define _dbg_eclipses 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0

@@ -1400,6 +1400,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         )
 {
     int i, j, sphres = 0;
+    float szm = size.magnitude()/2;
     int seql = get_end_resno();
     bool resno_already[8192];
     for (i=0; i<8192; i++) resno_already[i] = false;
@@ -1455,7 +1456,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         if (a) pt2 = a->get_location();
         else   pt2 = ligand->get_barycenter();
 
-        if (pt2.get_3d_distance(ca->get_location()) < 4)
+        if (pt2.get_3d_distance(ca->get_location()) < szm)
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;
@@ -1502,7 +1503,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         SCoord dir(&pt1);
 
-        if (dir.r <= 1)
+        if (dir.r <= 0.75)
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;

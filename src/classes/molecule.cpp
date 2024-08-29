@@ -2980,6 +2980,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
                                 ptd.multiply(fmin(fabs(-abind) / 1000, 1));
+                                if (ptd.magnitude() > speed_limit) ptd.scale(speed_limit);
                                 lmx += lmpush * sgn(ptd.x);
                                 lmy += lmpush * sgn(ptd.y);
                                 lmz += lmpush * sgn(ptd.z);
@@ -2997,6 +2998,14 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             lmx += lmpull * mc.x * mc_bpotential / mcrr;
                             lmy += lmpull * mc.y * mc_bpotential / mcrr;
                             lmz += lmpull * mc.z * mc_bpotential / mcrr;
+                            lc = sqrt(lmx*lmx+lmy*lmy+lmz*lmz);
+                            if (lc > speed_limit)
+                            {
+                                lc = speed_limit / lc;
+                                lmx *= lc;
+                                lmy *= lc;
+                                lmz *= lc;
+                            }
                         }
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);

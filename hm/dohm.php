@@ -230,7 +230,13 @@ A100 &a100
 ECHO "A100 Score: " &a100
 IF &a100 < 10 FAIL "A100 score too low."
 
-IF HELIX %45.51 OR HELIX %45.52 OR HELIX %45.53 OR HELIX %45.54 OR HELIX %45.55 OR HELIX %45.56 OR HELIX %45.57 GOTO _exr2_helix_ok
+IF HELIX %45.51 GOTO _exr2_helix_ok
+IF HELIX %45.52 GOTO _exr2_helix_ok
+IF HELIX %45.53 GOTO _exr2_helix_ok
+IF HELIX %45.54 GOTO _exr2_helix_ok
+IF HELIX %45.55 GOTO _exr2_helix_ok
+IF HELIX %45.56 GOTO _exr2_helix_ok
+IF HELIX %45.57 GOTO _exr2_helix_ok
 SAVE "hm/failed.pdb"
 FAIL "No EXR2 helix."
 _exr2_helix_ok:

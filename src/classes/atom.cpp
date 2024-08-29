@@ -3246,6 +3246,14 @@ std::ostream& operator<<(std::ostream& os, const bond_rotation_fail_reason& bf)
     return os;
 }
 
+Atom* Atom::get_heavy_atom()
+{
+    if (Z > 1) return this;
+    if (!bonded_to) return this;
+    if (!bonded_to[0].atom2) return this;
+    return bonded_to[0].atom2;
+}
+
 
 
 

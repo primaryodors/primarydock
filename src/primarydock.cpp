@@ -2556,7 +2556,7 @@ _try_again:
             #endif
             #endif
 
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, nodecen, size, addl_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligand->get_barycenter(), size, addl_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
 
             // Flexion Selection
@@ -2739,25 +2739,8 @@ _try_again:
                     if (out_bb_pairs) cout << endl;
                 }
                 else if (pdpst == pst_constrained)
-                {
-                    int csiter, ultimate_csidx=0;
-                    float lbest_energy;
-                    Pose best_cslig;
-                    best_cslig.copy_state(ligand);
-                    for (csiter=0; csiter<5; csiter++)
-                    {
-                        Search::do_constrained_search(protein, ligand);
-                        float cse = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                        if (!csiter || cse > lbest_energy)
-                        {
-                            lbest_energy = cse;
-                            best_cslig.copy_state(ligand);
-                            ultimate_csidx = cs_idx;
-                        }
-                        if (cs_bt[cs_idx] == ionic) break;
-                    }
-                    best_cslig.restore_state(ligand);
-                    cs_idx = ultimate_csidx;
+                {                    
+                    Search::do_constrained_search(protein, ligand);
 
                     #if _dbg_groupsel
                     cout << "Binding constraint:\n" << cs_res[ultimate_csidx]->get_name()
@@ -2874,6 +2857,7 @@ _try_again:
             ligand->agroups = global_pairs;
             if (output_each_iter) output_iter(0, cfmols);
             if (pdpst == pst_best_binding) ligand->movability = (MovabilityType)(MOV_CAN_AXIAL | MOV_CAN_RECEN | MOV_CAN_FLEX);
+            if (pdpst == pst_constrained) ligand->movability = MOV_NORECEN;
             Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
 
             if (!nodeno) // && outpdb.length())
@@ -3053,7 +3037,7 @@ _try_again:
             }
             #endif
 
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, pocketcen, size, addl_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligand->get_barycenter(), size, addl_resno);
 
             if (out_pdbdat_res)
             {

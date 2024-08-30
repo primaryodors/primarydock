@@ -498,6 +498,7 @@ bool Atom::move(Point* pt)
     if (geov) delete[] geov;
     geov = NULL;
     geometry_dirty = true;
+    if (mol) mol_shape_has_changed(mol);
     return true;
 }
 

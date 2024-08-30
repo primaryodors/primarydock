@@ -112,6 +112,7 @@ if (!is_localhost) $.ajax(
 
 function do_initial_load()
 {
+	if (molid == "none") return;
 	var url = getParameterByName('url') ? getParameterByName('url') : website+'/sdf.php';
 
 	var literal_pdb = false;

@@ -118,6 +118,8 @@ public:
     float pi_stackability(bool include_backbone = false);
 
     // Spatial functions.
+    const Point* obtain_vdW_surface(float density = 20);
+    Atom** get_vdW_vertex_atoms() { return vdw_vertex_atom; }
     Point get_barycenter(bool bond_weighted = false) const;
     virtual void move(SCoord move_amt, bool override_residue = false);
     virtual void move(Point move_amt, bool override_residue = false);
@@ -134,6 +136,7 @@ public:
     float get_atom_bond_length_anomaly(Atom* atom, Atom* ignore = nullptr);
     float evolve_structure(int generations = _evolution_default_generations, float mutation_rate = _default_mutation_rate, int pop_size = _default_population_size);
     void compute_lm_from_recent_clashes();
+    void shape_has_changed();
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -274,6 +277,9 @@ protected:
     int atcount = 0;
     char* name = 0;
     char* smiles = 0;
+    Point* vdw_surface = nullptr;
+    Atom** vdw_vertex_atom = nullptr;
+    int vdw_vertex_count = 0;
     Atom*** paths = nullptr;
     Ring** rings = nullptr;
     Bond** rotatable_bonds = nullptr;

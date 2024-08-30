@@ -5,6 +5,12 @@
 
 using namespace std;
 
+void mol_shape_has_changed(Molecule* mol)
+{
+    // This stub is necessary whenever we use the Atom class without the Molecule class.
+    ;
+}
+
 int main (int argc, char** argv)
 {
     if (argc < 2)

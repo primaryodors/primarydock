@@ -396,6 +396,7 @@ protected:
 };
 
 bool atoms_are_conjugated(Atom** atoms);
+void mol_shape_has_changed(Molecule* mol);
 
 static bool read_elem_syms = false;
 

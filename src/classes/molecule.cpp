@@ -79,6 +79,8 @@ Molecule::~Molecule()
     if (smiles) delete[] smiles;
     if (rings) delete[] rings;
     if (rotatable_bonds) delete[] rotatable_bonds;
+    if (vdw_surface) delete[] vdw_surface;
+    if (vdw_vertex_atom) delete[] vdw_vertex_atom;
 }
 
 int length(Atom** array)
@@ -2494,6 +2496,7 @@ void Molecule::move(SCoord move_amt, bool override_residue)
         return;
     }
     int i;
+    int vvc = vdw_vertex_count;
 
     #if _dbg_improvements_only_rule
     float before;
@@ -2516,6 +2519,8 @@ void Molecule::move(SCoord move_amt, bool override_residue)
     }
     excuse_deterioration = false;
     #endif
+
+    vdw_vertex_count = vvc;
 }
 
 void Molecule::move(Point move_amt, bool override_residue)
@@ -2527,6 +2532,7 @@ void Molecule::move(Point move_amt, bool override_residue)
         return;
     }
     int i;
+    int vvc = vdw_vertex_count;
 
     #if _dbg_improvements_only_rule
     float before;
@@ -2550,6 +2556,8 @@ void Molecule::move(Point move_amt, bool override_residue)
     }
     excuse_deterioration = false;
     #endif
+
+    vdw_vertex_count = vvc;
 }
 
 Point Molecule::get_barycenter(bool bond_weighted) const
@@ -2602,6 +2610,7 @@ void Molecule::recenter(Point nl)
 void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
 {
     if (noAtoms(atoms)) return;
+    int vvc = vdw_vertex_count;
     // cout << name << " Molecule::rotate()" << endl;
 
     if (movability <= MOV_FLEXONLY) return;
@@ -2634,6 +2643,8 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     }
     excuse_deterioration = false;
     #endif
+
+    vdw_vertex_count = vvc;
 }
 
 void Molecule::rotate(LocatedVector lv, float theta)
@@ -2642,6 +2653,7 @@ void Molecule::rotate(LocatedVector lv, float theta)
 
     if (movability <= MOV_FLEXONLY) return;
     if (movability <= MOV_NORECEN) lv.origin = get_barycenter();
+    int vvc = vdw_vertex_count;
 
     #if _dbg_improvements_only_rule
     float before;
@@ -2669,6 +2681,8 @@ void Molecule::rotate(LocatedVector lv, float theta)
     }
     excuse_deterioration = false;
     #endif
+
+    vdw_vertex_count = vvc;
 }
 
 bool Molecule::shielded(Atom* a, Atom* b) const
@@ -3485,6 +3499,63 @@ bool Molecule::contact_maintained()
     return r <= dltr*contact_maintenance_allowance;
 }
 
+const Point* Molecule::obtain_vdW_surface(float d)
+{
+    if (!atcount || !atoms) return nullptr;
+    if (vdw_surface && vdw_vertex_count > 0) return vdw_surface;
+
+    int maxpoints = atcount * d * d / 3 + 256;
+    if (!vdw_surface)
+    {
+        vdw_surface = new Point[maxpoints];
+        vdw_vertex_atom = new Atom*[maxpoints];
+    }
+
+    float halfstep = M_PI / d;
+    float step = halfstep * 2;
+
+    int i, ivdW = 0;
+    SCoord v;
+    for (i=0; i<atcount && atoms[i]; i++)
+    {
+        Point aloc = atoms[i]->get_location();
+        v.r = atoms[i]->get_vdW_radius();
+        float ystep = step / v.r / v.r;
+        for (v.theta = -square; v.theta <= square; v.theta += step)
+        {
+            float xstep = step / v.r / fmax(cos(v.theta), 0.000001);
+            float end = M_PI*2-xstep/2;
+            for (v.phi = 0; v.phi < end; v.phi += xstep)
+            {
+                Point pt = aloc.add(v);
+                Atom* na = this->get_nearest_atom(pt);
+                if (na != atoms[i] && pt.get_3d_distance(na->get_location()) < na->get_vdW_radius()) continue;
+                if (!pt.x && !pt.y && !pt.z) pt = Point(-0.001, 0.001, -0.001);
+                vdw_vertex_atom[ivdW] = atoms[i];
+                vdw_surface[ivdW++] = pt;
+                if (ivdW >= maxpoints)
+                {
+                    cout << "Too many vdW surface vertices. Please increase limit in code." << endl;
+                    throw 0xbadc0de;
+                }
+            }
+        }
+    }
+    vdw_vertex_count = ivdW;
+
+    return vdw_surface;
+}
+
+void Molecule::shape_has_changed()
+{
+    vdw_vertex_count = 0;
+}
+
+void mol_shape_has_changed(Molecule* mol)
+{
+    mol->shape_has_changed();
+}
+
 #define _dbg_atom_pointing 0
 
 void Molecule::conform_atom_to_location(int i, Point t, int iters, float od)
@@ -4030,6 +4101,7 @@ SCoord Molecule::motion_to_optimal_contact(Molecule* l)
 {
     Pose p;
     p.copy_state(this);
+    int vvc = vdw_vertex_count;
 
     MovabilityType m = movability, lm = l->movability;
     movability = l->movability = MOV_FLEXONLY;
@@ -4080,6 +4152,7 @@ SCoord Molecule::motion_to_optimal_contact(Molecule* l)
     movability = m;
     l->movability = lm;
 
+    vdw_vertex_count = vvc;
     return total_motion;
 }
 

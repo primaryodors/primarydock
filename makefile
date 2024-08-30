@@ -10,7 +10,7 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 	$(OBJDIR)/search.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
-	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test test/cs_test test/mcoord_test
+	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test test/cs_test test/mcoord_test test/vdw_vertex_test.cpp
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic \
 	 $(BINDIR)/score_pdb $(BINDIR)/ramachandran $(BINDIR)/ringflip
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
@@ -147,6 +147,9 @@ test/cs_test: src/test/cs_test.cpp $(OBJS)
 
 test/mcoord_test: src/test/mcoord_test.cpp $(OBJS)
 	$(CC) src/test/mcoord_test.cpp $(OBJS) -o test/mcoord_test $(CFLAGS)
+
+test/vdw_vertex_test: src/test/vdw_vertex_test.cpp $(OBJS)
+	$(CC) src/test/vdw_vertex_test.cpp $(OBJS) -o test/vdw_vertex_test $(CFLAGS)
 
 $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/search.o $(OBJDIR)/scoring.o
 	$(CC) src/primarydock.cpp $(OBJS) -o $(BINDIR)/primarydock $(CFLAGS)

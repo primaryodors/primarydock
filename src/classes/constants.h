@@ -97,7 +97,7 @@
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
-#define speed_limit 0.666
+#define speed_limit 0.3
 #define warn_orphan_atoms 0
 
 #define pi_mult_dkytw 264
@@ -185,8 +185,8 @@
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
 #define ridiculous_5k1_pipe_dream 0
-#define contact_maintenance_allowance 1.333
-#define contact_maintenance_creep 1.2
+#define contact_maintenance_allowance 1.5
+#define contact_maintenance_creep 1.25
 
 // Mandatory coordination bindings (REQSR) that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5

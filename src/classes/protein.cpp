@@ -3124,6 +3124,27 @@ Point Protein::find_loneliest_point(Point cen, Point sz, Point bias, float bd)
     float x, y, z, xp, yp, zp, xa, ya, za, r, bestr = 0, step = 0.25;
     int i;
     Point retval = cen;
+    int sr = get_start_resno(), er = get_end_resno();
+    
+    i = get_region_start("TMR2");
+    if (i) sr = i;
+    i = get_region_end("TMR7");
+    if (i) er = i;
+    
+    Point bbox1(0,0,0), bbox2(0,0,0);
+    for (i=sr; i<=er; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
+        Point pt = aa->get_CA_location();
+
+        if (pt.x < bbox1.x) bbox1.x = pt.x;
+        if (pt.y < bbox1.y) bbox1.y = pt.y;
+        if (pt.z < bbox1.z) bbox1.z = pt.z;
+        if (pt.x > bbox2.x) bbox2.x = pt.x;
+        if (pt.y > bbox2.y) bbox2.y = pt.y;
+        if (pt.z > bbox2.z) bbox2.z = pt.z;
+    }
 
     sz.x /= 2;
     sz.y /= 2;
@@ -3152,6 +3173,7 @@ Point Protein::find_loneliest_point(Point cen, Point sz, Point bias, float bd)
                 if (r > 1) continue;
 
                 Point maybe(xa, ya, za);
+                if (maybe.distance_to_bounding_box(bbox1, bbox2) < 2) continue;
                 float minr = Avogadro;
                 int minres = 0;
 
@@ -3172,11 +3194,11 @@ Point Protein::find_loneliest_point(Point cen, Point sz, Point bias, float bd)
                     }
                 }
 
-                // if (minr > 3) cout << maybe << " " << minr << " " << minres << endl;
-                if (minr < 1e9 && minr > bestr)
+                if (minr < 1e21 && minr > bestr)
                 {
                     retval = maybe;
                     bestr = minr;
+                    // cout << maybe << " " << minr << " " << minres << endl;
                 }
             }
         }

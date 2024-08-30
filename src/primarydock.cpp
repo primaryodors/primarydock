@@ -300,9 +300,9 @@ int interpret_resno(const char* field)
     int i;
     for (i=0; buffer[i] >= 'A' && buffer[i] <= 'Z'; i++)
     {
-        if (buffer[i] == aa->get_letter()) return retval;
+        if (buffer[i] == aa->get_letter()) aa->priority = true;
     }
-    return 0;
+    return retval;
 }
 
 void freeze_bridged_residues()
@@ -806,9 +806,9 @@ void iteration_callback(int iter, Molecule** mols)
             {
                 if (ligand->lastbind < 0)
                 {
-                    bary.x += (ligcen_target.x - bary.x) * drift;
-                    bary.y += (ligcen_target.y - bary.y) * drift;
-                    bary.z += (ligcen_target.z - bary.z) * drift;
+                    bary.x += (pocketcen.x - bary.x) * drift;
+                    bary.y += (pocketcen.y - bary.y) * drift;
+                    bary.z += (pocketcen.z - bary.z) * drift;
                 }
                 else drift *= (1.0 - drift_decay_rate/iters);
             }
@@ -925,7 +925,7 @@ void update_progressbar(float percentage)
     hueoffset += 0.3;
 }
 
-Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
+Point pocketcen_from_config_fields(char** words, Point* old_pocketcen)
 {
     int i=1;
     Point local_pocketcen;
@@ -1639,7 +1639,7 @@ void apply_protein_specific_settings(Protein* p)
     char buffer[1024];
     strcpy(buffer, CEN_buf.c_str());
     char** words = chop_spaced_words(buffer);
-    pocketcen = pocketcen_from_config_words(words, nullptr);
+    pocketcen = pocketcen_from_config_fields(words, nullptr);
     delete[] words;
 
     n = atomto.size();
@@ -2030,7 +2030,7 @@ int main(int argc, char** argv)
 
     strcpy(buffer, CEN_buf.c_str());
     char** words = chop_spaced_words(buffer);
-    pocketcen = pocketcen_from_config_words(words, nullptr);
+    pocketcen = pocketcen_from_config_fields(words, nullptr);
     loneliest = protein->find_loneliest_point(pocketcen, size);
 
     #if pocketcen_is_loneliest
@@ -2513,7 +2513,7 @@ _try_again:
                     return 0xbadc09f;
                 }
                 words = chop_spaced_words(buffer);
-                nodecen = pocketcen_from_config_words(&words[1], &nodecen);
+                nodecen = pocketcen_from_config_fields(&words[1], &nodecen);
 
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added whatever points together." << endl;

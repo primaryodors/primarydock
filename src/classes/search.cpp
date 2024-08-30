@@ -344,6 +344,24 @@ void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_
     std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid, l_pocket_cen);
     global_pairs = GroupPair::pair_groups(lagc, scg, l_pocket_cen);
 
+    AminoAcid* mainres = global_pairs[0]->scg->aminos[0];
+    Atom* mtl = mainres->coordmtl;
+    intera_type bt = vdW;
+    if (mtl) bt = mcoord;
+    else if (mainres->get_charge()) bt = ionic;
+    else if (global_pairs[0]->scg->hydrophilicity() > hydrophilicity_cutoff) bt = hbond;
+    else if (global_pairs[0]->scg->pi_stackability() && global_pairs[0]->ag->get_pi()) bt = pi;
+
+    Atom* resbba = mtl ? mtl
+        : mainres->get_one_most_bindable(bt);
+    Atom* ligbba = global_pairs[1]->ag->one_best_binding_atom(bt);
+
+    if (bt != pi)
+    {
+        ligand->maintain_contact(ligbba, resbba);
+        mainres->maintain_contact(resbba, ligbba);
+    }
+
     if (global_pairs.size() > 2)
     {
         // If the 2nd group is closer to the 1st group than the 3rd group is, swap the 2nd and 3rd groups.
@@ -601,67 +619,39 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     Atom* ligbba = cs_lag[cs_idx]->one_best_binding_atom(cs_bt[cs_idx]);
     if (cs_bt[cs_idx] == hbond && (resbba->get_Z() == 1 && ligbba->get_Z() == 1)) ligbba = ligbba->get_heavy_atom();
 
-    loneliest = protein->find_loneliest_point(loneliest, Point(15,15,15), cs_res[cs_idx]->get_reach_atom_location(), 7);
+    loneliest = protein->find_loneliest_point(loneliest, Point(20,20,20));
+    #if _dbg_constrained_search
+    Atom* dummy = ligand->get_atom("DMY");
+    if (!dummy) dummy = ligand->add_atom("Ar", "DMY", nullptr, 0);
+    dummy->move(loneliest);
+    #endif
 
     // Point residue toward where ligand will be, unless using pi stacking.
-    if (cs_bt[cs_idx] != pi && cs_bt[cs_idx] != mcoord)
+    if (cs_bt[cs_idx] != pi && cs_bt[cs_idx] != mcoord && cs_res[cs_idx]->movability != MOV_PINNED)
     {
         MovabilityType mt = cs_res[cs_idx]->movability;
         cs_res[cs_idx]->movability = MOV_FLEXONLY;
-        Atom* scra = cs_res[cs_idx]->get_reach_atom();
-        cs_res[cs_idx]->conform_atom_to_location(scra->name, loneliest);
+        cs_res[cs_idx]->conform_atom_to_location(resbba->name, loneliest);
         cs_res[cs_idx]->movability = mt;
 
         #if _dbg_constrained_search
-        cout << "Conformed " << cs_res[cs_idx]->get_name() << ":" << scra->name << " towards " << loneliest << endl << flush;
+        cout << "Conformed " << cs_res[cs_idx]->get_name() << ":" << resbba->name << " towards " << loneliest << endl << flush;
         #endif
     }
 
-    // Place the ligand so that the atom group is centered in the binding pocket.
+    float optr = InteratomicForce::optimal_distance(resbba, ligbba);
+    SCoord ligbb_offset = loneliest.subtract(resbba->get_location());
+    ligbb_offset.r = optr;
+    Point ligbb_target = resbba->get_location().add(ligbb_offset);
+
+    // Place the ligand.
     ligand->movability = MOV_ALL;
-    ligand->recenter(loneliest);
-    Point agp = cs_lag[cs_idx]->get_center();
-    SCoord mov = loneliest.subtract(agp);
+    SCoord mov = ligbb_target.subtract(ligbba->get_location());
     ligand->move(mov);
 
     #if _dbg_constrained_search
-    cout << "Ligand is centered at " << ligand->get_barycenter() << endl << flush;
-    #endif
-
-    // Rotate the ligand so the atom group faces the chosen residue.
-    Point resca = mtl ? mtl->get_location() : cs_res[cs_idx]->get_CA_location();
-    Point agcen = cs_lag[cs_idx]->get_center();
-    Rotation rot = align_points_3d(agcen, resca, ligand->get_barycenter());
-    LocatedVector lv = rot.v;
-    lv.origin = ligand->get_barycenter();
-    ligand->rotate(lv, rot.a);
-
-    #if _dbg_constrained_search
-    cout << "Rotated ligand " << (rot.a*fiftyseven) << "deg toward " << cs_res[cs_idx]->get_name() << endl << flush;
-    #endif
-
-    // Align the sidechain to the ligand.
-    float optr = InteratomicForce::optimal_distance(resbba, ligbba);
-    cs_res[cs_idx]->conform_atom_to_location(resbba->name, ligbba->get_location(), 20, optr);
-
-    #if _dbg_constrained_search
-    cout << "Pointed " << cs_res[cs_idx]->get_name() << ":" << resbba->name << " toward ligand " << ligbba->name << endl << flush;
-    #endif
-
-    // Move the ligand so that the atom group is at the optimal distance to the residue.
-    Point resna = mtl ? mtl->get_location() : resbba->get_location();
-    mov = resna.subtract(ligbba->get_location());
-    mov.r -= mtl ? 2 : optr;
-    if (mov.r > 0)
-    {
-        ligand->move(mov);
-
-        #if _dbg_constrained_search
-        cout << "Moved ligand " << mov.r << "A toward binding residue." << endl << flush;
-        #endif
-    }
-    #if _dbg_constrained_search
-    else cout << "Ligand motion would be " << mov.r << ", skipping." << endl << flush;
+    cout << "Moved ligand " << mov.r << "A toward binding residue." << endl << flush;
+    dummy->move(loneliest);
     #endif
 
     bool contact_mtse = false;
@@ -678,16 +668,16 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     }
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
-    agcen = ligbba->get_location();
-    rot = align_points_3d(ligand->get_barycenter(), loneliest, agcen);
-    lv = rot.v;
+    Point agcen = ligbba->get_location();
+    Rotation rot = align_points_3d(ligand->get_barycenter(), loneliest, agcen);
+    LocatedVector lv = rot.v;
     lv.origin = agcen;
     ligand->rotate(lv, rot.a);
 
     #if _dbg_constrained_search
     cout << "Rotated ligand " << (rot.a * fiftyseven) << "deg about its binding atom to face pocket center." << endl << flush;
-    #endif
-
+    dummy->move(loneliest);
+    #endif    
 
     // Perform 360° rotations about the residue and look for the rotamer with the smallest clash total.
     Point axes[3];
@@ -695,8 +685,8 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     axes[1] = Point(0,1,0);
     axes[2] = Point(0,0,1);
 
-    agcen = cs_lag[cs_idx]->get_center();
-    resna = resbba->get_location();
+    agcen = ligbba->get_location();
+    Point resna = resbba->get_location();
     rot = align_points_3d(axes[2], agcen.subtract(resna), agcen);
 
     for (j=0; j<3; j++)
@@ -713,6 +703,8 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     {
         for (j=0; j<3; j++)
         {
+            lv = (SCoord)axes[j];
+            lv.origin = agcen;
             for (; theta < M_PI*2; theta += cs_360_step)
             {
                 AminoAcid* cc[SPHREACH_MAX+4];
@@ -736,12 +728,14 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     cout << "Performed multiaxial rotation.";
     if (contact_mtse) cout << " Ligand binding atom " << ligbba->name << " is " << ligbba->distance_to(resbba) << "A from residue " << resbba->name << ".";
     cout << endl << flush;
+    dummy->move(loneliest);
     #endif
 
     ligand->movability = MOV_ALL;
 
     #if _dbg_constrained_search
     cout << endl << flush;
+    dummy->move(loneliest);
     #endif
 }
 

@@ -3334,10 +3334,9 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
             if (r > 4) continue;
 
             Atom* H = om->atoms[j]->is_bonded_to("H");
-            if (H && atoms[i]->distance_to(H) < r) continue;
-
             float theta = find_angle_along_vector(atoms[i]->get_location(),
                 om->atoms[j]->get_location(), b->atom2->get_location(), b->get_axis());
+            if (H && atoms[i]->distance_to(H) < r) theta += M_PI;
             if (b->can_rotate)
             {
                 b->rotate(theta, false, true);

@@ -49,6 +49,7 @@ struct Point
     void scale(float new_magn);
     void multiply(float multiplier);
     bool fits_inside(Point container);
+    float distance_to_bounding_box(Point corner1, Point corner2);
 
     std::string printable() const;
 

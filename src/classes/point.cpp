@@ -157,6 +157,18 @@ float Point::magnitude() const
     return sqrt(x*x + y*y + z*z);
 }
 
+float Point::distance_to_bounding_box(Point corner1, Point corner2)
+{
+    if (sgn(x-corner1.x) == sgn(x-corner2.x)) return 0;
+    if (sgn(y-corner1.y) == sgn(y-corner2.y)) return 0;
+    if (sgn(z-corner1.z) == sgn(z-corner2.z)) return 0;
+
+    return fmin(
+            fmin(fabs(x - corner1.x), fmin(fabs(y - corner1.y), fabs(z - corner1.z))),
+            fmin(fabs(x - corner2.x), fmin(fabs(y - corner2.y), fabs(z - corner2.z)))
+            );
+}
+
 Point::Point(SCoord* v)
 {
     x = v->r * sin(v->phi) *  cos(v->theta);

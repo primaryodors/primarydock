@@ -5,7 +5,7 @@ PROT="$1"
 LIG="$2"
 DKR="$3"
 
-if [ -z "$4" ]; then
+if [ -n "$4" ]; then
     SMILES="$3"
     DKR="$4"
 fi
@@ -36,7 +36,7 @@ else
 fi
 
 DKRARG=""
-if [[ "$DKR" = "pd" ]]; then
+if [[ "$DKR" == "pd" ]]; then
     DKRARG="docker=$DKR"
 elif [[ "$DKR" == "vina" ]]; then
     DKRARG="docker=$DKR"

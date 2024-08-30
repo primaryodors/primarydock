@@ -2963,6 +2963,26 @@ Point Protein::get_region_center(int startres, int endres)
     return average_of_points(range, samples);
 }
 
+Point Protein::get_region_bounds(int startres, int endres)
+{
+    Point cen = get_region_center(startres, endres);
+    Point retval(0,0,0);
+
+    int i;
+    for (i=startres; i<=endres; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
+        Point CA = aa->get_CA_location();
+        CA = CA.subtract(cen);
+        if (fabs(CA.x) > retval.x) retval.x = fabs(CA.x);
+        if (fabs(CA.y) > retval.y) retval.y = fabs(CA.y);
+        if (fabs(CA.z) > retval.z) retval.z = fabs(CA.z);
+    }
+
+    return retval;
+}
+
 void Protein::move_piece(int start_res, int end_res, Point new_center)
 {
     Point old_center = get_region_center(start_res, end_res);

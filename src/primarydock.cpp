@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include "classes/dynamic.h"
 #include "classes/group.h"
+#include "classes/cavity.h"
 #include "classes/search.h"
 #include "classes/scoring.h"
 

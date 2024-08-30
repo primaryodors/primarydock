@@ -145,6 +145,7 @@ public:
     Molecule** all_residues_as_molecules();
     Molecule** all_residues_as_molecules_except(Molecule** mm);
     Point get_region_center(int startres, int endres);
+    Point get_region_bounds(int startres, int endres);
     SCoord get_region_axis(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size, Point bias = Point(0,0,0), float bias_distance = 0);

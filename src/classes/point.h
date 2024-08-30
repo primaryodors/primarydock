@@ -57,6 +57,13 @@ struct Point
     friend std::ostream& operator<<(std::ostream& os, const SCoord& v);
 };
 
+struct Sphere
+{
+    Point center;
+    float radius;
+    float volume() { return M_PI*radius*radius; }
+};
+
 struct SCoord
 {
     double r=0, theta=0, phi=0;

@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 
     FILE* fp;
 
-    int i, j;
+    int i, j, l;
     for (i=1; i<argc; i++)
     {
         if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--prot") || !strcmp(argv[i], "--protein"))
@@ -218,6 +218,72 @@ int main(int argc, char** argv)
                 i++;
             }
         }
+        else if (!strcmp(argv[i], "-m") || !strcmp(argv[i], "--metal"))
+        {
+            if (!p.get_seq_length())
+            {
+                cout << "Protein must be specified before metal coordination." << endl;
+                return -1;
+            }
+
+            i++;
+            char* esym = argv[i];
+            i++;
+            int charge = atoi(argv[i]);
+            i++;
+            int mcr[16], mcrq=0;
+            Point mcraloc[16];
+
+            while (i < argc)
+            {
+                if (argv[i][0] == '-')
+                {
+                    i--;
+                    break;
+                }
+                int resno = interpret_resno(argv[i]);
+                if (!resno) continue;
+                AminoAcid* aa = p.get_residue(resno);
+                if (!aa) continue;
+                Atom* a = aa->get_one_most_bindable(mcoord);
+                if (!a) continue;
+                mcraloc[mcrq] = a->get_location();
+                mcr[mcrq++] = resno;
+                i++;
+                if (mcrq > 16)
+                {
+                    cout << "Maximum number of metal coordination residues exceeded." << endl;
+                    return -1;
+                }
+            }
+
+            if (mcrq)
+            {
+                Point mcen = average_of_points(mcraloc, mcrq);
+                cout << "Performing metal coordination (3 residues)..." << endl << flush;
+                std::vector<MCoord> mtlcoords;
+                MCoord mc;
+                mc.Z = Atom::Z_from_esym(esym);
+                mc.charge = charge;
+                mc.mtl = new Atom(esym, &mcen, charge);
+                mc.mtl->name = new char[16];
+                strcpy(mc.mtl->name, "MTL");
+
+                for (l=0; l<mcrq; l++)
+                {
+                    ResiduePlaceholder rp;
+                    rp.resno = mcr[l];
+                    mc.coordres.push_back(rp);
+                    AminoAcid* aa = p.get_residue(rp.resno);
+                    Atom* a = aa->get_one_most_bindable(mcoord);
+                    aa->conform_atom_to_location(a->name, mcen);
+                }
+
+                mtlcoords.push_back(mc);
+
+                p.coordinate_metal(mtlcoords);
+            }
+        }
         else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--iter") || !strcmp(argv[i], "--iters"))
         {
             i++;
@@ -228,7 +294,7 @@ int main(int argc, char** argv)
             i++;
             poses = atoi(argv[i]);
         }
-        else if (!strcmp(argv[i], "-m") || !strcmp(argv[i], "--movie"))
+        else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--movie"))
         {
             output_each_iter = true;
         }
@@ -272,14 +338,14 @@ int main(int argc, char** argv)
 
             cout << "-l, --ligand\tSpecifies a file in SDF format for the ligand to be docked." << endl << endl;
 
-            cout << "-m, --movie\tCreates a dock file in the tmp/ folder showing each" << endl;
-            cout << "\t\titeration of the dock algorithm. Used for debugging." << endl << endl;
-
             cout << "-n, --poses\tSets the maximum number of output poses." << endl << endl;
 
             cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be docked." << endl << endl;
 
             cout << "-q\t\tSuppresses the progress bar." << endl << endl;
+
+            cout << "-v, --movie\tCreates a dock file in the tmp/ folder showing each" << endl;
+            cout << "\t\titeration of the dock algorithm. Used for debugging." << endl << endl;
 
             return 0;
         }
@@ -361,6 +427,7 @@ int main(int argc, char** argv)
         p.save_pdb(fp, &m);
         cout << "Saved output file in tmp/." << endl;
     }
+    else return 0;
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -372,7 +439,8 @@ int main(int argc, char** argv)
     Molecule* cfmols[sphres+8];
     j=0;
     cfmols[j++] = ligand;
-    // TODO: Metal.
+    Molecule* met = p.metals_as_molecule();
+    if (met) cfmols[j++] = met;
     for (i=0; i<sphres; i++) cfmols[j++] = reinterpret_cast<Molecule*>(reaches_spheroid[nodeno][i]);
     cfmols[j] = nullptr;
     cout << "Refining fit..." << endl << flush;

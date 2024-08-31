@@ -1044,8 +1044,10 @@ int Molecule::from_pdb(FILE* is, bool het_only)
     /*
     ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
     */
+    int i;
     char buffer[1024];
     int added=0;
+    for (i=0; i<1024; i++) buffer[i] = 0;
 
     while (!feof(is))
     {
@@ -1083,7 +1085,6 @@ int Molecule::from_pdb(FILE* is, bool het_only)
                     else
                         strcpy(esym, words[2]);
 
-                    int i;
                     for (i=1; i<6; i++)
                     {
                         if (!esym[i+1]) esym[i] = 0;
@@ -1121,7 +1122,7 @@ int Molecule::from_pdb(FILE* is, bool het_only)
         }
         buffer[0] = 0;
 
-        delete words;
+        delete[] words;
     }
 
     identify_conjugations();

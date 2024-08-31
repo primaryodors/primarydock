@@ -273,6 +273,9 @@ Atom::Atom(FILE* is)
     char buffer[1024], res3let[5];
     int resno=0;
     init_nulls(buffer, 1024);
+    bonded_to = new Bond[18];
+    int i;
+    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
 
     while (1)
     {
@@ -297,7 +300,6 @@ Atom::Atom(FILE* is)
                     else
                         strcpy(esym, words[2]);
 
-                    int i;
                     if (words[10])
                     {
                         esym[0] = words[10][0];
@@ -334,8 +336,6 @@ Atom::Atom(FILE* is)
                     used = 0;
 
                     figure_out_valence();
-                    bonded_to = new Bond[abs(geometry)];
-                    for (i=0; i<geometry; i++) bonded_to[i].atom1 = bonded_to[i].atom2 = nullptr;
 
                     Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
                     location = aloc;
@@ -669,7 +669,7 @@ void Atom::fetch_bonds(Bond** result)
 
         for (i=0; i<geometry; i++)
         {
-            if (abs((__int64_t)(this) - (__int64_t)bonded_to[i].atom1) > memsanity) break;
+            if (abs((__int64_t)(this) - (__int64_t)bonded_to[i].atom1) > memsanity) bonded_to[i].atom1 = nullptr;
             if (!bonded_to[i].atom1) continue;
             if (!bonded_to[i].atom1->Z) continue;
             result[i] = &bonded_to[i];
@@ -2033,6 +2033,8 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
     // #259 fix:
     for (i=0; i<geometry; i++)
     {
+        if (abs((__int64_t)(this) - (__int64_t)bonded_to[i].atom1) > memsanity) bonded_to[i].atom1 = nullptr;
+        if (abs((__int64_t)(this) - (__int64_t)bonded_to[i].atom2) > memsanity) bonded_to[i].atom2 = nullptr;
         if (bonded_to[i].atom2)
         {
             Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].atom2->location, location);

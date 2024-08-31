@@ -78,7 +78,6 @@ public:
     void delete_sidechain(int resno);
     void delete_residues(int startres, int endres);
     void delete_sidechains(int startres, int endres);
-    MetalCoord* coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames);
     std::vector<MCoord> coordinate_metal(std::vector<MCoord> mtlcoords);
     void set_region(std::string name, int start, int end);
     void set_bw50(int helixno, int resno);

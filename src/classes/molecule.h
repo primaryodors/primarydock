@@ -135,7 +135,7 @@ public:
     std::vector<Atom*> longest_dimension();
     float get_atom_bond_length_anomaly(Atom* atom, Atom* ignore = nullptr);
     float evolve_structure(int generations = _evolution_default_generations, float mutation_rate = _default_mutation_rate, int pop_size = _default_population_size);
-    void compute_lm_from_recent_clashes();
+    void increment_lm(SCoord vector_to_add);
     void shape_has_changed();
 
     // Atom functions.

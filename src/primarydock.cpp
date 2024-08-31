@@ -14,6 +14,7 @@ Protein* protein;
 Molecule* ligand;
 bool progressbar = true;
 bool output_each_iter = false;
+bool flex = true;
 int movie_offset = 0;
 int poses = 10;
 int pose = 1;
@@ -21,6 +22,7 @@ int nodeno = 0;
 float elim = -0.01;
 char* protfname;
 AminoAcid* reaches_spheroid[10][SPHREACH_MAX+16];
+AminoAcid* priorities[64];
 int spinchr = 0;
 float hueoffset = 0;
 bool kcal = false;
@@ -111,6 +113,21 @@ void output_iter(int iter, Molecule** mols)
 
 void iteration_callback(int iter, Molecule** mols)
 {
+    int i;
+    for (i=0; priorities[i]; i++)
+    {
+        Atom *a, *b;
+        priorities[i]->mutual_closest_atoms(ligand, &a, &b);
+        float r = a->distance_to(b);
+        float opt = InteratomicForce::optimal_distance(a, b);
+        if (r > opt)
+        {
+            Point pt = a->get_location().subtract(b->get_location());
+            pt.multiply(0.333);
+            ligand->increment_lm(pt);
+        }
+    }
+
     if (output_each_iter) output_iter(iter, mols);
 }
 
@@ -147,6 +164,7 @@ int main(int argc, char** argv)
     // Splash
     cout << "\n                                                                                      __       ____  \npppp                                            ddd                  k            ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n";
 
+    Point size(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF);
     bool verbose = false;
     int iters = 50;
     Protein p("TheProtein");
@@ -158,7 +176,8 @@ int main(int argc, char** argv)
 
     FILE* fp;
 
-    int i, j, l;
+    int i, j, k, l, n;
+    for (i=0; i<64; i++) priorities[i] = nullptr;
     for (i=1; i<argc; i++)
     {
         if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--prot") || !strcmp(argv[i], "--protein"))
@@ -209,6 +228,7 @@ int main(int argc, char** argv)
             }
 
             i++;
+            l = 0;
             while (i < argc)
             {
                 if (argv[i][0] == '-')
@@ -219,7 +239,12 @@ int main(int argc, char** argv)
                 int resno = interpret_resno(argv[i]);
                 if (!resno) continue;
                 AminoAcid* aa = p.get_residue(resno);
-                if (aa) aa->priority = true;
+                if (aa)
+                {
+                    aa->priority = true;
+                    if (l<60) priorities[l++] = aa;
+                    priorities[l] = nullptr;
+                }
                 i++;
             }
         }
@@ -303,6 +328,10 @@ int main(int argc, char** argv)
         {
             i++;
             strcpy(outfile, argv[i]);
+        }
+        else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--rigid"))
+        {
+            flex = false;
         }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--movie"))
         {
@@ -538,8 +567,62 @@ int main(int argc, char** argv)
             if (aa) residue_candidates[pose-1][i].restore_state(aa);
         }
 
-        result[pose-1] = new DockResult(protein, ligand, Point(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF), nullptr, pose);
+        result[pose-1] = new DockResult(protein, ligand, size, nullptr, pose);
         result[pose-1]->energy_mult = kcal ? _kcal_per_kJ : 1;
+        
+        std::ostringstream pdbdat;
+        n = ligand->get_atom_count();
+        int offset = n;
+
+        for (l=0; l<n; l++)
+        {
+            Atom* a = ligand->get_atom(l);
+            if (!a) continue;
+            a->residue = pose;
+            a->stream_pdb_line(pdbdat, 9000+l, true);
+        }
+
+        int sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligand->get_barycenter(), size);
+
+        int resno;
+        for (resno = protein->get_start_resno(); resno <= seqlen; resno++)
+        {
+            AminoAcid* laa = protein->get_residue(resno);
+            if (!laa) continue;
+            if (!flex || !laa->been_flexed)
+            {
+                if (laa->distance_to(ligand) > 5) continue;
+                for (k=0; reaches_spheroid[nodeno][k]; k++)
+                {
+                    if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
+                    if (reaches_spheroid[nodeno][k] == laa) goto _afterall;
+                }
+                continue;
+            }
+            _afterall:
+            n = laa->get_atom_count();
+            for (l=0; l<n; l++)
+            {
+                laa->get_atom(l)->stream_pdb_line(
+                    pdbdat,
+                    laa->atno_offset+l
+                );
+            }
+        }
+
+        if (mtlcoords.size())
+        {
+            for (l=0; l<mtlcoords.size(); l++)
+            {
+                mtlcoords[l].mtl->stream_pdb_line(
+                    pdbdat,
+                    9000+offset+l
+                );
+            }
+            offset += l;
+        }
+
+        result[pose-1]->pdbdat = pdbdat.str();
     }
 
 
@@ -595,9 +678,18 @@ int main(int argc, char** argv)
         j = sortidx[i];
         if (j<0) break;
 
+        cout << "Pose: " << pose << endl << "Node: " << 0 << endl;
+        if (output) *output << "Pose: " << pose << endl << "Node: " << 0 << endl;
+
+        result[j]->include_pdb_data = (output == nullptr);
         cout << *result[j] << endl << endl;
+        result[j]->include_pdb_data = true;
         if (output) *output << *result[j] << endl << endl;
     }
+
+    cout << i << " pose" << (i==1?"":"s") << " found." << endl;
+    if (i) cout << "Best energy: " << (-result[sortidx[0]]->kJmol*result[sortidx[0]]->energy_mult) << " "
+        << (kcal?"kcal/mol":"kJ/mol") << "." << endl;
 
     time_t finished = time(NULL);
     cout << "\nCalculation took: " << (finished-began) << " seconds." << endl;

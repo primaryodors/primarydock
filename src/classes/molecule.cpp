@@ -3045,14 +3045,6 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             lmx += lmpull * mc.x * mc_bpotential / mcrr;
                             lmy += lmpull * mc.y * mc_bpotential / mcrr;
                             lmz += lmpull * mc.z * mc_bpotential / mcrr;
-                            lc = sqrt(lmx*lmx+lmy*lmy+lmz*lmz);
-                            if (lc > speed_limit)
-                            {
-                                lc = speed_limit / lc;
-                                lmx *= lc;
-                                lmy *= lc;
-                                lmz *= lc;
-                            }
                         }
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
@@ -3062,6 +3054,14 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     }
     // cout << "Total: " << kJmol << endl;
     // cout << endl;
+    float lc = sqrt(lmx*lmx+lmy*lmy+lmz*lmz);
+    if (lc > speed_limit)
+    {
+        lc = speed_limit / lc;
+        lmx *= lc;
+        lmy *= lc;
+        lmz *= lc;
+    }
 
     return kJmol;
 }
@@ -3631,6 +3631,22 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters, float od)
     }
 }
 
+void Molecule::increment_lm(SCoord v)
+{
+    Point pt(v);
+    lmx += pt.x;
+    lmy += pt.y;
+    lmz += pt.z;
+    float m = sqrt(lmx*lmx+lmy*lmy+lmz*lmz);
+    if (m > speed_limit)
+    {
+        m = speed_limit/m;
+        lmx *= m;
+        lmy *= m;
+        lmz *= m;
+    }
+}
+
 float Molecule::total_intermol_binding(Molecule** l)
 {
     int i;
@@ -3719,7 +3735,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
 
                 benerg = cfmol_multibind(a, nearby);
-                if (motion.magnitude() > 0.01*speed_limit)
+                if (motion.magnitude() > 0.001*speed_limit)
                 {
                     pib.copy_state(a);
                     motion.scale(motion.magnitude()/lmsteps);

@@ -9,7 +9,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     int i, j, l, sr = p->get_start_resno(), er = p->get_end_resno();
     float x, y, z, step;
     Point pcen = p->get_region_center(sr, er), pbox = p->get_region_bounds(sr, er);
-    step = pbox.magnitude() / 30;
+    step = 1.8;
     AminoAcid* can_clash[SPHREACH_MAX+4];
     Molecule dummy("DUMMY");
     dummy.add_atom("H", "H1", nullptr, 0);
@@ -72,6 +72,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     j=0;
     for (i=0; i<pmax; i++)
     {
+        if (parts[i].s.center.magnitude() == 0) break;
         bool glommed = false;
         for (l=0; l<j; l++)
         {
@@ -89,7 +90,6 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
         {
             tmpcav[j++].add_partial(parts[i]);
         }
-        // if (j >= cmax-1) break;
         if (j >= 4090) break;
     }
 
@@ -97,7 +97,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     j=0;
     for (i=0; i<l; i++)
     {
-        if (tmpcav[i].count_partials() >= 10) cavs[j++] = tmpcav[i];
+        if (tmpcav[i].count_partials() >= 7) cavs[j++] = tmpcav[i];
         if (j >= cmax-1) break;
     }
 
@@ -129,6 +129,8 @@ void Cavity::add_partial(CPartial p)
         pallocd = 256;
         partials = new CPartial[pallocd+4];
     }
+
+    if (!p.s.center.x && !p.s.center.y && !p.s.center.z) return;
 
     int i, j;
     for (i=0; i<pallocd; i++) if (partials[i].s.radius < min_partial_radius) break;             // Get count.
@@ -192,7 +194,7 @@ void Cavity::output_ngl_js(FILE* fp)
     fprintf(fp, "} );\n");
     fprintf(fp, "shape.addBuffer( sphereBuffer );\n");
     fprintf(fp, "var shapeComp = stage.addComponentFromObject( shape );\n");
-    fprintf(fp, "shapeComp.addRepresentation( \"buffer\" );\n");
+    fprintf(fp, "shapeComp.addRepresentation( \"buffer\", { opacity: 0.3 } );\n");
     // fprintf(fp, "shapeComp.autoView();\n");
     fprintf(fp, "\n");
 }
@@ -203,4 +205,100 @@ int Cavity::count_partials()
     int i;
     for (i=0; i<pallocd; i++) if (partials[i].s.radius < min_partial_radius) return i;
     return 0;
+}
+
+Point Cavity::get_center()
+{
+    if (!pallocd) return Point(0,0,0);
+    int i, j=0;
+    Point foravg[pallocd+4];
+    for (i=0; i<pallocd; i++)
+    {
+        if (partials[i].s.radius < min_partial_radius) break;
+        foravg[j] = partials[i].s.center;
+        foravg[j].weight = partials[i].s.radius;
+        j++;
+    }
+
+    return average_of_points(foravg, j);
+}
+
+CPartial* Cavity::point_inside_pocket(Point pt)
+{
+    if (!pallocd) return nullptr;
+    int i;
+    for (i=0; i<pallocd; i++)
+    {
+        if (partials[i].s.radius < min_partial_radius) break;
+        float r = partials[i].s.center.get_3d_distance(pt);
+        if (r < partials[i].s.radius) return &partials[i];
+    }
+
+    return nullptr;
+}
+
+float Cavity::containment_violations(Molecule* m)
+{
+    const Point* vertices = m->obtain_vdW_surface(20);
+    if (!vertices) return 0;
+    Atom** va = m->get_vdW_vertex_atoms();
+
+    int i;
+    float viol = 0;
+    for (i=0; vertices[i].x || vertices[i].y || vertices[i].z; i++)
+    {
+        CPartial* cp = point_inside_pocket(vertices[i]);
+        int Z = va[i]->get_Z();
+        if (!cp)
+        {
+            viol += (Z > 1) ? 1 : 0.5;
+        }
+        else
+        {
+            if (cp->metallic && Z==16) viol -= 10;
+            if (cp->chargedn && va[i]->get_charge() >  hydrophilicity_cutoff) viol -= 5;
+            if (cp->chargedp && va[i]->get_charge() < -hydrophilicity_cutoff) viol -= 5;
+            if (cp->polar && fabs(va[i]->is_polar()) > hydrophilicity_cutoff) viol -= 2;
+        }
+    }
+
+    return viol;
+}
+
+float Cavity::find_best_containment(Molecule* m)
+{
+    Point cen = get_center();
+    m->recenter(cen);
+    Pose best(m);
+    float bestviol = containment_violations(m);
+
+    Point axes[3];
+    axes[0] = Point(1,0,0);
+    axes[1] = Point(0,1,0);
+    axes[2] = Point(0,0,1);
+    int i, j, l;
+    float theta;
+    for (l=0; l<10; l++)
+    {
+        for (j=0; j<3; j++)
+        {
+            LocatedVector lv = (SCoord)axes[j];
+            lv.origin = cen;
+            for (; theta < M_PI*2; theta += cav_360_step)
+            {
+                float viol = containment_violations(m);
+                if (viol < bestviol)
+                {
+                    best.copy_state(m);
+                    bestviol = viol;
+                    if (!viol) return viol;         // Can't improve on zero.
+                }
+
+                m->rotate(lv, cav_360_step);
+            }
+            best.restore_state(m);
+        }
+    }
+
+    return bestviol;
 }

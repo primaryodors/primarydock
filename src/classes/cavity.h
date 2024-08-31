@@ -3,8 +3,9 @@
 #ifndef _CAVITY
 #define _CAVITY
 
-#define min_partial_radius 1.5
+#define min_partial_radius 1.0
 #define min_dist_bounding_box 11
+#define cav_360_step fiftyseventh*0.5
 
 struct CPartial
 {
@@ -25,6 +26,10 @@ class Cavity
     void add_partial(CPartial p);
     void output_ngl_js(FILE* fp);
     int count_partials();
+    Point get_center();
+    CPartial* point_inside_pocket(Point pt);
+    float containment_violations(Molecule* m);
+    float find_best_containment(Molecule* m);
 
     protected:
     CPartial* partials = nullptr;

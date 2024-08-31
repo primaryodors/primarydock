@@ -54,22 +54,8 @@ if ($disulfs) $disulfs = "    def special_patches(self, aln):\n$disulfs";
 
 $mdlcls = "DOPEHRLoopModel";
 
-$pdbname_5k1 = "1015_MM_1_IFD3_cmpd1_1.pdb";
-
-if (!file_exists("$pdbname_5k1"))
-{
-    $copyfrom = "../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb";
-    if (file_exists($copyfrom))
-    {
-        copy($copyfrom, $pdbname_5k1);
-    }
-    else echo "Warning: Third party OR5K1 model not found. Some olfactory receptors might fail homology modeling.\n"
-        ."Please install https://github.com/dipizio/OR5K1_binding_site and unzip the OR5K1_IFD3_models.zip archive.\n";
-}
-
 exec("php -f build_alignment_file.php");
 
-$OR5K1  = "'1015'";
 $CLASSI = "'8f76', '8hti'";
 $CLASSII = "'OR1B1', 'OR1G1', 'OR2J2', 'OR5AC2', 'OR6C70', 'OR8D1', 'OR10X1', 'OR14J1'";
 $CLASSII_tight = "'OR2M7', 'OR2T11'";
@@ -116,11 +102,6 @@ switch ($fam)
     case 'OR2':
     if (substr($rcpid, 0, 4) == "OR2M" || substr($rcpid, 0, 4) == "OR2T" || substr($rcpid, 0, 4) == "OR2V") $knowns = $CLASSII_tight;
     else $knowns = $CLASSII;
-    break;
-
-    case 'OR5':
-    if (!file_exists("$pdbname_5k1")) die("Modeling this receptor requires the third party OR5K1 template.\n");
-    else $knowns = "$OR5K1, $CLASSII";
     break;
 
     default:        // Class II ORs

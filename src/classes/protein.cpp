@@ -1416,6 +1416,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;
+            if (sphres >= SPHREACH_MAX-2) break;
             continue;
         }
 
@@ -1437,6 +1438,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                             *debug << std::hex << s.n << std::dec << " " << flush;
                         }
                         #endif
+                        if (sphres >= SPHREACH_MAX-2) break;
                     }
                     continue;
                 }
@@ -1457,6 +1459,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;
+            if (sphres >= SPHREACH_MAX-2) break;
             continue;
         }
 
@@ -1480,6 +1483,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                             *debug << std::hex << s.n << std::dec << " " << flush;
                         }
                         #endif
+                        if (sphres >= SPHREACH_MAX-2) break;
                     }
                     continue;
                 }

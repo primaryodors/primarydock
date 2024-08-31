@@ -209,6 +209,7 @@ void Pose::restore_state(Molecule* m)
     {
         m->atoms[i]->move(saved_atom_locs[i]);
     }
+    m->shape_has_changed();
 }
 
 float Pose::total_atom_motions()
@@ -2605,6 +2606,17 @@ void Molecule::recenter(Point nl)
     Point rel = nl.subtract(&loc);
     SCoord v(&rel);
     move(v);
+
+    if (vdw_surface && vdw_vertex_count)
+    {
+        int i;
+        for (i=0; i<vdw_vertex_count; i++)
+        {
+            Point loc = vdw_surface[i];
+            Point rel = nl.subtract(&loc);
+            vdw_surface[i] = rel;
+        }
+    }
 }
 
 void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
@@ -2633,6 +2645,16 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
         Point loc = atoms[i]->get_location();
         Point nl  = rotate3D(&loc, &cen, SCoord, theta);
         atoms[i]->move(&nl);
+    }
+
+    if (vdw_surface && vdw_vertex_count)
+    {
+        for (i=0; i<vdw_vertex_count; i++)
+        {
+            Point loc = vdw_surface[i];
+            Point nl  = rotate3D(&loc, &cen, SCoord, theta);
+            vdw_surface[i] = nl;
+        }
     }
 
     #if _dbg_improvements_only_rule
@@ -2671,6 +2693,16 @@ void Molecule::rotate(LocatedVector lv, float theta)
         Point loc = atoms[i]->get_location();
         Point nl  = rotate3D(&loc, &lv.origin, &lv, theta);
         atoms[i]->move(&nl);
+    }
+
+    if (vdw_surface && vdw_vertex_count)
+    {
+        for (i=0; i<vdw_vertex_count; i++)
+        {
+            Point loc = vdw_surface[i];
+            Point nl  = rotate3D(&loc, &lv.origin, &lv, theta);
+            vdw_surface[i] = nl;
+        }
     }
 
     #if _dbg_improvements_only_rule

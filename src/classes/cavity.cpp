@@ -9,11 +9,11 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     int i, j, l, sr = p->get_start_resno(), er = p->get_end_resno();
     float x, y, z, step;
     Point pcen = p->get_region_center(sr, er), pbox = p->get_region_bounds(sr, er);
-    step = 1.8;
+    step = cav_xyz_step;
     AminoAcid* can_clash[SPHREACH_MAX+4];
     Molecule dummy("DUMMY");
     dummy.add_atom("H", "H1", nullptr, 0);
-    Point size(_INTERA_R_CUTOFF/2, _INTERA_R_CUTOFF/2, _INTERA_R_CUTOFF/2);
+    Point size(_INTERA_R_CUTOFF/1.5, _INTERA_R_CUTOFF/1.5, _INTERA_R_CUTOFF/1.5);
     CPartial parts[65536];
     j=0;
 
@@ -28,10 +28,9 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                 Point pt(x,y,z);
                 dummy.recenter(pt);
                 int sphres = p->get_residues_can_clash_ligand(can_clash, &dummy, pt, size, nullptr);
-                if (sphres < 7) continue;          // Too isolated.
+                if (sphres < 8) continue;          // Too isolated.
                 float rmin;
                 CPartial working;
-                int ci = -1;
                 for (i=0; i<sphres; i++)
                 {
                     Atom* a = can_clash[i]->get_nearest_atom(pt);
@@ -39,19 +38,20 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                     if (r < rmin || !i)
                     {
                         rmin = r;
-                        ci = i;
                     }
                     if (r < min_partial_radius) break;
-                }
 
-                if (ci >= 0)
-                {
-                    if (can_clash[ci]->coordmtl) working.metallic = true;
-                    if (can_clash[ci]->get_charge() < -hydrophilicity_cutoff) working.chargedn = true;
-                    if (can_clash[ci]->get_charge() >  hydrophilicity_cutoff) working.chargedp = true;
-                    if (can_clash[ci]->pi_stackability() >= 0.2) working.pi = true;
-                    if (fabs(can_clash[ci]->hydrophilicity()) > hydrophilicity_cutoff) working.polar = true;
-                    if (can_clash[ci]->count_atoms_by_element("S")) working.thio = true;
+                    Atom* CB = can_clash[i]->get_atom("CB");
+                    if (CB && a->get_location().get_3d_distance(CB->get_location()) 
+                        < a->get_location().get_3d_distance(can_clash[i]->get_CA_location()))
+                    {
+                        if (can_clash[i]->coordmtl) working.metallic = true;
+                        if (can_clash[i]->get_charge() < -hydrophilicity_cutoff) working.chargedn = true;
+                        if (can_clash[i]->get_charge() >  hydrophilicity_cutoff) working.chargedp = true;
+                        if (can_clash[i]->pi_stackability() >= 0.2) working.pi = true;
+                        if (fabs(can_clash[i]->hydrophilicity()) > hydrophilicity_cutoff) working.polar = true;
+                        if (can_clash[i]->count_atoms_by_element("S")) working.thio = true;
+                    }
                 }
 
                 if (rmin >= min_partial_radius)
@@ -77,7 +77,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
         for (l=0; l<j; l++)
         {
             float inter = tmpcav[l].partial_intersects_cavity(parts[i]);
-            if (inter >= 2.5)
+            if (inter >= cav_linking_threshold)
             {
                 tmpcav[l].add_partial(parts[i]);
                 glommed = true;
@@ -97,7 +97,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     j=0;
     for (i=0; i<l; i++)
     {
-        if (tmpcav[i].count_partials() >= 7) cavs[j++] = tmpcav[i];
+        if (tmpcav[i].count_partials() >= cav_min_partials) cavs[j++] = tmpcav[i];
         if (j >= cmax-1) break;
     }
 
@@ -255,10 +255,10 @@ float Cavity::containment_violations(Molecule* m)
         }
         else
         {
-            if (cp->metallic && Z==16) viol -= 10;
-            if (cp->chargedn && va[i]->get_charge() >  hydrophilicity_cutoff) viol -= 5;
-            if (cp->chargedp && va[i]->get_charge() < -hydrophilicity_cutoff) viol -= 5;
-            if (cp->polar && fabs(va[i]->is_polar()) > hydrophilicity_cutoff) viol -= 2;
+            if (cp->metallic && Z==16) viol -= 1.00;
+            if (cp->chargedn && va[i]->get_charge() >  hydrophilicity_cutoff) viol -= .50;
+            if (cp->chargedp && va[i]->get_charge() < -hydrophilicity_cutoff) viol -= .50;
+            if (cp->polar && fabs(va[i]->is_polar()) > hydrophilicity_cutoff) viol -= .25;
         }
     }
 
@@ -278,7 +278,7 @@ float Cavity::find_best_containment(Molecule* m)
     axes[2] = Point(0,0,1);
     int i, j, l;
     float theta;
-    for (l=0; l<10; l++)
+    for (l=0; l<30; l++)
     {
         for (j=0; j<3; j++)
         {
@@ -291,13 +291,30 @@ float Cavity::find_best_containment(Molecule* m)
                 {
                     best.copy_state(m);
                     bestviol = viol;
-                    if (!viol) return viol;         // Can't improve on zero.
                 }
 
                 m->rotate(lv, cav_360_step);
             }
             best.restore_state(m);
         }
+
+        for (j=0; j<=26; j++)
+        {
+            Point maybe = cen;
+            maybe.x += 0.5 * (j%3-1);
+            maybe.y += 0.5 * ((j/3)%3-1);
+            maybe.z += 0.5 * j/9;
+
+            m->recenter(maybe);
+            float viol = containment_violations(m);
+            if (viol < bestviol)
+            {
+                best.copy_state(m);
+                bestviol = viol;
+                if (!viol) return viol;
+            }
+        }
+        best.restore_state(m);
     }
 
     return bestviol;

@@ -10,6 +10,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+    bool verbose = false;
     Protein p("TheProtein");
 
     FILE* fp;
@@ -64,8 +65,9 @@ int main(int argc, char** argv)
                 for (i=0; i<qfound; i++)
                 {
                     Point cavcen = cavities[i].get_center();
-                    if (cavcen.y < 0 || cavcen.y > 15) continue;
+                    if (cavcen.y < 5 || cavcen.y > 18) continue;
                     float viol = cavities[i].find_best_containment(&m);
+                    if (verbose) cout << endl << "Cavity centered at " << cavcen << " has " << viol << " containment violations";
                     if (viol < bestviol)
                     {
                         best.copy_state(&m);

@@ -4,6 +4,7 @@
 #define _CAVITY
 
 #define min_partial_radius 1.5
+#define min_dist_bounding_box 11
 
 struct CPartial
 {
@@ -23,6 +24,7 @@ class Cavity
     float partial_intersects_cavity(CPartial p);
     void add_partial(CPartial p);
     void output_ngl_js(FILE* fp);
+    int count_partials();
 
     protected:
     CPartial* partials = nullptr;

@@ -268,7 +268,7 @@ float Cavity::containment_violations(Molecule* m)
         }
         else
         {
-            float coefficient = cp->priority ? 5 : 1;
+            float coefficient = cp->priority ? 50 : 1;
             if (cp->metallic && Z==16) viol -= 1.00*coefficient;
             if (cp->chargedn && va[i]->get_charge() >  hydrophilicity_cutoff) viol -= .50*coefficient;
             if (cp->chargedp && va[i]->get_charge() < -hydrophilicity_cutoff) viol -= .50*coefficient;

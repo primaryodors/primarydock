@@ -24,6 +24,7 @@ AminoAcid* reaches_spheroid[10][SPHREACH_MAX+16];
 int spinchr = 0;
 float hueoffset = 0;
 bool kcal = false;
+char outfile[1024];
 
 int interpret_resno(const char* field)
 {
@@ -143,6 +144,9 @@ void update_progressbar(float percentage)
 
 int main(int argc, char** argv)
 {
+    // Splash
+    cout << "                                                                                      __       __\npppp                                            ddd                  k            ,-_/  `-_--_/  \\\np   p         i                                 d  d                 k            )              (__\np   p                                           d   d                k           )   ()    __/      \\\npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/   /\np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\  (\np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      ijk        \\    ()      _      )\np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __   / \\    /\np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `-'   \\___)\n                                             y\n                                       yyyyyy\n\n";
+
     bool verbose = false;
     int iters = 50;
     Protein p("TheProtein");
@@ -150,6 +154,7 @@ int main(int argc, char** argv)
     char buffer[65536];
     protein = &p;
     ligand = &m;
+    outfile[0] = 0;
 
     FILE* fp;
 
@@ -294,6 +299,11 @@ int main(int argc, char** argv)
             i++;
             poses = atoi(argv[i]);
         }
+        else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--out"))
+        {
+            i++;
+            strcpy(outfile, argv[i]);
+        }
         else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--movie"))
         {
             output_each_iter = true;
@@ -315,7 +325,7 @@ int main(int argc, char** argv)
         {
             cout << "Usage:" << endl << endl;
             cout << "bin/primarydock -p path/to/protein.pdb -l path/to/ligand.sdf [-b binding site residues [-i iters [other options]]]" << endl << endl;
-            cout << "Options can occur in any sequence except -b cannot precede -p." << endl << endl;
+            cout << "Options can occur in any sequence except -p must occur before -b and -m." << endl << endl;
             cout << "OPTIONS:" << endl;
             cout << "-b, --bsr\tSpecify binding site residues." << endl;
             cout << "\t\tCan be specified as residue numbers, e.g. -b 104 255," << endl;
@@ -338,7 +348,15 @@ int main(int argc, char** argv)
 
             cout << "-l, --ligand\tSpecifies a file in SDF format for the ligand to be docked." << endl << endl;
 
+            cout << "-m, --metal\tSpecifies a metal coordination site. Can occur multiple times." << endl;
+            cout << "\t\tThe format is: -m element_symbol charge coordinating_residues." << endl;
+            cout << "\t\tExample: -m Cu +1 M5.36 C5.42 C5.43." << endl;
+            cout << "\t\tEither sequence numbers or BW numbers can be used, and the amino acid" << endl;
+            cout << "\t\tletters are optional." << endl << endl;
+
             cout << "-n, --poses\tSets the maximum number of output poses." << endl << endl;
+
+            cout << "-o, --out\tSpecifies an output filename for dock results." << endl << endl;
 
             cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be docked." << endl << endl;
 
@@ -356,10 +374,13 @@ int main(int argc, char** argv)
         cout << "No protein specified." << endl;
         return -1;
     }
+    int seqlen = p.get_end_resno();
 
     ////////////////////////////////////////////////////////////////////////////
     // Phase I: Cavity Search.                                                //
     ////////////////////////////////////////////////////////////////////////////
+
+    time_t began = time(NULL);
 
     Cavity cavities[1029];
     int qfound = Cavity::scan_in_protein(&p, cavities, 1024);
@@ -382,6 +403,7 @@ int main(int argc, char** argv)
     // Phase II: Fleximer Search.                                             //
     ////////////////////////////////////////////////////////////////////////////
 
+    Pose best(&m), secondbest(&m), thirdbest(&m);
     if (m.get_atom_count())
     {
         Pose fleximers[10];
@@ -391,8 +413,7 @@ int main(int argc, char** argv)
             fleximers[i].copy_state(&m);
         }
 
-        Pose best(&m);
-        float bestviol = Avogadro;
+        float bestviol = Avogadro, bestviol2 = Avogadro, bestviol3 = Avogadro;
         cout << "Trying ligand in pockets..." << flush;
         for (j=0; j<10; j++)
         {
@@ -405,8 +426,24 @@ int main(int argc, char** argv)
                 if (verbose) cout << endl << "Cavity centered at " << cavcen << " has a score of " << viol;
                 if (viol < bestviol)
                 {
+                    thirdbest = secondbest;
+                    secondbest = best;
                     best.copy_state(&m);
+                    bestviol3 = bestviol2;
+                    bestviol2 = bestviol;
                     bestviol = viol;
+                }
+                else if (viol < bestviol2)
+                {
+                    thirdbest = secondbest;
+                    secondbest.copy_state(&m);
+                    bestviol3 = bestviol2;
+                    bestviol2 = viol;
+                }
+                else if (viol < bestviol3)
+                {
+                    thirdbest.copy_state(&m);
+                    bestviol3 = viol;
                 }
                 cout << "." << flush;
             }
@@ -434,23 +471,131 @@ int main(int argc, char** argv)
     // Phase III: Refinement.                                                 //
     ////////////////////////////////////////////////////////////////////////////
 
-    int sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligand->get_barycenter(),
-        Point(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF));
-    Molecule* cfmols[sphres+8];
-    j=0;
-    cfmols[j++] = ligand;
-    Molecule* met = p.metals_as_molecule();
-    if (met) cfmols[j++] = met;
-    for (i=0; i<sphres; i++) cfmols[j++] = reinterpret_cast<Molecule*>(reaches_spheroid[nodeno][i]);
-    cfmols[j] = nullptr;
-    cout << "Refining fit..." << endl << flush;
-    if (output_each_iter) output_iter(0, cfmols);
-    Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
+    Pose residue_init[seqlen+1];
+    for (i=1; i<=seqlen; i++)
+    {
+        AminoAcid* aa = protein->get_residue(i);
+        if (aa) residue_init[i].copy_state(aa);
+    }
 
+    cout << "Generating poses and refining..." << endl << endl << flush;
+    Pose candidates[poses];
+    Pose residue_candidates[poses][seqlen+1];
+    for (pose=1; pose<=poses; pose++)
+    {
+        j = (rand() % 3);
+
+        if (j==0) best.restore_state(ligand);
+        else if (j==1) secondbest.restore_state(ligand);
+        else thirdbest.restore_state(ligand);
+        for (i=1; i<=seqlen; i++)
+        {
+            AminoAcid* aa = protein->get_residue(i);
+            if (aa) residue_init[i].restore_state(aa);
+        }
+
+        int sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligand->get_barycenter(),
+            Point(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF));
+        
+        Molecule* cfmols[sphres+8];
+        j=0;
+        cfmols[j++] = ligand;
+        Molecule* met = p.metals_as_molecule();
+        if (met) cfmols[j++] = met;
+        for (i=0; i<sphres; i++) cfmols[j++] = reinterpret_cast<Molecule*>(reaches_spheroid[nodeno][i]);
+        cfmols[j] = nullptr;
+
+        if (output_each_iter) output_iter(0, cfmols);
+        Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
+
+        candidates[pose-1].copy_state(ligand);
+        for (i=1; i<=seqlen; i++)
+        {
+            AminoAcid* aa = protein->get_residue(i);
+            if (aa) residue_candidates[pose-1][i].copy_state(aa);
+        }
+    }
+
+    /*
     fp = fopen("tmp/refined.pdb", "wb");
     if (!fp) return -1;
     p.save_pdb(fp, &m);
     cout << "Saved output file in tmp/." << endl;
+    */
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Phase IV: Scoring.                                                     //
+    ////////////////////////////////////////////////////////////////////////////
+
+    DockResult* result[poses];
+    for (pose=1; pose<=poses; pose++)
+    {
+        candidates[pose-1].restore_state(ligand);
+        for (i=1; i<=seqlen; i++)
+        {
+            AminoAcid* aa = protein->get_residue(i);
+            if (aa) residue_candidates[pose-1][i].restore_state(aa);
+        }
+
+        result[pose-1] = new DockResult(protein, ligand, Point(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF), nullptr, pose);
+        result[pose-1]->energy_mult = kcal ? _kcal_per_kJ : 1;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Phase V: Filtering.                                                    //
+    ////////////////////////////////////////////////////////////////////////////
+
+    bool meets_criteria[poses];
+    for (pose=1; pose<=poses; pose++)
+    {
+        meets_criteria[pose-1] = (-result[pose-1]->kJmol*result[pose-1]->energy_mult) < elim;
+        if (-result[pose-1]->worst_nrg_aa > clash_limit_per_aa) meets_criteria[pose-1] = false;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Phase VI: Sorting.                                                     //
+    ////////////////////////////////////////////////////////////////////////////
+
+    int sortidx[poses];
+    float sorted[poses];
+    for (i=0; i<poses; i++)
+    {
+        sortidx[i] = -1;
+        for (j=0; j<poses; j++)
+        {
+            if (!meets_criteria[j]) continue;
+            float e = -result[j]->kJmol;
+            if ((!j || e < sorted[i]) && (!i || e >= sorted[i-1]) && (!i || j != sortidx[i-1]))
+            {
+                sorted[i] = e;
+                sortidx[i] = j;
+            }
+        }
+    }
+
+    for (i=0; i<poses; i++) cout << i << ": index " << sortidx[i] << " energy " << sorted[i] << endl;
+
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Phase VII: Output generation.                                          //
+    ////////////////////////////////////////////////////////////////////////////
+
+    std::ofstream *output = nullptr;
+    if (outfile[0]) output = new std::ofstream(outfile, std::ofstream::out);
+    for (i=0; i<poses; i++)
+    {
+        pose = i+1;
+        j = sortidx[i];
+
+        cout << *result[j] << endl << endl;
+        if (output) *output << *result[j] << endl << endl;
+    }
+
+    time_t finished = time(NULL);
+    cout << "\nCalculation took: " << (finished-began) << " seconds." << endl;
 
     return 0;
 }

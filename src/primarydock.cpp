@@ -145,7 +145,7 @@ void update_progressbar(float percentage)
 int main(int argc, char** argv)
 {
     // Splash
-    cout << "                                                                                      __       __\npppp                                            ddd                  k            ,-_/  `-_--_/  \\\np   p         i                                 d  d                 k            )              (__\np   p                                           d   d                k           )   ()    __/      \\\npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/   /\np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\  (\np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      ijk        \\    ()      _      )\np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __   / \\    /\np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `-'   \\___)\n                                             y\n                                       yyyyyy\n\n";
+    cout << "\n                                                                                      __       ____  \npppp                                            ddd                  k            ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n";
 
     bool verbose = false;
     int iters = 50;
@@ -564,11 +564,15 @@ int main(int argc, char** argv)
     for (i=0; i<poses; i++)
     {
         sortidx[i] = -1;
+        sorted[i] = Avogadro;
         for (j=0; j<poses; j++)
         {
             if (!meets_criteria[j]) continue;
             float e = -result[j]->kJmol;
-            if ((!j || e < sorted[i]) && (!i || e >= sorted[i-1]) && (!i || j != sortidx[i-1]))
+            if (   ((!j) || (e < sorted[i]))
+                && ((!i) || (e >= sorted[i-1]))
+                && ((!i) || (j != sortidx[i-1]))
+               )
             {
                 sorted[i] = e;
                 sortidx[i] = j;
@@ -576,7 +580,7 @@ int main(int argc, char** argv)
         }
     }
 
-    for (i=0; i<poses; i++) cout << i << ": index " << sortidx[i] << " energy " << sorted[i] << endl;
+    // for (i=0; i<poses; i++) cout << i << ": index " << sortidx[i] << " energy " << sorted[i] << endl;
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -589,6 +593,7 @@ int main(int argc, char** argv)
     {
         pose = i+1;
         j = sortidx[i];
+        if (j<0) break;
 
         cout << *result[j] << endl << endl;
         if (output) *output << *result[j] << endl << endl;

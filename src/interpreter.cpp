@@ -1847,6 +1847,34 @@ int main(int argc, char** argv)
                 // if (lig_chain && ligand.get_atom_count()) ligand.hydrogenate();
             }   // HYDRO
 
+            else if (!strcmp(words[0], "DEHYD"))
+            {
+                int resno, endres = working->get_end_resno();
+                cout << "Dehydrogenating...";
+                for (resno=1; resno<=endres; resno++)
+                {
+                    AminoAcid* res = working->get_residue(resno);
+                    if (res)
+                    {
+                        res->dehydrogenate();
+
+                        AminoAcid** rcc = working->get_residues_can_clash(resno);
+                        if (!rcc) continue;
+                        for (n=0; rcc[n]; n++);
+                        Molecule* mols[n+4];
+                        for (i=0; i<=n; i++) mols[i] = (Molecule*)rcc[i];
+                        float f = res->get_intermol_clashes(mols);
+                        if (f >= 5)
+                        {
+                            working->minimize_residue_clashes(resno);
+                        }
+                    }
+                    cout << "." << flush;
+                }
+                cout << endl;
+                // if (lig_chain && ligand.get_atom_count()) ligand.hydrogenate();
+            }   // DEHYD
+
             else if (!strcmp(words[0], "IF"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for IF.");

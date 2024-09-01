@@ -250,6 +250,7 @@ Point average_of_points(Point* points, int count)
     #endif
 
     Point retval(x, y, z);
+    retval.weight = sum;
     return retval;
 }
 

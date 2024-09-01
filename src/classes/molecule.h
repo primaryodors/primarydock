@@ -111,6 +111,7 @@ public:
     int get_bond_count(bool unidirectional) const;
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
+    Atom* get_farthest_atom(Point loc);
     Point get_bounding_box() const;				// Return the +x+y+z vertex of a bounding box, including vdW radii, if center={0,0,0}.
     float get_charge() const;
     int is_residue();
@@ -302,6 +303,7 @@ protected:
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.
     float amx=0,amy=0,amz=0;			// Angular momentum xyz.
+    LocatedVector clash_avoidance_rotlv;
 
     bool from_smiles(char const * smilesstr, Atom* ipreva);
     int smlen = 0;

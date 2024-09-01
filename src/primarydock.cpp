@@ -167,7 +167,7 @@ int main(int argc, char** argv)
     // Splash
     cout << "\n                                                                                      __       ____  \npppp                                            ddd                  k            ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n";
 
-    Point size(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF);
+    Point size(_INTERA_R_CUTOFF*1.333, _INTERA_R_CUTOFF*1.333, _INTERA_R_CUTOFF*1.333);
     int iters = 50;
     Protein p("TheProtein");
     Molecule m("ligand");
@@ -502,8 +502,8 @@ int main(int argc, char** argv)
     Pose best(&m), secondbest(&m), thirdbest(&m);
     if (m.get_atom_count())
     {
-        Pose fleximers[10];
-        for (i=0; i<10; i++)
+        Pose fleximers[ligand_fleximer_count];
+        for (i=0; i<ligand_fleximer_count; i++)
         {
             m.crumple(7.5*fiftyseventh);
             fleximers[i].copy_state(&m);
@@ -511,7 +511,7 @@ int main(int argc, char** argv)
 
         float bestviol = Avogadro, bestviol2 = Avogadro, bestviol3 = Avogadro;
         cout << "Trying ligand fleximers in pockets..." << flush;
-        for (j=0; j<10; j++)
+        for (j=0; j<ligand_fleximer_count; j++)
         {
             fleximers[j].restore_state(&m);
             for (i=0; i<qfound; i++)
@@ -594,8 +594,7 @@ int main(int argc, char** argv)
         }
 
         Point ligcen = ligand->get_barycenter();
-        int sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligcen,
-            Point(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF));
+        int sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligcen, size);
         
         Molecule* cfmols[sphres+8];
         j=0;
@@ -612,6 +611,7 @@ int main(int argc, char** argv)
             bbt = mcoord;
             ligbba = ligand->get_single_most_bindable(bbt);
             resbba = met->get_nearest_atom(ligbba->get_location());
+            ligand->maintain_contact(ligbba, resbba);
         }
         else
         {
@@ -646,7 +646,7 @@ int main(int argc, char** argv)
                 resbba = aa->get_one_most_bindable(bbt);
                 ligbba = ligand->get_single_most_bindable(bbt);
                 float opt = InteratomicForce::optimal_distance(ligbba, resbba);
-                aa->conform_atom_to_location(resbba->name, ligbba->get_location(), opt);
+                // aa->conform_atom_to_location(resbba->name, ligbba->get_location(), opt);
                 ligand->conform_atom_to_location(ligbba->name, resbba->get_location(), opt);
             }
         }
@@ -658,6 +658,9 @@ int main(int argc, char** argv)
             motion.r += r - opt*2;
             ligand->move(motion);
 
+            ligand->maintain_contact(ligbba, resbba);
+            if (resbba->mol) resbba->mol->maintain_contact(resbba, ligbba);
+
             if (test) cout << "Ligand " << ligbba->name << " can " << bbt << " with "
                 << (resbba->mol ? resbba->mol->get_name() : "UNKNOWN")
                 << ":" << resbba->name << "." << endl << endl;
@@ -666,7 +669,7 @@ int main(int argc, char** argv)
 
         if (output_each_iter) output_iter(0, cfmols);
         Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
-        
+
         candidates[pose-1].copy_state(ligand);
         for (i=1; i<=seqlen; i++)
         {
@@ -674,7 +677,7 @@ int main(int argc, char** argv)
             if (aa) residue_candidates[pose-1][i].copy_state(aa);
         }
     }
-    cout << "\033[A|                                                                                                                                     " << endl;
+    cout << "\033[A                                                                                                                                      " << endl;
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -800,6 +803,7 @@ int main(int argc, char** argv)
     if (output) *output << "Ligand: " << ligfname << endl;
     if (output) *output << endl;
 
+    int num_poses = 0;
     for (i=0; i<poses; i++)
     {
         pose = i+1;
@@ -813,6 +817,8 @@ int main(int argc, char** argv)
         cout << *result[j] << endl << endl;
         result[j]->include_pdb_data = true;
         if (output) *output << *result[j];
+
+        num_poses++;
 
         if (pose <= outpdb_poses)
         {
@@ -838,7 +844,7 @@ int main(int argc, char** argv)
         for (i=1; i<=seqlen; i++)
         {
             AminoAcid* aa = protein->get_residue(i);
-            if (aa) residue_candidates[sortidx[0]][i].restore_state(aa);
+            if (aa) residue_candidates[max(0,sortidx[0])][i].restore_state(aa);
         }
 
         FILE* pf = fopen(outfile, "ab");
@@ -848,8 +854,8 @@ int main(int argc, char** argv)
         cout << "PDB appended to output file." << endl;
     }
 
-    cout << i << " pose" << (i==1?"":"s") << " found." << endl;
-    if (i) cout << "Best energy: " << (-result[sortidx[0]]->kJmol*result[sortidx[0]]->energy_mult) << " "
+    cout << num_poses << " pose" << (i==1?"":"s") << " found." << endl;
+    if (num_poses) cout << "Best energy: " << (-result[sortidx[0]]->kJmol*result[sortidx[0]]->energy_mult) << " "
         << (kcal?"kcal/mol":"kJ/mol") << "." << endl;
 
     time_t finished = time(NULL);

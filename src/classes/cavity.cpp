@@ -99,7 +99,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
         if (j >= 4090) break;
     }
 
-    if (any_priority) cout << "Priority residues found." << endl;
+    // if (any_priority) cout << "Priority residues found." << endl;
     l=j;
     j=0;
     for (i=0; i<l; i++)

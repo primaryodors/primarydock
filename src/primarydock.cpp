@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <cstring>
+#include <regex>
 #include "classes/cavity.h"
 #include "classes/group.h"
 #include "classes/scoring.h"
@@ -21,12 +22,14 @@ int pose = 1;
 int nodeno = 0;
 float elim = -0.01;
 char* protfname;
+char* ligfname;
 AminoAcid* reaches_spheroid[10][SPHREACH_MAX+16];
 AminoAcid* priorities[64];
 int spinchr = 0;
 float hueoffset = 0;
 bool kcal = false;
 char outfile[1024];
+Atom *ligbba, *resbba;
 
 int interpret_resno(const char* field)
 {
@@ -137,9 +140,9 @@ void update_progressbar(float percentage)
     if (percentage > 100) percentage = 100;
     cout << "\033[A|";
     int i;
-    for (i=0; i<80; i++)
+    for (i=0; i<100; i++)
     {
-        float cmpi = 1.25*i;
+        float cmpi = i;
         if (cmpi <= percentage)
         {
             float h = M_PI*2 * cmpi / 46 + hueoffset;
@@ -165,7 +168,6 @@ int main(int argc, char** argv)
     cout << "\n                                                                                      __       ____  \npppp                                            ddd                  k            ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n";
 
     Point size(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF);
-    bool verbose = false;
     int iters = 50;
     Protein p("TheProtein");
     Molecule m("ligand");
@@ -173,6 +175,11 @@ int main(int argc, char** argv)
     protein = &p;
     ligand = &m;
     outfile[0] = 0;
+    char outpdb[1024];
+    int outpdb_poses = 0;
+    bool test = false;
+
+    protfname = ligfname = nullptr;
 
     FILE* fp;
 
@@ -200,6 +207,7 @@ int main(int argc, char** argv)
             i++;
             if (file_exists(argv[i]))
             {
+                ligfname = argv[i];
                 fp = fopen(argv[i], "rb");
                 if (fp)
                 {
@@ -218,6 +226,14 @@ int main(int argc, char** argv)
                 cout << "File not found: " << argv[i] << endl;
                 return -1;
             }
+        }
+        else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--model"))
+        {
+            i++;
+            outpdb_poses = atoi(argv[i]);
+
+            i++;
+            strcpy(outpdb, argv[i]);
         }
         else if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bsr"))           // Binding Site Residues.
         {
@@ -337,6 +353,10 @@ int main(int argc, char** argv)
         {
             output_each_iter = true;
         }
+        else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--test"))
+        {
+            test = true;
+        }
         else if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--congress"))
         {
             progressbar = false;
@@ -357,13 +377,24 @@ int main(int argc, char** argv)
             cout << "Options can occur in any sequence except -p must occur before -b and -m." << endl << endl;
             cout << "OPTIONS:" << endl;
             cout << "-b, --bsr\tSpecify binding site residues." << endl;
-            cout << "\t\tCan be specified as residue numbers, e.g. -b 104 255," << endl;
-            cout << "\t\tor as Ballesteros-Weinstein numbers, e.g. -b 3.33 6.54." << endl;
-            cout << "\t\tCan be preceded by one or more amino acid letters, meaning" << endl;
-            cout << "\t\tresidue must match one of the specified letters or it will" << endl;
-            cout << "\t\tnot be counted as a BSR." << endl << endl;
+            cout << "\t\tCan be specified as residue numbers, e.g. -b 104 255, or as " << endl;
+            cout << "\t\tBallesteros-Weinstein numbers, e.g. -b 3.33 6.54. Can be the " << endl;
+            cout << "\t\tpreceded by one or more amino acid letters, meaning residue " << endl;
+            cout << "\t\tmust match one of the specified aminos or it will not be " << endl;
+            cout << "\t\tcounted as a BSR. Residues listed in this option are given " << endl;
+            cout << "\t\tspecial priority for ligand binding." << endl << endl;
 
             cout << "-c, --kcal\tOutput energies in kcal/mol. Default is kJ/mol." << endl << endl;
+
+            cout << "-d, --model\tSpecifies the filename of output PDB models for dock " << endl;
+            cout << "\t\tposes. The syntax is -d num_poses path/to/file.pdb, where " << endl;
+            cout << "\t\tnum_poses is a positive integer. The special codes %p and %l " << endl;
+            cout << "\t\tcan be used as placeholders for the protein name and ligand " << endl;
+            cout << "\t\tname, respectively, and PrimaryDock will automatically fill " << endl;
+            cout << "\t\tthem in. Similarly, the %o placeholder will be auto-replaced " << endl;
+            cout << "\t\twith the pose number in decreasing order of energetic " << endl;
+            cout << "\t\tfavorability. This filename normally ends with a .pdb " << endl;
+            cout << "\t\textension." << endl << endl;
 
             cout << "-e, --energy\tSet maximum energy for output poses." << endl;
             cout << "\t\tCandidate poses not meeting this requirement will be omitted." << endl << endl;
@@ -371,28 +402,31 @@ int main(int argc, char** argv)
             cout << "-h, --help\tShows this help screen." << endl << endl;
 
             cout << "-i, --iter\tSets the number of dock iterations." << endl;
-            cout << "\t\tHigher numbers will produce better results, but at diminishing" << endl;
-            cout << "\t\tgains and longer processing time. Too few iterations will produce" << endl;
-            cout << "\t\tinaccurate results and/or failed docks." << endl << endl;
+            cout << "\t\tHigher numbers will produce better results, but at diminishing " << endl;
+            cout << "\t\tgains and longer processing time. Too few iterations will " << endl;
+            cout << "\t\tproduce inaccurate results and/or failed docks." << endl << endl;
 
             cout << "-l, --ligand\tSpecifies a file in SDF format for the ligand to be docked." << endl << endl;
 
-            cout << "-m, --metal\tSpecifies a metal coordination site. Can occur multiple times." << endl;
-            cout << "\t\tThe format is: -m element_symbol charge coordinating_residues." << endl;
+            cout << "-m, --metal\tSpecifies a metal coordination site. Can occur multiple " << endl;
+            cout << "\t\ttimes. The format is: -m element charge coordinating_residues. " << endl;
             cout << "\t\tExample: -m Cu +1 M5.36 C5.42 C5.43." << endl;
-            cout << "\t\tEither sequence numbers or BW numbers can be used, and the amino acid" << endl;
-            cout << "\t\tletters are optional." << endl << endl;
+            cout << "\t\tEither sequence numbers or BW numbers can be used, and the " << endl;
+            cout << "\t\tamino acid letters are optional." << endl << endl;
 
             cout << "-n, --poses\tSets the maximum number of output poses." << endl << endl;
 
-            cout << "-o, --out\tSpecifies an output filename for dock results." << endl << endl;
+            cout << "-o, --out\tSpecifies an output filename for dock results. The special " << endl;
+            cout << "\t\tcodes %p and %l will be replaced with the name of the protein " << endl;
+            cout << "\t\tand ligand, respectively. This filename normally ends with a " << endl;
+            cout << "\t\t.dock extension." << endl << endl;
 
             cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be docked." << endl << endl;
 
             cout << "-q\t\tSuppresses the progress bar." << endl << endl;
 
-            cout << "-v, --movie\tCreates a dock file in the tmp/ folder showing each" << endl;
-            cout << "\t\titeration of the dock algorithm. Used for debugging." << endl << endl;
+            cout << "-v, --movie\tCreates a dock file in the tmp/ folder showing each iteration " << endl;
+            cout << "\t\tof the dock algorithm. Used for debugging." << endl << endl;
 
             return 0;
         }
@@ -405,6 +439,39 @@ int main(int argc, char** argv)
     }
     int seqlen = p.get_end_resno();
 
+    cout << "PDB file: " << protfname << endl;
+    if (ligfname) cout << "Ligand: " << ligfname << endl;
+
+    char* pcntp = strstr(outfile, "%p");
+    if (pcntp)
+    {
+        char tmp[4096], protn[64];
+        *(pcntp++) = 0;
+        *(pcntp++) = 0;
+        strcpy(protn, strrchr(protfname, '/')+1);
+        char* dot = strchr(protn, '.');
+        if (dot) *dot = 0;
+        sprintf(tmp, "%s%s%s", outfile, protn, pcntp);
+        strcpy(outfile, tmp);
+    }
+
+    char* pcntl = strstr(outfile, "%l");
+    if (pcntl)
+    {
+        char tmp[4096], lign[64];
+        *(pcntl++) = 0;
+        *(pcntl++) = 0;
+        strcpy(lign, strrchr(ligfname, '/')+1);
+        char* dot = strchr(lign, '.');
+        if (dot) *dot = 0;
+        sprintf(tmp, "%s%s%s", outfile, lign, pcntl);
+        strcpy(outfile, tmp);
+    }
+
+    if (strlen(outfile)) cout << "Output file: " << outfile << endl;
+    cout << endl;
+
+
     ////////////////////////////////////////////////////////////////////////////
     // Phase I: Cavity Search.                                                //
     ////////////////////////////////////////////////////////////////////////////
@@ -414,7 +481,7 @@ int main(int argc, char** argv)
     Cavity cavities[1029];
     int qfound = Cavity::scan_in_protein(&p, cavities, 1024);
 
-    cout << "Found " << qfound << " cavit" << (qfound == 1 ? "y." : "ies.") << endl;
+    if (test) cout << "Found " << qfound << " cavit" << (qfound == 1 ? "y." : "ies.") << endl;
 
     fp = fopen("tmp/cavities.js", "w");
     if (fp)
@@ -443,7 +510,7 @@ int main(int argc, char** argv)
         }
 
         float bestviol = Avogadro, bestviol2 = Avogadro, bestviol3 = Avogadro;
-        cout << "Trying ligand in pockets..." << flush;
+        cout << "Trying ligand fleximers in pockets..." << flush;
         for (j=0; j<10; j++)
         {
             fleximers[j].restore_state(&m);
@@ -452,7 +519,7 @@ int main(int argc, char** argv)
                 Point cavcen = cavities[i].get_center();
                 if (cavcen.y < 5 || cavcen.y > 18) continue;
                 float viol = cavities[i].find_best_containment(&m);
-                if (verbose) cout << endl << "Cavity centered at " << cavcen << " has a score of " << viol;
+                if (test) cout << endl << "Cavity centered at " << cavcen << " has a score of " << viol;
                 if (viol < bestviol)
                 {
                     thirdbest = secondbest;
@@ -486,12 +553,15 @@ int main(int argc, char** argv)
         }
 
         best.restore_state(&m);
-        cout << "Best pre-iteration pose has a score of " << bestviol << "." << endl;
-        cout << "Ligand centered at " << m.get_barycenter() << endl;
-        fp = fopen("tmp/quickdock.pdb", "wb");
-        if (!fp) return -1;
-        p.save_pdb(fp, &m);
-        cout << "Saved output file in tmp/." << endl;
+        if (test)
+        {
+            cout << "Best pre-iteration pose has a score of " << bestviol << " (negative = favorable)." << endl;
+            cout << "Ligand centered at " << m.get_barycenter() << endl;
+            fp = fopen("tmp/predock.pdb", "wb");
+            if (!fp) return -1;
+            p.save_pdb(fp, &m);
+            cout << "Saved output file in tmp/." << endl;
+        }
     }
     else return 0;
 
@@ -523,7 +593,8 @@ int main(int argc, char** argv)
             if (aa) residue_init[i].restore_state(aa);
         }
 
-        int sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligand->get_barycenter(),
+        Point ligcen = ligand->get_barycenter();
+        int sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, ligcen,
             Point(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF));
         
         Molecule* cfmols[sphres+8];
@@ -534,9 +605,68 @@ int main(int argc, char** argv)
         for (i=0; i<sphres; i++) cfmols[j++] = reinterpret_cast<Molecule*>(reaches_spheroid[nodeno][i]);
         cfmols[j] = nullptr;
 
+        // Identify the mutual best atom pair for binding and preemptively move the ligand in place.
+        intera_type bbt = vdW;
+        if (met && met->get_atom_count())
+        {
+            bbt = mcoord;
+            ligbba = ligand->get_single_most_bindable(bbt);
+            resbba = met->get_nearest_atom(ligbba->get_location());
+        }
+        else
+        {
+            float nr = Avogadro;
+            for (i=0; i<sphres; i++)
+            {
+                Atom* ra = reaches_spheroid[nodeno][i]->get_nearest_atom(ligcen);
+                if (!ra) continue;
+                Atom* la = ligand->get_nearest_atom(ra->get_location());
+                float r = ra->distance_to(la);
+                if (reaches_spheroid[nodeno][i]->priority) r /= 10;
+
+                intera_type lt = Molecule::best_binding_type(reinterpret_cast<Molecule*>(reaches_spheroid[nodeno][i]), ligand);
+                if (lt == mcoord) r /= 200;
+                else if (lt == ionic) r /= 60;
+                else if (lt == hbond) r /= 25;
+                else if (lt == pi) r /= 12;
+                else if (lt == polarpi) r /= 8;
+
+                if (r < nr)
+                {
+                    nr = r;
+                    resbba = ra;
+                    ligbba = la;
+                    bbt = lt;
+                }
+            }
+
+            if (resbba && ligbba)
+            {
+                AminoAcid* aa = p.get_residue(resbba->residue);
+                resbba = aa->get_one_most_bindable(bbt);
+                ligbba = ligand->get_single_most_bindable(bbt);
+                float opt = InteratomicForce::optimal_distance(ligbba, resbba);
+                aa->conform_atom_to_location(resbba->name, ligbba->get_location(), opt);
+                ligand->conform_atom_to_location(ligbba->name, resbba->get_location(), opt);
+            }
+        }
+        if (ligbba && resbba)
+        {
+            float r = ligbba->distance_to(resbba);
+            float opt = InteratomicForce::optimal_distance(ligbba, resbba);
+            SCoord motion = resbba->get_location().subtract(ligbba->get_location());
+            motion.r += r - opt*2;
+            ligand->move(motion);
+
+            if (test) cout << "Ligand " << ligbba->name << " can " << bbt << " with "
+                << (resbba->mol ? resbba->mol->get_name() : "UNKNOWN")
+                << ":" << resbba->name << "." << endl << endl;
+        }
+        else if (test) cout << "Mutual nearest atom adjustment failed." << endl << endl;
+
         if (output_each_iter) output_iter(0, cfmols);
         Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
-
+        
         candidates[pose-1].copy_state(ligand);
         for (i=1; i<=seqlen; i++)
         {
@@ -544,13 +674,7 @@ int main(int argc, char** argv)
             if (aa) residue_candidates[pose-1][i].copy_state(aa);
         }
     }
-
-    /*
-    fp = fopen("tmp/refined.pdb", "wb");
-    if (!fp) return -1;
-    p.save_pdb(fp, &m);
-    cout << "Saved output file in tmp/." << endl;
-    */
+    cout << "\033[A|                                                                                                                                     " << endl;
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -634,7 +758,7 @@ int main(int argc, char** argv)
     for (pose=1; pose<=poses; pose++)
     {
         meets_criteria[pose-1] = (-result[pose-1]->kJmol*result[pose-1]->energy_mult) < elim;
-        if (-result[pose-1]->worst_nrg_aa > clash_limit_per_aa) meets_criteria[pose-1] = false;
+        // if (-result[pose-1]->worst_nrg_aa > clash_limit_per_aa) meets_criteria[pose-1] = false;
     }
 
 
@@ -672,6 +796,10 @@ int main(int argc, char** argv)
 
     std::ofstream *output = nullptr;
     if (outfile[0]) output = new std::ofstream(outfile, std::ofstream::out);
+    if (output) *output << "PDB file: " << protfname << endl;
+    if (output) *output << "Ligand: " << ligfname << endl;
+    if (output) *output << endl;
+
     for (i=0; i<poses; i++)
     {
         pose = i+1;
@@ -684,7 +812,40 @@ int main(int argc, char** argv)
         result[j]->include_pdb_data = (output == nullptr);
         cout << *result[j] << endl << endl;
         result[j]->include_pdb_data = true;
-        if (output) *output << *result[j] << endl << endl;
+        if (output) *output << *result[j];
+
+        if (pose <= outpdb_poses)
+        {
+            char protn[64];
+            strcpy(protn, strrchr(protfname, '/')+1);
+            char* dot = strchr(protn, '.');
+            if (dot) *dot = 0;
+
+            char lign[64];
+            strcpy(lign, strrchr(ligfname, '/')+1);
+            dot = strchr(lign, '.');
+            if (dot) *dot = 0;
+
+            std::string out_pdb_fn = std::regex_replace(outpdb, std::regex("[%][p]"), protn);
+            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][l]"), lign);
+            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][o]"), to_string(pose));
+        }
+    }
+
+    if (output)
+    {
+        output->close();
+        for (i=1; i<=seqlen; i++)
+        {
+            AminoAcid* aa = protein->get_residue(i);
+            if (aa) residue_candidates[sortidx[0]][i].restore_state(aa);
+        }
+
+        FILE* pf = fopen(outfile, "ab");
+        fprintf(pf, "\nOriginal PDB:\n");
+        protein->save_pdb(pf);
+        fclose(pf);
+        cout << "PDB appended to output file." << endl;
     }
 
     cout << i << " pose" << (i==1?"":"s") << " found." << endl;

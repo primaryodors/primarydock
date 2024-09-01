@@ -160,6 +160,7 @@ public:
     int has_hbond_donors();
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
     int has_pi_atoms(bool include_backbone = false);
+    int has_metal_atoms();
 
     // Bond functions.
     Bond** get_rotatable_bonds(bool include_can_flip = true);
@@ -198,6 +199,7 @@ public:
     void mutual_closest_atoms(Molecule* mol2, Atom** atom1, Atom** atom2);
     void maintain_contact(Atom* my_atom, Atom* other_atom);
     bool contact_maintained();
+    Atom* get_single_most_bindable(intera_type bond_type);
 
     #if compute_vdw_repulsion
     float get_vdW_repulsion(Molecule* ligand);
@@ -238,6 +240,8 @@ public:
     void remove_mandatory_connection(Molecule* rmvmol);
     void zero_mandatory_connection_cache();
     void delete_mandatory_connections();
+
+    static intera_type best_binding_type(Molecule* mol1, Molecule* mol2);
 
     // Debug stuff.
     #if debug_break_on_move

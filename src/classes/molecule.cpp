@@ -342,6 +342,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* lo
     Atom* a = new Atom(elemsym, location, charge);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
+    a->mol = this;
     strcpy(a->name, aname);
     if (bond_to && bcard) a->bond_to(bond_to, bcard);
 
@@ -367,6 +368,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
     Atom* a = new Atom(elemsym);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
+    a->mol = this;
     strcpy(a->name, aname);
 
     try
@@ -3645,6 +3647,81 @@ void Molecule::increment_lm(SCoord v)
         lmy *= m;
         lmz *= m;
     }
+}
+
+Atom* Molecule::get_single_most_bindable(intera_type bt)
+{
+    if (!atoms) return nullptr;
+    int i, Z;
+    float bestscore = 0;
+    Atom* retval = nullptr;
+    Point bary = get_barycenter();
+    for (i=0; i<atcount; i++)
+    {
+        if (!atoms[i]) continue;
+        if (atoms[i]->is_backbone) continue;
+        float potential = 0;
+        switch (bt)
+        {
+            case mcoord:
+            Z = atoms[i]->get_Z();
+            if (Z == 7 || Z == 8 || Z == 15 || Z == 16 || Z == 34) potential = 100;
+            break;
+
+            case ionic:
+            potential = fabs(atoms[i]->get_charge()) * 60;
+            break;
+
+            case hbond:
+            potential = fabs(atoms[i]->is_polar()) * 25;
+            break;
+
+            case pi:
+            potential = atoms[i]->is_pi() ? 12 : 0;
+            break;
+
+            case vdW:
+            default:
+            potential = (fabs(atoms[i]->is_polar()) < hydrophilicity_cutoff) ? 4 : 0;
+        }
+
+        if (!potential) continue;
+
+        float r = atoms[i]->get_location().get_3d_distance(bary);
+        potential *= r;
+
+        if (potential > bestscore)
+        {
+            bestscore = potential;
+            retval = atoms[i];
+        }
+    }       // for i
+
+    return retval;
+}
+
+int Molecule::has_metal_atoms()
+{
+    if (!atoms) return 0;
+    int i, result=0;
+    for (i=0; atoms[i]; i++) if (atoms[i]->is_metal()) result++;
+    return result;
+}
+
+intera_type Molecule::best_binding_type(Molecule* mol1, Molecule* mol2)
+{
+    if (mol1->has_metal_atoms() && (mol2->count_atoms_by_element("N") || mol2->count_atoms_by_element("S"))) return mcoord;
+    if (mol2->has_metal_atoms() && (mol1->count_atoms_by_element("N") || mol1->count_atoms_by_element("S"))) return mcoord;
+    if (fabs(mol1->get_charge()) > hydrophilicity_cutoff && fabs(mol2->get_charge()) > hydrophilicity_cutoff
+        && sgn(mol1->get_charge()) == -sgn(mol2->get_charge())) return ionic;
+    if (mol1->has_hbond_donors() && mol2->has_hbond_acceptors()) return hbond;
+    if (mol2->has_hbond_donors() && mol1->has_hbond_acceptors()) return hbond;
+    if (mol1->has_pi_atoms() && mol2->has_pi_atoms()) return pi;
+    if (mol1->has_metal_atoms() && mol2->has_pi_atoms()) return polarpi;            // Metal-pi is considered the same as polar-pi.
+    if (mol2->has_metal_atoms() && mol1->has_pi_atoms()) return polarpi;
+    if (mol1->has_hbond_donors() && mol2->has_pi_atoms()) return polarpi;
+    if (mol2->has_hbond_donors() && mol1->has_pi_atoms()) return polarpi;
+    return vdW;
 }
 
 float Molecule::total_intermol_binding(Molecule** l)

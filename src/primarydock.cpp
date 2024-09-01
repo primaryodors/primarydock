@@ -13,6 +13,8 @@ using namespace std;
 
 Protein* protein;
 Molecule* ligand;
+Molecule* waters;
+int nwater = 0;
 bool progressbar = true;
 bool output_each_iter = false;
 bool flex = true;
@@ -30,6 +32,8 @@ float hueoffset = 0;
 bool kcal = false;
 char outfile[1024];
 Atom *ligbba, *resbba;
+bool output_missed_connections = false;
+bool output_vdW_repulsions = false;
 
 int interpret_resno(const char* field)
 {
@@ -165,7 +169,7 @@ void update_progressbar(float percentage)
 int main(int argc, char** argv)
 {
     // Splash
-    cout << "\n                                                                                      __       ____  \npppp                                            ddd                  k            ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n";
+    cout << "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n";
 
     Point size(_INTERA_R_CUTOFF*1.333, _INTERA_R_CUTOFF*1.333, _INTERA_R_CUTOFF*1.333);
     int iters = 50;
@@ -180,6 +184,7 @@ int main(int argc, char** argv)
     bool test = false;
 
     protfname = ligfname = nullptr;
+    waters = nullptr;
 
     FILE* fp;
 
@@ -357,6 +362,59 @@ int main(int argc, char** argv)
         {
             test = true;
         }
+        else if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "--water"))
+        {
+            i++;
+            nwater = atoi(argv[i]);
+            waters = new Molecule[n+4];
+            for (j=0; j<nwater; j++)
+            {
+                waters[j].from_smiles("O");
+            }
+        }
+        else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--soft"))
+        {
+            // TODO: Soft dock.
+            ;
+        }
+        else if (!strcmp(argv[i], "-x") || !strcmp(argv[i], "--iso"))
+        {
+            // TODO: Ligand enantiomers.
+            ;
+        }
+        else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--atomto"))
+        {
+            if (!p.get_seq_length())
+            {
+                cout << "Protein must be specified before pointing side chains." << endl;
+                return -1;
+            }
+
+            // Conform side chain atoms to location.
+            i++;
+            int resno = interpret_resno(argv[i]);
+            AminoAcid* aa = resno ? p.get_residue(resno) : nullptr;
+
+            i++;
+            Atom* pointing;
+            if (aa && !strcasecmp(argv[i], "ext") || !strcasecmp(argv[i], "extent")) pointing = aa->get_reach_atom();
+            else pointing = aa ? aa->get_atom(argv[i]) : nullptr;
+
+            i++;
+            int tres = interpret_resno(argv[i]);
+            AminoAcid* target = tres ? p.get_residue(tres) : nullptr;
+            Atom* tatom = target ? target->get_nearest_atom(pointing->get_location()) : nullptr;
+
+            if (aa && pointing && target) aa->conform_atom_to_location(pointing->name, tatom->get_location(), 20, InteratomicForce::optimal_distance(pointing, tatom));
+        }
+        else if (!strcmp(argv[i], "--outmc"))
+        {
+            output_missed_connections = true;
+        }
+        else if (!strcmp(argv[i], "--outvdwr"))
+        {
+            output_vdW_repulsions = true;
+        }
         else if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--congress"))
         {
             progressbar = false;
@@ -374,7 +432,7 @@ int main(int argc, char** argv)
         {
             cout << "Usage:" << endl << endl;
             cout << "bin/primarydock -p path/to/protein.pdb -l path/to/ligand.sdf [-b binding site residues [-i iters [other options]]]" << endl << endl;
-            cout << "Options can occur in any sequence except -p must occur before -b and -m." << endl << endl;
+            cout << "Options can occur in any sequence except -b and -m can only occur after -p." << endl << endl;
             cout << "OPTIONS:" << endl;
             cout << "-b, --bsr\tSpecify binding site residues." << endl;
             cout << "\t\tCan be specified as residue numbers, e.g. -b 104 255, or as " << endl;
@@ -421,12 +479,21 @@ int main(int argc, char** argv)
             cout << "\t\tand ligand, respectively. This filename normally ends with a " << endl;
             cout << "\t\t.dock extension." << endl << endl;
 
+            cout << "--outmc\tIncludes \"missed connections\", residues that could not optimally " << endl;
+            cout << "\t\tbind to the ligand, in the output." << endl << endl;
+
+            cout << "--outvdwr\tIncludes van der Waals repulsions between the ligand and nearby " << endl;
+            cout << "\t\tresidues in the output." << endl << endl;
+
             cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be docked." << endl << endl;
 
             cout << "-q\t\tSuppresses the progress bar." << endl << endl;
 
             cout << "-v, --movie\tCreates a dock file in the tmp/ folder showing each iteration " << endl;
             cout << "\t\tof the dock algorithm. Used for debugging." << endl << endl;
+
+            cout << "-w, --water\tAdds a specified number of water molecules to the binding pocket, " << endl;
+            cout << "\t\te.g. -w 5 to add 5 molecules." << endl << endl;
 
             return 0;
         }
@@ -601,8 +668,22 @@ int main(int argc, char** argv)
         cfmols[j++] = ligand;
         Molecule* met = p.metals_as_molecule();
         if (met) cfmols[j++] = met;
+        if (nwater && waters) for (i=0; i<nwater; i++) cfmols[j++] = &waters[i];
         for (i=0; i<sphres; i++) cfmols[j++] = reinterpret_cast<Molecule*>(reaches_spheroid[nodeno][i]);
         cfmols[j] = nullptr;
+
+        if (nwater && waters) for (i=0; i<nwater; i++)
+        {
+            for (l=nwater+2; l<j; l++)
+            {
+                if (fabs(cfmols[l]->hydrophilicity()) > hydrophilicity_cutoff && frand(0,1) < 0.333)
+                {
+                    Point pt = cfmols[l]->get_single_most_bindable(hbond)->get_location();
+                    SCoord voffset(2.5, frand(0, M_PI), frand(0, M_PI*2));
+                    waters[i].recenter(pt.add(voffset));
+                }
+            }
+        }
 
         // Identify the mutual best atom pair for binding and preemptively move the ligand in place.
         intera_type bbt = vdW;
@@ -696,6 +777,8 @@ int main(int argc, char** argv)
 
         result[pose-1] = new DockResult(protein, ligand, size, nullptr, pose);
         result[pose-1]->energy_mult = kcal ? _kcal_per_kJ : 1;
+        result[pose-1]->out_vdw_repuls = output_vdW_repulsions;
+        result[pose-1]->out_mc = output_missed_connections;
         
         std::ostringstream pdbdat;
         n = ligand->get_atom_count();
@@ -838,6 +921,20 @@ int main(int argc, char** argv)
         }
     }
 
+    cout << num_poses << " pose" << (i==1?"":"s") << " found." << endl;
+    if (output) *output << num_poses << " pose" << (i==1?"":"s") << " found." << endl;
+    if (num_poses)
+    {
+        cout << "Best energy: " << (-result[sortidx[0]]->kJmol*result[sortidx[0]]->energy_mult) << " "
+            << (kcal?"kcal/mol":"kJ/mol") << "." << endl;
+        if (output) *output << "Best energy: " << (-result[sortidx[0]]->kJmol*result[sortidx[0]]->energy_mult) << " "
+            << (kcal?"kcal/mol":"kJ/mol") << "." << endl;
+    }
+
+    time_t finished = time(NULL);
+    cout << "\nCalculation took: " << (finished-began) << " seconds." << endl;
+    if (output) *output << "\nCalculation took: " << (finished-began) << " seconds." << endl;
+
     if (output)
     {
         output->close();
@@ -853,13 +950,6 @@ int main(int argc, char** argv)
         fclose(pf);
         cout << "PDB appended to output file." << endl;
     }
-
-    cout << num_poses << " pose" << (i==1?"":"s") << " found." << endl;
-    if (num_poses) cout << "Best energy: " << (-result[sortidx[0]]->kJmol*result[sortidx[0]]->energy_mult) << " "
-        << (kcal?"kcal/mol":"kJ/mol") << "." << endl;
-
-    time_t finished = time(NULL);
-    cout << "\nCalculation took: " << (finished-began) << " seconds." << endl;
 
     return 0;
 }

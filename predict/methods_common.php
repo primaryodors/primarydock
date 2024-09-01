@@ -647,113 +647,49 @@ heredoc;
         break;
 
         case "pd":
-        if ($cenres)
+
+        $bsr = [];
+        if ($cenres) foreach (explode(" ", $cenres) as $bw)
         {
-            foreach (explode(" ", $cenres) as $bw)
-            {
-                $resno = resno_from_bw($protid, $bw);
-                if ($resno) $cenresno[] = $resno;
-            }
-
-            $cenresno = implode(" ", $cenresno);
-            $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
-            echo "$cmd\n";
-            $censz = [];
-            exec($cmd, $censz);
-
-            switch (family_from_protid($protid))
-            {
-                case "OR":
-                $softness = "1.0";
-                break;
-
-                case "TAAR":
-                $softness = "0.0";
-                break;
-
-                default:
-                $softness = "1.0";
-            }
-
-            foreach ($censz as $ln)
-            {
-                if (substr($ln, 0, 4) == "SZ: ")
-                {
-                    $ln = substr($ln, 4);
-                    $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
-                    $sx = floatval($psiz[0])+2;
-                    $sy = floatval($psiz[1])+2;
-                    $sz = floatval($psiz[2])+2;
-                    $size = "$sx $sy $sz";
-                }
-            }
+            if (substr($bw, -1) == "!") $bsr[] = str_replace('!', '', $bw);
         }
 
+        $bsr = count($bsr) ? "-b ".implode(" ", $bsr) : "";
+
         $fam = family_from_protid($protid);
+        switch ($fam)
+        {
+            case "OR":
+            $softness = "1.0";
+            break;
+
+            case "TAAR":
+            $softness = "0.0";
+            break;
+
+            default:
+            $softness = "1.0";
+        }
+
         if ($isomers)
         {
             $iso = [];
-            foreach ($isomers as $k => $v) $iso[] = "ISO sdf/".str_replace(' ','_',$v).".sdf";
+            foreach ($isomers as $k => $v) $iso[] = "--iso sdf/".str_replace(' ','_',$v).".sdf";
             $iso = implode("\n", $iso);
             if ($pose < 4*count($isomers)) $pose = 4*count($isomers);
         }
         else $iso = "";
 
         $excl1 = resno_from_bw($protid, "2.37");
-        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 3 4 45 5 6 7" : "";
+        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "--soft $softness 3 4 45 5 6 7" : "";
 
-        $configf = <<<heredoc
-
-PROT $pdbfname
-LIG sdf/$ligname.sdf
-$iso
-
-CEN RES $cenres
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-
-EXCL 1 $excl1		# Head, TMR1, and CYT1.
-$excl
-
-SEARCH $search
-POSE $pose
-ELIM $elim
-$flex_constraints
-ITERS $iter
-PROGRESS
-OUTMC 1
-OUTVDWR 1
-# MOVIE
-
-FLEX 1
-$soft
-
-OUT $outfname
-OUTPDB 1 $modelfname
-OPEND
-
-
-heredoc;
+        // TODO: $iso, $atomto, $soft, $outmc, $outvdwr, water
+        $cmd = "bin/primarydock -p \"$pdbfname\" -l \"sdf/$ligname.sdf\" $mcoord $bsr -n $pose -e $elim -i $iter -o $outfname -d 1 $modelfname";
         
         chdir(__DIR__);
         chdir("..");
         if (!file_exists("output/$fam")) mkdir("output/$fam");
         if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
-
-        $lignospace = str_replace(" ", "", $ligname);
-        $prefixfn = $metrics_prefix ? "_$metrics_prefix" : "";
-        $cnfname = "tmp/prediction.$protid$prefixfn.$lignospace.config";
-        $f = fopen($cnfname, "wb");
-        if (!$f) die("File write error. Check tmp folder is write enabled.\n");
-
-        if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
-
-        fwrite($f, $configf);
-        fclose($f);
 
         $retvar = 0;
         $best_energy = false;
@@ -767,7 +703,6 @@ heredoc;
         {
             set_time_limit(300);
             $outlines = [];
-            $cmd = "bin/primarydock \"$cnfname\"";
             echo "$cmd\n";
             passthru($cmd, $retvar);
             $outlines = explode("\n", file_get_contents($outfname));
@@ -777,7 +712,7 @@ heredoc;
         $num_poses = 0;
         foreach ($outlines as $ln)
         {
-            if (false !== strpos($ln, "pose(s) found"))
+            if (false !== strpos($ln, "pose(s) found") || false !== strpos($ln, "poses found") || false !== strpos($ln, "pose found"))
             {
                 $num_poses = intval($ln);
             }
@@ -854,7 +789,7 @@ heredoc;
             }
         }
 
-        if (false !== strpos($ln, "pose(s) found"))
+        if (false !== strpos($ln, "pose(s) found") || false !== strpos($ln, "poses found") || false !== strpos($ln, "pose found"))
         {
             $num_poses = intval($ln);
             $posesln = true;
@@ -1043,7 +978,7 @@ heredoc;
             }
         }
 
-        if (false !== strpos($ln, "pose(s) found"))
+        if (false !== strpos($ln, "pose(s) found") || false !== strpos($ln, "poses found") || false !== strpos($ln, "pose found"))
         {
             $mode = "POSES";
             if (isset($metrics_to_process[$mode]))
@@ -1127,6 +1062,7 @@ heredoc;
 
     if (function_exists("make_prediction"))
     {
+        print_r($outdata);
         $oc = count($outdata);
         $prediction = make_prediction($outdata);
         $outdata = array_merge($outdata, $prediction);

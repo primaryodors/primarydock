@@ -205,7 +205,7 @@
     "OR51*":
     {
         "active_pocket": "3.33 3.37 45.52 5.39 5.47 6.55 6.59!",
-        "inactive_pocket": "3.33 45.52 5.39",
+        "inactive_pocket": "3.33 45.52! 5.39",
         "odorophores":
         {
             "[O-]":

@@ -1,5 +1,14 @@
 <?php
 
+define("R", 0.00831446261815324);
+define("body_temperature", 310.2);
+
+function equilibrium($kJmol1, $kJmol2)
+{
+    $deltaG = $kJmol2 - $kJmol1;
+    return exp($deltaG / (-R * body_temperature));
+}
+
 function make_prediction($data)
 {
     global $protid, $ligname, $pose;
@@ -17,12 +26,14 @@ function make_prediction($data)
         $attns = floatval(@$data['a_occlusion'] ?: 1);
         $ittns = floatval(@$data['i_occlusion'] ?: 1);
 
-        if ($ascore > 0 && $aa100 > 0 && $ascore > $iscore)
+        $K = equilibrium(floatval(@$data['i_Pose1']), floatval(@$data['a_Pose1']));
+
+        if ($K >= 0.01)
         {
             $data['Predicted'] = 'Agonist';
             $data['Affinity'] = round($ascore, 4);
             $data['A100'] = round($aa100, 4);
-            $data['DockScore'] = round(min($ascore, 150) * $attns * $aa100 / 100, 4);
+            $data['DockScore'] = $ascore * $K;
         }
         else if ($iscore > 0)
         {

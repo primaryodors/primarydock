@@ -526,21 +526,13 @@ Such ligands will be included in any subsequent `SAVE` commands, unless cleared 
 Example:
 ```
 MCOORD Ag 1 %res1 %res2 %res3 %res4			# Coordinate Ag+ to the residues indicated by the variables.
-MCOORD Th8 Cu 2 123 154 203 259 			# Coordinate Cu2+ to the indicated residues, forming thiolates of any cysteines.
-MCOORD YAr Zn 2 123 234 356 YO 467			# Coordinate Zn2+, cation-pi bonding any tyrosines except the last listed residue.
+MCOORD Cu 2 123 154 203 259 			    # Coordinate Cu2+ to the indicated residues.
+MCOORD Zn 2 123 234 356 467			        # Coordinate Zn2+.
 ```
 
 Coordinate a metal ion to the indicated residues. A minimum of 3 residues is required.
 
-The optional Th8 parameter indicates that the metal ion should be thiolated to any CYS or SEC residues in the list, i.e. the metal will be covalently
-bonded to the S or Se, replacing the residue's H. TODO: This feature has not been implemented yet.
-
-Tyrosine is treated as both an aromatic residue and an oxygen coordinating residue. Aromatic residues are capable of forming cation-pi bonds, therefore
-phenylalanine and tryptophan will also be cation-pi coordinated to the metal if found. The default coordination method for tyrosine is cation-pi, however
-the default can be overridden with YO to force oxygen coordination or YAr to force pi coordination.
-
-Yar or YO before the metal symbol applies globally to the coordination residues. Yar or YO directly before a residue number applies only to that residue,
-overriding the default or any global.
+Any CYS residues in the list will be automatically thiolated.
 
 
 # MEASURE

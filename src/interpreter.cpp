@@ -2585,30 +2585,20 @@ int main(int argc, char** argv)
                 std::vector<string> cratoms;	// coordinating residue atoms.																						oh god I hooked up with this guy once who used kratom and after we both finished goddamn all he did was yipyapyipyapyipyap all night until finally I said babe, I n**d my sleep, and I musta finally dozed off at something like 5am, yeah kinda like the song. Then it's morning and he goes home and a hot drummer/songwriter is coming over to audition for my rock band that day and I'm running on 3 hours of sleep, what a way to make a first impression, thank flying spaghetti monster our guitarist was my roommate because at least someone in the house was awake. Ahhh, my 30s, when I still had (false) hope. Good times, those.
                 bool force_tyrosine_O = false;
                 bool thiolate = false;
-                bool uses_fancy_options = false;
                 Atom** ba = nullptr;
 
                 _yes_I_used_goto_for_this:
                 if (!strcmp(words[l], "YO"))
                 {
-                    force_tyrosine_O = true;
-                    uses_fancy_options = true;
-                    l++;
-                    goto _yes_I_used_goto_for_this;
+                    raise_error("YO, YAr, and Th8 are deprecated in MCOORD.");
                 }
                 else if (!strcmp(words[l], "YAr"))
                 {
-                    force_tyrosine_O = false;
-                    uses_fancy_options = true;
-                    l++;
-                    goto _yes_I_used_goto_for_this;
+                    raise_error("YO, YAr, and Th8 are deprecated in MCOORD.");
                 }
                 else if (!strcmp(words[l], "Th8"))
                 {
-                    thiolate = true;
-                    uses_fancy_options = true;
-                    l++;
-                    goto _yes_I_used_goto_for_this;
+                    raise_error("YO, YAr, and Th8 are deprecated in MCOORD.");
                 }
 
                 if (!words[l]) raise_error("Insufficient parameters given for MCOORD.");
@@ -2632,17 +2622,11 @@ int main(int argc, char** argv)
                     _another_goto:
                     if (!strcmp(words[l], "YO"))
                     {
-                        local_O = true;
-                        uses_fancy_options = true;
-                        l++;
-                        goto _another_goto;
+                        raise_error("YO and YAr are deprecated in MCOORD.");
                     }
                     else if (!strcmp(words[l], "YAr"))
                     {
-                        local_O = false;
-                        uses_fancy_options = true;
-                        l++;
-                        goto _another_goto;
+                        raise_error("YO and YAr are deprecated in MCOORD.");
                     }
 
                     if (!words[l]) raise_error("Insufficient parameters given for MCOORD.");
@@ -2688,27 +2672,22 @@ int main(int argc, char** argv)
                 }
 
                 if (ncr < 2) raise_error("MCOORD requires at least 2 coordinating atoms.");
-                if (ncr < 3 && uses_fancy_options) raise_error("MCOORD with YO, YAr, or Th8 requires at least 3 coordinating atoms.");
-                if (uses_fancy_options) working->coordinate_metal(ma, ncr, resnos, cratoms);
-                else
+                std::vector<MCoord> mtlcoords;
+                MCoord mc;
+                mc.Z = ma->get_Z();
+                mc.charge = elem_charge;
+                mc.mtl = ma;
+
+                for (l=0; l<ncr; l++)
                 {
-                    std::vector<MCoord> mtlcoords;
-                    MCoord mc;
-                    mc.Z = ma->get_Z();
-                    mc.charge = elem_charge;
-                    mc.mtl = ma;
-
-                    for (l=0; l<ncr; l++)
-                    {
-                        ResiduePlaceholder rp;
-                        rp.resno = resnos[l];
-                        mc.coordres.push_back(rp);
-                    }
-
-                    mtlcoords.push_back(mc);
-
-                    working->coordinate_metal(mtlcoords);
+                    ResiduePlaceholder rp;
+                    rp.resno = resnos[l];
+                    mc.coordres.push_back(rp);
                 }
+
+                mtlcoords.push_back(mc);
+
+                working->coordinate_metal(mtlcoords);
             } // MCOORD
 
             else if (!strcmp(words[0], "MEASURE"))

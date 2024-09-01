@@ -893,8 +893,8 @@ int main(int argc, char** argv)
         j = sortidx[i];
         if (j<0) break;
 
-        cout << "Pose: " << pose << endl << "Node: " << 0 << endl;
-        if (output) *output << "Pose: " << pose << endl << "Node: " << 0 << endl;
+        cout << "Pose: " << pose << endl << "Node: " << 0 << endl << endl;
+        if (output) *output << "Pose: " << pose << endl << "Node: " << 0 << endl << endl;
 
         result[j]->include_pdb_data = (output == nullptr);
         cout << *result[j] << endl << endl;

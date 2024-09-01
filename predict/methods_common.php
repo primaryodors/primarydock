@@ -434,12 +434,11 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     if (!file_exists("tmp")) mkdir("tmp");
     $modelfname = preg_replace("/.dock$/", ".model%o.pdb", $outfname);
     $retvar = 0;
+    if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
 
     switch(strtolower($docker))
     {
         case "vina":
-
-        if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
         $cenresno = [];
         $center = "--center_x 0 --center_y 15 --center_z 0";
         $size = "--size_x 20 --size_y 20 --size_z 20";
@@ -681,7 +680,7 @@ heredoc;
         else $iso = "";
 
         $excl1 = resno_from_bw($protid, "2.37");
-        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "--soft $softness 3 4 45 5 6 7" : "";
+        $soft = (($metrics_prefix != "i_") && $softness) ? "--soft $softness 3 4 45 5 6 7" : "";
 
         // TODO: $iso, $atomto, $soft, $outmc, $outvdwr, water
         $cmd = "bin/primarydock -p \"$pdbfname\" -l \"sdf/$ligname.sdf\" $mcoord $bsr -n $pose -e $elim -i $iter -o $outfname -d 1 $modelfname";

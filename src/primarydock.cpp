@@ -563,27 +563,27 @@ int main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////
-    // Phase II: Fleximer Search.                                             //
+    // Phase II: Rotamer Search.                                             //
     ////////////////////////////////////////////////////////////////////////////
 
     Pose best(&m), secondbest(&m), thirdbest(&m);
     if (m.get_atom_count())
     {
-        Pose fleximers[ligand_fleximer_count];
+        Pose rotamers[ligand_rotamer_count];
         ligand->movability = MOV_ALL;
         ligand->minimize_internal_clashes();
-        for (i=0; i<ligand_fleximer_count; i++)
+        for (i=0; i<ligand_rotamer_count; i++)
         {
             if (i >= 10) m.crumple(0.11*fiftyseventh);
-            fleximers[i].copy_state(&m);
+            rotamers[i].copy_state(&m);
         }
 
         float bestviol = Avogadro, bestviol2 = Avogadro, bestviol3 = Avogadro;
-        cout << "Trying ligand fleximers in pockets..." << flush;
-        for (j=0; j<ligand_fleximer_count; j++)
+        cout << "Trying ligand rotamers in pockets..." << flush;
+        for (j=0; j<ligand_rotamer_count; j++)
         {
             ligand->movability = MOV_ALL;
-            fleximers[j].restore_state(&m);
+            rotamers[j].restore_state(&m);
             for (i=0; i<qfound; i++)
             {
                 Point cavcen = cavities[i].get_center();

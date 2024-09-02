@@ -147,11 +147,11 @@
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 1.0
-#define lmpull 1.0
-#define lmsteps 3
+#define lmpull 333.3
+#define lmsteps 10
 #define recapture_ejected_ligand 0
 #define summed_missed_connections 1
-#define ligand_fleximer_count 25
+#define ligand_rotamer_count 25
 #define amide_zwitterionic_amount 0.1
 
 #define priority_weight_group 10

@@ -3091,10 +3091,25 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         }
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
-                }
-            }
+                }   // if r < cutoff
+            }   // for ligand atoms
+        }   // for ligands
+    }   // for atoms
+
+    if (dlt1 && dlt2)
+    {
+        SCoord d = dlt2->get_location().subtract(dlt1->get_location());
+        if (d.r < dltr) dltr = fmax(d.r, InteratomicForce::optimal_distance(dlt1, dlt2));
+        else if (d.r > dltr)
+        {
+            d.r -= dltr;
+            Point pt(d);
+            lmx += lmpull * pt.x;
+            lmy += lmpull * pt.y;
+            lmz += lmpull * pt.z;
         }
     }
+
     // cout << "Total: " << kJmol << endl;
     // cout << endl;
     float lc = sqrt(lmx*lmx+lmy*lmy+lmz*lmz);
@@ -3857,7 +3872,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
 
                 benerg = cfmol_multibind(a, nearby);
-                if (motion.magnitude() > 0.001*speed_limit)
+                if (motion.magnitude() > 0.00001*speed_limit)
                 {
                     pib.copy_state(a);
                     motion.scale(motion.magnitude()/lmsteps);

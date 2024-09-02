@@ -92,8 +92,8 @@ switch ($fam)
     case 'OR52':
     case 'OR56':
     if ($rcpid == "OR51E2") $knowns = "'8f76'";
-    else if ($rcpid == "OR51F2") $mdlcls = "AutoModel";
     else $knowns = "$CLASSI";
+    if ($rcpid == "OR51F2") $mdlcls = "AutoModel";
     break;
 
     case 'OR1':

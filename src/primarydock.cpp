@@ -171,7 +171,7 @@ int main(int argc, char** argv)
     // Splash
     cout << "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n";
 
-    Point size(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF);
+    Point size(_INTERA_R_CUTOFF*0.5, _INTERA_R_CUTOFF*0.5, _INTERA_R_CUTOFF*0.5);
     int iters = 50;
     Protein p("TheProtein");
     Molecule m("ligand");
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
     for (i=1; i<argc; i++)
     {
         if (buffer[0] != '-' || !buffer[1]) strcpy(buffer, argv[i]);
-        if (!strcmp(buffer, "-p") || !strcmp(buffer, "--prot") || !strcmp(buffer, "--protein"))
+        if ((buffer[0] == '-' && buffer[1] == 'p') || !strcmp(buffer, "--prot") || !strcmp(buffer, "--protein"))
         {
             i++;
             if (file_exists(argv[i]))
@@ -512,7 +512,7 @@ int main(int argc, char** argv)
         if (buffer[0] == '-' && buffer[1] != '-')
         {
             strcpy(buffer+1, buffer+2);
-            i--;
+            if (buffer[1]) i--;
         }
     }
 
@@ -592,6 +592,26 @@ int main(int argc, char** argv)
         for (i=0; i<ligand_rotamer_count; i++)
         {
             if (i >= 10) m.crumple(0.11*fiftyseventh);
+            int nr = m.get_num_rings();
+            if (nr)
+            {
+                l = rand() % nr;
+                if (!m.ring_is_coplanar(l))
+                {
+                    Atom** ra = m.get_ring_atoms(l);
+                    if (ra && ra[0])
+                    {
+                        n = m.get_ring_num_atoms(l);
+                        if (n >= 6)
+                        {
+                            l = rand() % n;
+
+                            Ring** rr = ra[0]->get_rings();
+                            if (rr && rr[0]) rr[0]->flip_atom(ra[0]);
+                        }
+                    }
+                }
+            }
             rotamers[i].copy_state(&m);
         }
 

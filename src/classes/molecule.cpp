@@ -3107,9 +3107,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     if (dlt1 && dlt2)
     {
         float opt = InteratomicForce::optimal_distance(dlt1, dlt2);
-        if (dltr > opt) dltr -= 0.5*(dltr-opt);
         SCoord d = dlt2->get_location().subtract(dlt1->get_location());
-        if (d.r < dltr) dltr = fmax(0.9*d.r, opt);
+        if (d.r < dltr && dltr > opt) dltr -= 0.5*(dltr-opt);
         if (d.r > dltr)
         {
             d.r -= dltr;

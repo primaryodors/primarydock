@@ -236,6 +236,89 @@ Point Cavity::get_center()
     return average_of_points(foravg, j);
 }
 
+Point Cavity::nearest_surface_vertex(Point pt)
+{
+    if (!vdw_vertex_count) return Point(0,0,0);
+    int i;
+    float bestr;
+    Point result;
+    for (i=0; i<vdw_vertex_count; i++)
+    {
+        float r = pt.get_3d_distance(vdw_surface[i]);
+        if (!i || r < bestr)
+        {
+            bestr = r;
+            result = vdw_surface[i];
+        }
+    }
+
+    return result;
+}
+
+CPartial* Cavity::get_nearest_partial(Point pt)
+{
+    if (!pallocd || !partials) return nullptr;
+
+    int i;
+    float bestr;
+    CPartial* result;
+    for (i=0; i<pallocd && partials[i].s.radius; i++)
+    {
+        float r = partials[i].s.center.get_3d_distance(pt);
+        if (!i || r < bestr)
+        {
+            bestr = r;
+            result = &partials[i];
+        }
+    }
+
+    return result;
+}
+
+void Cavity::compute_vdW_surface(float d)
+{
+    if (!pallocd || !partials) return;
+
+    int maxpoints = pallocd * d * d / 3 + 256;
+    if (!vdw_surface)
+    {
+        vdw_surface = new Point[maxpoints];
+        vdw_vertex_partial = new CPartial*[maxpoints];
+    }
+
+    float halfstep = M_PI / d;
+    float step = halfstep * 2;
+
+    int i, ivdW = 0;
+    SCoord v;
+    for (i=0; i<pallocd && partials[i].s.radius; i++)
+    {
+        Point ploc = partials[i].s.center;
+        v.r = partials[i].s.radius;
+        float ystep = step / v.r / v.r;
+        for (v.theta = -square; v.theta <= square; v.theta += step)
+        {
+            float xstep = step / v.r / fmax(cos(v.theta), 0.000001);
+            float end = M_PI*2-xstep/2;
+            for (v.phi = 0; v.phi < end; v.phi += xstep)
+            {
+                Point pt = ploc.add(v);
+                CPartial* np = this->get_nearest_partial(pt);
+                if (np != &partials[i] && pt.get_3d_distance(np->s.center) < np->s.radius) continue;
+                if (!pt.x && !pt.y && !pt.z) pt = Point(-0.001, 0.001, -0.001);
+                vdw_vertex_partial[ivdW] = &partials[i];
+                vdw_surface[ivdW++] = pt;
+                if (ivdW >= maxpoints)
+                {
+                    cout << "Too many cavity surface ligand_vertices. Please increase limit in code." << endl;
+                    throw 0xbadc0de;
+                }
+            }
+        }
+    }
+    vdw_vertex_count = ivdW;
+}
+
 CPartial* Cavity::point_inside_pocket(Point pt)
 {
     if (!pallocd) return nullptr;
@@ -250,21 +333,23 @@ CPartial* Cavity::point_inside_pocket(Point pt)
     return nullptr;
 }
 
-float Cavity::containment_violations(Molecule* m)
+const Point* ligand_vertices;
+float Cavity::containment_violations(Molecule* m, float simt)
 {
-    const Point* vertices = m->obtain_vdW_surface(20);
-    if (!vertices) return 0;
+    if (!ligand_vertices) return 0;
     Atom** va = m->get_vdW_vertex_atoms();
 
     int i;
     float viol = m->total_eclipses()*33;
-    for (i=0; vertices[i].x || vertices[i].y || vertices[i].z; i++)
+    for (i=0; ligand_vertices[i].x || ligand_vertices[i].y || ligand_vertices[i].z; i++)
     {
-        CPartial* cp = point_inside_pocket(vertices[i]);
+        CPartial* cp = point_inside_pocket(ligand_vertices[i]);
         int Z = va[i]->get_Z();
         if (!cp)
         {
             viol += (Z > 1) ? 1 : 0.5;
+
+            if (viol > simt) return viol+simt;
         }
         else
         {
@@ -281,6 +366,7 @@ float Cavity::containment_violations(Molecule* m)
 
 float Cavity::find_best_containment(Molecule* m)
 {
+    ligand_vertices = m->obtain_vdW_surface(10);
     Point cen = get_center();
     m->recenter(cen);
     Pose best(m);
@@ -290,7 +376,7 @@ float Cavity::find_best_containment(Molecule* m)
     axes[0] = Point(1,0,0);
     axes[1] = Point(0,1,0);
     axes[2] = Point(0,0,1);
-    int i, j, l, n = m->get_atom_count();
+    int i, j, k, l, n = m->get_atom_count();
     float theta, besttheta;
     for (l=0; l<5; l++)
     {
@@ -317,7 +403,7 @@ float Cavity::find_best_containment(Molecule* m)
 
                 if (!atoms_outside_cavity)
                 {
-                    float viol = containment_violations(m);
+                    float viol = containment_violations(m, fmax(0, bestviol));
                     if (viol < bestviol)
                     {
                         best.copy_state(m);
@@ -334,6 +420,8 @@ float Cavity::find_best_containment(Molecule* m)
         for (j=0; j<=26; j++)
         {
             Point maybe = cen;
+            k=0;
+            _retry_linear_motion:
             maybe.x += 0.5 * (j%3-1);
             maybe.y += 0.5 * ((j/3)%3-1);
             maybe.z += 0.5 * j/9;
@@ -344,7 +432,8 @@ float Cavity::find_best_containment(Molecule* m)
             {
                 best.copy_state(m);
                 bestviol = viol;
-                if (!viol) return viol;
+                k++;
+                if (k < 5) goto _retry_linear_motion;
             }
         }
         best.restore_state(m);

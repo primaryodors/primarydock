@@ -147,7 +147,7 @@
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 1.0
-#define lmpull 250
+#define lmpull 50
 #define lmsteps 10
 #define recapture_ejected_ligand 0
 #define summed_missed_connections 1

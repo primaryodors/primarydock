@@ -783,6 +783,12 @@ int main(int argc, char** argv)
         if (output_each_iter) output_iter(0, cfmols);
         Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
 
+        n = ligand->get_atom_count();
+        for (i=0; i<n= i++)
+        {
+            Atom* a = ligand->get_atom(i);
+            if (a) a->residue = 0;
+        }
         candidates[pose-1].copy_state(ligand);
         for (i=1; i<=seqlen; i++)
         {

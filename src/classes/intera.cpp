@@ -623,6 +623,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float kJmol = 0;
     float partial = 0;
 
+    if (   (!b->residue && b->get_family() == CHALCOGEN && a->residue == 264 && a->get_family() == PNICTOGEN)
+        || (!a->residue && a->get_family() == CHALCOGEN && b->residue == 264 && b->get_family() == PNICTOGEN))
+    {
+        i = 0;
+    }
+
     InteratomicForce* forces_by_type[_num_force_precedences];
     for (i=0; i<_num_force_precedences; i++) forces_by_type[i] = nullptr;
     for (i=0; forces[i]; i++)

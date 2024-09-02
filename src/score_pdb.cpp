@@ -67,6 +67,7 @@ int main(int argc, char** argv)
     fseek(fp, 0, 0);
     m.from_pdb(fp, true);
     fclose(fp);
+    cout << "Loaded " << m.get_atom_count() << " ligand atom(s)." << endl;
 
     AminoAcid* aa = p.get_residue_bw(3, 50);
     if (!aa) aa = p.get_residue_bw(6, 48);
@@ -90,7 +91,7 @@ int main(int argc, char** argv)
     m.save_sdf(fp);
     fclose(fp);
 
-    DockResult dr(&p, &m, Point(10000,10000,10000));
+    DockResult dr(&p, &m, Point(_INTERA_R_CUTOFF,_INTERA_R_CUTOFF,_INTERA_R_CUTOFF));
     dr.include_pdb_data = false;
     dr.display_clash_atom1 = true;
     dr.display_clash_atom2 = true;

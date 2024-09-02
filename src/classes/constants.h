@@ -14,7 +14,7 @@
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
 #define default_cavity_stuffing 0.03
-#define _DEFAULT_INTERA_R_CUTOFF 6
+#define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
 
@@ -352,6 +352,7 @@
 
 // Should normally be false or zero:
 #define _dbg_259 0
+#define _dbg_51e1_ionic 1
 #define _dbg_51e2_ionic 0
 #define _dbg_A100 0
 #define _dbg_allow_excessive_aa_clashes 0

@@ -2953,21 +2953,29 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     clash_worst = 0;
     for (i=0; atoms[i]; i++)
     {
+        #if _dbg_51e1_ionic
+        if (!atoms[i]->residue /*&& atoms[i]->get_family() == CHALCOGEN*/ && ligands[0]->is_residue() == 108)
+        {
+            j = 0;
+        }
+        #endif
+
         Point aloc = atoms[i]->get_location();
         Point bary = get_barycenter();
         int Z = atoms[i]->get_Z();
         for (l=0; ligands[l]; l++)
         {
-            #if _dbg_51e2_ionic
-            if (!is_residue() && atoms[i]->get_family() == CHALCOGEN && ligands[l]->is_residue() == 262)
-            {
-                j = 0;
-            }
-            #endif
-
             if (ligands[l] == this) continue;
             for (j=0; j<ligands[l]->atcount; j++)
             {
+                #if _dbg_51e1_ionic
+                if (!is_residue() && atoms[i]->get_family() == CHALCOGEN && ligands[l]->is_residue() == 264)
+                {
+                    j++;
+                    j--;
+                }
+                #endif
+
                 // TODO: Fix this in the hydrogenate function, but for now we'll fix it here and hope for the best. 🤞🏼
                 if (!ligands[l]->atoms[j])
                 {

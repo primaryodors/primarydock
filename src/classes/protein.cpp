@@ -1413,7 +1413,22 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         int resno = aa->get_residue_no();
         if (resno_already[resno]) continue;
 
+        if (resno == 264)
+        {
+            j=0;
+        }
+
         if (!ip && aa->priority)
+        {
+            reaches_spheroid[sphres++] = aa;
+            resno_already[resno] = true;
+            if (sphres >= SPHREACH_MAX-2) break;
+            continue;
+        }
+
+        Atom *la, *na;
+        ligand->mutual_closest_atoms(reinterpret_cast<Molecule*>(aa), &la, &na);
+        if (la->distance_to(na) < 6)
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;

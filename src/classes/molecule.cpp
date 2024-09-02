@@ -3049,9 +3049,9 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 Point laloc = ligands[l]->atoms[j]->get_location();
                                 Point ptd = bary.subtract(laloc);
                                 ptd.multiply(fmin(fabs(-abind) / 5, 1));
-                                lmx += lmpush * sgn(ptd.x);
-                                lmy += lmpush * sgn(ptd.y);
-                                lmz += lmpush * sgn(ptd.z);
+                                lmx += lmpush * ptd.x;
+                                lmy += lmpush * ptd.y;
+                                lmz += lmpush * ptd.z;
 
                                 Point far = get_farthest_atom(laloc)->get_location();
                                 far.weight = 1;

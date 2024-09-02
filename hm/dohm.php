@@ -60,7 +60,7 @@ $CLASSI = "'8f76', '8hti'";
 $CLASSII = "'OR1B1', 'OR1G1', 'OR2J2', 'OR5AC2', 'OR6C70', 'OR8D1', 'OR10X1', 'OR14J1'";
 $CLASSII_tight = "'OR2M7', 'OR2T11'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
-$MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
+$mTAAR = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9', '8pm2'";
 // $ADORA2A = "'6gdg'";
 // $ADRB2 = "'7dhr', '8gej'";
 $LPAR1 = "'7td0', '7yu3'";
@@ -76,8 +76,8 @@ switch ($fam)
         $knowns = $TAAR1;
         $mdlcls = "AutoModel";
     }
-    else if ($rcpid == "TAAR9") $knowns = $MTAAR9;
-    else $knowns = "$MTAAR9, $TAAR1";
+    else if ($rcpid == "TAAR9") $knowns = $mTAAR;
+    else $knowns = "$mTAAR, $TAAR1";
     break;
 
     case 'VN1R':
@@ -105,7 +105,7 @@ switch ($fam)
     break;
 
     default:        // Class II ORs
-    $knowns = "$CLASSI, $CLASSII, $MTAAR9, $TAAR1";      // , $LPAR1
+    $knowns = "$CLASSI, $CLASSII, $mTAAR, $TAAR1";      // , $LPAR1
 }
 
 

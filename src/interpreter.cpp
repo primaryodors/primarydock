@@ -1843,6 +1843,7 @@ int main(int argc, char** argv)
                     }
                     cout << "." << flush;
                 }
+                if (ligand.get_atom_count()) ligand.hydrogenate();
                 cout << endl;
                 // if (lig_chain && ligand.get_atom_count()) ligand.hydrogenate();
             }   // HYDRO
@@ -2494,7 +2495,7 @@ int main(int argc, char** argv)
 				n = 0;
                 chain = 'A';
                 include_ligand = false;
-                
+
 				if (words[2]) chain = words[2][0];
                 if (words[2] && words[3])
                 {
@@ -2525,7 +2526,12 @@ int main(int argc, char** argv)
                 l = working->load_pdb(pf, n, chain);
                 if (!l) raise_error("No residues loaded.");
                 working->set_name_from_pdb_name(words[1]);
-                if (include_ligand) ligand.from_pdb(pf, true);
+                if (include_ligand)
+                {
+                    rewind(pf);
+                    ligand.from_pdb(pf, true);
+                    cout << "Loaded " << ligand.get_atom_count() << " ligand atoms." << endl;
+                }
 
                 fclose(pf);
 
@@ -2999,6 +3005,8 @@ int main(int argc, char** argv)
                     raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for writing.");
                     return 0xbadf12e;
                 }
+
+                Molecule* save_ligand = ligand.get_atom_count() ? &ligand : nullptr;
                 for (l=0; l<26; l++)
                 {
                     if (!strands[l]) continue;
@@ -3006,7 +3014,9 @@ int main(int argc, char** argv)
                     if (!working->get_seq_length()) continue;
                     g_chain = l+65;
                     working->set_pdb_chain(l+65);
-                    working->save_pdb(pf, ligand.get_atom_count() ? &ligand : nullptr);
+                    working->save_pdb(pf, save_ligand);
+                    if (save_ligand) cout << "Including ligand." << endl;
+                    save_ligand = nullptr;
                 }
                 working->end_pdb(pf);
 

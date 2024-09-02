@@ -683,8 +683,8 @@ heredoc;
         $soft = (($metrics_prefix != "i_") && $softness) ? "--soft $softness 3 4 45 5 6 7" : "";
 
         // TODO: $iso, $atomto, $soft, $outmc, $outvdwr, water
-        $cmd = "bin/primarydock -p \"$pdbfname\" -l \"sdf/$ligname.sdf\" $mcoord $bsr -n $pose -e $elim -i $iter -o $outfname -d 1 $modelfname";
-        
+        $cmd = "bin/primarydock -vp \"$pdbfname\" -l \"sdf/$ligname.sdf\" $mcoord $bsr -n $pose -e $elim -i $iter -o $outfname -d 1 $modelfname";
+
         chdir(__DIR__);
         chdir("..");
         if (!file_exists("output/$fam")) mkdir("output/$fam");

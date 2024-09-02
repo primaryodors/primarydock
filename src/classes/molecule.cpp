@@ -518,7 +518,7 @@ void Molecule::hydrogenate(bool steric_only)
         int h_to_add = round(valence - bcardsum);
         if (atoms[i]->aaletter == 'H' && !strcmp(atoms[i]->name, "NE2")) h_to_add++;
         if (atoms[i]->aaletter == 'W' && !strcmp(atoms[i]->name, "NE1")) h_to_add++;
-        if (atoms[i]->aaletter == 'R' && !strcmp(atoms[i]->name, "NH1")) h_to_add--;
+        if (atoms[i]->aaletter == 'R' &&  strcmp(atoms[i]->name, "NH1")) h_to_add++;
         for (j=0; j<h_to_add; j++)
         {
             char hname[15];
@@ -3098,9 +3098,11 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 
     if (dlt1 && dlt2)
     {
+        float opt = InteratomicForce::optimal_distance(dlt1, dlt2);
+        if (dltr > opt) dltr -= 0.5*(dltr-opt);
         SCoord d = dlt2->get_location().subtract(dlt1->get_location());
-        if (d.r < dltr) dltr = fmax(d.r, InteratomicForce::optimal_distance(dlt1, dlt2));
-        else if (d.r > dltr)
+        if (d.r < dltr) dltr = fmax(0.9*d.r, opt);
+        if (d.r > dltr)
         {
             d.r -= dltr;
             Point pt(d);

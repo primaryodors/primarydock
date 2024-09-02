@@ -190,9 +190,11 @@ int main(int argc, char** argv)
 
     int i, j, k, l, n;
     for (i=0; i<64; i++) priorities[i] = nullptr;
+    buffer[0] = 0;
     for (i=1; i<argc; i++)
     {
-        if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--prot") || !strcmp(argv[i], "--protein"))
+        if (buffer[0] != '-' || !buffer[1]) strcpy(buffer, argv[i]);
+        if (!strcmp(buffer, "-p") || !strcmp(buffer, "--prot") || !strcmp(buffer, "--protein"))
         {
             i++;
             if (file_exists(argv[i]))
@@ -207,7 +209,7 @@ int main(int argc, char** argv)
                 return -1;
             }
         }
-        else if (!strcmp(argv[i], "-l") || !strcmp(argv[i], "--lig") || !strcmp(argv[i], "--ligand"))
+        else if ((buffer[0] == '-' && buffer[1] == 'l') || !strcmp(buffer, "--lig") || !strcmp(buffer, "--ligand"))
         {
             i++;
             if (file_exists(argv[i]))
@@ -232,7 +234,7 @@ int main(int argc, char** argv)
                 return -1;
             }
         }
-        else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--model"))
+        else if ((buffer[0] == '-' && buffer[1] == 'd') || !strcmp(buffer, "--model"))
         {
             i++;
             outpdb_poses = atoi(argv[i]);
@@ -240,7 +242,7 @@ int main(int argc, char** argv)
             i++;
             strcpy(outpdb, argv[i]);
         }
-        else if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--bsr"))           // Binding Site Residues.
+        else if ((buffer[0] == '-' && buffer[1] == 'b') || !strcmp(buffer, "--bsr"))           // Binding Site Residues.
         {
             if (!p.get_seq_length())
             {
@@ -269,7 +271,7 @@ int main(int argc, char** argv)
                 i++;
             }
         }
-        else if (!strcmp(argv[i], "-m") || !strcmp(argv[i], "--metal"))
+        else if ((buffer[0] == '-' && buffer[1] == 'm') || !strcmp(buffer, "--metal"))
         {
             if (!p.get_seq_length())
             {
@@ -335,34 +337,34 @@ int main(int argc, char** argv)
                 p.coordinate_metal(mtlcoords);
             }
         }
-        else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--iter") || !strcmp(argv[i], "--iters"))
+        else if ((buffer[0] == '-' && buffer[1] == 'i') || !strcmp(buffer, "--iter") || !strcmp(buffer, "--iters"))
         {
             i++;
             iters = atoi(argv[i]);
         }
-        else if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--pose") || !strcmp(argv[i], "--poses"))
+        else if ((buffer[0] == '-' && buffer[1] == 'n') || !strcmp(buffer, "--pose") || !strcmp(buffer, "--poses"))
         {
             i++;
             poses = atoi(argv[i]);
         }
-        else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--out"))
+        else if ((buffer[0] == '-' && buffer[1] == 'o') || !strcmp(buffer, "--out"))
         {
             i++;
             strcpy(outfile, argv[i]);
         }
-        else if (!strcmp(argv[i], "-r") || !strcmp(argv[i], "--rigid"))
+        else if ((buffer[0] == '-' && buffer[1] == 'r') || !strcmp(buffer, "--rigid"))
         {
             flex = false;
         }
-        else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--movie"))
+        else if ((buffer[0] == '-' && buffer[1] == 'v') || !strcmp(buffer, "--movie"))
         {
             output_each_iter = true;
         }
-        else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--test"))
+        else if ((buffer[0] == '-' && buffer[1] == 't') || !strcmp(buffer, "--test"))
         {
             test = true;
         }
-        else if (!strcmp(argv[i], "-w") || !strcmp(argv[i], "--water"))
+        else if ((buffer[0] == '-' && buffer[1] == 'w') || !strcmp(buffer, "--water"))
         {
             i++;
             nwater = atoi(argv[i]);
@@ -372,17 +374,17 @@ int main(int argc, char** argv)
                 waters[j].from_smiles("O");
             }
         }
-        else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--soft"))
+        else if ((buffer[0] == '-' && buffer[1] == 's') || !strcmp(buffer, "--soft"))
         {
             // TODO: Soft dock.
             ;
         }
-        else if (!strcmp(argv[i], "-x") || !strcmp(argv[i], "--iso"))
+        else if ((buffer[0] == '-' && buffer[1] == 'x') || !strcmp(buffer, "--iso"))
         {
             // TODO: Ligand enantiomers.
             ;
         }
-        else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "--atomto"))
+        else if ((buffer[0] == '-' && buffer[1] == 'a') || !strcmp(buffer, "--atomto"))
         {
             if (!p.get_seq_length())
             {
@@ -407,33 +409,42 @@ int main(int argc, char** argv)
 
             if (aa && pointing && target) aa->conform_atom_to_location(pointing->name, tatom->get_location(), 20, InteratomicForce::optimal_distance(pointing, tatom));
         }
-        else if (!strcmp(argv[i], "--outmc"))
+        else if (!strcmp(buffer, "--outmc"))
         {
             output_missed_connections = true;
         }
-        else if (!strcmp(argv[i], "--outvdwr"))
+        else if (!strcmp(buffer, "--outvdwr"))
         {
             output_vdW_repulsions = true;
         }
-        else if (!strcmp(argv[i], "-q") || !strcmp(argv[i], "--congress"))
+        else if ((buffer[0] == '-' && buffer[1] == 'q') || !strcmp(buffer, "--congress"))
         {
             progressbar = false;
         }
-        else if (!strcmp(argv[i], "-e") || !strcmp(argv[i], "--elim") || !strcmp(argv[i], "--energy"))
+        else if ((buffer[0] == '-' && buffer[1] == 'e') || !strcmp(buffer, "--elim") || !strcmp(buffer, "--energy"))
         {
             i++;
             elim = atof(argv[i]);
         }
-        else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--kcal"))
+        else if ((buffer[0] == '-' && buffer[1] == 'c') || !strcmp(buffer, "--kcal"))
         {
             kcal = true;
         }
-        else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help"))
+        else if ((buffer[0] == '-' && buffer[1] == 'h') || !strcmp(buffer, "--help"))
         {
             cout << "Usage:" << endl << endl;
             cout << "bin/primarydock -p path/to/protein.pdb -l path/to/ligand.sdf [-b binding site residues [-i iters [other options]]]" << endl << endl;
             cout << "Options can occur in any sequence except -b and -m can only occur after -p." << endl << endl;
             cout << "OPTIONS:" << endl;
+
+            cout << "-a, --atomto\tSpecify side chain atoms to move toward other features." << endl;
+            cout << "\t\tThe syntax is -a residue atom target, where atom is the name of a" << endl;
+            cout << "\t\tside chain atom and target is a residue to point toward. In place" << endl;
+            cout << "\t\tof a named atom, the word extent can be used to select the most" << endl;
+            cout << "\t\tdistant atom from the residue's α carbon. The residue and target" << endl;
+            cout << "\t\tcan be either a residue number or a Ballesteros-Weinstein number." << endl;
+            cout << "\t\tThe target residue's nearest atom will be the effective target." << endl << endl;
+
             cout << "-b, --bsr\tSpecify binding site residues." << endl;
             cout << "\t\tCan be specified as residue numbers, e.g. -b 104 255, or as " << endl;
             cout << "\t\tBallesteros-Weinstein numbers, e.g. -b 3.33 6.54. Can be the " << endl;
@@ -496,6 +507,12 @@ int main(int argc, char** argv)
             cout << "\t\te.g. -w 5 to add 5 molecules." << endl << endl;
 
             return 0;
+        }
+
+        if (buffer[0] == '-' && buffer[1] != '-')
+        {
+            strcpy(buffer+1, buffer+2);
+            i--;
         }
     }
 
@@ -641,6 +658,8 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////
 
     Pose residue_init[seqlen+1];
+    Pose tmp_pdb_waters[poses+1][nwater+1];
+    Point tmp_pdb_metal_locs[poses+1][mtlcoords.size()+1];
     for (i=1; i<=seqlen; i++)
     {
         AminoAcid* aa = protein->get_residue(i);
@@ -769,6 +788,18 @@ int main(int argc, char** argv)
         {
             AminoAcid* aa = protein->get_residue(i);
             if (aa) residue_candidates[pose-1][i].copy_state(aa);
+        }
+        if (nwater)
+        {
+            for (j=0; j<nwater; j++)
+            {
+                tmp_pdb_waters[pose-1][j].copy_state(&waters[j]);
+            }
+        }
+        n = mtlcoords.size();
+        for (j=0; j < n; j++)
+        {
+            tmp_pdb_metal_locs[pose][j] = mtlcoords[j].mtl->get_location();
         }
     }
     cout << "                                      \033[A                                                                                                                                      " << endl << "                                                                                                                                             " << endl;
@@ -931,6 +962,35 @@ int main(int argc, char** argv)
             std::string out_pdb_fn = std::regex_replace(outpdb, std::regex("[%][p]"), protn);
             out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][l]"), lign);
             out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][o]"), to_string(pose));
+
+            FILE* pfout = fopen(out_pdb_fn.c_str(), "wb");
+            if (!pfout) cout << "Failed to open " << out_pdb_fn << " for writing." << endl;
+            else
+            {
+                protein->save_pdb(pfout, ligand);
+
+                int atno_offset = protein->last_saved_atom_number;
+                if (nwater)
+                {
+                    for (j=0; j<nwater; j++)
+                    {
+                        tmp_pdb_waters[pose-1][j].restore_state(&waters[j]);
+                        waters[j].save_pdb(pfout, atno_offset);
+                        atno_offset += waters[j].get_atom_count();
+                    }
+                }
+
+                n = mtlcoords.size();
+                for (j=0; j < n; j++)
+                {
+                    mtlcoords[j].mtl->move(tmp_pdb_metal_locs[pose][j]);
+                    mtlcoords[j].mtl->save_pdb_line(pfout, ++atno_offset);
+                }
+
+                protein->end_pdb(pfout);
+
+                fclose(pfout);
+            }
         }
     }
 

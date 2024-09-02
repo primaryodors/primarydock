@@ -784,7 +784,7 @@ int main(int argc, char** argv)
         Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
 
         n = ligand->get_atom_count();
-        for (i=0; i<n= i++)
+        for (i=0; i<n; i++)
         {
             Atom* a = ligand->get_atom(i);
             if (a) a->residue = 0;

@@ -257,7 +257,7 @@ float Cavity::containment_violations(Molecule* m)
     Atom** va = m->get_vdW_vertex_atoms();
 
     int i;
-    float viol = 0;
+    float viol = m->total_eclipses()*33;
     for (i=0; vertices[i].x || vertices[i].y || vertices[i].z; i++)
     {
         CPartial* cp = point_inside_pocket(vertices[i]);
@@ -268,7 +268,7 @@ float Cavity::containment_violations(Molecule* m)
         }
         else
         {
-            float coefficient = cp->priority ? 0.5 : 0.01;
+            float coefficient = cp->priority ? 0.05 : 0.001;
             if (cp->metallic && Z==16) viol -= 1.00*coefficient;
             if (cp->chargedn && va[i]->get_charge() >  hydrophilicity_cutoff) viol -= .50*coefficient;
             if (cp->chargedp && va[i]->get_charge() < -hydrophilicity_cutoff) viol -= .50*coefficient;

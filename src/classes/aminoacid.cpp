@@ -1400,7 +1400,9 @@ _return_added:
     if (!check_Greek_continuity()) throw 0xbadc0de;
     #endif
 
+    #if include_residue_eclipses
     initial_eclipses = total_eclipses();
+    #endif
 
     return added;
 }

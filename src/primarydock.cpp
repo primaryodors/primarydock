@@ -570,9 +570,11 @@ int main(int argc, char** argv)
     if (m.get_atom_count())
     {
         Pose fleximers[ligand_fleximer_count];
+        ligand->movability = MOV_ALL;
+        ligand->minimize_internal_clashes();
         for (i=0; i<ligand_fleximer_count; i++)
         {
-            m.crumple(7.5*fiftyseventh);
+            if (i >= 10) m.crumple(0.11*fiftyseventh);
             fleximers[i].copy_state(&m);
         }
 
@@ -580,6 +582,7 @@ int main(int argc, char** argv)
         cout << "Trying ligand fleximers in pockets..." << flush;
         for (j=0; j<ligand_fleximer_count; j++)
         {
+            ligand->movability = MOV_ALL;
             fleximers[j].restore_state(&m);
             for (i=0; i<qfound; i++)
             {
@@ -647,9 +650,11 @@ int main(int argc, char** argv)
     cout << "Generating poses and refining..." << endl << endl << flush;
     Pose candidates[poses];
     Pose residue_candidates[poses][seqlen+1];
+    float beste = 0;
     for (pose=1; pose<=poses; pose++)
     {
         j = (rand() % 3);
+        ligand->movability = MOV_ALL;
 
         if (j==0) best.restore_state(ligand);
         else if (j==1) secondbest.restore_state(ligand);
@@ -733,10 +738,18 @@ int main(int argc, char** argv)
         }
         if (ligbba && resbba)
         {
+            ligcen = ligand->get_barycenter();
+            Rotation rot = align_points_3d(ligbba->get_location(), resbba->get_location(), ligcen);
+            LocatedVector lv = rot.v;
+            lv.origin = ligcen;
+            ligand->rotate(lv, rot.a);
+
             float r = ligbba->distance_to(resbba);
+            float rcen = ligcen.get_3d_distance(resbba->get_location());
+            float ll = ligcen.get_3d_distance(ligbba->get_location());
             float opt = InteratomicForce::optimal_distance(ligbba, resbba);
-            SCoord motion = resbba->get_location().subtract(ligbba->get_location());
-            motion.r += r - opt*2;
+            SCoord motion = resbba->get_location().subtract(ligcen);
+            motion.r = (rcen > ll) ? (r - opt*2) : (-opt*2);
             ligand->move(motion);
 
             ligand->maintain_contact(ligbba, resbba);
@@ -748,8 +761,11 @@ int main(int argc, char** argv)
         }
         else if (test) cout << "Mutual nearest atom adjustment failed." << endl << endl;
 
+        ligand->movability = MOV_ALL;
         if (output_each_iter) output_iter(0, cfmols);
         Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
+        if (-ligand->lastbind < beste) beste = -ligand->lastbind;
+        if (beste < 0) cout << "                                    \n\033[A  " << beste;
 
         candidates[pose-1].copy_state(ligand);
         for (i=1; i<=seqlen; i++)
@@ -758,8 +774,8 @@ int main(int argc, char** argv)
             if (aa) residue_candidates[pose-1][i].copy_state(aa);
         }
     }
-    cout << "\033[A                                                                                                                                      " << endl;
-
+    cout << "                                      \033[A                                                                                                                                      " << endl << "                                                                                                                                             " << endl;
+ 
 
     ////////////////////////////////////////////////////////////////////////////
     // Phase IV: Scoring.                                                     //

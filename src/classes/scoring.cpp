@@ -230,7 +230,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #if compute_missed_connections
     this->missed_connections = new float[metcount];
     #endif
+    #if include_residue_eclipses
     ligand_self = ligand->get_intermol_binding(ligand) - ligand->total_eclipses();
+    #endif
     A100 = protein->A100();
     lig_occlusion = ligand->occlusion;
     kJmol += ligand_self;

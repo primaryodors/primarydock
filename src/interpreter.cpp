@@ -2099,17 +2099,18 @@ int main(int argc, char** argv)
                 n = -1;
                 Protein* p = nullptr;
                 int sr=1, er;
-                if (!words[l])
-                {
-                    p = working;
-                    er = working->get_end_resno();
-                }
-                else if (words[l][0] >= 'A' && words[l][0] <= 'Z')
+                
+                if (words[l][0] >= 'A' && words[l][0] <= 'Z')
                 {
                     if (!strands[words[l][0]-'A']) raise_error("No strand with specified chain letter.");
                     p = strands[words[l][0]-'A'];
                     er = p->get_end_resno();
                     l++;
+                }
+                else
+                {
+                    p = working;
+                    er = working->get_end_resno();
                 }
 
                 n = interpret_single_int(words[l]);

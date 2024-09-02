@@ -731,9 +731,6 @@ std::vector<Atom*> Molecule::longest_dimension()
 
 float Molecule::total_eclipses()
 {
-    #if !include_eclipses
-    return 0;
-    #else
     if (!atoms) return 0;
     float result = 0;
     int i, j, k, l, m, n;
@@ -784,7 +781,6 @@ float Molecule::total_eclipses()
     }
 
     return result*eclipsing_kJmol_per_radian;
-    #endif
 }
 
 float Molecule::bindability_by_type(intera_type t, bool ib)
@@ -3370,7 +3366,7 @@ void Molecule::delete_mandatory_connections()
 float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 {
     float lbias = 1.0 + (sgn(is_residue()) == sgn(om->is_residue()) ? 0 : dock_ligand_bias);
-    float rawbind = get_intermol_binding(om, !is_ac);
+    float rawbind = get_intermol_binding(om, !is_ac) - total_eclipses();
     float lbind = rawbind * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
     lbind += get_intermol_contact_area(om, true) * cavity_stuffing;
@@ -3456,7 +3452,11 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     a->occlusion = 0;
     if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic()) ((AminoAcid*)a)->set_conditional_basicity(nearby);
 
-    float result = -a->total_eclipses();
+    float result = 0;
+    #if include_residue_eclipses
+    result -= a->total_eclipses();
+    #endif
+
     if (a->is_residue()) result += reinterpret_cast<AminoAcid*>(a)->initial_eclipses;
 
     int j;
@@ -4121,7 +4121,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;
                                 #endif
 
-                                if (tryenerg > benerg && (benerg < 0 || a->contact_maintained()) && a->get_internal_clashes() <= self_clash)
+                                if (tryenerg > benerg && a->contact_maintained() && a->get_internal_clashes() <= self_clash)
                                 {
                                     benerg = tryenerg;
                                     best_theta = theta;

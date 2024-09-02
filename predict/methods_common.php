@@ -717,10 +717,6 @@ heredoc;
             }
         }
 
-        if (!file_exists("tmp/nodelete")) unlink($cnfname);
-        else echo "WARNING: Not deleting a temporary config file in tmp/ because you have selected the debug \"nodelete\" behavior.\n"
-            ."You should check the tmp/ folder periodically and clean out old files manually.\n";
-
         break;
 
         default:
@@ -1061,7 +1057,6 @@ heredoc;
 
     if (function_exists("make_prediction"))
     {
-        print_r($outdata);
         $oc = count($outdata);
         $prediction = make_prediction($outdata);
         $outdata = array_merge($outdata, $prediction);

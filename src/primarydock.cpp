@@ -171,7 +171,7 @@ int main(int argc, char** argv)
     // Splash
     cout << "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n";
 
-    Point size(_INTERA_R_CUTOFF*1.333, _INTERA_R_CUTOFF*1.333, _INTERA_R_CUTOFF*1.333);
+    Point size(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF);
     int iters = 50;
     Protein p("TheProtein");
     Molecule m("ligand");
@@ -650,7 +650,6 @@ int main(int argc, char** argv)
     cout << "Generating poses and refining..." << endl << endl << flush;
     Pose candidates[poses];
     Pose residue_candidates[poses][seqlen+1];
-    float beste = 0;
     for (pose=1; pose<=poses; pose++)
     {
         j = (rand() % 3);
@@ -764,8 +763,6 @@ int main(int argc, char** argv)
         ligand->movability = MOV_ALL;
         if (output_each_iter) output_iter(0, cfmols);
         Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform, progressbar ? &update_progressbar : nullptr);
-        if (-ligand->lastbind < beste) beste = -ligand->lastbind;
-        if (beste < 0) cout << "                                    \n\033[A  " << beste;
 
         candidates[pose-1].copy_state(ligand);
         for (i=1; i<=seqlen; i++)

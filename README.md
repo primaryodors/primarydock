@@ -45,30 +45,22 @@ SDFs can be obtained a few different ways:
   <li>Or at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{SMILES}/SDF?record_type=3d</li>
 </ul>
 
-Please take a look at the `primarydock.config` file as a sample of the format for dock settings. You will want to edit this file,
-or create a new one, for each receptor+ligand pair that you wish to dock. There are lines for repointing to your PDB and SDF
-model input files, as well as various other options that may be useful to your purposes.
-
-Known issue: please make sure to add an empty line at the end of your config file, or primarydock will throw an exception.
-
-Once your .config file is ready, and the PrimaryDock code is compiled, simply cd to the primarydock folder and run the following command:
+The simplest way to run PrimaryDock is to first `cd` to the `primarydock/` folder and invoke the application with arguments specifying
+a protein PDB and a ligand SDF, for example:
 
 ```
-./bin/primarydock {config file}
+bin/primarydock -p pdbs/OR51/OR51E2.active.pdb -l sdf/propionic_acid.sdf
 ```
 
-(...replacing `{config file}` with the actual name of your config file.)
+After a little while, PrimaryDock will output data about one or more poses, including binding energies per residue, binding energies
+per interaction type, total binding energy, PDB data of the ligand, and PDB data of the flexed residues and binding residues. This
+output can be either captured directly or sent to a .dock file using the `-o` argument, and then parsed by external code written in
+your language of choice for further computation, storage in a database, etc.
 
-After a little while, depending on your config settings, PrimaryDock will output data about one or more poses, including binding energy
-per residue, binding energy per type, total binding energy, PDB data of the ligand, and (if flexing is enabled) PDB data of the flexed
-residues and binding residues. This output can be captured and parsed by external code written in your language of choice, for further
-omputation, storage in a database, etc.
+To view all supported arguments, run `bin/primarydock -h` or `bin/primarydock --help`.
 
-Most of the time, PrimaryDock will find poses with favorable energy levels because of the Best-Binding algorithm, which seeks to match
-binding pocket features with compatible ligand features. However, there may be a few cases when a ligand is a poor fit for a binding
-pocket, and PrimaryDock might find zero output poses. If this happens, you can try increasing the energy limit or performing a soft dock.
-PrimaryDock is stochastic so that its output will be different each time, and rerunning the application can often catch poses that
-previous runs may have missed.
+PrimaryDock is stochastic so that its output will be different each time, and rerunning the application (or increasing the maximum
+number of poses) can often catch poses that previous runs may have missed.
 
 Contributions are always welcome! Please create a branch off of stable, then submit a pull request.
 All PRs that change the C++ classes or any of the apps must pass the master unit tests (`test/unit_test_master.sh`) before merge.

@@ -29,9 +29,12 @@ enum MovabilityType
     MOV_MUST_FLEX   =     0x80,           // Molecule's rotatable bonds are guaranteed free to rotate.
     MOV_MC_FLEX     =     0x40,           // Monte Carlo flexion is allowed.
     MOV_CAN_FLEX    =     0x20,           // Molecule's rotatable bonds may rotate if selected for flexion.
+    MOV_CAN_FLX360  =     0x10,
     MOV_ALL			=   0xfff0,
     MOV_NORECEN		=   0x0ff0,
     MOV_NOAXIAL     =   0xf0f0,
+    MOV_NO360       =   0xffe0,
+    MOV_RES_NO360   =   0x0fe0,
     MOV_FORCEFLEX   =     0xf0,
     MOV_FLEXONLY	=     0x70,
     MOV_PINNED      =     0x04,

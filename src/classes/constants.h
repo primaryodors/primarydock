@@ -8,6 +8,7 @@
 #define triangular (M_PI/1.5)
 #define square (M_PI/2)
 #define hexagonal (M_PI/3)
+#define octagonal (M_PI/4)
 #define circle M_PI*2
 
 #define _kcal_per_kJ 0.239006
@@ -89,15 +90,15 @@
 #define _ALLOW_FLEX_RINGS 1
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
-#define _can_clash_angle (180.0 * fiftyseventh)
+#define _can_clash_angle (110.0 * fiftyseventh)
 #define _allow_fullrot 1
 #define _fullrot_stepdeg 22.5
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
-#define _fullrot_every 5
+#define _fullrot_every 13
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
-#define speed_limit 0.8
+#define speed_limit 0.5
 #define warn_orphan_atoms 0
 
 #define pi_mult_dkytw 264
@@ -146,8 +147,8 @@
 #define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 1.0
-#define lmpull 50
+#define lmpush 0.5
+#define lmpull 150
 #define lmsteps 10
 #define recapture_ejected_ligand 0
 #define summed_missed_connections 1

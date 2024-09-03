@@ -482,6 +482,25 @@ void Bond::fetch_moves_with_atom2(Atom** result)
     result[i] = nullptr;
 }
 
+bool Bond::does_bond_move_atom(Atom* a)
+{
+    int i;
+    if (!moves_with_atom2)
+    {
+        fill_moves_with_cache();
+        enforce_moves_with_uniqueness();
+    }
+    if (!moves_with_atom2)
+    {
+        return false;
+    }
+
+    // Not calling init_nulls() for performance reasons.
+    for (i=0; moves_with_atom2[i]; i++)
+        if (moves_with_atom2[i] == a) return true;
+    return false;
+}
+
 bool Atom::move(Point* pt)
 {
     #if debug_break_on_move

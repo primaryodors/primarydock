@@ -4123,27 +4123,47 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         int heavy_atoms = bb[q]->count_heavy_moves_with_atom2();
                         if (heavy_atoms && (!(a->movability & MOV_CAN_FLEX) || (a->movability & MOV_FORBIDDEN))) continue;
 
+                        if (a->dlt1 && bb[q]->does_bond_move_atom(a->dlt1))
+                        {
+                            if (a->is_residue()) continue;
+                            bb[q] = bb[q]->get_reversed();
+                            if (bb[q]->does_bond_move_atom(a->dlt1)) continue;
+                        }
+
                         #if _dbg_mol_flexion
                         bool is_flexion_dbg_mol_bond = is_flexion_dbg_mol & !strcmp(bb[q]->atom2->name, "OG");
                         #endif
 
-                        if (do_full_rotation && a->is_residue() /*&& benerg <= 0*/ && bb[q]->can_rotate)
+                        if (do_full_rotation && (a->movability & MOV_CAN_FLX360) /* && a->is_residue() && benerg <= 0*/ && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
                             Pose prior_state;
-                            prior_state.copy_state(a);
-                            for (theta=_fullrot_steprad; theta < M_PI*2; theta += _fullrot_steprad)
+                            if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN) && !a->contact_maintained())
                             {
-                                bb[q]->rotate(_fullrot_steprad, false);
-                                if (a->agroups.size() && group_realign)
-                                {
-                                    // group_realign(a, a->agroups);
-                                }
+                                SCoord cm = a->dlt2->get_location().subtract(a->dlt1->get_location());
+                                cm.r -= InteratomicForce::optimal_distance(a->dlt1, a->dlt2);
+                                a->move(cm);
+                            }
+                            prior_state.copy_state(a);
+                            benerg = cfmol_multibind(a, nearby);
+                            for (theta=_fullrot_steprad; theta <= M_PI*2; theta += _fullrot_steprad)
+                            {
+                                bb[q]->rotate(_fullrot_steprad, false, true);
+                                if (!a->is_residue() && theta >= octagonal && theta < M_PI*2-octagonal) continue;
                                 tryenerg = cfmol_multibind(a, nearby);
 
                                 #if _dbg_mol_flexion
                                 if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;
                                 #endif
+
+                                /*if (!a->is_residue()) cout
+                                    << bb[q]->atom1->name << "-" << bb[q]->atom2->name << " "
+                                    << (theta*fiftyseven) << " "
+                                    << (a->dlt1 ? a->dlt1->name : "(nothing)") << " "
+                                    << (a->dlt2 ? a->dlt2->residue : 0) << ":"
+                                    << (a->dlt2 ? a->dlt2->name : "(nothing)") << " "
+                                    << (a->contact_maintained() ? "OK" : "FAIL")
+                                    << endl;*/
 
                                 if (tryenerg > benerg && a->contact_maintained() && a->get_internal_clashes() <= self_clash)
                                 {

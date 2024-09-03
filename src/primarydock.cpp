@@ -712,7 +712,11 @@ int main(int argc, char** argv)
         Molecule* met = p.metals_as_molecule();
         if (met) cfmols[j++] = met;
         if (nwater && waters) for (i=0; i<nwater; i++) cfmols[j++] = &waters[i];
-        for (i=0; i<sphres; i++) cfmols[j++] = reinterpret_cast<Molecule*>(reaches_spheroid[nodeno][i]);
+        for (i=0; i<sphres; i++)
+        {
+            cfmols[j++] = reinterpret_cast<Molecule*>(reaches_spheroid[nodeno][i]);
+            if (reaches_spheroid[nodeno][i]->priority) cfmols[j-1]->movability = MOV_RES_NO360;
+        }
         cfmols[j] = nullptr;
 
         if (nwater && waters) for (i=0; i<nwater; i++)

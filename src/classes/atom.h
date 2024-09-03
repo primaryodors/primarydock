@@ -66,6 +66,7 @@ public:
         moves_with_atom2 = 0;
     }
     void fetch_moves_with_atom2(Atom** result);
+    bool does_bond_move_atom(Atom* a);
     int count_moves_with_atom2();
     int count_heavy_moves_with_atom();
     int count_heavy_moves_with_atom2();

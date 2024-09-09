@@ -2843,6 +2843,12 @@
         },
         "oid": "0d24bc7973e9178611bef12d26ee4cb2"
     },
+    "0d693c7bae7ca65e29c636a8b003e5bb":
+    {
+        "full_name": "(1R,2S,5S)-(-)-isomenthol",
+        "smiles": "C[C@H]1CC[C@H]([C@@H](C1)O)C(C)C",
+        "oid": "0d693c7bae7ca65e29c636a8b003e5bb"
+    },
     "0d93161dac3d4d72075415be1bc94e75":
     {
         "full_name": "gamma-caprolactone",
@@ -10470,9 +10476,14 @@
     "43ba55863f1ec011d729ce8c93e9e504":
     {
         "full_name": "2-furfurylthiol",
-        "smiles": "C1=COC(=C1)CS",
+        "name1": "(furan-2-yl)methanethiol",
+        "smiles": "SCc1ccco1",
         "aroma":
         {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "coffee"
+            ],
             "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
             [
                 "sulfurous",
@@ -10481,6 +10492,13 @@
         },
         "activity":
         {
+            "https:\/\/doi.org\/10.1093\/chemse\/bjw118":
+            {
+                "OR2M3":
+                {
+                    "adjusted_curve_top": "0"
+                }
+            },
             "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
             {
                 "OR2W1":
@@ -13922,7 +13940,8 @@
                     "ec50": "-3.427"
                 }
             }
-        }
+        },
+        "oid": "5f12e00aaedb41f574e8dfc007ff9693"
     },
     "5f14e9c196635f4b84919ded96c1b71a":
     {
@@ -14662,7 +14681,8 @@
     },
     "628f0b25c6ed66360638c6491f25e145":
     {
-        "full_name": "(-)-menthol",
+        "full_name": "(1R,2S,5R)-(-)-menthol",
+        "name1": "(-)-menthol",
         "smiles": "C[C@@H]1CC[C@H]([C@@H](C1)O)C(C)C",
         "aroma":
         {
@@ -15143,6 +15163,17 @@
                 {
                     "type": "na",
                     "adjusted_curve_top": "0"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biopha.2024.117403":
+            {
+                "OR1A1":
+                {
+                    "type": "a"
+                },
+                "OR1G1":
+                {
+                    "type": "a"
                 }
             }
         },
@@ -17575,6 +17606,14 @@
                 {
                     "type": "ia",
                     "adjusted_curve_top": "-14.347825605973"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biopha.2024.117403":
+            {
+                "OR6A2":
+                {
+                    "type": "a",
+                    "ec50": "-4"
                 }
             }
         },
@@ -20729,6 +20768,17 @@
                     "adjusted_curve_top": "6.1",
                     "ec50": "-3.61"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biopha.2024.117403":
+            {
+                "OR1A1":
+                {
+                    "type": "a"
+                },
+                "OR1G1":
+                {
+                    "type": "a"
+                }
             }
         },
         "oid": "856552991e50ec3120124fb0cb155e93"
@@ -22498,6 +22548,14 @@
                 {
                     "ec50": "-3.964"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biopha.2024.117403":
+            {
+                "OR6A2":
+                {
+                    "type": "a",
+                    "ec50": "-5"
+                }
             }
         },
         "oid": "90ba0a98060f887bac95703791beebf8"
@@ -22971,6 +23029,12 @@
             }
         },
         "oid": "9374d0d9c132647f38c6d00e4afa01e0"
+    },
+    "93831581fc102ec5220635097e6f4505":
+    {
+        "full_name": "(1R,2R,5R)-(+)-neoisomenthol",
+        "smiles": "C[C@@H]1CC[C@@H]([C@@H](C1)O)C(C)C",
+        "oid": "93831581fc102ec5220635097e6f4505"
     },
     "93d2e6e26ccdba43664e2a19a2c31194":
     {
@@ -25233,29 +25297,6 @@
         },
         "oid": "a79baa2ec07741d850812f503e1bcb21"
     },
-    "a7df03e9e964ac51ca75a2670cfdd559":
-    {
-        "full_name": "(furan-2-yl)methanethiol",
-        "smiles": "SCc1ccco1",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "coffee"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1093\/chemse\/bjw118":
-            {
-                "OR2M3":
-                {
-                    "adjusted_curve_top": "0"
-                }
-            }
-        },
-        "oid": "a7df03e9e964ac51ca75a2670cfdd559"
-    },
     "a8528269b879add154348c3a5583a480":
     {
         "full_name": "2,4,6-trichlorophenol",
@@ -25798,6 +25839,11 @@
             }
         },
         "oid": "ac35ffb2ee7416888479094607d05069"
+    },
+    "ac432d37485b7f0ec9f7410b8f97b316":
+    {
+        "full_name": "(1S,2S,5S)-(-)-neoisomenthol",
+        "smiles": "C[C@H]1CC[C@H]([C@H](C1)O)C(C)C"
     },
     "ac49f0276a3cff303482b7a25c47aebb":
     {
@@ -27175,6 +27221,12 @@
         },
         "oid": "b271d50ac6a40859d13043bf804c4dfb"
     },
+    "b2960e5069eedc62a664ce4822b365f0":
+    {
+        "full_name": "(1S,2S,5R)-(+)-neomenthol",
+        "smiles": "C[C@@H]1CC[C@H]([C@H](C1)O)C(C)C",
+        "oid": "b2960e5069eedc62a664ce4822b365f0"
+    },
     "b34ca7b041c2c7a844406f2d99a49016":
     {
         "full_name": "methyl jasmonate",
@@ -28124,6 +28176,17 @@
                 {
                     "type": "vwa",
                     "adjusted_curve_top": "0.20000000298023"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biopha.2024.117403":
+            {
+                "OR1A1":
+                {
+                    "type": "a"
+                },
+                "OR1G1":
+                {
+                    "type": "a"
                 }
             }
         },
@@ -30348,6 +30411,12 @@
         },
         "oid": "cbe4ba6b6396ce481ca25ffd88246dcc"
     },
+    "cbee2b2e50169c0c4e4798ff9db7240e":
+    {
+        "full_name": "(1S,2R,5R)-(+)-isomenthol",
+        "smiles": "C[C@@H]1CC[C@@H]([C@H](C1)O)C(C)C",
+        "oid": "cbee2b2e50169c0c4e4798ff9db7240e"
+    },
     "cc2cf68861f527bf30390cb049cea5e5":
     {
         "full_name": "acetophenone",
@@ -30982,6 +31051,12 @@
             }
         },
         "oid": "d187dbf0112107d2183cccbb9c47742b"
+    },
+    "d1f19050bc676e963d06a4d19e6d4309":
+    {
+        "full_name": "(1R,2R,5S)-(-)-neomenthol",
+        "smiles": "C[C@H]1CC[C@@H]([C@@H](C1)O)C(C)C",
+        "oid": "d1f19050bc676e963d06a4d19e6d4309"
     },
     "d28ba1d810c7bc8b1e99081eb0763c27":
     {
@@ -33297,7 +33372,8 @@
     },
     "e079ad580bd31e3912ac91ee1128f734":
     {
-        "full_name": "(+)-menthol",
+        "full_name": "(1S,2R,5S)-(+)-menthol",
+        "name1": "(+)-menthol",
         "smiles": "C[C@H]1CC[C@@H]([C@H](C1)O)C(C)C",
         "aroma":
         {
@@ -37120,6 +37196,14 @@
                 {
                     "type": "ma",
                     "ec50": "-5"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biopha.2024.117403":
+            {
+                "OR2Y1":
+                {
+                    "type": "a",
+                    "ec50": "-3.14"
                 }
             }
         },

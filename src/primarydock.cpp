@@ -1653,6 +1653,8 @@ void apply_protein_specific_settings(Protein* p)
         aa->movability = MOV_FLEXONLY;
         aa->conform_atom_to_location(a->name, target->get_CA_location());
         aa->movability = aamov;
+
+        delete[] words;
     }
 
     dyn_motions.clear();

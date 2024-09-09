@@ -1205,7 +1205,7 @@ void Protein::set_clashables(int resno, bool recursed)
             }
         }
 
-        res_can_clash[i] = new AminoAcid*[maxres+8];
+        if (!res_can_clash[i]) res_can_clash[i] = new AminoAcid*[maxres+8];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];
@@ -3116,6 +3116,8 @@ Atom* Protein::region_pivot_atom(Region rgn)
         }
     }
 
+    delete a;
+    delete b;
     return retval;
 }
 

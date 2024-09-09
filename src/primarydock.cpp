@@ -3407,9 +3407,27 @@ _exitposes:
     if (met) delete met;
 
     time_t finished = time(NULL);
-    cout << "\nCalculation took: " << (finished-began) << " seconds." << endl;
-    if (output) *output << "\nCalculation took: " << (finished-began) << " seconds." << endl;
-    if (debug) *debug << "\nCalculation took: " << (finished-began) << " seconds." << endl;
+    int seconds = finished-began;
+    int minutes = seconds/60;
+    seconds -= 60*minutes;
+    int hours = minutes/60;
+    minutes -= 60*hours;
+
+    std::string elapsed;
+    if (hours)
+    {
+        elapsed += std::to_string(hours);
+        elapsed += (std::string)":";
+        if (minutes < 10) elapsed += (std::string)"0";
+    }
+    elapsed += std::to_string(minutes);
+    elapsed += (std::string)":";
+    if (seconds < 10) elapsed += (std::string)"0";
+    elapsed += std::to_string(seconds);
+
+    cout << "\nCalculation took: " << elapsed << "." << endl;
+    if (output) *output << "\nCalculation took: " << elapsed << "." << endl;
+    if (debug) *debug << "\nCalculation took: " << elapsed << "." << endl;
 
     if (output) output->close();
     if (append_pdb)

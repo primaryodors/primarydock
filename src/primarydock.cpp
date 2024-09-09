@@ -1681,6 +1681,12 @@ void apply_protein_specific_settings(Protein* p)
             BallesterosWeinstein bw = protein->get_bw_from_resno(aa->is_residue());
             if (bw.helix_no == 6 && bw.member_no >= 48 && bw.member_no <= 59) continue;
 
+            std::string rgname = (bw.helix_no < 8 ? "TMR" : (bw.helix_no == 8 ? "HXR" : 
+                ((bw.helix_no == 23 || bw.helix_no == 45 || bw.helix_no == 67) ? "EXR" : "CYT")));
+            if (bw.helix_no < 10) rgname += std::to_string(bw.helix_no);
+            else rgname += std::to_string((int)(bw.helix_no+10)/20);
+            if (i >= protein->get_region_start(rgname.c_str()) && i <= protein->get_region_end(rgname.c_str())) continue;
+
             if (aa->is_alpha_helix()) helixed = true;
             else for (j=i-2; j<=i+2; j++)
             {

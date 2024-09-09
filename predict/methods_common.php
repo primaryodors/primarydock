@@ -647,6 +647,7 @@ heredoc;
         break;
 
         case "pd":
+        $nodel = "";
         if ($cenres)
         {
             foreach (explode(" ", $cenres) as $bw)
@@ -690,6 +691,9 @@ heredoc;
         }
 
         $fam = family_from_protid($protid);
+        if ($fam == "TAAR") $nodel = "NODEL 45.60 5.38";
+        else $nodel = "NODEL 45.51 45.59";
+
         if ($isomers)
         {
             $iso = [];
@@ -734,7 +738,7 @@ PROGRESS
 
 FLEX 1
 $soft
-NODEL 45.60 5.38
+$nodel
 
 OUT $outfname
 OUTPDB 1 $modelfname

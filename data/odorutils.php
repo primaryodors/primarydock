@@ -131,7 +131,7 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 	$obj['ref'] = @$obj['refe'] ?: @$obj['reft'];
 	unset($obj['reft']);
 	unset($obj['refe']);
-	if ($obj['ec50'] < 0 && $obj['adjusted_curve_top'] <= 0) unset($obj['adjusted_curve_top']);
+	if (@$obj['ec50'] < 0 && $obj['adjusted_curve_top'] <= 0) unset($obj['adjusted_curve_top']);
 
 	return $as_object ? $obj : $btyp;
 }

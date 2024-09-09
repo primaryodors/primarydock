@@ -734,6 +734,7 @@ PROGRESS
 
 FLEX 1
 $soft
+NODEL 45.60 5.38
 
 OUT $outfname
 OUTPDB 1 $modelfname

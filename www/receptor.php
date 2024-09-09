@@ -732,7 +732,9 @@ echo "</p>";*/
 <?php if (count($predictions)) { ?>
 <div style="background-color: #fc9; color: 000; font-size: 0.7em; padding: 2px;">
 This page features beta versions of predictions, including links to viewable 3D models. 
-The numbers and models are not yet fully accurate, but the repository is accepting pull requests at
+The numbers and models are not yet guaranteed to be accurate,
+and we welcome collaboration on our codebase.
+The repository is accepting pull requests at
 <a style="color: #00c;" href="https://github.com/primaryodors/primarydock">https://github.com/primaryodors/primarydock</a>.
 </div>
 <?php } ?>

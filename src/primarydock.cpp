@@ -140,6 +140,7 @@ std::vector<Region> softrgns;
 std::vector<Atom*> softrgpiva;
 std::vector<int> softrgn_allowed;
 std::vector<float> softrgn_initclash;
+std::vector<ResiduePlaceholder> soft_nodelete_start, soft_nodelete_end;
 
 AminoAcid*** reaches_spheroid = nullptr;
 int sphres = 0;
@@ -1419,6 +1420,15 @@ int interpret_config_line(char** words)
             }
         }
     }
+    else if (!strcmp(words[0], "NODEL"))
+    {
+        ResiduePlaceholder rpsr, rper;
+        rpsr.set(words[1]);
+        rper.set(words[2]);
+        soft_nodelete_start.push_back(rpsr);
+        soft_nodelete_end.push_back(rper);
+        return 2;
+    }
     else if (!strcmp(words[0], "STATE"))
     {
         states.push_back(origbuff);
@@ -1669,6 +1679,13 @@ void apply_protein_specific_settings(Protein* p)
 
     if (softdock)
     {
+        int sndn = soft_nodelete_start.size();
+        for (i=0; i<sndn; i++)
+        {
+            if (!soft_nodelete_start[i].resno) soft_nodelete_start[i].resolve_resno(protein);
+            if (!soft_nodelete_end[i].resno) soft_nodelete_end[i].resolve_resno(protein);
+        }
+
         n = protein->get_end_resno();
         for (i=1; i<=n; i++)
         {
@@ -1680,6 +1697,23 @@ void apply_protein_specific_settings(Protein* p)
             // TODO: This should not be hard coded to 6.48-6.59, and it should not depend on the protein having BW numbers.
             BallesterosWeinstein bw = protein->get_bw_from_resno(aa->is_residue());
             if (bw.helix_no == 6 && bw.member_no >= 48 && bw.member_no <= 59) continue;
+
+            std::string rgname = (bw.helix_no < 8 ? "TMR" : (bw.helix_no == 8 ? "HXR" : 
+                ((bw.helix_no == 23 || bw.helix_no == 45 || bw.helix_no == 67) ? "EXR" : "CYT")));
+            if (bw.helix_no < 10) rgname += std::to_string(bw.helix_no);
+            else rgname += std::to_string((int)(bw.helix_no+10)/20);
+            if (i >= protein->get_region_start(rgname.c_str()) && i <= protein->get_region_end(rgname.c_str())) continue;
+
+            bool snfound = false;
+            for (j=0; j<sndn; j++)
+            {
+                if (i >= soft_nodelete_start[j].resno && i <= soft_nodelete_end[j].resno)
+                {
+                    snfound = true;
+                    break;
+                }
+            }
+            if (snfound) continue;
 
             if (aa->is_alpha_helix()) helixed = true;
             else for (j=i-2; j<=i+2; j++)

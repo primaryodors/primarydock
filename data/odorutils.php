@@ -97,7 +97,8 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 {
 	global $odors, $sepyt;
 
-	$btyp = $as_object ? false : $sepyt["?"];
+	$btyp = $sepyt["?"];
+	$obj = [];
 
 	$o = find_odorant($aroma);
 
@@ -107,22 +108,32 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 		{
 			if (isset($acv[$protein]))
 			{
-				// echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
+				// echo "<!-- Reference $ref says {$o['full_name']} is ec50 {$acv[$protein]['ec50']} for $protein. -->\n";
 
-				// TODO: This is horribly inadequate for $as_object=true.
-				if (isset($acv[$protein]['type']) && $sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
+				if (isset($acv[$protein]['adjusted_curve_top']) &&
+					(!isset($obj['adjusted_curve_top']) || $obj['adjusted_curve_top'] < floatval($acv[$protein]['adjusted_curve_top'])))
 				{
-					$btyp = $as_object ? $acv[$protein] : @$sepyt[trim($acv[$protein]['type'])];
-					if ($as_object) $btyp['ref'] = $ref;
-					// echo "Ligand type set to $btyp.\n";
+					$obj['adjusted_curve_top'] = floatval($acv[$protein]['adjusted_curve_top']);
+					$obj['reft'] = $ref;
+					$btyp = @$sepyt[trim($acv[$protein]['type'])];
+				}
+				if (isset($acv[$protein]['ec50']) &&
+					(!isset($obj['ec50']) || ($obj['ec50'] > floatval($acv[$protein]['ec50']))))
+				{
+					$obj['ec50'] = floatval($acv[$protein]['ec50']);
+					$obj['refe'] = $ref;
+					$btyp = @$sepyt[trim($acv[$protein]['type'])];
 				}
 			}
 		}
-
-		return $btyp;
 	}
 
-	return $btyp;
+	$obj['ref'] = @$obj['refe'] ?: @$obj['reft'];
+	unset($obj['reft']);
+	unset($obj['refe']);
+	if (@$obj['ec50'] < 0 && $obj['adjusted_curve_top'] <= 0) unset($obj['adjusted_curve_top']);
+
+	return $as_object ? $obj : $btyp;
 }
 
 function empirical_response($protein, $odorobj)

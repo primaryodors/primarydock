@@ -1,0 +1,26 @@
+
+#################################################################################
+#                                                                               #
+# hm/fivewinder.pepd                                                            #
+#                                                                               #
+# Performs winding motions on TMR5 of a specified residue. Useful for the OR2M  #
+# and OR2T subfamilies, as well as any other proteins whose TMR5 region is not  #
+# adequately positioned by the homology modeling system.                        #
+#                                                                               #
+# Example:                                                                      #
+# bin/pepteditor hm/fivewinder.pepd hm/OR2M7.active.pdb -5                      #
+#                                                                               #
+#################################################################################
+
+LET $pdbname = "hm/OR2M7.active.pdb"
+IF $arg2 THEN LET $pdbname = $arg2
+
+LET &amount = 5
+IF $arg3 THEN LET &amount = $arg3
+
+LOAD $pdbname
+
+WIND %A.5.58 %A.TMR5.s &amount
+
+SAVE $pdbname
+

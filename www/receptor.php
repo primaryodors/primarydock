@@ -193,6 +193,28 @@ include("header.php");
 }
 </style>
 <script>
+
+var embdd;
+function show_bsr_chains()
+{
+<?php
+    $tmo = 81;
+    foreach (array_keys($bsr) as $bw)
+    {
+        try
+        {
+            $resno = resno_from_bw($rcpid, $bw);
+            echo "\twindow.setTimeout( function() { embdd.contentWindow.showSideChain($resno); }, $tmo);\n";
+            $tmo += 53;
+        }
+        catch (Exception $ex)
+        {
+            ;
+        }
+    }
+?>
+}
+
 var viewer_loaded = false;
 function load_viewer(obj)
 {
@@ -203,34 +225,24 @@ function load_viewer(obj)
         {
             $('#viewer').on('load', function()
             {
-                var embdd = $('#viewer')[0];
+                embdd = $('#viewer')[0];
                 $("[type=file]", embdd.contentDocument).hide();
                 var filediv = $("#filediv", embdd.contentDocument)[0];
 
-                filediv.innerText = "<?php echo @$rcpid; ?>";
-
-                window.setTimeout( function()
+                <?php chdir(__DIR__);
+                if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
                 {
-                    <?php
-                    $tmo = 81;
-                    foreach (array_keys($bsr) as $bw)
-                    {
-                        try
-                        {
-                            $resno = resno_from_bw($rcpid, $bw);
-                            echo "window.setTimeout( function()\n";
-                            echo "{\n";
-                            echo "embdd.contentWindow.showSideChain($resno);\n";
-                            echo "}, $tmo);\n";
-                            $tmo += 53;
-                        }
-                        catch (Exception $ex)
-                        {
-                            ;
-                        }
-                    }
-                    ?>
-                }, 1234);
+                    echo "filediv.innerHTML = \"$rcpid";
+                    echo " &#xb7; <small><a href=\\\"#\\\" onclick=\\\"load_remote_pdb('pdb.php?prot=$rcpid'); window.parent.setTimeout( window.parent.show_bsr_chains, 1234);\\\">inactive</a></small>";
+                    echo " &#xb7; <small><a href=\\\"#\\\" onclick=\\\"load_remote_pdb('pdb.php?prot=$rcpid&mod=a'); window.parent.setTimeout( window.parent.show_bsr_chains, 1234);\\\">active</a></small>";
+                    echo "\";";
+                }
+                else
+                { ?>
+                filediv.innerText = "<?php echo @$rcpid; ?>";
+                <?php } ?>
+                
+                window.setTimeout( show_bsr_chains, 1234);
             });
             $('#viewer')[0].src = '<?php echo "viewer.php?url=pdb.php&prot=$rcpid"; ?>'; 
         }, 259); 

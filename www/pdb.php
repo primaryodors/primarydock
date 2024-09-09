@@ -24,6 +24,7 @@ chdir("..");
 
 $mod = "upright";
 if (@$_REQUEST['mod'] == 'm') $mod = "metal";
+else if (@$_REQUEST['mod'] == 'a') $mod = "active";
 $pdbfn = "pdbs/$fam/$protid.$mod.pdb";
 if (!file_exists($pdbfn)) $pdbfn = "pdbs/$fam/$protid.upright.pdb";
 

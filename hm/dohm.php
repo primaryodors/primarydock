@@ -41,6 +41,8 @@ foreach ($xlinx as $xl)
         continue;
     }
 
+    if (!$rno1 || !$rno2) continue;
+
     $raa1 = substr($p['sequence'], $rno1-1, 1);
     $raa2 = substr($p['sequence'], $rno2-1, 1);
     if ($raa1 == 'C' && $raa2 == 'C') $disulfs .=
@@ -52,25 +54,13 @@ if ($disulfs) $disulfs = "    def special_patches(self, aln):\n$disulfs";
 
 $mdlcls = "DOPEHRLoopModel";
 
-$pdbname_5k1 = "1015_MM_1_IFD3_cmpd1_1.pdb";
-
-if (!file_exists("$pdbname_5k1"))
-{
-    $copyfrom = "../../OR5K1_binding_site/OR5K1_IFD3_models/MM_IFD3/1015_MM_1_IFD3_cmpd1_1.pdb";
-    if (file_exists($copyfrom))
-    {
-        copy($copyfrom, $pdbname_5k1);
-    }
-    else echo "Warning: Third party OR5K1 model not found. Some olfactory receptors might fail homology modeling.\n"
-        ."Please install https://github.com/dipizio/OR5K1_binding_site and unzip the OR5K1_IFD3_models.zip archive.\n";
-}
-
 exec("php -f build_alignment_file.php");
 
-$OR5K1  = "'1015'";
 $CLASSI = "'8f76', '8hti'";
+$CLASSII = "'OR1B1', 'OR1G1', 'OR2J2', 'OR5AC2', 'OR6C70', 'OR8D1', 'OR10X1', 'OR14J1'";
+$CLASSII_tight = "'OR2M7', 'OR2T11'";
 $TAAR1 = "'8jln', '8jlo', '8jlp', '8jlq', '8jlr', '8jso'";
-$MTAAR9 = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9'";
+$mTAAR = "'8iwe', '8iwm', '8itf', '8iw4', '8iw9', '8pm2'";
 // $ADORA2A = "'6gdg'";
 // $ADRB2 = "'7dhr', '8gej'";
 $LPAR1 = "'7td0', '7yu3'";
@@ -86,8 +76,8 @@ switch ($fam)
         $knowns = $TAAR1;
         $mdlcls = "AutoModel";
     }
-    else if ($rcpid == "TAAR9") $knowns = $MTAAR9;
-    else $knowns = "$MTAAR9, $TAAR1";
+    else if ($rcpid == "TAAR9") $knowns = $mTAAR;
+    else $knowns = "$mTAAR, $TAAR1";
     break;
 
     case 'VN1R':
@@ -103,23 +93,20 @@ switch ($fam)
     case 'OR56':
     if ($rcpid == "OR51E2") $knowns = "'8f76'";
     else $knowns = "$CLASSI";
+    if ($rcpid == "OR51F2") $mdlcls = "AutoModel";
     break;
 
     case 'OR1':
-    $knowns = "$CLASSI, $MTAAR9";
+    $knowns = "$CLASSI, $CLASSII";
     break;
 
     case 'OR2':
-    $knowns = "$CLASSI, $MTAAR9, $TAAR1";       // Seems to work for OR2W1 - hexenol.
-    break;
-
-    case 'OR5':
-    if (!file_exists("$pdbname_5k1")) die("Modeling this receptor requires the third party OR5K1 template.\n");
-    else $knowns = "$OR5K1";
+    if (substr($rcpid, 0, 4) == "OR2M" || substr($rcpid, 0, 4) == "OR2T" || substr($rcpid, 0, 4) == "OR2V") $knowns = $CLASSII_tight;
+    else $knowns = $CLASSII;
     break;
 
     default:        // Class II ORs
-    $knowns = "$CLASSI, $MTAAR9, $TAAR1";      // , $LPAR1
+    $knowns = "$CLASSI, $CLASSII, $mTAAR, $TAAR1";      // , $LPAR1
 }
 
 
@@ -218,14 +205,23 @@ IF $5.58 != "Y" GOTO _not_57_hbond
 IF $7.53 != "Y" GOTO _not_57_hbond
 MEASURE %5.58 "OH" %7.53 "OH" &d57
 ECHO "Y5.58 and Y7.53 are " &d57 "A apart."
-IF &d57 > 5.3 FAIL "Y57 distance is too great."
+IF &d57 > 5.5 FAIL "Y57 distance is too great."
 _not_57_hbond:
 
 A100 &a100
 ECHO "A100 Score: " &a100
 IF &a100 < 10 FAIL "A100 score too low."
 
-IF NOT HELIX %45.53 FAIL "No EXR2 helix."
+IF HELIX %45.51 GOTO _exr2_helix_ok
+IF HELIX %45.52 GOTO _exr2_helix_ok
+IF HELIX %45.53 GOTO _exr2_helix_ok
+IF HELIX %45.54 GOTO _exr2_helix_ok
+IF HELIX %45.55 GOTO _exr2_helix_ok
+IF HELIX %45.56 GOTO _exr2_helix_ok
+IF HELIX %45.57 GOTO _exr2_helix_ok
+SAVE "hm/failed.pdb"
+FAIL "No EXR2 helix."
+_exr2_helix_ok:
 
 DELETE 1 %1.20
 HYDRO
@@ -248,7 +244,7 @@ SAVE \$outf
 
 blixtos;
 
-$fp = fopen("$rcpid.hm.pepd", "w");
+$fp = fopen("$rcpid.hm.pepd", "w") or die("FAILED to open $rcpid.hm.pepd for writing.");
 fwrite($fp, $pepd);
 fclose($fp);
 

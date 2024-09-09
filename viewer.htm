@@ -112,6 +112,7 @@ if (!is_localhost) $.ajax(
 
 function do_initial_load()
 {
+	if (molid == "none") return;
 	var url = getParameterByName('url') ? getParameterByName('url') : website+'/sdf.php';
 
 	var literal_pdb = false;
@@ -492,7 +493,7 @@ body.whtbk option.unknown
     width: 503px;
 }
 
-#seqdd, #sfrndd
+#seqdd, #sfrndd, #statsdd
 {
 	background-color: #223355cc;
 	position: absolute;
@@ -506,6 +507,11 @@ body.whtbk option.unknown
 	border-radius: 15px;
 	overflow-y: auto;
 	max-height: 81%;
+}
+
+#statsdd
+{
+	font-family: Monospace;
 }
 
 body.whtbk #seqdd
@@ -719,12 +725,14 @@ function rotate3D(point, source, axis, theta)
 <a id="nohyd" title="Turn Off Hydrogens" class="nodebtn clickme symbol smaller" onclick="hydrogens=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } update_hydrogens(); $(this).hide(); $('#hydro').show();">&#x1f3dc;&#xFE0F;</a>
 <a id="hydro" title="Turn On Hydrogens" class="nodebtn clickme symbol smaller" onclick="hydrogens=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } update_hydrogens(); $(this).hide(); $('#nohyd').show();" style="display: none;">&#x1F6b0;</a>
 
-<a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
-<a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
+<a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; aqua=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
+<a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; aqua=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colaq').show();" style="display: none;">BORN</a>
+<a id="colaq" title="Colors: Sky & Sea" class="nodebtn clickme symbol smaller" onclick="born=aqua=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">Aqua</a>
 <a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode);">&#x1F388;</a>
 <a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="ballAndStick();" style="display: none; background-color: #234;">&#x1F9B4;</a>
 <a id="spinon" title="Spin On" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
 <a id="spinoff" title="Spin Off" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
+<a id="vstats" title="View Stats" style="display: none;" class="nodebtn clickme symbol smaller" onclick="show_stats();">&#x1f4ca;</a>
 
 <div id="center">
 <a id="fsbtn" class="nodebtn clickme" onclick="if (is_fullscreen) exitFullscreen(); else openFullscreen(document.body); is_fullscreen = !is_fullscreen">&#x26F6;</a>
@@ -1998,7 +2006,7 @@ function spaceFill(resno = -1)
 		}
 		else
 		{
-			// TODO: pull up a list from model[0].structure.residueStore.resno array.
+			// Pull up a list from model[0].structure.residueStore.resno array.
 			var sfrndd = document.createElement('div');
 			sfrndd.id = "sfrndd";
 			sfrndd.style.position = "absolute";
@@ -2069,14 +2077,24 @@ function enable_spacefill()
 }
 
 var born = false;
-var whtbk = false;
+var aqua = false;
+var whtbk  = false;
 var spcfill = false;
 var sfenable = true;
 var hydrogens = true;
+
+var dock_result_txt = [];
+
 if (getParameterByName("born"))
 {
 	born = true;
 	$("#colborn").show();
+	$("#colcpk").hide();
+}
+if (getParameterByName("aqua"))
+{
+	aqua = true;
+	$("#colaq").show();
 	$("#colcpk").hide();
 }
 if (getParameterByName("whtbk"))
@@ -2144,8 +2162,8 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
                 return 0x666666;
             }
 
-        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0033FF);
-        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x3300FF);
+        	case 'O': return aqua ? (atom.isBackbone() ? 0x006666 : 0x00EEFF) : (born ? (atom.isBackbone() ? 0x003366 : 0x00CCFF) : (atom.isBackbone() ? 0x660000 : 0xFF0000));
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xffaa00;
@@ -2228,8 +2246,8 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
                 return 0x777777;
             }
 
-        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0033FF);
-        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x3300FF);
+        	case 'O': return aqua ? (atom.isBackbone() ? 0x006666 : 0x00EEFF) : (born ? (atom.isBackbone() ? 0x003366 : 0x00CCFF) : (atom.isBackbone() ? 0x660000 : 0xFF2222));
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -2267,8 +2285,8 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'H': return 0xe1faff;
 			case 'He': return 0xfcaa93;
         	case 'C': return whtbk ? 0x333741 : 0xa7ada4;
-        	case 'N': return born ? 0xFF3300 : 0x5555FF;
-        	case 'O': return born ? 0x0099FF : 0xFF2222;
+        	case 'N': return born ? 0xFF3300 : 0x5533FF;
+        	case 'O': return aqua ? 0x00EEFF : (born ? 0x00CCFF : 0xFF2222);
 			case 'Ne': return 0xff4e00;
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
@@ -2828,8 +2846,8 @@ function load_remote_sdf(sdfurl)
 		{
 		    if (result.length < 100 && result.indexOf('not found') >= 0)
 		    {
-		        alert('Please make sure openbabel is installed and the compound\'s SMILES string is correct.');
-			$('#pleasewait')[0].innerText = 'Failed to load molecule.';
+		        alert('Please make sure openbabel is installed and the compound\'s SMILES string is correct. Also make sure the web server has access to write to the sdf/ folder.');
+				$('#pleasewait')[0].innerText = 'Failed to load molecule.';
 		        return;
 		    }
 		    $('#posey').show();
@@ -2940,6 +2958,22 @@ function showPose(p)
     if (curr_ligand) $('#ligbtn, #prsv').show();
     
 	set_gmdl_opacity();
+}
+
+function show_stats()
+{
+	var txt = dock_result_txt[gpose][gnode];
+	
+	var statsdd = document.createElement('div');
+	statsdd.id = "statsdd";
+	statsdd.style.position = "absolute";
+	statsdd.style.top = 50;
+	statsdd.style.right = "30%";
+	statsdd.style.maxWidth = "33%";
+	statsdd.setAttribute("onmouseleave", "document.body.removeChild(this);");
+	statsdd.innerText = txt;
+
+	document.body.appendChild(statsdd);
 }
 
 function showNode(n)
@@ -3316,6 +3350,7 @@ function loadFile(fileData, fileName = "")
             {
 		        case 'sdf':
 		        case 'pdb':
+				$("#vstats").hide();
                 stage.removeAllComponents();
                 window.result = fileData;
                 cen_ligand = false;
@@ -3563,6 +3598,7 @@ function loadFile(fileData, fileName = "")
 
             	case 'txt':
             	case 'dock':
+				dock_result_txt = [];
                 stage.removeAllComponents();
                 var lines = fileData.split("\n");
                 cen_ligand = true;
@@ -3582,14 +3618,35 @@ function loadFile(fileData, fileName = "")
                 }
 
 				var lln = lines.length;
+				var lpose = -1, lnode = -1;
 				for (i=0; i<lln; i++)
 				{
-					if (lines[i] == "Original PDB:")
+					if (lines[i].substr(0, 6) == "Pose: ")
 					{
+						lpose = parseInt(lines[i].substr(6));
+						if (typeof dock_result_txt[lpose] == "undefined") dock_result_txt[lpose] = [];
+					}
+					else if (lines[i].substr(0, 6) == "Node: ")
+					{
+						lnode = parseInt(lines[i].substr(6));
+						dock_result_txt[lpose][lnode] = "";
+						$("#vstats").show();
+					}
+					else if (lines[i] == "Original PDB:")
+					{
+						lpose = lnode = -1;
 						orid = false;
 						var pdbdat = "";
 						for (i++; i<lln; i++) pdbdat += lines[i] + "\n";
 						apply_pdb(pdbdat);
+					}
+					else if (lines[i].substr(0, 7) == "ATOM   " || lines[i].substr(0, 7) == "HETATM " || lines[i] == "# PDB Data" || lines[i] == "PDBDAT:")
+					{
+						lpose = lnode = -1;
+					}
+					else if (lpose >= 0 && lnode >= 0)
+					{
+						dock_result_txt[lpose][lnode] += lines[i] + "\n";
 					}
 				}
 

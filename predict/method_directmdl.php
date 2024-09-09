@@ -30,6 +30,7 @@ prepare_outputs();
 
 $metrics_to_process["BEST"] = "Pose1";
 $metrics_to_process["A100"] = "A100";
+$metrics_to_process["occlusion"] = "occlusion";
 
 chdir(__DIR__);
 chdir("..");

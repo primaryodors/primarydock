@@ -287,7 +287,7 @@ function prepare_outputs()
     $odor = find_odorant($ligname);
 
     $size = "7.5 7.5 7.5";
-    $search = "CS";
+    $search = "BB";
     $atomto = [];
     $excl = "";
     $stcr = "";
@@ -447,7 +447,8 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         {
             foreach (explode(" ", $cenres) as $bw)
             {
-                $cenresno[] = resno_from_bw($protid, $bw);
+                $resno = resno_from_bw($protid, $bw);
+                if ($resno) $cenresno[] = $resno;
             }
 
             $cenresno = implode(" ", $cenresno);
@@ -650,7 +651,8 @@ heredoc;
         {
             foreach (explode(" ", $cenres) as $bw)
             {
-                $cenresno[] = resno_from_bw($protid, $bw);
+                $resno = resno_from_bw($protid, $bw);
+                if ($resno) $cenresno[] = $resno;
             }
 
             $cenresno = implode(" ", $cenresno);
@@ -716,6 +718,9 @@ $flxr
 
 EXCL 1 $excl1		# Head, TMR1, and CYT1.
 $excl
+ATOMTO 3.39 EXTENT 7.53
+BRIDGE 3.39 7.49
+STCR 3.39 7.49
 
 SEARCH $search
 POSE $pose
@@ -723,8 +728,8 @@ ELIM $elim
 $flex_constraints
 ITERS $iter
 PROGRESS
-OUTMC 1
-OUTVDWR 1
+# OUTMC 1
+# OUTVDWR 1
 # MOVIE
 
 FLEX 1
@@ -775,7 +780,7 @@ heredoc;
         $num_poses = 0;
         foreach ($outlines as $ln)
         {
-            if (false !== strpos($ln, "pose(s) found"))
+            if (false !== strpos($ln, "pose(s) found") || false !== strpos($ln, "poses found") || false !== strpos($ln, "pose found"))
             {
                 $num_poses = intval($ln);
             }
@@ -852,7 +857,7 @@ heredoc;
             }
         }
 
-        if (false !== strpos($ln, "pose(s) found"))
+        if (false !== strpos($ln, "pose(s) found") || false !== strpos($ln, "poses found") || false !== strpos($ln, "pose found"))
         {
             $num_poses = intval($ln);
             $posesln = true;
@@ -998,6 +1003,19 @@ heredoc;
                     }
                     continue;
                 }
+                else if ($coldiv[0] == "Ligand occlusion")
+                {
+                    $mode = "occlusion";
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                    }
+                    continue;
+                }
                 else if ($coldiv[0] == "Protein clashes")
                 {
                     $mode = "PCLASH";
@@ -1028,9 +1046,19 @@ heredoc;
             }
         }
 
-        if (false !== strpos($ln, "pose(s) found"))
+        if (false !== strpos($ln, "pose(s) found") || false !== strpos($ln, "poses found") || false !== strpos($ln, "pose found"))
         {
             $mode = "POSES";
+            if (isset($metrics_to_process[$mode]))
+            {
+                $wmode = $metrics_to_process[$mode];
+                $outdata[$metrics_prefix.$wmode] = intval($ln);
+            }
+            continue;
+        }
+        else if (false !== strpos($ln, "Repeatability"))
+        {
+            $mode = "Repeatability";
             if (isset($metrics_to_process[$mode]))
             {
                 $wmode = $metrics_to_process[$mode];

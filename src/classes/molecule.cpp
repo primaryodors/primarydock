@@ -3010,6 +3010,12 @@ float Molecule::get_intermol_contact_area(Molecule* ligand, bool hpho)
 
         for (j=0; j<ligand->atcount; j++)
         {
+            if (!ligand->atoms[j])
+            {
+                ligand->atcount = j;
+                break;
+            }
+
             if (hpho && ligand->atoms[j]->is_polar()) continue;
 
             float r = ligand->atoms[j]->get_location().get_3d_distance(&aloc);
@@ -3715,6 +3721,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 if (bb)
                 {
                     int q, rang=0;
+                    float bbodds = 1;
                     for (q=0; bb[q]; q++)
                     {
                         if (!bb[q]->atom1 || !bb[q]->atom2) continue;         // Sanity check, otherwise we're sure to get random foolish segfaults.
@@ -3722,6 +3729,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         if (!bb[q]->count_moves_with_atom2()) continue;
                         if (bb[q]->atom1->is_backbone && strcmp(bb[q]->atom1->name, "CA")) continue;
                         if (bb[q]->atom2->is_backbone) continue;
+                        bbodds *= 0.85;
+                        if (frand(0,1) > bbodds) continue;
                         float theta;
                         int heavy_atoms = bb[q]->count_heavy_moves_with_atom2();
                         if (heavy_atoms && (!(a->movability & MOV_CAN_FLEX) || (a->movability & MOV_FORBIDDEN))) continue;

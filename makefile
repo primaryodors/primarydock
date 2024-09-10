@@ -7,7 +7,7 @@ TMPDIR=tmp
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR) $(TMPDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o \
 	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o $(OBJDIR)/conj.o \
-	$(OBJDIR)/search.o
+	$(OBJDIR)/search.o $(OBJDIR)/cavity.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
 	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test test/cs_test test/mcoord_test
@@ -82,6 +82,9 @@ $(OBJDIR)/group.o: src/classes/group.h src/classes/group.cpp $(OBJDIR)/protein.o
 $(OBJDIR)/search.o: src/classes/search.h src/classes/search.cpp $(OBJDIR)/group.o
 	$(CC) -c src/classes/search.cpp -o $(OBJDIR)/search.o $(CFLAGS)
 
+$(OBJDIR)/cavity.o: src/classes/cavity.h src/classes/cavity.cpp $(OBJDIR)/protein.o
+	$(CC) -c src/classes/cavity.cpp -o $(OBJDIR)/cavity.o $(CFLAGS)
+
 $(OBJDIR)/dynamic.o: src/classes/dynamic.h src/classes/dynamic.cpp $(OBJDIR)/protein.o
 	$(CC) -c src/classes/dynamic.cpp -o $(OBJDIR)/dynamic.o $(CFLAGS)
 
@@ -153,6 +156,9 @@ $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDI
 
 $(BINDIR)/pepteditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
 	$(CC) src/interpreter.cpp $(OBJS) -o $(BINDIR)/pepteditor $(CFLAGS)
+
+$(BINDIR)/cavity_search: src/cavity_search.cpp $(OBJS) $(OBJDIR)/cavity.o
+	$(CC) src/cavity_search.cpp $(OBJS) -o $(BINDIR)/cavity_search $(CFLAGS)
 
 $(BINDIR)/ic: src/ic.cpp $(OBJS) $(OBJDIR)/protein.o
 	$(CC) src/ic.cpp $(OBJS) -o $(BINDIR)/ic $(CFLAGS)

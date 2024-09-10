@@ -141,6 +141,7 @@ std::vector<Atom*> softrgpiva;
 std::vector<int> softrgn_allowed;
 std::vector<float> softrgn_initclash;
 std::vector<ResiduePlaceholder> soft_nodelete_start, soft_nodelete_end;
+char splash[16384];
 
 AminoAcid*** reaches_spheroid = nullptr;
 int sphres = 0;
@@ -881,9 +882,9 @@ void update_progressbar(float percentage)
     if (percentage > 100) percentage = 100;
     cout << "\033[A|";
     int i;
-    for (i=0; i<80; i++)
+    for (i=0; i<100; i++)
     {
-        float cmpi = 1.25*i;
+        float cmpi = i;
         if (cmpi <= percentage)
         {
             float h = M_PI*2 * cmpi / 46 + hueoffset;
@@ -1810,6 +1811,7 @@ void apply_protein_specific_settings(Protein* p)
 
 int main(int argc, char** argv)
 {
+    strcpy(splash, "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n");
     char buffer[65536];
     int i, j;
 
@@ -1854,6 +1856,8 @@ int main(int argc, char** argv)
 
     read_config_file(pf);
     fclose(pf);
+
+    cout << splash << endl << endl;
 
     for (i=1; i<argc; i++)
     {

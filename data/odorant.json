@@ -24106,6 +24106,25 @@
         },
         "oid": "9dea373714bf26fb56f16df79b9c4519"
     },
+    "9eddcecb096618242940feeee841de38":
+    {
+        "full_name": "2-methylundecanoic acid",
+        "smiles": "[O-]C(=O)C(C)CCCCCCCCC",
+        "isomers":
+        {
+            "(R)": "[O-]C(=O)[C@H](C)CCCCCCCCC",
+            "(S)": "[O-]C(=O)[C@@H](C)CCCCCCCCC"
+        },
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "sour_milk",
+                "rancid",
+                "sickening"
+            ]
+        }
+    },
     "a00c3d2eaaca6e91820c963b74b829dd":
     {
         "full_name": "tonka undecanone",
@@ -25844,7 +25863,8 @@
     "ac432d37485b7f0ec9f7410b8f97b316":
     {
         "full_name": "(1S,2S,5S)-(-)-neoisomenthol",
-        "smiles": "C[C@H]1CC[C@H]([C@H](C1)O)C(C)C"
+        "smiles": "C[C@H]1CC[C@H]([C@H](C1)O)C(C)C",
+        "oid": "ac432d37485b7f0ec9f7410b8f97b316"
     },
     "ac49f0276a3cff303482b7a25c47aebb":
     {

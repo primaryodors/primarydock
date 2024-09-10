@@ -152,7 +152,7 @@ bool Point::pt_in_bounding_box(const Point* corner1, const Point* corner2)
     return true;
 }
 
-float Point::magnitude()
+float Point::magnitude() const
 {
     return sqrt(x*x + y*y + z*z);
 }

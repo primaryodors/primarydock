@@ -1442,6 +1442,27 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
     throw BOND_DEF_NOT_FOUND;
 }
 
+float InteratomicForce::optimal_distance(Atom* a, Atom* b)
+{
+    InteratomicForce* forces[32];
+    fetch_applicable(a, b, forces);
+
+    int i;
+    float strongest = 0, optimal = -1;
+    for (i=0; forces[i]; i++)
+    {
+        if (!forces[i]->distance) continue;
+        if (forces[i]->kJ_mol > strongest)
+        {
+            strongest = forces[i]->kJ_mol;
+            optimal = forces[i]->distance;
+        }
+    }
+
+    if (optimal < 0) optimal = a->get_vdW_radius() + b->get_vdW_radius();
+    return optimal;
+}
+
 float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type btype)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();

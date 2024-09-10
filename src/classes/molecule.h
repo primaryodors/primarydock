@@ -121,6 +121,8 @@ public:
     virtual void move(SCoord move_amt, bool override_residue = false);
     virtual void move(Point move_amt, bool override_residue = false);
     virtual void recenter(Point new_location);
+    const Point* obtain_vdW_surface(float density);
+    Atom** get_vdW_vertex_atoms() { return vdw_vertex_atom; }
     void rotate(SCoord* SCoord, float theta, bool bond_weighted = false);
     void rotate(LocatedVector vec, float theta);
     bool shielded(Atom* a, Atom* b) const;
@@ -267,6 +269,9 @@ protected:
     int atcount = 0;
     char* name = 0;
     char* smiles = 0;
+    Point* vdw_surface = nullptr;
+    Atom** vdw_vertex_atom = nullptr;
+    int vdw_vertex_count = 0;
     Atom*** paths = nullptr;
     Ring** rings = nullptr;
     Bond** rotatable_bonds = nullptr;

@@ -1398,14 +1398,17 @@ std::vector<AminoAcid*> Protein::get_residues_can_clash(int sr, int er)
     return result;
 }
 
+
 int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         Molecule* ligand,
         const Point nodecen,
         const Point size,
-        const int* addl_resno
+        const int* addl_resno,
+        bool ip
         )
 {
     int i, j, sphres = 0;
+    float szm = size.magnitude()/2;
     int seql = get_end_resno();
     bool resno_already[8192];
     for (i=0; i<8192; i++) resno_already[i] = false;
@@ -1420,10 +1423,26 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         int resno = aa->get_residue_no();
         if (resno_already[resno]) continue;
 
-        if (aa->priority)
+        if (resno == 264)
+        {
+            j=0;
+        }
+
+        if (!ip && aa->priority)
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;
+            if (sphres >= SPHREACH_MAX-2) break;
+            continue;
+        }
+
+        Atom *la, *na;
+        ligand->mutual_closest_atoms(reinterpret_cast<Molecule*>(aa), &la, &na);
+        if (la->distance_to(na) < 6)
+        {
+            reaches_spheroid[sphres++] = aa;
+            resno_already[resno] = true;
+            if (sphres >= SPHREACH_MAX-2) break;
             continue;
         }
 
@@ -1445,6 +1464,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                             *debug << std::hex << s.n << std::dec << " " << flush;
                         }
                         #endif
+                        if (sphres >= SPHREACH_MAX-2) break;
                     }
                     continue;
                 }
@@ -1461,10 +1481,11 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         if (a) pt2 = a->get_location();
         else   pt2 = ligand->get_barycenter();
 
-        if (pt2.get_3d_distance(ca->get_location()) < 4)
+        if (pt2.get_3d_distance(ca->get_location()) < szm)
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;
+            if (sphres >= SPHREACH_MAX-2) break;
             continue;
         }
 
@@ -1488,6 +1509,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                             *debug << std::hex << s.n << std::dec << " " << flush;
                         }
                         #endif
+                        if (sphres >= SPHREACH_MAX-2) break;
                     }
                     continue;
                 }
@@ -1508,7 +1530,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         SCoord dir(&pt1);
 
-        if (dir.r <= 1)
+        if (dir.r <= 0.75)
         {
             reaches_spheroid[sphres++] = aa;
             resno_already[resno] = true;

@@ -12,28 +12,9 @@
 using namespace std;
 
 Protein* protein;
-Molecule* ligand;
-Molecule* waters;
-int nwater = 0;
-bool progressbar = true;
-bool output_each_iter = false;
-bool flex = true;
-int movie_offset = 0;
-int poses = 10;
-int pose = 1;
-int nodeno = 0;
-float elim = -0.01;
 char* protfname;
-char* ligfname;
-AminoAcid* reaches_spheroid[10][SPHREACH_MAX+16];
 AminoAcid* priorities[64];
-int spinchr = 0;
-float hueoffset = 0;
-bool kcal = false;
 char outfile[1024];
-Atom *ligbba, *resbba;
-bool output_missed_connections = false;
-bool output_vdW_repulsions = false;
 
 int interpret_resno(const char* field)
 {
@@ -79,16 +60,11 @@ int main(int argc, char** argv)
     Point size(_INTERA_R_CUTOFF*0.5, _INTERA_R_CUTOFF*0.5, _INTERA_R_CUTOFF*0.5);
     int iters = 50;
     Protein p("TheProtein");
-    Molecule m("ligand");
     char buffer[65536];
     protein = &p;
-    ligand = &m;
     outfile[0] = 0;
-    char outpdb[1024];
-    int outpdb_poses = 0;
 
-    protfname = ligfname = nullptr;
-    waters = nullptr;
+    protfname = nullptr;
 
     FILE* fp;
 
@@ -106,31 +82,6 @@ int main(int argc, char** argv)
                 protfname = argv[i];
                 fp = fopen(argv[i], "rb");
                 p.load_pdb(fp);
-            }
-            else
-            {
-                cout << "File not found: " << argv[i] << endl;
-                return -1;
-            }
-        }
-        else if ((buffer[0] == '-' && buffer[1] == 'l') || !strcmp(buffer, "--lig") || !strcmp(buffer, "--ligand"))
-        {
-            i++;
-            if (file_exists(argv[i]))
-            {
-                ligfname = argv[i];
-                fp = fopen(argv[i], "rb");
-                if (fp)
-                {
-                    fread(buffer, 1, 65536, fp);
-                    fclose(fp);
-                    m.from_sdf(buffer);
-                }
-                else
-                {
-                    cout << "Failed to open " << argv[i] << " for reading." << endl;
-                    return -1;
-                }
             }
             else
             {
@@ -352,7 +303,6 @@ int main(int argc, char** argv)
     int seqlen = p.get_end_resno();
 
     cout << "PDB file: " << protfname << endl;
-    if (ligfname) cout << "Ligand: " << ligfname << endl;
 
     char* pcntp = strstr(outfile, "%p");
     if (pcntp)
@@ -364,19 +314,6 @@ int main(int argc, char** argv)
         char* dot = strchr(protn, '.');
         if (dot) *dot = 0;
         sprintf(tmp, "%s%s%s", outfile, protn, pcntp);
-        strcpy(outfile, tmp);
-    }
-
-    char* pcntl = strstr(outfile, "%l");
-    if (pcntl)
-    {
-        char tmp[4096], lign[64];
-        *(pcntl++) = 0;
-        *(pcntl++) = 0;
-        strcpy(lign, strrchr(ligfname, '/')+1);
-        char* dot = strchr(lign, '.');
-        if (dot) *dot = 0;
-        sprintf(tmp, "%s%s%s", outfile, lign, pcntl);
         strcpy(outfile, tmp);
     }
 

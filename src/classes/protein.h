@@ -157,6 +157,7 @@ public:
     void set_conditional_basicities();
     float A100();
     Atom* region_pivot_atom(Region region);
+    Point get_region_bounds(int startres, int endres);
 
     // Motion functions
     void upright();

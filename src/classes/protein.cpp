@@ -2649,6 +2649,26 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     return m_mcoord[j];
 }
 
+Point Protein::get_region_bounds(int startres, int endres)
+{
+    Point cen = get_region_center(startres, endres);
+    Point retval(0,0,0);
+
+    int i;
+    for (i=startres; i<=endres; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
+        Point CA = aa->get_CA_location();
+        CA = CA.subtract(cen);
+        if (fabs(CA.x) > retval.x) retval.x = fabs(CA.x);
+        if (fabs(CA.y) > retval.y) retval.y = fabs(CA.y);
+        if (fabs(CA.z) > retval.z) retval.z = fabs(CA.z);
+    }
+
+    return retval;
+}
+
 std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 {
     int i, j, k, l, m, n, q, miter, i2, j1;

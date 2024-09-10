@@ -639,33 +639,48 @@ void iteration_callback(int iter, Molecule** mols)
     n = softrgns.size();
     if (n && iter>8) for (i=0; i<n; i++)
     {
+        Point softpush(0,0,0);
+        Point foravg[softrgns[i].end-softrgns[i].start+16];
+        float pushmax = 0;
+        l = 0;
+
         for (j=softrgns[i].start; j<=softrgns[i].end; j++)
         {
             AminoAcid* aa = protein->get_residue(j);
             if (!aa) continue;
             float c = aa->get_intermol_clashes(ligand);
-            if (c > clash_limit_per_aa)
+            if (c > clash_limit_per_aa*10)
             {
                 Point A = aa->get_CA_location();
-                SCoord AB = ligand->get_nearest_atom(A)->get_location().subtract(A);
+                foravg[l++] = A;
+                SCoord AB = A.subtract(ligand->get_nearest_atom(A)->get_location());
                 AB.r = pow(c, 1.0/3);
-                Point B = A.subtract(AB);
-                Point C = softrgpiva[i]->get_location();
-                Rotation rot = align_points_3d(A, B, C);
-                rot.a = fmin(rot.a, 0.1*softness*fiftyseventh);
-
-                float c1;
-                if (i >= softrgn_initclash.size())
-                {
-                    c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
-                    softrgn_initclash.push_back(c1);
-                }
-                else c1 = softrgn_initclash[i];
-
-                protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, rot.a);
-                float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 20);
-                if (c2 > c1 + clash_limit_per_aa*2) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
+                softpush = softpush.add(AB);
+                if (AB.r > pushmax) pushmax = AB.r;
             }
+        }
+
+        if (l)
+        {
+            SCoord AB = softpush;
+            AB.r = pushmax;
+            Point A = average_of_points(foravg, l);
+            Point B = A.add(AB);
+            Point C = softrgpiva[i]->get_location();
+            Rotation rot = align_points_3d(A, B, C);
+            rot.a = fmin(rot.a, 0.1*softness*fiftyseventh);
+
+            float c1;
+            if (i >= softrgn_initclash.size())
+            {
+                c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
+                softrgn_initclash.push_back(c1);
+            }
+            else c1 = softrgn_initclash[i];
+
+            protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, rot.a);
+            float c2 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end, true, 20);
+            if (c2 > c1 + clash_limit_per_aa*2) protein->rotate_piece(softrgns[i].start, softrgns[i].end, C, rot.v, -rot.a);
         }
     }
 
@@ -1964,6 +1979,7 @@ int main(int argc, char** argv)
         }
         else protein->homology_conform(ptemplt, protein);
 
+        if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_homolog.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");
@@ -1980,6 +1996,7 @@ int main(int argc, char** argv)
             if (res) res->hydrogenate();
         }
 
+        if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_hydro.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");
@@ -1994,6 +2011,7 @@ int main(int argc, char** argv)
         protein->pocketcen = pocketcen;
         mtlcoords = protein->coordinate_metal(mtlcoords);
 
+        if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_metal.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");
@@ -2005,6 +2023,7 @@ int main(int argc, char** argv)
     {
         reconnect_bridges();
 
+        if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_bridged.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");
@@ -2208,6 +2227,7 @@ int main(int argc, char** argv)
         cout << "Static dock - no path nodes." << endl;
         if (output) *output << "Static dock - no path nodes." << endl;
     }
+    if (progressbar) cout << endl;
 
     reaches_spheroid = new AminoAcid**[pathnodes+2];
     for (i=0; i<=pathnodes; i++) reaches_spheroid[i] = new AminoAcid*[SPHREACH_MAX+4];
@@ -3425,9 +3445,9 @@ _exitposes:
     if (seconds < 10) elapsed += (std::string)"0";
     elapsed += std::to_string(seconds);
 
-    cout << "\nCalculation took: " << elapsed << "." << endl;
-    if (output) *output << "\nCalculation took: " << elapsed << "." << endl;
-    if (debug) *debug << "\nCalculation took: " << elapsed << "." << endl;
+    cout << "\nCalculation time: " << elapsed << "." << endl;
+    if (output) *output << "\nCalculation time: " << elapsed << "." << endl;
+    if (debug) *debug << "\nCalculation time: " << elapsed << "." << endl;
 
     if (output) output->close();
     if (append_pdb)

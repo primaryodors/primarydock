@@ -105,6 +105,56 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         reaches_spheroid[i]->clear_atom_binding_energies();
         int resno = reaches_spheroid[i]->get_residue_no();
 
+        if ((reaches_spheroid[i]->has_hbond_acceptors() && ligand->has_hbond_donors())
+            || (reaches_spheroid[i]->has_hbond_donors() && ligand->has_hbond_acceptors())
+           )
+        {
+            int aai, li, aan = reaches_spheroid[i]->get_atom_count(), ln = ligand->get_atom_count();
+            for (li=0; li<ln; li++)
+            {
+                Atom* a = ligand->get_atom(li);
+                if (!a) continue;
+                float apol = a->is_polar();
+                if (fabs(apol) < hydrophilicity_cutoff) continue;
+                int aZ = a->get_Z();
+                if (sgn(apol) > 0 && aZ > 1) continue;
+                for (aai=0; aai<aan; aai++)
+                {
+                    Atom* b = reaches_spheroid[i]->get_atom(aai);
+                    if (!b) continue;
+                    float bpol = b->is_polar();
+                    if (fabs(bpol) < hydrophilicity_cutoff) continue;
+                    int bZ = b->get_Z();
+                    if (sgn(bpol) > 0 && bZ > 1) continue;
+                    if (sgn(apol) == sgn(bpol)) continue;
+                    float r = a->distance_to(b);
+                    if (r > 6) continue;
+
+                    Atom* H = (aZ==1) ? a : b;
+                    Atom* target = (aZ==1) ? b : a;
+                    Atom* targetH = target->is_bonded_to("H");
+                    Bond* bond = H->get_bond_by_idx(0);
+                    if (!bond) continue;
+                    Atom* heavy = bond->atom2;
+                    if (!heavy) continue;
+
+                    bond = heavy->get_bond_by_idx(0);
+                    if (!bond || !bond->atom2) continue;
+
+                    SCoord axis = heavy->get_location().subtract(bond->atom2->get_location());
+                    float theta = find_angle_along_vector(H->get_location(), target->get_location(), heavy->get_location(), axis);
+                    if (targetH && heavy->distance_to(targetH) < target->distance_to(H)) theta += M_PI;
+
+                    Point newHloc1 = rotate3D(H->get_location(), heavy->get_location(), axis, theta);
+                    Point newHloc2 = rotate3D(H->get_location(), heavy->get_location(), axis, -theta);
+
+                    if (newHloc1.get_3d_distance(target->get_location()) < newHloc2.get_3d_distance(target->get_location()))
+                        H->move(newHloc1);
+                    else H->move(newHloc2);
+                }
+            }
+        }
+
         mc_bpotential = 0;
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
         float clash = ligand->get_intermol_clashes(reaches_spheroid[i]);

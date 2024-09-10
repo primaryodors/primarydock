@@ -139,7 +139,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
                     if (!heavy) continue;
 
                     bond = heavy->get_bond_by_idx(0);
-                    if (!bond || !bond->atom2) continue;
+                    if (!bond || !bond->atom2 || !bond->can_rotate()) continue;
 
                     SCoord axis = heavy->get_location().subtract(bond->atom2->get_location());
                     float theta = find_angle_along_vector(H->get_location(), target->get_location(), heavy->get_location(), axis);

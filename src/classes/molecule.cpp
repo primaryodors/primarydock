@@ -3010,6 +3010,12 @@ float Molecule::get_intermol_contact_area(Molecule* ligand, bool hpho)
 
         for (j=0; j<ligand->atcount; j++)
         {
+            if (!ligand->atoms[j])
+            {
+                ligand->atcount = j;
+                break;
+            }
+
             if (hpho && ligand->atoms[j]->is_polar()) continue;
 
             float r = ligand->atoms[j]->get_location().get_3d_distance(&aloc);

@@ -1607,6 +1607,7 @@ var orid;
 var mtlcoord = [];
 var sequence = ["-"];
 var pocket = [0,0,0];
+var cavities = [];
 
 $("#affichage").hide();
 
@@ -2791,7 +2792,7 @@ function load_remote_pdb(pdburl)
                 var ln = lines[i];
 				if (ln.substr(0, 6) == 'REMARK')
 				{
-					var pieces = ln.split(" ");
+					var pieces = ln.replaceAll(/\s+/g, ' ').split(" ");
 					if (pieces[2] == 'HELIX' && (pieces[3].substr(0,3) == 'TMR' || pieces[3].substr(0,3) == 'HXR'))
 					{
 						var tmrno = parseInt(pieces[3].substr(-1));
@@ -2816,6 +2817,24 @@ function load_remote_pdb(pdburl)
 						var resno = parseInt(pieces[4]);
 						if (isNaN(resno)) resno = 0;
 						mcres.push(resno);
+					}
+					else if (pieces[1] == "821" && typeof pieces[3] != "undefined")
+					{
+						var cavno = parseInt(pieces[2]);
+						if (typeof cavities[cavno] == "undefined") cavities[cavno] = [];
+						var cavdata = [];
+						cavdata['x'] = parseFloat(pieces[3]);
+						cavdata['y'] = parseFloat(pieces[4]);
+						cavdata['z'] = parseFloat(pieces[5]);
+						cavdata['r'] = parseFloat(pieces[6]);
+						cavdata['metal'] = pieces[7].indexOf('M') >= 0;
+						cavdata['chargep'] = pieces[7].indexOf('+') >= 0;
+						cavdata['chargen'] = pieces[7].indexOf('-') >= 0;
+						cavdata['hydro'] = pieces[7].indexOf('H') >= 0;
+						cavdata['thio'] = pieces[7].indexOf('S') >= 0;
+						cavdata['pi'] = pieces[7].indexOf('P') >= 0;
+						cavdata['priority'] = pieces[7].indexOf('!') >= 0;
+						cavities[cavno].push(cavdata);
 					}
 				}
 			}
@@ -3124,6 +3143,73 @@ function rainbowNodes()
     }
 
 	set_gmdl_opacity();
+}
+
+function show_cavity(cavno, cmode=0)
+{
+	if (typeof cavities[cavno] == "undefined") return;
+	hide_cavity(cavno);
+
+	var shape = new NGL.Shape("shape");
+	var position = [];
+	var radius = [];
+	var color = [];
+
+	var i, n = cavities.length;
+	for (i=0; i<n; i++)
+	{
+		if (typeof cavities[cavno][i] == undefined) break;
+		position.push(cavities[cavno][i]['x']);
+		position.push(cavities[cavno][i]['y']);
+		position.push(cavities[cavno][i]['z']);
+			radius.push(cavities[cavno][i]['r']);
+
+		var red, green, blue;
+		switch (cmode)
+		{
+			case 1:
+			if (cavities[cavno][i]["metal"]) { red = 0.75; green = 0.6; blue = 0.5; }
+			else if (cavities[cavno][i]["chargen"] && cavities[cavno][i]["chargep"]) { red = 0.75; green = 0.5; blue = 0.75; }
+			else if (cavities[cavno][i]["chargen"]) { red = 0.75; green = 0.5; blue = 0.5; }
+			else if (cavities[cavno][i]["chargep"]) { red = 0.5; green = 0.5; blue = 0.75; }
+			else if (cavities[cavno][i]["hydro"]) { red = 0.5; green = 0.7; blue = 0.75; }
+			else if (cavities[cavno][i]["thio"]) { red = 0.75; green = 0.75; blue = 0.5; }
+			else if (cavities[cavno][i]["pi"]) { red = 0.55; green = 0.5; blue = 0.55; }
+			else { red = 0.6; green = 0.6; blue = 0.6; }
+			break;
+
+			case 2:
+			if (cavities[cavno][i]["priority"]) { red = 0.5; green = 0.75; blue = 0.5; }
+			else { red = 0.6; green = 0.6; blue = 0.6; }
+			break;
+
+			case 0:
+			default:
+			var c = hsl_to_rgb(cavno*360.0/n, 128, 128);
+			red = 0.00392 * (c & 0xff0000) / 65536;
+			green = 0.00392 * (c & 0xff00) / 256;
+			blue = 0.00392 * (c & 0xff);
+		}
+
+		color.push(red);
+		color.push(green);
+		color.push(blue);
+	}
+
+	var sphereBuffer = new NGL.SphereBuffer({ position: new Float32Array(position), color: new Float32Array(color), radius: new Float32Array(radius) });
+	shape.addBuffer(sphereBuffer);
+
+	var shapeComp = stage.addComponentFromObject(shape);
+	cavities[cavno]['shapeComp'] = shapeComp;
+
+	cavities[cavno]['shapeComp'].addRepresentation("buffer", { opacity: 0.3 });
+}
+
+function hide_cavity(cavno)
+{
+	if (typeof cavities[cavno] == "undefined") return;
+	if (typeof cavities[cavno]['shapeComp'] == "undefined") return;
+	cavities[cavno]['shapeComp'].removeAllRepresentations();
 }
 
 $("body").on("keyup", function(e, obj)

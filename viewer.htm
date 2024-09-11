@@ -2562,6 +2562,65 @@ stage.mouseControls.remove( "scroll-alt" );
 stage.mouseControls.remove( "drag-ctrl-right ");
 stage.mouseControls.remove( "drag-ctrl-left ");
 
+function process_cavity_ln(ln)
+{
+	var pieces = ln.replaceAll(/\s+/g, ' ').split(" ");
+	var cavno = parseInt(pieces[2]);
+	if (typeof cavities[cavno] == "undefined")
+	{
+		cavities[cavno] = [];
+		cavities[cavno]['residues'] = [];
+	}
+	var cavdata = [];
+	cavdata['x'] = parseFloat(pieces[3]);
+	cavdata['y'] = parseFloat(pieces[4]);
+	cavdata['z'] = parseFloat(pieces[5]);
+	cavdata['r'] = parseFloat(pieces[6]);
+	if (pieces.length < 8) return;
+	cavdata['metal'] = pieces[7].indexOf('M') >= 0;
+	cavdata['chargep'] = pieces[7].indexOf('+') >= 0;
+	cavdata['chargen'] = pieces[7].indexOf('-') >= 0;
+	cavdata['hydro'] = pieces[7].indexOf('H') >= 0;
+	cavdata['thio'] = pieces[7].indexOf('S') >= 0;
+	cavdata['pi'] = pieces[7].indexOf('P') >= 0;
+	cavdata['priority'] = pieces[7].indexOf('!') >= 0;
+	cavities[cavno].push(cavdata);
+
+	var resno = parseInt(pieces[8]);
+	if (!isNaN(resno)) cavities[cavno]['residues'][resno] = resno;
+}
+
+function finish_cavity_lines()
+{
+	var n = cavities.length;
+	if (n)
+	{
+		var i, j;
+		for (i=0; i<n; i++)
+		{
+			var list = cavities[i]['residues'].values();
+			var newres = [];
+			j = 0;
+			for (let resno of list)
+			{
+				if (resno)
+				{
+					newres[j] = resno;
+					j++;
+				}
+			}
+			cavities[i]['residues'] = newres;
+
+			if (typeof cavities[i]['residues'] != "undefined") cavities[i]['residues'].sort(function(a, b){return a - b});
+		}
+
+		cavities.sort(function(a, b){ return b['residues'].length - a['residues'].length; });
+
+		$('#pockets').show();
+	}
+	else $('#pockets').hide();
+}
+
 function apply_pdb(poresult)
 {
 	var i;
@@ -2573,6 +2632,7 @@ function apply_pdb(poresult)
 	for (i=0; i<result.length; i++)
 	{
 		var ln = result[i];
+		if (ln.substr(0,10) == "REMARK 821") process_cavity_ln(ln);
 		var resno = parseInt(ln.substr(22,4));
 		if (isNaN(resno)) resno = 0;
 		var strandid = ln.substr(21,1).trim();
@@ -2830,60 +2890,12 @@ function load_remote_pdb(pdburl)
 					}
 					else if (pieces[1] == "821" && typeof pieces[3] != "undefined")
 					{
-						var cavno = parseInt(pieces[2]);
-						if (typeof cavities[cavno] == "undefined")
-						{
-							cavities[cavno] = [];
-							cavities[cavno]['residues'] = [];
-						}
-						var cavdata = [];
-						cavdata['x'] = parseFloat(pieces[3]);
-						cavdata['y'] = parseFloat(pieces[4]);
-						cavdata['z'] = parseFloat(pieces[5]);
-						cavdata['r'] = parseFloat(pieces[6]);
-						cavdata['metal'] = pieces[7].indexOf('M') >= 0;
-						cavdata['chargep'] = pieces[7].indexOf('+') >= 0;
-						cavdata['chargen'] = pieces[7].indexOf('-') >= 0;
-						cavdata['hydro'] = pieces[7].indexOf('H') >= 0;
-						cavdata['thio'] = pieces[7].indexOf('S') >= 0;
-						cavdata['pi'] = pieces[7].indexOf('P') >= 0;
-						cavdata['priority'] = pieces[7].indexOf('!') >= 0;
-						cavities[cavno].push(cavdata);
-
-						var resno = parseInt(pieces[8]);
-						if (!isNaN(resno)) cavities[cavno]['residues'][resno] = resno;
+						process_cavity_ln(ln);
 					}
 				}
 			}
 
-			var n = cavities.length;
-			if (n)
-			{
-				for (i=0; i<n; i++)
-				{
-					var list = cavities[i]['residues'].values();
-					var newres = [];
-					j = 0;
-					for (let resno of list)
-					{
-						if (resno)
-						{
-							newres[j] = resno;
-							j++;
-						}
-					}
-					cavities[i]['residues'] = newres;
-
-					if (typeof cavities[i]['residues'] != "undefined") cavities[i]['residues'].sort(function(a, b){return a - b});
-				}
-
-				cavities.sort(function(a, b){
-					return b['residues'].length - a['residues'].length;
-				});
-
-				$('#pockets').show();
-			}
-			else $('#pockets').hide();
+			finish_cavity_lines();
 
 			loadFile(result, protid+'.pdb');
 		}
@@ -3573,6 +3585,10 @@ function loadFile(fileData, fileName = "")
 								var resno = parseInt(pieces[4]);
 								mcres.push(resno);
 							}
+							else if (pieces[1] == "821" && typeof pieces[3] != "undefined")
+							{
+								process_cavity_ln(ln);
+							}
 						}
 						else
                         {
@@ -3614,6 +3630,9 @@ function loadFile(fileData, fileName = "")
                         tmpstr += ln + "\n";
 						last_strandid = strandid;
                     }
+
+					finish_cavity_lines();
+
                     /*if (tmpstr)
                     {
 	                	var stringBlob6a = new Blob( [tmpstr], { type: 'text/plain'} );
@@ -3788,7 +3807,8 @@ function loadFile(fileData, fileName = "")
 				var lpose = -1, lnode = -1;
 				for (i=0; i<lln; i++)
 				{
-					if (lines[i].substr(0, 6) == "Pose: ")
+					if (lines[i].substr(0,10) == "REMARK 821") process_cavity_ln(lines[i]);
+					else if (lines[i].substr(0, 6) == "Pose: ")
 					{
 						lpose = parseInt(lines[i].substr(6));
 						if (typeof dock_result_txt[lpose] == "undefined") dock_result_txt[lpose] = [];
@@ -3816,6 +3836,8 @@ function loadFile(fileData, fileName = "")
 						dock_result_txt[lpose][lnode] += lines[i] + "\n";
 					}
 				}
+
+				finish_cavity_lines();
 
 				if (orid)
 				{

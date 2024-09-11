@@ -92,10 +92,35 @@ if (@$_REQUEST['view'] == "dock")
     $mode = $_REQUEST["mode"];      // active or inactive.
     $n = @$_REQUEST["n"] ?: 1;
 
-
     $dock = "../output/$fam/$protid/$protid.$odor.$mode.dock";
     if (!file_exists($dock)) die("Something went wrong.");
     $txt = file_get_contents($dock);
+
+    $cavfn = "../pdbs/$fam/$protid.".($mode=='active'?$mode:"upright").".cav";
+    if (file_exists($cavfn))
+    {
+        $lines = explode("\n", $txt);
+        foreach ($lines as $i => $ln)
+        {
+            if (substr($ln, 0, 10) != "REMARK 800") continue;
+            $next = @$lines[$i+1];
+            if (substr($next, 0, 10) != "REMARK 800")
+            {
+                $ln .= "\nREMARK 821";
+                $cavs = explode("\n", file_get_contents($cavfn));
+                foreach ($cavs as $cav)
+                {
+                    if (!trim($cav)) continue;
+                    $ln .= "\nREMARK 821 $cav";
+                }
+                $ln .= "\nREMARK 821";
+                $lines[$i] = $ln;
+                break;
+            }
+        }
+    
+        $txt = implode("\n", $lines);
+    }
 
     // $c = str_replace("	var lligbs = get_ligbs_from_orid();\n", $ligbs, $c);
     $c = str_replace("var literal_pdb = false;\n", "var literal_pdb = `$txt`;\n", $c);

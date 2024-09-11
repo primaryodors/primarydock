@@ -514,6 +514,11 @@ body.whtbk option.unknown
 	font-family: Monospace;
 }
 
+#pocketsdd
+{
+	font-size: 13px;
+}
+
 body.whtbk #seqdd
 {
 	background-color: #bbccffcc;
@@ -3052,7 +3057,7 @@ function show_pockets()
 	{
 		if (typeof cavities[i] == 'undefined') break;
 		html += "<p><a onclick=\"show_hide_cavity("+i+", 1);\" style=\"cursor: pointer;\">";
-		html += cavities[i]['residues'].toString();
+		html += cavities[i]['residues'].toString().replaceAll(',',' ');
 		html += "</a></p>\n\n";
 	}
 

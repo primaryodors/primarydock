@@ -41,6 +41,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                     if (r < rmin || !i)
                     {
                         rmin = r;
+                        working.resno = a->residue;
                     }
                     if (r < min_partial_radius) break;
 

@@ -20,6 +20,7 @@ struct CPartial
     bool polar = false;
     bool thio = false;
     bool pi = false;
+    int resno = 0;
 };
 
 class Cavity

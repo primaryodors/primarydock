@@ -308,7 +308,7 @@ int main(int argc, char** argv)
         for (j=0; j<n; j++)
         {
             CPartial* part = cavities[i].get_partial_by_idx(j);
-            if (fp) fprintf(fp, "%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c\n", i, 
+            if (fp) fprintf(fp, "%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %4d\n", i, 
                 part->s.center.x,
                 part->s.center.y,
                 part->s.center.z,
@@ -319,9 +319,10 @@ int main(int argc, char** argv)
                 part->polar    ? 'H' : ' ',
                 part->thio     ? 'S' : ' ',
                 part->pi       ? 'P' : ' ',
-                part->priority ? '!' : ' '
+                part->priority ? '!' : ' ',
+                part->resno
                 );
-            else printf("%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c\n", i, 
+            else printf("%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %4d\n", i, 
                 part->s.center.x,
                 part->s.center.y,
                 part->s.center.z,
@@ -332,7 +333,8 @@ int main(int argc, char** argv)
                 part->polar    ? 'H' : ' ',
                 part->thio     ? 'S' : ' ',
                 part->pi       ? 'P' : ' ',
-                part->priority ? '!' : ' '
+                part->priority ? '!' : ' ',
+                part->resno
                 );
         }
     }

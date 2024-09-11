@@ -89,6 +89,11 @@ int main(int argc, char** argv)
                 return -1;
             }
         }
+        else if ((buffer[0] == '-' && buffer[1] == 'o') || !strcmp(buffer, "--out") || !strcmp(buffer, "--output"))
+        {
+            i++;
+            strcpy(outfile, argv[i]);
+        }
         else if ((buffer[0] == '-' && buffer[1] == 'b') || !strcmp(buffer, "--bsr"))           // Binding Site Residues.
         {
             if (!p.get_seq_length())
@@ -117,6 +122,31 @@ int main(int argc, char** argv)
                 }
                 i++;
             }
+        }
+        else if ((buffer[0] == '-' && buffer[1] == 'a') || !strcmp(buffer, "--atomto"))
+        {
+            if (!p.get_seq_length())
+            {
+                cout << "Protein must be specified before pointing side chains." << endl;
+                return -1;
+            }
+
+            // Conform side chain atoms to location.
+            i++;
+            int resno = interpret_resno(argv[i]);
+            AminoAcid* aa = resno ? p.get_residue(resno) : nullptr;
+
+            i++;
+            Atom* pointing;
+            if (aa && !strcasecmp(argv[i], "ext") || !strcasecmp(argv[i], "extent")) pointing = aa->get_reach_atom();
+            else pointing = aa ? aa->get_atom(argv[i]) : nullptr;
+
+            i++;
+            int tres = interpret_resno(argv[i]);
+            AminoAcid* target = tres ? p.get_residue(tres) : nullptr;
+            Atom* tatom = target ? target->get_nearest_atom(pointing->get_location()) : nullptr;
+
+            if (aa && pointing && target) aa->conform_atom_to_location(pointing->name, tatom->get_location(), 20, InteratomicForce::optimal_distance(pointing, tatom));
         }
         else if ((buffer[0] == '-' && buffer[1] == 'm') || !strcmp(buffer, "--metal"))
         {
@@ -184,31 +214,6 @@ int main(int argc, char** argv)
                 p.coordinate_metal(mtlcoords);
             }
         }
-        else if ((buffer[0] == '-' && buffer[1] == 'a') || !strcmp(buffer, "--atomto"))
-        {
-            if (!p.get_seq_length())
-            {
-                cout << "Protein must be specified before pointing side chains." << endl;
-                return -1;
-            }
-
-            // Conform side chain atoms to location.
-            i++;
-            int resno = interpret_resno(argv[i]);
-            AminoAcid* aa = resno ? p.get_residue(resno) : nullptr;
-
-            i++;
-            Atom* pointing;
-            if (aa && !strcasecmp(argv[i], "ext") || !strcasecmp(argv[i], "extent")) pointing = aa->get_reach_atom();
-            else pointing = aa ? aa->get_atom(argv[i]) : nullptr;
-
-            i++;
-            int tres = interpret_resno(argv[i]);
-            AminoAcid* target = tres ? p.get_residue(tres) : nullptr;
-            Atom* tatom = target ? target->get_nearest_atom(pointing->get_location()) : nullptr;
-
-            if (aa && pointing && target) aa->conform_atom_to_location(pointing->name, tatom->get_location(), 20, InteratomicForce::optimal_distance(pointing, tatom));
-        }
         else if ((buffer[0] == '-' && buffer[1] == 'h') || !strcmp(buffer, "--help"))
         {
             cout << "Usage:" << endl << endl;
@@ -242,7 +247,10 @@ int main(int argc, char** argv)
             cout << "\t\tEither sequence numbers or BW numbers can be used, and the " << endl;
             cout << "\t\tamino acid letters are optional." << endl << endl;
 
-            cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be docked." << endl << endl;
+            cout << "-o, --output\tSpecifies a destination filename for the output data. " << endl;
+            cout << "\t\tTypically, this file would end in a .cav extension." << endl << endl;
+
+            cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be searched." << endl << endl;
 
             return 0;
         }
@@ -299,31 +307,32 @@ int main(int argc, char** argv)
         n = cavities[i].count_partials();
         for (j=0; j<n; j++)
         {
+            CPartial* part = cavities[i].get_partial_by_idx(j);
             if (fp) fprintf(fp, "%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c\n", i, 
-                cavities[i].get_partial_by_idx(j)->s.center.x,
-                cavities[i].get_partial_by_idx(j)->s.center.y,
-                cavities[i].get_partial_by_idx(j)->s.center.z,
-                cavities[i].get_partial_by_idx(j)->s.radius,
-                cavities[i].get_partial_by_idx(j)->metallic ? 'M' : ' ',
-                cavities[i].get_partial_by_idx(j)->chargedn ? '-' : ' ',
-                cavities[i].get_partial_by_idx(j)->chargedp ? '+' : ' ',
-                cavities[i].get_partial_by_idx(j)->polar    ? 'H' : ' ',
-                cavities[i].get_partial_by_idx(j)->thio     ? 'S' : ' ',
-                cavities[i].get_partial_by_idx(j)->pi       ? 'P' : ' ',
-                cavities[i].get_partial_by_idx(j)->priority ? '!' : ' '
+                part->s.center.x,
+                part->s.center.y,
+                part->s.center.z,
+                part->s.radius,
+                part->metallic ? 'M' : ' ',
+                part->chargedn ? '-' : ' ',
+                part->chargedp ? '+' : ' ',
+                part->polar    ? 'H' : ' ',
+                part->thio     ? 'S' : ' ',
+                part->pi       ? 'P' : ' ',
+                part->priority ? '!' : ' '
                 );
             else printf("%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c\n", i, 
-                cavities[i].get_partial_by_idx(j)->s.center.x,
-                cavities[i].get_partial_by_idx(j)->s.center.y,
-                cavities[i].get_partial_by_idx(j)->s.center.z,
-                cavities[i].get_partial_by_idx(j)->s.radius,
-                cavities[i].get_partial_by_idx(j)->metallic ? 'M' : ' ',
-                cavities[i].get_partial_by_idx(j)->chargedn ? '-' : ' ',
-                cavities[i].get_partial_by_idx(j)->chargedp ? '+' : ' ',
-                cavities[i].get_partial_by_idx(j)->polar    ? 'H' : ' ',
-                cavities[i].get_partial_by_idx(j)->thio     ? 'S' : ' ',
-                cavities[i].get_partial_by_idx(j)->pi       ? 'P' : ' ',
-                cavities[i].get_partial_by_idx(j)->priority ? '!' : ' '
+                part->s.center.x,
+                part->s.center.y,
+                part->s.center.z,
+                part->s.radius,
+                part->metallic ? 'M' : ' ',
+                part->chargedn ? '-' : ' ',
+                part->chargedp ? '+' : ' ',
+                part->polar    ? 'H' : ' ',
+                part->thio     ? 'S' : ' ',
+                part->pi       ? 'P' : ' ',
+                part->priority ? '!' : ' '
                 );
         }
     }

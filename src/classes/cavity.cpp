@@ -7,7 +7,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     if (cmax < 1) return 0;
 
     int i, j, l, sr = p->get_start_resno(), er = p->get_end_resno();
-    float x, y, z, step;
+    float x, y, z, step, yoff = 0, zoff = 0;
     Point pcen = p->get_region_center(sr, er), pbox = p->get_region_bounds(sr, er);
     step = cav_xyz_step;
     AminoAcid* can_clash[SPHREACH_MAX+4];
@@ -22,9 +22,11 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     for (x = pcen.x - pbox.x + min_dist_bounding_box; x <= pcen.x + pbox.x - min_dist_bounding_box; x += step)
     {
         cout << "." << flush;
-        for (y = pcen.y - pbox.y + min_dist_bounding_box; y <= pcen.y + pbox.y - min_dist_bounding_box; y += step)
+        yoff = yoff ? 0 : step/2;
+        for (y = pcen.y - pbox.y + min_dist_bounding_box - yoff; y <= pcen.y + pbox.y - min_dist_bounding_box; y += step)
         {
-            for (z = pcen.z - pbox.z + min_dist_bounding_box; z <= pcen.z + pbox.z - min_dist_bounding_box; z += step)
+            zoff = zoff ? 0 : step/2;
+            for (z = pcen.z - pbox.z + min_dist_bounding_box - zoff; z <= pcen.z + pbox.z - min_dist_bounding_box; z += step)
             {
                 Point pt(x,y,z);
                 dummy.recenter(pt);

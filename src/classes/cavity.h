@@ -31,6 +31,7 @@ class Cavity
     void add_partial(CPartial p);
     void output_ngl_js(FILE* fp);
     int count_partials();
+    CPartial* get_partial_by_idx(int idx) { return &partials[idx]; }
     Point get_center();
     CPartial* point_inside_pocket(Point pt);
     float containment_violations(Molecule* m, float stop_if_more_than = Avogadro);

@@ -232,29 +232,9 @@ int main(int argc, char** argv)
             cout << "\t\tcounted as a BSR. Residues listed in this option are given " << endl;
             cout << "\t\tspecial priority for ligand binding." << endl << endl;
 
-            cout << "-c, --kcal\tOutput energies in kcal/mol. Default is kJ/mol." << endl << endl;
-
-            cout << "-d, --model\tSpecifies the filename of output PDB models for dock " << endl;
-            cout << "\t\tposes. The syntax is -d num_poses path/to/file.pdb, where " << endl;
-            cout << "\t\tnum_poses is a positive integer. The special codes %p and %l " << endl;
-            cout << "\t\tcan be used as placeholders for the protein name and ligand " << endl;
-            cout << "\t\tname, respectively, and PrimaryDock will automatically fill " << endl;
-            cout << "\t\tthem in. Similarly, the %o placeholder will be auto-replaced " << endl;
-            cout << "\t\twith the pose number in decreasing order of energetic " << endl;
-            cout << "\t\tfavorability. This filename normally ends with a .pdb " << endl;
-            cout << "\t\textension." << endl << endl;
-
-            cout << "-e, --energy\tSet maximum energy for output poses." << endl;
-            cout << "\t\tCandidate poses not meeting this requirement will be omitted." << endl << endl;
-
             cout << "-h, --help\tShows this help screen." << endl << endl;
 
-            cout << "-i, --iter\tSets the number of dock iterations." << endl;
-            cout << "\t\tHigher numbers will produce better results, but at diminishing " << endl;
-            cout << "\t\tgains and longer processing time. Too few iterations will " << endl;
-            cout << "\t\tproduce inaccurate results and/or failed docks." << endl << endl;
-
-            cout << "-l, --ligand\tSpecifies a file in SDF format for the ligand to be docked." << endl << endl;
+            // cout << "-l, --ligand\tSpecifies a file in SDF format for the ligand to be docked." << endl << endl;
 
             cout << "-m, --metal\tSpecifies a metal coordination site. Can occur multiple " << endl;
             cout << "\t\ttimes. The format is: -m element charge coordinating_residues. " << endl;
@@ -262,28 +242,7 @@ int main(int argc, char** argv)
             cout << "\t\tEither sequence numbers or BW numbers can be used, and the " << endl;
             cout << "\t\tamino acid letters are optional." << endl << endl;
 
-            cout << "-n, --poses\tSets the maximum number of output poses." << endl << endl;
-
-            cout << "-o, --out\tSpecifies an output filename for dock results. The special " << endl;
-            cout << "\t\tcodes %p and %l will be replaced with the name of the protein " << endl;
-            cout << "\t\tand ligand, respectively. This filename normally ends with a " << endl;
-            cout << "\t\t.dock extension." << endl << endl;
-
-            cout << "--outmc\tIncludes \"missed connections\", residues that could not optimally " << endl;
-            cout << "\t\tbind to the ligand, in the output." << endl << endl;
-
-            cout << "--outvdwr\tIncludes van der Waals repulsions between the ligand and nearby " << endl;
-            cout << "\t\tresidues in the output." << endl << endl;
-
             cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be docked." << endl << endl;
-
-            cout << "-q\t\tSuppresses the progress bar." << endl << endl;
-
-            cout << "-v, --movie\tCreates a dock file in the tmp/ folder showing each iteration " << endl;
-            cout << "\t\tof the dock algorithm. Used for debugging." << endl << endl;
-
-            cout << "-w, --water\tAdds a specified number of water molecules to the binding pocket, " << endl;
-            cout << "\t\te.g. -w 5 to add 5 molecules." << endl << endl;
 
             return 0;
         }
@@ -331,6 +290,45 @@ int main(int argc, char** argv)
     int qfound = Cavity::scan_in_protein(&p, cavities, 1024);
 
     cout << "Found " << qfound << " cavit" << (qfound == 1 ? "y." : "ies.") << endl;
+
+    if (strlen(outfile)) fp = fopen(outfile, "w");
+    else fp = nullptr;
+
+    for (i=0; i<qfound; i++)
+    {
+        n = cavities[i].count_partials();
+        for (j=0; j<n; j++)
+        {
+            if (fp) fprintf(fp, "%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c\n", i, 
+                cavities[i].get_partial_by_idx(j)->s.center.x,
+                cavities[i].get_partial_by_idx(j)->s.center.y,
+                cavities[i].get_partial_by_idx(j)->s.center.z,
+                cavities[i].get_partial_by_idx(j)->s.radius,
+                cavities[i].get_partial_by_idx(j)->metallic ? 'M' : ' ',
+                cavities[i].get_partial_by_idx(j)->chargedn ? '-' : ' ',
+                cavities[i].get_partial_by_idx(j)->chargedp ? '+' : ' ',
+                cavities[i].get_partial_by_idx(j)->polar    ? 'H' : ' ',
+                cavities[i].get_partial_by_idx(j)->thio     ? 'S' : ' ',
+                cavities[i].get_partial_by_idx(j)->pi       ? 'P' : ' ',
+                cavities[i].get_partial_by_idx(j)->priority ? '!' : ' '
+                );
+            else printf("%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c\n", i, 
+                cavities[i].get_partial_by_idx(j)->s.center.x,
+                cavities[i].get_partial_by_idx(j)->s.center.y,
+                cavities[i].get_partial_by_idx(j)->s.center.z,
+                cavities[i].get_partial_by_idx(j)->s.radius,
+                cavities[i].get_partial_by_idx(j)->metallic ? 'M' : ' ',
+                cavities[i].get_partial_by_idx(j)->chargedn ? '-' : ' ',
+                cavities[i].get_partial_by_idx(j)->chargedp ? '+' : ' ',
+                cavities[i].get_partial_by_idx(j)->polar    ? 'H' : ' ',
+                cavities[i].get_partial_by_idx(j)->thio     ? 'S' : ' ',
+                cavities[i].get_partial_by_idx(j)->pi       ? 'P' : ' ',
+                cavities[i].get_partial_by_idx(j)->priority ? '!' : ' '
+                );
+        }
+    }
+
+    if (fp) fclose(fp);
 
     fp = fopen("cavities.js", "w");
     if (fp)

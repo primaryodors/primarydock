@@ -650,7 +650,7 @@ void iteration_callback(int iter, Molecule** mols)
             AminoAcid* aa = protein->get_residue(j);
             if (!aa) continue;
             float c = aa->get_intermol_clashes(ligand);
-            if (c > clash_limit_per_aa*10)
+            if (c > clash_limit_per_aa)
             {
                 Point A = aa->get_CA_location();
                 foravg[l++] = A;

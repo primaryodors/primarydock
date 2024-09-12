@@ -656,6 +656,12 @@ heredoc;
                 if ($resno) $cenresno[] = $resno;
             }
 
+            $fam = family_from_protid($protid);
+            $cavfname = "pdbs/$fam/$protid.upright.cav";
+            if (!file_exists($cavfname)) passthru("bin/cavity_search pdbs/$fam/$protid.upright.pdb $cavfname");
+            $cavfname = "pdbs/$fam/$protid.active.cav";
+            if (!file_exists($cavfname)) passthru("bin/cavity_search pdbs/$fam/$protid.active.pdb $cavfname");
+
             $cenresno = implode(" ", $cenresno);
             $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
             echo "$cmd\n";
@@ -690,7 +696,6 @@ heredoc;
             }
         }
 
-        $fam = family_from_protid($protid);
         if ($fam == "TAAR") $nodel = "NODEL 45.60 5.38";
         else $nodel = "NODEL 45.51 45.59";
 

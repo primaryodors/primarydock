@@ -3024,8 +3024,6 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
             }
         }
     }
-    // cout << "Total: " << kJmol << endl;
-    // cout << endl;
 
     return kJmol;
 }

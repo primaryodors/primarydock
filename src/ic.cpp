@@ -29,10 +29,15 @@ int main(int argc, char** argv)
         {
             if (cl[j] < aa) continue;
             if (fabs(cl[j]->get_residue_no() - i) < 3) continue;
+            // float r = aa->get_CA_location().get_3d_distance(cl[j]->get_CA_location());
+            Atom *a, *b;
+            aa->Molecule::mutual_closest_atoms(cl[j], &a, &b);
+            if (!a || !b) continue;
+            float r = a->distance_to(b);
+            if (r > _INTERA_R_CUTOFF) continue;
 
-            float f = aa->get_intermol_binding(cl[j]);
-            float r = aa->get_CA_location().get_3d_distance(cl[j]->get_CA_location());
-            if (fabs(f) >= threshold) cout << *aa << "-" << *cl[j] << ": " << -f << " r=" << r << "Å" << endl;
+            float f = aa->get_intermol_binding(cl[j], false);
+            if (fabs(f) >= threshold) cout << *aa << "-" << *cl[j] << ": r=" << r << "Å" << endl;
         }
     }
 }

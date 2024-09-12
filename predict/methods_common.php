@@ -382,6 +382,7 @@ function prepare_outputs()
     
         if (isset($mbp["atomto"]))
         {
+            if (!is_array($mbp["atomto"])) $mbp["atomto"] = [$mbp["atomto"]];
             foreach ($mbp["atomto"] as $a2)
             {
                 $atomto[] = "ATOMTO $a2";
@@ -418,8 +419,8 @@ function prepare_outputs()
         }
         else die("Unsupported receptor family.\n");
     }
-    
-    $atomto = implode("\n", $atomto);    
+
+    $atomto = implode("\n", $atomto);
 }
 
 $multicall = 0;

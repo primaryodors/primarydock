@@ -658,9 +658,9 @@ heredoc;
 
             $fam = family_from_protid($protid);
             $cavfname = "pdbs/$fam/$protid.upright.cav";
-            if (!file_exists($cavfname)) passthru("bin/cavity_search pdbs/$fam/$protid.upright.pdb $cavfname");
+            if (!file_exists($cavfname)) passthru("bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname");
             $cavfname = "pdbs/$fam/$protid.active.cav";
-            if (!file_exists($cavfname)) passthru("bin/cavity_search pdbs/$fam/$protid.active.pdb $cavfname");
+            if (!file_exists($cavfname)) passthru("bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname");
 
             $cenresno = implode(" ", $cenresno);
             $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";

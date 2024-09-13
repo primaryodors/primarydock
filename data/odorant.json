@@ -20757,12 +20757,11 @@
             },
             "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
             {
-                "OR51E2":
+                "OR52E1":
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.25",
-                    "ec50": "-4.43",
-                    "notes": "Mislabeled as \"OR52E1\" in the literature."
+                    "ec50": "-4.43"
                 },
                 "OR51I2":
                 {

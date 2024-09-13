@@ -180,7 +180,7 @@ int main(int argc, char** argv)
                 oxy.move(&loc);
                 oxy.clear_geometry_cache();
 
-                float tb = InteratomicForce::total_binding(anisoa, &probe);
+                float tb = InteratomicForce::total_binding(anisoa, &probe).summed();
 
                 if (tb > best_energy) best_energy = tb;
 

@@ -48,7 +48,7 @@ float DynamicMotion::get_ligand_contact_energy(Molecule* ligand)
         AminoAcid* aa = prot->get_residue(i);
         if (!aa) continue;
     
-        float e = -((Molecule*)aa)->get_intermol_binding(ligand);
+        float e = -((Molecule*)aa)->get_intermol_binding(ligand).summed();
         result += e;
     }
 
@@ -79,7 +79,7 @@ float DynamicMotion::get_nearby_contact_energy()
         {
             if (aa->get_CA_location().get_3d_distance(nearby_contacts[j]->get_CA_location()) > (aa->get_reach() + nearby_contacts[j]->get_reach()) ) continue;
 
-            float e = 0; // -aa->get_intermol_binding(nearby_contacts[j]);
+            float e = 0;
             m = nearby_contacts[j]->get_atom_count();
 
             for (k=0; k<n; k++)
@@ -217,7 +217,7 @@ float DynamicMotion::apply_incremental_nochecks(float amt)
 {
     AminoAcid* aa;
     Point fulcrum, ptaxis;
-    int i, j, sr, er;
+    int i, j, sr, er, dir;
     float lamt, lamt_phi, lamt_psi;
     LocatedVector lv;
 
@@ -294,15 +294,18 @@ float DynamicMotion::apply_incremental_nochecks(float amt)
         if (!i) throw -1;
         er = i - 50 + end_resno.member_no;
 
+        dir = sgn(er-sr);
+
         lamt = amt * bias * fiftyseventh;
         last_change = amt;
         lamt_phi = lamt/(M_PI*2) * (ALPHA_PHI - -M_PI);
         lamt_psi = lamt/(M_PI*2) * (ALPHA_PSI - -M_PI);
 
-        for (i=sr; i<=er; i++)
+        for (i=sr; 1; i+=dir)
         {
-            prot->rotate_backbone_partial(i, er, N_asc, lamt_phi);
-            prot->rotate_backbone_partial(i, er, CA_asc, lamt_psi);
+            prot->rotate_backbone_partial(i, er, dir>0 ? N_asc : CA_desc, lamt_phi);
+            prot->rotate_backbone_partial(i, er, dir>0 ? CA_asc : C_desc, lamt_psi);
+            if (i == er) break;
         }
         applied += amt;
 

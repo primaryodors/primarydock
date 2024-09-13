@@ -2493,7 +2493,7 @@ void Molecule::move(SCoord move_amt, bool override_residue)
     int i;
 
     #if _dbg_improvements_only_rule
-    float before;
+    Interaction before;
     if (check_ligand && check_mols && !excuse_deterioration) before = cfmol_multibind(check_ligand, check_mols);
     #endif
 
@@ -2508,8 +2508,8 @@ void Molecule::move(SCoord move_amt, bool override_residue)
     #if _dbg_improvements_only_rule
     if (check_ligand && check_mols && !excuse_deterioration) 
     {
-        float after = cfmol_multibind(check_ligand, check_mols);
-        if (after < before) throw 0xb0661;
+        Interaction after = cfmol_multibind(check_ligand, check_mols);
+        if (!after.improved(before)) throw 0xb0661;
     }
     excuse_deterioration = false;
     #endif
@@ -2825,7 +2825,7 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     return retval;
 }
 
-float Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
+Interaction Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
@@ -2888,21 +2888,21 @@ float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
     return kJmol;
 }
 
-float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
+Interaction Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 {
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
     int i, j, l;
-    float kJmol = 0;
+    Interaction kJmol;
     if (!atoms) return 0;
-    if (subtract_clashes) kJmol -= get_internal_clashes();
+    if (subtract_clashes) kJmol.repulsive += get_internal_clashes();
 
     lastshielded = 0;
     clash1 = clash2 = nullptr;
     float best_atom_energy = 0;
 
     #if _dbg_internal_energy
-    cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
+    cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol.summed() << endl;
     #endif
 
     for (i=0; atoms[i]; i++)
@@ -2961,7 +2961,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         missed_connection.r = -Avogadro;
                         mc_bpotential = 0;
                         // cout << ligands[l]->atoms[j]->get_location().subtract(atoms[i]->get_location()) << ": ";
-                        float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
+                        Interaction abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                         #if _dbg_internal_energy
                         if (ligands[l] == this)
                         {
@@ -2969,37 +2969,37 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 << " = " << abind << " kJ/mol." << endl;
                         }
                         #endif
-                        if (abind && !isnan(abind) && !isinf(abind))
+                        if ((abind.attractive || abind.repulsive) && !isnan(abind.summed()) && !isinf(abind.summed()))
                         {
-                            if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;
+                            if (abind.summed() > 0 && minimum_searching_aniso && ligands[l]->priority) abind.attractive *= 1.5;
                             kJmol += abind;
 
-                            if (abind > best_atom_energy)
+                            if (abind.summed() > best_atom_energy)
                             {
-                                best_atom_energy = abind;
+                                best_atom_energy = abind.summed();
                                 best_intera = atoms[i];
                                 best_interactor = ligands[l];
                                 best_other_intera = ligands[l]->atoms[j];
                             }
 
-                            atoms[i]->last_bind_energy += abind;
-                            if (abind > atoms[i]->strongest_bind_energy)
+                            atoms[i]->last_bind_energy += abind.summed();
+                            if (abind.attractive > atoms[i]->strongest_bind_energy)
                             {
-                                atoms[i]->strongest_bind_energy = abind;
+                                atoms[i]->strongest_bind_energy = abind.attractive;
                                 atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
                             }
 
-                            if (abind < 0 && -abind > clash_worst)
+                            if (abind.summed() < 0 && abind.repulsive > clash_worst)
                             {
-                                clash_worst = -abind;
+                                clash_worst = abind.repulsive;
                                 clash1 = atoms[i];
                                 clash2 = ligands[l]->atoms[j];
                             }
 
-                            if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
+                            if (abind.summed() < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
-                                ptd.multiply(fmin(fabs(-abind) / 1000, 1));
+                                ptd.multiply(fmin(fabs(-abind.summed()) / 1000, 1));
                                 lmx += lmpush * sgn(ptd.x);
                                 lmy += lmpush * sgn(ptd.y);
                                 lmz += lmpush * sgn(ptd.z);
@@ -3019,7 +3019,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             lmz += lmpull * mc.z * mc_bpotential / mcrr;
                         }
                     }
-                    else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
+                    else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]).summed();
                 }
             }
         }
@@ -3288,17 +3288,16 @@ void Molecule::delete_mandatory_connections()
     #endif
 }
 
-float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
+Interaction Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 {
     float lbias = 1.0 + (sgn(is_residue()) == sgn(om->is_residue()) ? 0 : dock_ligand_bias);
-    float rawbind = get_intermol_binding(om, !is_ac);
-    float lbind = rawbind * lbias;
+    Interaction rawbind = get_intermol_binding(om, !is_ac);
+    Interaction lbind = rawbind * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
-    lbind += get_intermol_contact_area(om, true) * cavity_stuffing;
-    float clashes = get_intermol_clashes(om);
-    lbind -= clashes * iteration_additional_clash_coefficient;
+    lbind.attractive += get_intermol_contact_area(om, true) * cavity_stuffing;
+    lbind.repulsive *= iteration_additional_clash_coefficient;
 
-    if (mandatory_connection && rawbind >= 0)                   // Allow pullaway if mols are clashing.
+    if (mandatory_connection && rawbind.summed() >= 0)                   // Allow pullaway if mols are clashing.
     {
         int i;
         if (!last_mc_binding)
@@ -3311,11 +3310,11 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
         {
             if (mandatory_connection[i] == om)
             {
-                if (lbind < last_mc_binding[i] && lbind < mandatory_coordination_threshold)
+                if (lbind.summed() < last_mc_binding[i] && lbind.summed() < mandatory_coordination_threshold)
                 {
                     return -1e9;
                 }
-                else last_mc_binding[i] = lbind;
+                else last_mc_binding[i] = lbind.summed();
             }
         }
     }
@@ -3323,24 +3322,24 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     return lbind;
 }
 
-float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
+Interaction Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 {
     if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic()) ((AminoAcid*)a)->set_conditional_basicity(nearby);
 
-    float result = -a->total_eclipses();
+    Interaction result = -a->total_eclipses();
     if (a->is_residue()) result += reinterpret_cast<AminoAcid*>(a)->initial_eclipses;
 
     int j;
     for (j=0; nearby[j]; j++)
     {
-        float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
+        Interaction f = a->intermol_bind_for_multimol_dock(nearby[j], false);
         result += f;
     }
     if (a->mclashables)
     {
         for (j=0; a->mclashables[j]; j++)
         {
-            float f = a->intermol_bind_for_multimol_dock(a->mclashables[j], false);
+            Interaction f = a->intermol_bind_for_multimol_dock(a->mclashables[j], false);
             result += f;
         }
     }
@@ -3454,10 +3453,10 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters, float od)
     }
 }
 
-float Molecule::total_intermol_binding(Molecule** l)
+Interaction Molecule::total_intermol_binding(Molecule** l)
 {
     int i;
-    float f = 0;
+    Interaction f;
 
     for (i=0; l[i]; i++)
     {
@@ -3505,7 +3504,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             Point aloc = a->get_barycenter();
 
-            float benerg = 0;
+            Interaction benerg = 0;
             l = 0;
             for (j=0; j<n; j++)
             {
@@ -3530,7 +3529,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if (!a->check_Greek_continuity()) throw 0xbadc0de;
             #endif
 
-            float tryenerg;
+            Interaction tryenerg;
             Pose pib;
             // pib.copy_state(a);
 
@@ -3556,7 +3555,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
                         tryenerg = cfmol_multibind(a, nearby);
 
-                        if (tryenerg > benerg)
+                        if (tryenerg.improved(benerg))
                         {
                             benerg = tryenerg;
                             pib.copy_state(a);
@@ -3599,7 +3598,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     if (!i) cout << "(linear motion try " << -tryenerg << ") ";
                     #endif
 
-                    if (tryenerg > benerg)
+                    if (tryenerg.improved(benerg))
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
@@ -3627,7 +3626,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                         tryenerg = cfmol_multibind(a, nearby);
 
-                        if (tryenerg > benerg)
+                        if (tryenerg.improved(benerg))
                         {
                             benerg = tryenerg;
                             pib.copy_state(a);
@@ -3675,7 +3674,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                     tryenerg = cfmol_multibind(a, nearby);
 
-                    if (tryenerg > benerg)
+                    if (tryenerg.improved(benerg))
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
@@ -3717,7 +3716,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     a->rotate(&axis, theta);
                     tryenerg = cfmol_multibind(a, nearby);
 
-                    if (tryenerg > benerg)
+                    if (tryenerg.improved(benerg))
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
@@ -3791,7 +3790,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;
                                 #endif
 
-                                if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
+                                if (tryenerg.improved(benerg) && a->get_internal_clashes() <= self_clash)
                                 {
                                     benerg = tryenerg;
                                     best_theta = theta;
@@ -3847,7 +3846,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             if (is_flexion_dbg_mol_bond) cout << "Trying " << (theta*fiftyseven) << "deg rotation...";
                             #endif
 
-                            if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
+                            if (tryenerg.improved(benerg) && a->get_internal_clashes() <= self_clash)
                             {
                                 benerg = tryenerg;
                                 pib.copy_state(a);
@@ -3874,7 +3873,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 if (!i) cout << "flexion " << -benerg << " ";
                 #endif
 
-                mm[i]->lastbind = benerg;
+                mm[i]->lastbind = benerg.summed();
             }   // if MOV_CAN_FLEX
 
             #if _dbg_fitness_plummet
@@ -3955,10 +3954,10 @@ SCoord Molecule::motion_to_optimal_contact(Molecule* l)
     SCoord total_motion(0,0,0);
     SCoord incremental_motion;
 
-    float energy = -this->get_intermol_binding(l);
+    Interaction energy = this->get_intermol_binding(l);
 
     incremental_motion = this->get_barycenter().subtract(l->get_barycenter());
-    incremental_motion.r = sgn(energy);
+    incremental_motion.r = sgn(energy.summed());
 
     int i;
 
@@ -3969,9 +3968,9 @@ SCoord Molecule::motion_to_optimal_contact(Molecule* l)
     for (i=0; i<50; i++)
     {
         this->move(incremental_motion, true);
-        float new_energy = -this->get_intermol_binding(l);
+        Interaction new_energy = this->get_intermol_binding(l);
 
-        if (new_energy < energy)        // Improvement
+        if (new_energy.improved(energy))
         {
             energy = new_energy;
             total_motion = total_motion.add(incremental_motion);

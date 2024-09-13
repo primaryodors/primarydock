@@ -455,7 +455,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                 {
                     if (residues[i] == laa[j]) continue;
                     // if (residues[i]->get_intermol_clashes(laa[j]) >= 1)
-                    if (fabs(residues[i]->get_intermol_binding(laa[j])) >= 1)
+                    if (fabs(residues[i]->get_intermol_binding(laa[j]).summed()) >= 1)
                     {
                         #if _dbg_repack
                         dbgresstr += (std::string)" " + (std::string)laa[j]->get_name();
@@ -544,20 +544,19 @@ float Protein::get_rel_int_clashes()
     return get_internal_clashes(0, 0, false) - initial_int_clashes;
 }
 
-float Protein::get_internal_binding()
+Interaction Protein::get_internal_binding()
 {
     if (!residues) return 0;
     int i, j;
-    float result = 0;
+    Interaction result;
     for (i=0; residues[i]; i++)
     {
         for (j=i; residues[j]; j++)
         {
-            /*if (j==i) result += residues[i]->get_internal_binding();
-            else*/ result += residues[i]->get_intermol_binding(residues[j]);
+            result += residues[i]->get_intermol_binding(residues[j]);
         }
     }
-    result += initial_int_clashes;              // Compensate for AminoAcid::get_intermol_binding() which factors in clashes.
+    result.repulsive -= initial_int_clashes;              // Compensate for AminoAcid::get_intermol_binding() which factors in clashes.
     return result;
 }
 
@@ -576,14 +575,14 @@ float Protein::get_intermol_clashes(Molecule* ligand)
     return result;
 }
 
-float Protein::get_intermol_binding(Molecule* ligand)
+Interaction Protein::get_intermol_binding(Molecule* ligand)
 {
     AminoAcid** laminos = new AminoAcid*[SPHREACH_MAX+4];
     Point size(0,0,0);
     int cres = get_residues_can_clash_ligand(laminos, ligand, ligand->get_barycenter(), size, nullptr);
     if (!cres) return 0;
     int i;
-    float result = 0;
+    Interaction result;
     for (i=0; i<cres; i++)
     {
         result += laminos[i]->Molecule::get_intermol_binding(ligand);
@@ -639,7 +638,7 @@ void Protein::find_residue_initial_bindings()
         for (j=0; aa[j]; j++)
         {
             if (aa[j] == residues[i]) continue;
-            float f = residues[i]->get_intermol_binding(aa[j]);
+            float f = residues[i]->get_intermol_binding(aa[j]).summed();
             ib += f;
             if (j > i && f > maxb)
             {
@@ -1789,7 +1788,8 @@ void Protein::conform_backbone(int startres, int endres,
 
             // Get the preexisting nearby residues and inter-residue binding/clash value.
             // These will likely have changed since last iteration.
-            float bind=0, bind1=0, angle;
+            Interaction bind, bind1;
+            float angle;
 
             for (i=res; i != endres; i += inc)
             {
@@ -1797,18 +1797,18 @@ void Protein::conform_backbone(int startres, int endres,
                 if (!aa) continue;
                 AminoAcid** rcc = get_residues_can_clash(i);
                 if (!rcc) cout << "No clashables." << endl;
-                if (a1 && (iter >= ignore_clashes_until)) bind -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
+                if (a1 && (iter >= ignore_clashes_until)) bind.repulsive += aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
                 else bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1 && iter>10)
             {
                 Point pt = a1->get_location();
-                bind += alignfactor/(pt.get_3d_distance(target1)+0.001);
+                bind.attractive += alignfactor/(pt.get_3d_distance(target1)+0.001);
             }
             if (a2 && iter>10)
             {
                 Point pt = a2->get_location();
-                bind += alignfactor/(pt.get_3d_distance(target2)+0.001);
+                bind.attractive += alignfactor/(pt.get_3d_distance(target2)+0.001);
             }
 
             if (reinterpret_cast<long>(get_residue(res)) < 0x1000) cout << "Warning missing residue " << res << endl << flush;
@@ -1830,22 +1830,22 @@ void Protein::conform_backbone(int startres, int endres,
                 if (a1)
                 {
                     Point pt = a1->get_location();
-                    bind1 += alignfactor/(pt.get_3d_distance(target1)+0.001);
+                    bind1.attractive += alignfactor/(pt.get_3d_distance(target1)+0.001);
                 }
                 if (a2)
                 {
                     Point pt = a2->get_location();
-                    bind1 += alignfactor/(pt.get_3d_distance(target2)+0.001);
+                    bind1.attractive += alignfactor/(pt.get_3d_distance(target2)+0.001);
                 }
                 if (a3)
                 {
                     Point pt = a3->get_location();
-                    bind1 += alignfactor/(pt.get_3d_distance(target3)+0.001);
+                    bind1.attractive += alignfactor/(pt.get_3d_distance(target3)+0.001);
                 }
 
                 // If no, put it back.
                 // if (res == startres) cout << bind << " v. " << bind1 << endl;
-                if (bind1 < tolerance*bind || (a1 && iters_since_improvement > 10 && frand(0,1)<0.25))
+                if (!bind1.improved(bind) || (a1 && iters_since_improvement > 10 && frand(0,1)<0.25))
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
                     if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, angle*eando_mult[residx]);
@@ -1854,7 +1854,7 @@ void Protein::conform_backbone(int startres, int endres,
                 }
                 else
                 {
-                    if (bind1 < bind) bind = bind1;
+                    if (!bind1.improved(bind)) bind = bind1;
                     if (iter & 1) momenta1o[residx] *= enhance;
                     else momenta1e[residx] *= enhance;
                 }
@@ -1878,22 +1878,22 @@ void Protein::conform_backbone(int startres, int endres,
             if (a1)
             {
                 Point pt = a1->get_location();
-                bind1 += alignfactor/(pt.get_3d_distance(target1)+0.001);
+                bind1.attractive += alignfactor/(pt.get_3d_distance(target1)+0.001);
             }
             if (a2)
             {
                 Point pt = a2->get_location();
-                bind1 += alignfactor/(pt.get_3d_distance(target2)+0.001);
+                bind1.attractive += alignfactor/(pt.get_3d_distance(target2)+0.001);
             }
             if (a3)
             {
                 Point pt = a3->get_location();
-                bind1 += alignfactor/(pt.get_3d_distance(target3)+0.001);
+                bind1.attractive += alignfactor/(pt.get_3d_distance(target3)+0.001);
             }
 
             // If no, put it back.
             // if (res == startres) cout << bind << " vs. " << bind1 << endl;
-            if (bind1 < tolerance*bind || (a1 && iters_since_improvement > 10 && frand(0,1)<0.25))
+            if (!bind1.improved(bind) || (a1 && iters_since_improvement > 10 && frand(0,1)<0.25))
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
                 if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
@@ -2696,7 +2696,6 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
     for (i=0; i<n; i++)
     {
         m_mcoords.push_back(mtlcoords[i]);
-        int charge_left = mtlcoords[i].charge;
         Point lpt;
         Molecule** lmc = new Molecule*[mtlcoords[i].coordres.size()+4];
         lmc[0] = new Molecule("lcm");
@@ -2727,7 +2726,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                 lpt = lpt.add(aa->get_CA_location());
 
                 // If cysteine, make thiolate form.
-                if (aa->is_thiol() && charge_left)
+                if (aa->is_thiol())
                 {
                     if (Ss)
                     {
@@ -2737,7 +2736,6 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                         {
                             aa->delete_atom(H);
                             S->increment_charge(-1);
-                            charge_left--;
                         }
                     }
                 }
@@ -3143,7 +3141,7 @@ Atom* Protein::region_pivot_atom(Region rgn)
             }
             else
             {
-                float e = fmin(-InteratomicForce::total_binding(*a, *b), -aa->get_intermol_binding(ab));
+                float e = fmin(-InteratomicForce::total_binding(*a, *b).summed(), -aa->get_intermol_binding(ab).summed());
                 if (e < beststr)
                 {
                     beststr = e;
@@ -3965,7 +3963,7 @@ void Protein::minimize_residue_clashes(int resno)
     aa->movability = mt[0];
 }
 
-float Protein::binding_to_nearby_residues(int resno)
+Interaction Protein::binding_to_nearby_residues(int resno)
 {
     AminoAcid** caa = get_residues_can_clash(resno);
     if (!caa) return 0;

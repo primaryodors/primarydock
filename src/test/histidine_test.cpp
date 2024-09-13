@@ -23,11 +23,11 @@ int main(int argc, char** argv)
     AminoAcid* aa155 = p.get_residue(155);
     AminoAcid* aa159 = p.get_residue(159);
 
-    float hbond = aa155->get_intermol_binding(aa109);
+    float hbond = aa155->get_intermol_binding(aa109).summed();
     if (false && hbond < 2 && aa155->hisflips)
     {
         aa155->do_histidine_flip(aa155->hisflips[0]);
-        hbond = aa155->get_intermol_binding(aa109);
+        hbond = aa155->get_intermol_binding(aa109).summed();
         /*fp = fopen("pdbs/OR1/OR1E1.upright.pdb", "wb");
         if (!fp) throw 0xfffe;
         p.save_pdb(fp);
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 
     cout << aa109->get_name() << ":" << b->name << " polarity: " << polar << " binding energy " << -b->last_bind_energy << endl;
 
-    float energy = -InteratomicForce::total_binding(a, b);
+    float energy = -InteratomicForce::total_binding(a, b).summed();
 
     cout << "Interatomic energy: " << energy << endl;
 

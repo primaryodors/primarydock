@@ -154,7 +154,7 @@ float contact_energy(Protein* a, Protein* b, bool repack = false, int a_from = 0
     for (i=0; mols[i]; i++)
     {
         if (!mols[i]) continue;
-        f -= mols[i]->get_intermol_binding(mols);
+        f -= mols[i]->get_intermol_binding(mols).summed();
     }
 
     #if debug_contact_energy
@@ -951,7 +951,7 @@ int main(int argc, char** argv)
                 a2.paa = working->get_residue(r2);
                 if (!a2.n) raise_error((std::string)"Residue " + to_string(r2) + (std::string)" not found in protein.");
 
-                script_var[n].value.f = -(a1.pmol->get_intermol_binding(a2.pmol));
+                script_var[n].value.f = -(a1.pmol->get_intermol_binding(a2.pmol)).summed();
             }
 
             else if (!strcmp(words[0], "BRIDGE"))

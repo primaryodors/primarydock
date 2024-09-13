@@ -29,7 +29,7 @@ int main(int argc, char** argv)
 
     // Sandwich configuration.
     m2.move(Point(0,0,3.87));
-    e = -m1.get_intermol_binding(&m2);
+    e = -m1.get_intermol_binding(&m2).summed();
     cout << "Sandwich stack energy: " << e << " kJ/mol." << endl;
     pf = fopen("output/sandwich.sdf", "wb");
     if (!pf) { cout << "FAILED to open output file, please check output dir for write access." << endl; return -1; }
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 
     // Parallel displaced.
     m2.move(Point(0,1.09,0));
-    e = -m1.get_intermol_binding(&m2);
+    e = -m1.get_intermol_binding(&m2).summed();
     cout << "Parallel displaced stack energy: " << e << " kJ/mol." << endl;
     pf = fopen("output/pdisp.sdf", "wb");
     if (!pf) { cout << "FAILED to open output file, please check output dir for write access." << endl; return -1; }
@@ -51,7 +51,7 @@ int main(int argc, char** argv)
     m2.recenter(Point(0,0,4.96));
     SCoord axis = Point(1,0,0);
     m2.rotate(&axis, M_PI/2, false);
-    e = -m1.get_intermol_binding(&m2);
+    e = -m1.get_intermol_binding(&m2).summed();
     cout << "T-stack energy: " << e << " kJ/mol." << endl;
     pf = fopen("output/tstack.sdf", "wb");
     if (!pf) { cout << "FAILED to open output file, please check output dir for write access." << endl; return -1; }

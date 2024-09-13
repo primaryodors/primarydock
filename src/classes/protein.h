@@ -127,9 +127,9 @@ public:
     // Metrics functions.
     float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false, int repack_iters = 10);
     float get_rel_int_clashes();
-    float get_internal_binding();
+    Interaction get_internal_binding();
     float get_intermol_clashes(Molecule* ligand);
-    float get_intermol_binding(Molecule* ligand);
+    Interaction get_intermol_binding(Molecule* ligand);
     AminoAcid** get_residues_can_clash(int resno);
     std::vector<AminoAcid*> get_residues_can_clash(int start_resno, int end_resno);
     int get_residues_can_clash_ligand
@@ -150,7 +150,7 @@ public:
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
-    float binding_to_nearby_residues(int resno);
+    Interaction binding_to_nearby_residues(int resno);
     void minimize_residue_clashes(int resno);
     float region_can_move(int startres, int endres, SCoord direction, bool repack = false, int ignore_startres = 0, int ignore_endres = 0);
     float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false, float extra_clash_allowance = 0, int ignore_startres = 0, int ignore_endres = 0);     // Searches positive theta.

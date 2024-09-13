@@ -21,6 +21,53 @@ std::vector<std::string> interaudit;
 bool interauditing = false;
 #endif
 
+Interaction::Interaction()
+{
+    attractive = 0;
+    repulsive = 0;
+}
+
+Interaction::Interaction(double v)
+{
+    attractive = fmax(v, 0);
+    repulsive = fmax(-v, 0);
+}
+
+Interaction Interaction::operator+(Interaction const& obj)
+{
+    Interaction result;
+    result.attractive = attractive + obj.attractive;
+    result.repulsive = repulsive + obj.repulsive;
+    return result;
+}
+    
+Interaction Interaction::operator+=(Interaction const& obj)
+{
+    attractive += obj.attractive;
+    repulsive += obj.repulsive;
+    return obj;
+}
+
+Interaction Interaction::operator*(double const& f)
+{
+    Interaction result;
+    result.attractive = attractive * f;
+    result.repulsive = repulsive * f;
+    return result;
+}
+
+Interaction Interaction::operator+=(float const& f)
+{
+    attractive += f;
+    return *this;
+}
+
+Interaction Interaction::operator-=(float const& f)
+{
+    repulsive += f;
+    return *this;
+}
+
 void InteratomicForce::append_by_Z(int Za, int Zb, InteratomicForce* iff)
 {
     int i;
@@ -607,13 +654,13 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
 
 #define _num_force_precedences 6
 const intera_type force_precedence[_num_force_precedences] = {mcoord, ionic, hbond, pi, polarpi, vdW};
-float InteratomicForce::total_binding(Atom* a, Atom* b)
+Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
 {
     InteratomicForce* forces[32];
     fetch_applicable(a, b, forces);
 
     int i, j, k;
-    float kJmol = 0;
+    Interaction kJmol = 0;
     float partial = 0;
 
     InteratomicForce* forces_by_type[_num_force_precedences];
@@ -691,7 +738,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (achg && sgn(achg) == sgn(bchg))
     {
         float repulsion = charge_repulsion * achg*bchg / pow(r, 2);
-        kJmol -= repulsion;
+        kJmol.repulsive += repulsion;
         k = (ionic - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] -= repulsion;
     }
@@ -733,7 +780,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (sb && sb->atom2 && sb->atom2->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
-        kJmol -= pr;
+        kJmol.repulsive += pr;
         k = (hbond - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] -= pr;
     }
@@ -757,7 +804,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (!atoms_are_bonded && achg && bchg && sgn(achg) == -sgn(bchg))
     {
         float pcf = 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
-        kJmol += pcf;
+        kJmol.attractive += pcf;
         k = (ionic - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] += pcf;
     }
@@ -1242,7 +1289,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             #endif
         }
 
-        kJmol += partial;
+        kJmol.attractive += partial;
         if (partial > 0.5 && forces[i]->distance < rbind) 
         {
             float f = forces[i]->distance / rbind;
@@ -1297,7 +1344,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 str += (std::string)"unk";
             }
 
-            str += (std::string)" " + to_string(-partial) + (std::string)" (" + to_string(-kJmol) + (std::string)")";
+            str += (std::string)" " + to_string(-partial) + (std::string)" (" + to_string(-kJmol.summed()) + (std::string)")";
 
             str += (std::string)" theta: " + to_string(atheta*fiftyseven) + (std::string)", " + to_string(btheta*fiftyseven);
 
@@ -1351,7 +1398,7 @@ _canstill_clash:
     {
         // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << achg << " " << bchg << endl;
         clash = fmax(Lennard_Jones(a, b, sigma), 0);
-        kJmol -= clash;
+        kJmol.repulsive += clash;
         k = (vdW - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] -= clash;
 
@@ -1387,6 +1434,11 @@ float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
     return Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
 }
 
+bool Interaction::improved(Interaction rel)
+{
+    if (summed() < -clash_limit_per_aa*10) return rel.repulsive > repulsive;
+    return attractive > rel.attractive || repulsive < rel.repulsive;
+}
 
 float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 {

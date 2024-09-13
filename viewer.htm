@@ -493,7 +493,7 @@ body.whtbk option.unknown
     width: 503px;
 }
 
-#seqdd, #sfrndd, #statsdd
+#seqdd, #sfrndd, #statsdd, #pocketsdd
 {
 	background-color: #223355cc;
 	position: absolute;
@@ -512,6 +512,11 @@ body.whtbk option.unknown
 #statsdd
 {
 	font-family: Monospace;
+}
+
+#pocketsdd
+{
+	font-size: 13px;
 }
 
 body.whtbk #seqdd
@@ -730,6 +735,9 @@ function rotate3D(point, source, axis, theta)
 <a id="colaq" title="Colors: Aqua" class="nodebtn clickme symbol smaller" onclick="born=aqua=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">Aqua</a>
 <a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode);">&#x1F388;</a>
 <a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="ballAndStick();" style="display: none; background-color: #234;">&#x1F9B4;</a>
+
+<a id="pockets" title="Pockets" style="display: none;" class="nodebtn clickme symbol smaller" onclick="show_pockets();">&#x1f998;</a>
+
 <a id="spinon" title="Spin On" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
 <a id="spinoff" title="Spin Off" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
 <a id="vstats" title="View Stats" style="display: none;" class="nodebtn clickme symbol smaller" onclick="show_stats();">&#x1f4ca;</a>
@@ -1607,6 +1615,8 @@ var orid;
 var mtlcoord = [];
 var sequence = ["-"];
 var pocket = [0,0,0];
+var cavities = [];
+var last_clicked_cavity = false;
 
 $("#affichage").hide();
 
@@ -1701,7 +1711,8 @@ stage.mouseControls.add( "scroll-ctrl+shift", function( stage, delta )
 
 function centerPocket()
 {
-	stage.viewerControls.center( 
+	if (last_clicked_cavity) last_clicked_cavity['shapeComp'].autoView();
+	else stage.viewerControls.center( 
 	{
 		x: pocket[0],
 		y: pocket[1],
@@ -2537,8 +2548,8 @@ stage.setParameters(
 {
 	'backgroundColor': '#020408',
 	'ambientColor': '#59f',
-    'ambientIntensity': 0.6,
-	'lightColor': '#fc8',
+    'ambientIntensity': 0.3,
+	'lightColor': '#fff0e0',
     'lightIntensity': 0.8,
 });
 
@@ -2551,6 +2562,65 @@ stage.mouseControls.remove( "scroll-alt" );
 stage.mouseControls.remove( "drag-ctrl-right ");
 stage.mouseControls.remove( "drag-ctrl-left ");
 
+function process_cavity_ln(ln)
+{
+	var pieces = ln.replaceAll(/\s+/g, ' ').split(" ");
+	var cavno = parseInt(pieces[2]);
+	if (typeof cavities[cavno] == "undefined")
+	{
+		cavities[cavno] = [];
+		cavities[cavno]['residues'] = [];
+	}
+	var cavdata = [];
+	cavdata['x'] = parseFloat(pieces[3]);
+	cavdata['y'] = parseFloat(pieces[4]);
+	cavdata['z'] = parseFloat(pieces[5]);
+	cavdata['r'] = parseFloat(pieces[6]);
+	if (pieces.length < 8) return;
+	cavdata['metal'] = pieces[7].indexOf('M') >= 0;
+	cavdata['chargep'] = pieces[7].indexOf('+') >= 0;
+	cavdata['chargen'] = pieces[7].indexOf('-') >= 0;
+	cavdata['hydro'] = pieces[7].indexOf('H') >= 0;
+	cavdata['thio'] = pieces[7].indexOf('S') >= 0;
+	cavdata['pi'] = pieces[7].indexOf('P') >= 0;
+	cavdata['priority'] = pieces[7].indexOf('!') >= 0;
+	cavities[cavno].push(cavdata);
+
+	var resno = parseInt(pieces[8]);
+	if (!isNaN(resno)) cavities[cavno]['residues'][resno] = resno;
+}
+
+function finish_cavity_lines()
+{
+	var n = cavities.length;
+	if (n)
+	{
+		var i, j;
+		for (i=0; i<n; i++)
+		{
+			var list = cavities[i]['residues'].values();
+			var newres = [];
+			j = 0;
+			for (let resno of list)
+			{
+				if (resno)
+				{
+					newres[j] = resno;
+					j++;
+				}
+			}
+			cavities[i]['residues'] = newres;
+
+			if (typeof cavities[i]['residues'] != "undefined") cavities[i]['residues'].sort(function(a, b){return a - b});
+		}
+
+		cavities.sort(function(a, b){ return b['residues'].length - a['residues'].length; });
+
+		$('#pockets').show();
+	}
+	else $('#pockets').hide();
+}
+
 function apply_pdb(poresult)
 {
 	var i;
@@ -2562,6 +2632,7 @@ function apply_pdb(poresult)
 	for (i=0; i<result.length; i++)
 	{
 		var ln = result[i];
+		if (ln.substr(0,10) == "REMARK 821") process_cavity_ln(ln);
 		var resno = parseInt(ln.substr(22,4));
 		if (isNaN(resno)) resno = 0;
 		var strandid = ln.substr(21,1).trim();
@@ -2791,7 +2862,7 @@ function load_remote_pdb(pdburl)
                 var ln = lines[i];
 				if (ln.substr(0, 6) == 'REMARK')
 				{
-					var pieces = ln.split(" ");
+					var pieces = ln.replaceAll(/\s+/g, ' ').split(" ");
 					if (pieces[2] == 'HELIX' && (pieces[3].substr(0,3) == 'TMR' || pieces[3].substr(0,3) == 'HXR'))
 					{
 						var tmrno = parseInt(pieces[3].substr(-1));
@@ -2817,8 +2888,14 @@ function load_remote_pdb(pdburl)
 						if (isNaN(resno)) resno = 0;
 						mcres.push(resno);
 					}
+					else if (pieces[1] == "821" && typeof pieces[3] != "undefined")
+					{
+						process_cavity_ln(ln);
+					}
 				}
 			}
+
+			finish_cavity_lines();
 
 			loadFile(result, protid+'.pdb');
 		}
@@ -2976,6 +3053,30 @@ function show_stats()
 	document.body.appendChild(statsdd);
 }
 
+function show_pockets()
+{
+	var pocketsdd = document.createElement('div');
+	pocketsdd.id = "pocketsdd";
+	pocketsdd.style.position = "absolute";
+	pocketsdd.style.top = 50;
+	pocketsdd.style.right = "10%";
+	pocketsdd.style.maxWidth = "33%";
+	pocketsdd.setAttribute("onmouseleave", "document.body.removeChild(this);");
+	var html = "";
+
+	var i, n = cavities.length;
+	for (i=0; i<n; i++)
+	{
+		if (typeof cavities[i] == 'undefined') break;
+		html += "<p><a onclick=\"show_hide_cavity("+i+", 1);\" style=\"cursor: pointer;\">";
+		html += cavities[i]['residues'].toString().replaceAll(',',' ');
+		html += "</a></p>\n\n";
+	}
+
+	pocketsdd.innerHTML = html;
+	document.body.appendChild(pocketsdd);
+}
+
 function showNode(n)
 {
 	// TODO: get the resnos list from model[i].structure.residueStore.resno array and check global spacefill resnos - zero means ligand.
@@ -3124,6 +3225,84 @@ function rainbowNodes()
     }
 
 	set_gmdl_opacity();
+}
+
+function show_hide_cavity(cavno, cmode=1)
+{
+	if (typeof cavities[cavno]['shown'] == 'undefined') show_cavity(cavno, cmode);
+	else if (!cavities[cavno]['shown']) show_cavity(cavno, cmode);
+	else hide_cavity(cavno);
+}
+
+function show_cavity(cavno, cmode=1)
+{
+	if (typeof cavities[cavno] == "undefined") return;
+	hide_cavity(cavno);
+
+	var shape = new NGL.Shape("shape");
+	var position = [];
+	var radius = [];
+	var color = [];
+
+	var i, n = cavities[cavno].length;
+	for (i=0; i<n; i++)
+	{
+		if (typeof cavities[cavno][i] == undefined) break;
+		position.push(cavities[cavno][i]['x']);
+		position.push(cavities[cavno][i]['y']);
+		position.push(cavities[cavno][i]['z']);
+			radius.push(cavities[cavno][i]['r']);
+
+		var red, green, blue;
+		switch (cmode)
+		{
+			case 1:
+			if (cavities[cavno][i]["metal"]) { red = 0.75; green = 0.6; blue = 0.5; }
+			else if (cavities[cavno][i]["chargen"] && cavities[cavno][i]["chargep"]) { red = 0.9; green = 0.9; blue = 0.9; }
+			else if (cavities[cavno][i]["chargen"]) { red = 0.75; green = 0.5; blue = 0.5; }
+			else if (cavities[cavno][i]["chargep"]) { red = 0.5; green = 0.5; blue = 0.75; }
+			else if (cavities[cavno][i]["hydro"]) { red = 0.5; green = 0.7; blue = 0.75; }
+			else if (cavities[cavno][i]["thio"]) { red = 0.75; green = 0.75; blue = 0.5; }
+			else if (cavities[cavno][i]["pi"]) { red = 0.55; green = 0.5; blue = 0.55; }
+			else { red = 0.6; green = 0.6; blue = 0.6; }
+			break;
+
+			case 2:
+			if (cavities[cavno][i]["priority"]) { red = 0.5; green = 0.75; blue = 0.5; }
+			else { red = 0.6; green = 0.6; blue = 0.6; }
+			break;
+
+			case 0:
+			default:
+			var c = hsl_to_rgb(cavno*360.0/n, 128, 128);
+			red = 0.00392 * (c & 0xff0000) / 65536;
+			green = 0.00392 * (c & 0xff00) / 256;
+			blue = 0.00392 * (c & 0xff);
+		}
+
+		color.push(red);
+		color.push(green);
+		color.push(blue);
+	}
+
+	var sphereBuffer = new NGL.SphereBuffer({ position: new Float32Array(position), color: new Float32Array(color), radius: new Float32Array(radius) });
+	shape.addBuffer(sphereBuffer);
+
+	var shapeComp = stage.addComponentFromObject(shape);
+	cavities[cavno]['shapeComp'] = shapeComp;
+
+	cavities[cavno]['shapeComp'].addRepresentation("buffer", { opacity: 0.3 });
+	cavities[cavno]['shown'] = true;
+	last_clicked_cavity = cavities[cavno];
+}
+
+function hide_cavity(cavno)
+{
+	if (typeof cavities[cavno] == "undefined") return;
+	if (typeof cavities[cavno]['shapeComp'] == "undefined") return;
+	cavities[cavno]['shapeComp'].removeAllRepresentations();
+	cavities[cavno]['shown'] = false;
+	last_clicked_cavity = false;
 }
 
 $("body").on("keyup", function(e, obj)
@@ -3406,6 +3585,10 @@ function loadFile(fileData, fileName = "")
 								var resno = parseInt(pieces[4]);
 								mcres.push(resno);
 							}
+							else if (pieces[1] == "821" && typeof pieces[3] != "undefined")
+							{
+								process_cavity_ln(ln);
+							}
 						}
 						else
                         {
@@ -3447,6 +3630,9 @@ function loadFile(fileData, fileName = "")
                         tmpstr += ln + "\n";
 						last_strandid = strandid;
                     }
+
+					finish_cavity_lines();
+
                     /*if (tmpstr)
                     {
 	                	var stringBlob6a = new Blob( [tmpstr], { type: 'text/plain'} );
@@ -3621,7 +3807,8 @@ function loadFile(fileData, fileName = "")
 				var lpose = -1, lnode = -1;
 				for (i=0; i<lln; i++)
 				{
-					if (lines[i].substr(0, 6) == "Pose: ")
+					if (lines[i].substr(0,10) == "REMARK 821") process_cavity_ln(lines[i]);
+					else if (lines[i].substr(0, 6) == "Pose: ")
 					{
 						lpose = parseInt(lines[i].substr(6));
 						if (typeof dock_result_txt[lpose] == "undefined") dock_result_txt[lpose] = [];
@@ -3649,6 +3836,8 @@ function loadFile(fileData, fileName = "")
 						dock_result_txt[lpose][lnode] += lines[i] + "\n";
 					}
 				}
+
+				finish_cavity_lines();
 
 				if (orid)
 				{

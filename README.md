@@ -80,6 +80,53 @@ execution. The memory tool "thinks" the objects have not been initialized even w
 `--undef-value-errors=no` option with valgrind or the equivalent switch in your utility of choice.
 
 
+# Utilities
+
+A few utility apps are also provided in the bin/ dir.
+
+
+# cavity_search
+
+Scans a protein's 3 dimensional structure looking for places where a ligand may be able to dock. An output file can be specified to receive
+the coordinates of collections of spheres that form the shapes of the cavities.
+
+If the output file is in the same directory as a PDB model, and its name is identical except for having a .cav extension instead of .pdb,
+then certain 3D views of the web app will recognize the file and allow the user to see the found pockets in the protein's 3D structure.
+
+The prediction feature automatically generates .cav files for the active and inactive models used in the prediction, if no .cav file already
+exists when the prediction begins.
+
+
+# ic
+
+Finds internal contacts within a protein. Simply pass it the pathname of a PDB file and it will output a series of contacts between residues
+in that model.
+
+
+# pepteditor
+
+A tool for editing protein models using a scripting language. See the `SCRIPTING.md` file for more information.
+
+
+# ramachandran
+
+Allows visualizing Ramachandran plots of protein models. Takes the pathname of a PDB file as its only required argument.
+
+Optionally you can specify the -n parameter to output the plot as numbers instead of colorized blocks.
+
+
+# ringflip
+
+Performs flips of atoms in flexible rings. The canonical example would be the conversion of cyclohexane rings between chair form and boat form.
+
+
+# score_pdb
+
+Analyzes a .pdb file containing HETATM records and scores the interactions between ligand atoms and protein atoms. Internally, it uses the same
+code as the scoring function of `primarydock`, however this code depends on certain details not stored in the PDB format, so the results may
+vary from the output of `primarydock`.
+
+
 # Web Application
 
 You may optionally host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web

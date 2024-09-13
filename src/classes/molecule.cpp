@@ -74,6 +74,8 @@ Molecule::~Molecule()
     if (smiles) delete[] smiles;
     if (rings) delete[] rings;
     if (rotatable_bonds) delete[] rotatable_bonds;
+    if (vdw_surface) delete[] vdw_surface;
+    if (vdw_vertex_atom) delete[] vdw_vertex_atom;
 }
 
 int length(Atom** array)
@@ -2522,6 +2524,7 @@ void Molecule::move(Point move_amt, bool override_residue)
         return;
     }
     int i;
+    int vvc = vdw_vertex_count;
 
     #if _dbg_improvements_only_rule
     float before;
@@ -2545,6 +2548,8 @@ void Molecule::move(Point move_amt, bool override_residue)
     }
     excuse_deterioration = false;
     #endif
+
+    vdw_vertex_count = vvc;
 }
 
 Point Molecule::get_barycenter(bool bond_weighted) const
@@ -2592,6 +2597,17 @@ void Molecule::recenter(Point nl)
     Point rel = nl.subtract(&loc);
     SCoord v(&rel);
     move(v);
+
+    if (vdw_surface && vdw_vertex_count)
+    {
+        int i;
+        for (i=0; i<vdw_vertex_count; i++)
+        {
+            Point loc = vdw_surface[i];
+            Point rel = nl.subtract(&loc);
+            vdw_surface[i] = rel;
+        }
+    }
 }
 
 void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
@@ -2619,6 +2635,16 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
         Point loc = atoms[i]->get_location();
         Point nl  = rotate3D(&loc, &cen, SCoord, theta);
         atoms[i]->move(&nl);
+    }
+
+    if (vdw_surface && vdw_vertex_count)
+    {
+        for (i=0; i<vdw_vertex_count; i++)
+        {
+            Point loc = vdw_surface[i];
+            Point nl  = rotate3D(&loc, &cen, SCoord, theta);
+            vdw_surface[i] = nl;
+        }
     }
 
     #if _dbg_improvements_only_rule
@@ -2654,6 +2680,16 @@ void Molecule::rotate(LocatedVector lv, float theta)
         Point loc = atoms[i]->get_location();
         Point nl  = rotate3D(&loc, &lv.origin, &lv, theta);
         atoms[i]->move(&nl);
+    }
+
+    if (vdw_surface && vdw_vertex_count)
+    {
+        for (i=0; i<vdw_vertex_count; i++)
+        {
+            Point loc = vdw_surface[i];
+            Point nl  = rotate3D(&loc, &lv.origin, &lv, theta);
+            vdw_surface[i] = nl;
+        }
     }
 
     #if _dbg_improvements_only_rule
@@ -2988,8 +3024,6 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
             }
         }
     }
-    // cout << "Total: " << kJmol << endl;
-    // cout << endl;
 
     return kJmol;
 }
@@ -3965,6 +3999,53 @@ SCoord Molecule::motion_to_optimal_contact(Molecule* l)
     l->movability = lm;
 
     return total_motion;
+}
+
+const Point* Molecule::obtain_vdW_surface(float d)
+{
+    if (!atcount || !atoms) return nullptr;
+    if (vdw_surface && vdw_vertex_count > 0) return vdw_surface;
+
+    int maxpoints = atcount * d * d / 3 + 256;
+    if (!vdw_surface)
+    {
+        vdw_surface = new Point[maxpoints];
+        vdw_vertex_atom = new Atom*[maxpoints];
+    }
+
+    float halfstep = M_PI / d;
+    float step = halfstep * 2;
+
+    int i, ivdW = 0;
+    SCoord v;
+    for (i=0; i<atcount && atoms[i]; i++)
+    {
+        Point aloc = atoms[i]->get_location();
+        v.r = atoms[i]->get_vdW_radius();
+        float ystep = step / v.r / v.r;
+        for (v.theta = -square; v.theta <= square; v.theta += step)
+        {
+            float xstep = step / v.r / fmax(cos(v.theta), 0.000001);
+            float end = M_PI*2-xstep/2;
+            for (v.phi = 0; v.phi < end; v.phi += xstep)
+            {
+                Point pt = aloc.add(v);
+                Atom* na = this->get_nearest_atom(pt);
+                if (na != atoms[i] && pt.get_3d_distance(na->get_location()) < na->get_vdW_radius()) continue;
+                if (!pt.x && !pt.y && !pt.z) pt = Point(-0.001, 0.001, -0.001);
+                vdw_vertex_atom[ivdW] = atoms[i];
+                vdw_surface[ivdW++] = pt;
+                if (ivdW >= maxpoints)
+                {
+                    cout << "Too many vdW surface vertices. Please increase limit in code." << endl;
+                    throw 0xbadc0de;
+                }
+            }
+        }
+    }
+    vdw_vertex_count = ivdW;
+
+    return vdw_surface;
 }
 
 Atom* numbered[10];

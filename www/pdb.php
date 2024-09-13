@@ -34,5 +34,32 @@ if (!file_exists($pdbfn))
     exit;
 }
 
-echo file_get_contents($pdbfn);
+$result = file_get_contents($pdbfn);
 
+$cavfn = str_replace(".pdb", ".cav", $pdbfn);
+if (file_exists($cavfn))
+{
+    $lines = explode("\n", $result);
+    foreach ($lines as $i => $ln)
+    {
+        if (substr($ln, 0, 10) != "REMARK 800") continue;
+        $next = @$lines[$i+1];
+        if (substr($next, 0, 10) != "REMARK 800")
+        {
+            $ln .= "\nREMARK 821";
+            $cavs = explode("\n", file_get_contents($cavfn));
+            foreach ($cavs as $cav)
+            {
+                if (!trim($cav)) continue;
+                $ln .= "\nREMARK 821 $cav";
+            }
+            $ln .= "\nREMARK 821";
+            $lines[$i] = $ln;
+            break;
+        }
+    }
+
+    $result = implode("\n", $lines);
+}
+
+echo $result;

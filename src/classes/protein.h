@@ -137,7 +137,8 @@ public:
         Molecule* ligand,
         const Point nodecen,
         const Point size,
-        const int* addl_resno
+        const int* addl_resno,
+        bool ignore_priority = false
     );
 
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
@@ -157,6 +158,7 @@ public:
     void set_conditional_basicities();
     float A100();
     Atom* region_pivot_atom(Region region);
+    Point get_region_bounds(int startres, int endres);
 
     // Motion functions
     void upright();

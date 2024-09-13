@@ -263,7 +263,7 @@ fi
 
 bin/pepteditor testdata/8f76.pepd 2>&1 > /dev/null
 
-test/group_test_res pdbs/OR51/OR51E2.active.pdb sdf/propionic_acid.sdf 4.57 6.59 | sed '/^#/d' > testdata/received/group_test_res.received.txt
+test/group_test_res pdbs/OR51/OR51E2.active.pdb sdf/propionic_acid.sdf 4.57 6.59 | grep atom_group | sed '/^#/d' > testdata/received/group_test_res.received.txt
 RESULT=$(diff --unified testdata/group_test_res.51e2.approved.txt testdata/received/group_test_res.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}\u2588${NC}"

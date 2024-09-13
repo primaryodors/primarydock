@@ -382,6 +382,7 @@ function prepare_outputs()
     
         if (isset($mbp["atomto"]))
         {
+            if (!is_array($mbp["atomto"])) $mbp["atomto"] = [$mbp["atomto"]];
             foreach ($mbp["atomto"] as $a2)
             {
                 $atomto[] = "ATOMTO $a2";
@@ -418,8 +419,8 @@ function prepare_outputs()
         }
         else die("Unsupported receptor family.\n");
     }
-    
-    $atomto = implode("\n", $atomto);    
+
+    $atomto = implode("\n", $atomto);
 }
 
 $multicall = 0;
@@ -656,6 +657,12 @@ heredoc;
                 if ($resno) $cenresno[] = $resno;
             }
 
+            $fam = family_from_protid($protid);
+            $cavfname = "pdbs/$fam/$protid.upright.cav";
+            if (!file_exists($cavfname)) passthru("bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname");
+            $cavfname = "pdbs/$fam/$protid.active.cav";
+            if (!file_exists($cavfname)) passthru("bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname");
+
             $cenresno = implode(" ", $cenresno);
             $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
             echo "$cmd\n";
@@ -690,7 +697,6 @@ heredoc;
             }
         }
 
-        $fam = family_from_protid($protid);
         if ($fam == "TAAR") $nodel = "NODEL 45.60 5.38";
         else $nodel = "NODEL 45.51 45.59";
 
@@ -704,7 +710,7 @@ heredoc;
         else $iso = "";
 
         $excl1 = resno_from_bw($protid, "2.37");
-        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 3 4 45 5 6 7" : "";
+        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 1 2 3 4 45 5 6 7" : "";
 
         $configf = <<<heredoc
 

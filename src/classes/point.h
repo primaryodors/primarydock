@@ -45,7 +45,7 @@ struct Point
     float get_distance_to_line(const Point a, const Point b);         // Where a and b are the termini of the line.
     Point multiply_3d_distance(const Point* reference, float r_mult);
     bool pt_in_bounding_box(const Point* corner1, const Point* corner2);
-    float magnitude();
+    float magnitude() const;
     void scale(float new_magn);
     void multiply(float multiplier);
     bool fits_inside(Point container);
@@ -54,6 +54,13 @@ struct Point
 
     Point& operator=(SCoord v);
     friend std::ostream& operator<<(std::ostream& os, const SCoord& v);
+};
+
+struct Sphere
+{
+    Point center;
+    float radius;
+    float volume() { return M_PI*radius*radius; }
 };
 
 struct SCoord

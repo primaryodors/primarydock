@@ -287,7 +287,7 @@ function prepare_outputs()
     $odor = find_odorant($ligname);
 
     $size = "7.5 7.5 7.5";
-    $search = "BB";
+    $search = "CS";
     $atomto = [];
     $excl = "";
     $stcr = "";

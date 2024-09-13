@@ -2629,6 +2629,7 @@ function apply_pdb(poresult)
 	var lres = 0;
 	var lstrandid = "A";
 	var tmpstr = "";
+	cavities = [];
 	for (i=0; i<result.length; i++)
 	{
 		var ln = result[i];
@@ -2857,6 +2858,7 @@ function load_remote_pdb(pdburl)
 			var lines = result.split("\n");
 			$('#posey').hide();
 
+			cavities = [];
 			for (i=0; i<lines.length; i++)
             {
                 var ln = lines[i];
@@ -3544,6 +3546,7 @@ function loadFile(fileData, fileName = "")
                 	var i;
                 	var lines = fileData.split("\n");
                     var lres = 0;
+					cavities = [];
                     var tmpstr = "";
 					var ligtmp = "";
 					var strandid = "A";
@@ -3805,6 +3808,7 @@ function loadFile(fileData, fileName = "")
 
 				var lln = lines.length;
 				var lpose = -1, lnode = -1;
+				cavities = [];
 				for (i=0; i<lln; i++)
 				{
 					if (lines[i].substr(0,10) == "REMARK 821") process_cavity_ln(lines[i]);

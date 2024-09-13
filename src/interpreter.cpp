@@ -2052,15 +2052,15 @@ int main(int argc, char** argv)
                 n = -1;
                 if (!words[l])
                 {
-                    f = -working->get_internal_binding();
+                    f = -working->get_internal_binding().summed();
                 }
                 else if (words[l][0] >= 'A' && words[l][0] <= 'Z')
                 {
                     if (!strands[words[l][0]-'A']) raise_error("No strand with specified chain letter.");
-                    else f = -strands[words[l][0]-'A']->get_internal_binding();
+                    else f = -strands[words[l][0]-'A']->get_internal_binding().summed();
                     l++;
                 }
-                else f = -working->get_internal_binding();
+                else f = -working->get_internal_binding().summed();
 
                 if (words[l] && (words[l][0] == '&'))
                 {

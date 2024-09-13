@@ -272,11 +272,17 @@ int interpret_resno(const char* field)
 {
     char buffer[strlen(field)+4];
     strcpy(buffer, field);
+
+    char* offset = buffer;
+    while (*offset >= 'A' && *offset <= 'Z') offset++;
+
+    int retval = 0;
     char* dot = strchr(buffer, '.');
+    char* bang = strchr(buffer, '!');
     if (dot)
     {
         *(dot++) = 0;
-        int b = atoi(buffer);
+        int b = atoi(offset);
         int w = atoi(dot);
         int _50 = protein->get_bw50(b);
         if (_50 < 1)
@@ -284,9 +290,31 @@ int interpret_resno(const char* field)
             cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
             throw 0xbad12e5;
         }
-        return _50 + w - 50;
+        if (_50 < 1) return 0;
+        else retval = _50 + w - 50;
     }
-    else return atoi(buffer);
+    else retval = atoi(offset);
+
+    AminoAcid* aa = protein->get_residue(retval);
+    if (!aa) return 0;
+
+    if (offset == buffer)
+    {
+        if (bang) aa->priority = true;
+        return retval;
+    }
+
+    int i;
+    for (i=0; buffer[i] >= 'A' && buffer[i] <= 'Z'; i++)
+    {
+        if (buffer[i] == aa->get_letter())
+        {
+            if (bang) aa->priority = true;
+            return retval;
+        }
+    }
+
+    return bang ? retval : 0;
 }
 
 void freeze_bridged_residues()
@@ -298,10 +326,12 @@ void freeze_bridged_residues()
         for (i=0; i<bridges.size(); i++)
         {
             int resno1 = interpret_resno(bridges[i].c_str());
+            if (!resno1) continue;
             const char* r2 = strchr(bridges[i].c_str(), '|');
             if (!r2) throw 0xbadc0de;
             r2++;
             int resno2 = interpret_resno(r2);
+            if (!resno2) continue;
             
             AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
             if (aa1)
@@ -367,10 +397,12 @@ void reconnect_bridges()
     for (i=0; i<bridges.size(); i++)
     {
         int resno1 = interpret_resno(bridges[i].c_str());
+        if (!resno1) continue;
         const char* r2 = strchr(bridges[i].c_str(), '|');
         if (!r2) throw 0xbadc0de;
         r2++;
         int resno2 = interpret_resno(r2);
+        if (!resno2) continue;
 
         #if _dbg_bridges
         cout << "Bridging " << resno1 << " and " << resno2 << "..." << endl;
@@ -924,24 +956,12 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
         i++;
         for (; words[i]; i++)
         {
-            bool priority = false;
             int n = strlen(words[i]);
-            if (words[i][n-1] == '!')
-            {
-                priority = true;
-                words[i][n-1] = 0;
-            }
 
             int j = interpret_resno(words[i]);
-            if (!j) break;
+            if (!j) continue;
 
             center_resnos.push_back(j);
-            AminoAcid* aa = protein->get_residue(j);
-            if (priority)
-            {
-                priority_resnos.push_back(j);
-                if (aa) aa->priority = true;
-            }
         }
 
         int sz = center_resnos.size(), div=0;

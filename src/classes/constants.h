@@ -135,7 +135,7 @@
 // Warning - increasing these constants significantly above the original 35.0, 60.0 values
 // will cause docking fails in the unit tests.
 #define polar_repulsion 10.0
-#define charge_repulsion 5.0
+#define charge_repulsion 1.0
 
 #define atom_object_forces 1
 #define charge_attraction 60.0

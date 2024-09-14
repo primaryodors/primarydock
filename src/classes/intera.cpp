@@ -1169,6 +1169,9 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
             if (debug_criteria) cout << "Anisotropy: " << aniso << " from " << asum << " * " << bsum << endl;
             #endif
 
+            float force_eff_kJmol = forces[i]->kJ_mol;
+            if (forces[i]->type == ionic && sgn(achg) == sgn(bchg)) continue;
+
             if (r1 >= 0.99)
             {
                 rdecayed = (forces[i]->type == vdW
@@ -1179,7 +1182,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                         )
                         ? r1*r1*r1*r1*r1*r1
                         : r1*r1;
-                partial = aniso * forces[i]->kJ_mol / rdecayed;
+                partial = aniso * force_eff_kJmol / rdecayed;
 
                 SCoord mc = bloc.subtract(aloc);
                 mc.r = r - forces[i]->distance; // fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
@@ -1187,13 +1190,13 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                 #if compute_missed_connections
                 #if summed_missed_connections
                 missed_connection = missed_connection.add(mc);
-                mc_bpotential += forces[i]->kJ_mol;
+                mc_bpotential += force_eff_kJmol;
                 #else
-                if ((mc.r < fabs(missed_connection.r) && forces[i]->kJ_mol >= mc_bpotential)
-                    || forces[i]->kJ_mol > mc_bpotential)
+                if ((mc.r < fabs(missed_connection.r) && force_eff_kJmol >= mc_bpotential)
+                    || force_eff_kJmol > mc_bpotential)
                 {
                     missed_connection = mc;
-                    mc_bpotential = forces[i]->kJ_mol;
+                    mc_bpotential = force_eff_kJmol;
                 }
                 #endif
                 #endif
@@ -1201,7 +1204,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
             else
             {
                 // rdecayed = r1*r1*r1*r1*r1*r1;
-                partial = aniso * forces[i]->kJ_mol - Lennard_Jones(a, b, forces[i]->get_distance());
+                partial = aniso * force_eff_kJmol - Lennard_Jones(a, b, forces[i]->get_distance());
             }
 
             if (forces[i]->type == hbond)

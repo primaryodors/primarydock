@@ -48,7 +48,7 @@ function resno_from_bw($protid, $bw)
 	$bwraw = preg_replace("/^[A-Z]*/", "", $bw);
 	$aminos = substr($bw, 0, strlen($bw)-strlen($bwraw));
 	$bw = $bwraw;
-	
+
 	$pettia = explode(".", $bw);
 	$tmrno = intval($pettia[0]);
 	$offset = intval($pettia[1]);

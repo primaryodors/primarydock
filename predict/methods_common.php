@@ -267,7 +267,7 @@ function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname, $docker;
     global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
-    global $atomto, $excl, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
+    global $atomto, $excl, $nodel, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
     chdir("..");
@@ -290,6 +290,7 @@ function prepare_outputs()
     $search = "CS";
     $atomto = [];
     $excl = "";
+    $nodel = "";
     $stcr = "";
     $flxr = "";
     $astcr = "";
@@ -369,6 +370,7 @@ function prepare_outputs()
         if (isset($mbp["aflxr"])) $aflxr = "FLXR {$mbp["aflxr"]}";
         if (isset($mbp["iflxr"])) $iflxr = "FLXR {$mbp["iflxr"]}";
 
+
         if (isset($mbp["stddev"])) $num_std_devs = floatval($mbp["stddev"]);
         if (isset($mbp["excl"]))
         {
@@ -379,6 +381,7 @@ function prepare_outputs()
             else $er = intval($se[1]);
             $excl = "EXCL $sr $er\n";
         }
+        if (isset($mbp["nodel"])) $nodel = "NODEL {$mbp["nodel"]}";
     
         if (isset($mbp["atomto"]))
         {
@@ -392,15 +395,34 @@ function prepare_outputs()
     
     if ($mbp && (isset($mbp["pocket"]) || (isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))))
     {
-        if (isset($mbp["pocket"])) $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
+        if (isset($mbp["pocket"]))
+        {
+            if (is_array($mbp["pocket"]))
+            {
+                $cenres_inactive = "";
+                foreach ($mbp["pocket"] as $p) $cenres_inactive .= "CEN RES $p\n";
+                $cenres_active = $cenres_inactive;
+            }
+            else $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
+        }
     
         if ($mbp && isset($mbp["active_pocket"]))
         {
-            $cenres_active = "CEN RES {$mbp["active_pocket"]}";
+            if (is_array($mbp["active_pocket"]))
+            {
+                $cenres_active = "";
+                foreach ($mbp["active_pocket"] as $p) $cenres_active .= "CEN RES $p\n";
+            }
+            else $cenres_active = "CEN RES {$mbp["active_pocket"]}";
         }
         if ($mbp && isset($mbp["inactive_pocket"]))
         {
-            $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
+            if (is_array($mbp["inactive_pocket"]))
+            {
+                $cenres_inactive = "";
+                foreach ($mbp["inactive_pocket"] as $p) $cenres_inactive .= "CEN RES $p\n";
+            }
+            else $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
         }
     }
     else
@@ -427,7 +449,7 @@ $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
     global $ligname, $isomers, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
-    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST;
+    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST, $nodel;
     global $cenres, $size, $docker, $mcoord, $atomto, $excl, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
@@ -446,8 +468,9 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         $size = "--size_x 20 --size_y 20 --size_z 20";
         if ($cenres)
         {
-            foreach (explode(" ", $cenres) as $bw)
+            foreach (explode(" ", explode("\n", $cenres)[0]) as $bw)
             {
+                if (!preg_match("/[A-Z]*[0-9]+([.][0-9]+)?!?/", $bw)) continue;
                 $resno = resno_from_bw($protid, $bw);
                 if ($resno) $cenresno[] = $resno;
             }
@@ -648,11 +671,11 @@ heredoc;
         break;
 
         case "pd":
-        $nodel = "";
         if ($cenres)
         {
-            foreach (explode(" ", $cenres) as $bw)
+            foreach (explode(" ", explode("\n", $cenres)[0]) as $bw)
             {
+                if (!preg_match("/[A-Z]*[0-9]+([.][0-9]+)?!?/", $bw)) continue;
                 $resno = resno_from_bw($protid, $bw);
                 if ($resno) $cenresno[] = $resno;
             }
@@ -697,8 +720,8 @@ heredoc;
             }
         }
 
-        if ($fam == "TAAR") $nodel = "NODEL 45.60 5.38";
-        else $nodel = "NODEL 45.51 45.59";
+        if ($fam == "TAAR") $nodel .= "\nNODEL 45.60 5.38";
+        else $nodel .= "\nNODEL 45.51 45.59";
 
         if ($isomers)
         {
@@ -718,7 +741,7 @@ PROT $pdbfname
 LIG sdf/$ligname.sdf
 $iso
 
-CEN RES $cenres
+$cenres
 SIZE $size
 # H2O 5
 $mcoord

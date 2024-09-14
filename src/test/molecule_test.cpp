@@ -194,10 +194,10 @@ int main(int argc, char** argv)
     }
     cout << "\n# Moved molecule 2 by " << ttlmv << " A." << endl;*/
 
-    m1.get_intermol_binding(&m2);
+    m1.get_intermol_binding(&m2).summed();
 
     cout << "# Initial intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
-    cout << "# Initial intermol energy level: " << -m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
+    cout << "# Initial intermol energy level: " << -m1.get_intermol_binding(&m2).summed() << " kJ/mol." << endl;
 
     m1.reset_conformer_momenta();
     m2.reset_conformer_momenta();
@@ -213,7 +213,7 @@ int main(int argc, char** argv)
     #endif
     float final_clashes = m1.get_intermol_clashes(&m2);
 
-    float energyLevel = m1.get_intermol_binding(&m2);
+    float energyLevel = m1.get_intermol_binding(&m2).summed();
     cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
 
     #if _peratom_audit

@@ -185,8 +185,8 @@ public:
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_clashes(Molecule** ligands);
     static float total_intermol_clashes(Molecule** ligands);
-    float get_intermol_binding(Molecule* ligand, bool subtract_clashes = true);
-    float get_intermol_binding(Molecule** ligands, bool subtract_clashes = true);
+    Interaction get_intermol_binding(Molecule* ligand, bool subtract_clashes = true);
+    Interaction get_intermol_binding(Molecule** ligands, bool subtract_clashes = true);
     float get_intermol_potential(Molecule* ligand, bool disregard_distance = false);
     float get_intermol_potential(Molecule** ligands, bool disregard_distance = false);
     float hydrophilicity();
@@ -200,7 +200,7 @@ public:
 
     float bindability_by_type(intera_type type, bool include_backbone = false);
 
-    static float total_intermol_binding(Molecule** ligands);
+    static Interaction total_intermol_binding(Molecule** ligands);
 
     static void conform_molecules(Molecule** molecules, int iterations = 50,
         void (*callback)(int, Molecule**) = nullptr,
@@ -310,13 +310,13 @@ protected:
     void rotate_ring(int ringid, Rotation rot);
     bool in_same_ring(Atom* a, Atom* b);
     float get_atom_error(int atom_idx, LocatedVector* best_lv, bool hemispherical = true);
-    float intermol_bind_for_multimol_dock(Molecule* othermol, bool allow_clash);
+    Interaction intermol_bind_for_multimol_dock(Molecule* othermol, bool allow_clash);
 
     void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
-    static float cfmol_multibind(Molecule* mol, Molecule** nearby_mols);
+    static Interaction cfmol_multibind(Molecule* mol, Molecule** nearby_mols);
 };
 
 extern float conformer_momenta_multiplier;

@@ -239,7 +239,7 @@ float teleport_water(Molecule* mol)
             ligcen_target.z + frand(-size.z, size.z)
                       );
         waters[j]->recenter(teleport);
-        e = -waters[j]->get_intermol_binding(gcfmols);
+        e = -waters[j]->get_intermol_binding(gcfmols).summed();
         if (e < _water_satisfaction_threshold) break;
     }
     if (e > _water_satisfaction_threshold) delete_water(mol);
@@ -272,11 +272,17 @@ int interpret_resno(const char* field)
 {
     char buffer[strlen(field)+4];
     strcpy(buffer, field);
+
+    char* offset = buffer;
+    while (*offset >= 'A' && *offset <= 'Z') offset++;
+
+    int retval = 0;
     char* dot = strchr(buffer, '.');
+    char* bang = strchr(buffer, '!');
     if (dot)
     {
         *(dot++) = 0;
-        int b = atoi(buffer);
+        int b = atoi(offset);
         int w = atoi(dot);
         int _50 = protein->get_bw50(b);
         if (_50 < 1)
@@ -284,9 +290,31 @@ int interpret_resno(const char* field)
             cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
             throw 0xbad12e5;
         }
-        return _50 + w - 50;
+        if (_50 < 1) return 0;
+        else retval = _50 + w - 50;
     }
-    else return atoi(buffer);
+    else retval = atoi(offset);
+
+    AminoAcid* aa = protein->get_residue(retval);
+    if (!aa) return 0;
+
+    if (offset == buffer)
+    {
+        if (bang) aa->priority = true;
+        return retval;
+    }
+
+    int i;
+    for (i=0; buffer[i] >= 'A' && buffer[i] <= 'Z'; i++)
+    {
+        if (buffer[i] == aa->get_letter())
+        {
+            if (bang) aa->priority = true;
+            return retval;
+        }
+    }
+
+    return bang ? retval : 0;
 }
 
 void freeze_bridged_residues()
@@ -298,10 +326,12 @@ void freeze_bridged_residues()
         for (i=0; i<bridges.size(); i++)
         {
             int resno1 = interpret_resno(bridges[i].c_str());
+            if (!resno1) continue;
             const char* r2 = strchr(bridges[i].c_str(), '|');
             if (!r2) throw 0xbadc0de;
             r2++;
             int resno2 = interpret_resno(r2);
+            if (!resno2) continue;
             
             AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
             if (aa1)
@@ -367,10 +397,12 @@ void reconnect_bridges()
     for (i=0; i<bridges.size(); i++)
     {
         int resno1 = interpret_resno(bridges[i].c_str());
+        if (!resno1) continue;
         const char* r2 = strchr(bridges[i].c_str(), '|');
         if (!r2) throw 0xbadc0de;
         r2++;
         int resno2 = interpret_resno(r2);
+        if (!resno2) continue;
 
         #if _dbg_bridges
         cout << "Bridging " << resno1 << " and " << resno2 << "..." << endl;
@@ -387,7 +419,7 @@ void reconnect_bridges()
         if (!aa2) cout << resno2 << " not found." << endl;
         if (aa1 && aa2)
         {
-            float tb = -aa1->get_intermol_binding(aa2);
+            float tb = -aa1->get_intermol_binding(aa2).summed();
             cout << "Bridge energy " << tb << " kJ/mol." << endl;
         }
         #endif
@@ -460,8 +492,18 @@ void output_iter(int iter, Molecule** mols)
         {
             fprintf(fp, "PDB file: %s\n", protfname);
         }
-        fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
+        fprintf(fp, "Pose: %d\nNode: %d\n\n", pose, liter);
         int foff = 0;
+
+        DockResult ldr(protein, ligand, size, nullptr, pose);
+        ldr.include_pdb_data = false;
+        ldr.display_clash_atom1 = true;
+        ldr.display_clash_atom2 = true;
+        std::stringstream stst;
+        stst << ldr;
+        fprintf(fp, "%s\n", stst.str().c_str());
+
+        fprintf(fp, "\nPDBDAT:\n");
 
         for (i=0; reaches_spheroid[nodeno][i]; i++)
         {
@@ -499,10 +541,10 @@ void iteration_callback(int iter, Molecule** mols)
         csrot.a *= cs_ligand_rotation;
         Pose cswas(ligand);
         cswas.copy_state(ligand);
-        float e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+        Interaction e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->rotate(&csrot.v, csrot.a, true);
-        float e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
+        Interaction e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+        if (!e2.improved(e1)) cswas.restore_state(ligand);
 
         Atom *ra, *la;
         cs_res[cs_idx]->mutual_closest_atoms(ligand, &ra, &la);
@@ -513,7 +555,7 @@ void iteration_callback(int iter, Molecule** mols)
         e1 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
         ligand->move(r);
         e2 = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-        if (e2 < e1*cs_keep_ratio) cswas.restore_state(ligand);
+        if (!e2.improved(e1)) cswas.restore_state(ligand);
     }
 
     // Initialization for best-iteration saving for pose output.
@@ -526,7 +568,8 @@ void iteration_callback(int iter, Molecule** mols)
     // Stochastically force flexion on some side chains that get clashes.
     for (l=0; mols[l]; l++)
     {
-        float lf = mols[l]->get_intermol_binding(mols), lc = mols[l]->get_intermol_clashes(mols), ptnl = mols[l]->get_intermol_potential(mols);
+        Interaction li = mols[l]->get_intermol_binding(mols);
+        float lf = li.summed(), lc = li.repulsive, ptnl = mols[l]->get_intermol_potential(mols);
         f += lf;
 
         int lres = mols[l]->is_residue();
@@ -612,10 +655,10 @@ void iteration_callback(int iter, Molecule** mols)
                 Point pttgt = target->get_location();
                 Pose hbwas(mols[l]);
                 hbwas.copy_state(mols[l]);
-                float before = ligand->get_intermol_binding(mols);
+                Interaction before = ligand->get_intermol_binding(mols);
                 hbaa->conform_atom_to_location(reach->name, pttgt, 10, 2);
-                float after = ligand->get_intermol_binding(mols);
-                if (before > 1.1 * after) hbwas.restore_state(mols[l]);
+                Interaction after = ligand->get_intermol_binding(mols);
+                if (!after.improved(before)) hbwas.restore_state(mols[l]);
             }
         }
     }
@@ -762,9 +805,9 @@ void iteration_callback(int iter, Molecule** mols)
         #if allow_drift
 
         Pose predrift(ligand);
-        float predrift_binding = ligand->get_intermol_binding(mols);
+        Interaction predrift_binding = ligand->get_intermol_binding(mols);
 
-        if (predrift_binding < -drift_energy_threshold)
+        if (predrift_binding.summed() < -drift_energy_threshold)
         {
             #if !pocketcen_is_loneliest
             if (ligand->lastbind <= -100)
@@ -913,24 +956,12 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
         i++;
         for (; words[i]; i++)
         {
-            bool priority = false;
             int n = strlen(words[i]);
-            if (words[i][n-1] == '!')
-            {
-                priority = true;
-                words[i][n-1] = 0;
-            }
 
             int j = interpret_resno(words[i]);
-            if (!j) break;
+            if (!j) continue;
 
             center_resnos.push_back(j);
-            AminoAcid* aa = protein->get_residue(j);
-            if (priority)
-            {
-                priority_resnos.push_back(j);
-                if (aa) aa->priority = true;
-            }
         }
 
         int sz = center_resnos.size(), div=0;
@@ -2766,7 +2797,7 @@ _try_again:
                     for (csiter=0; csiter<5; csiter++)
                     {
                         Search::do_constrained_search(protein, ligand);
-                        float cse = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+                        float cse = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])).summed();
                         if (!csiter || cse > best_energy)
                         {
                             best_energy = cse;

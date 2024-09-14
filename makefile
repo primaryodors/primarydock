@@ -52,7 +52,7 @@ $(SDFDIR):
 $(TMPDIR):
 	if [ ! -f $(TMPDIR) ]; then mkdir -p $(TMPDIR); fi
 
-$(OBJDIR)/misc.o: src/classes/misc.h src/classes/misc.cpp src/classes/constants.h
+$(OBJDIR)/misc.o: src/classes/misc.h src/classes/misc.cpp src/classes/constants.h makefile
 	$(CC) -c src/classes/misc.cpp -o $(OBJDIR)/misc.o $(CFLAGS)
 
 $(OBJDIR)/point.o: src/classes/point.h src/classes/point.cpp $(OBJDIR)/misc.o src/classes/constants.h

@@ -36,7 +36,7 @@ int main(int argc, char** argv)
             float r = a->distance_to(b);
             if (r > _INTERA_R_CUTOFF) continue;
 
-            float f = aa->get_intermol_binding(cl[j], false);
+            float f = aa->get_intermol_binding(cl[j], false).summed();
             if (fabs(f) >= threshold) cout << *aa << "-" << *cl[j] << ": r=" << r << "Å" << endl;
         }
     }

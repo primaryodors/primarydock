@@ -161,8 +161,8 @@ public:
     LocatedVector get_psi_vector();
 
     // Intermol functions.
-    float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);
-    float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
+    Interaction get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);
+    Interaction get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
     float hydrophilicity() const;
     bool is_alpha_helix();
     bool is_helix(int periodicity);

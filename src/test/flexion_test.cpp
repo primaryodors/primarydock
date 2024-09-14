@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     m.from_pdb(fp, true);
 
     AminoAcid* aa = p.get_residue(107);
-    float before = -m.get_intermol_binding(aa);
+    float before = -m.get_intermol_binding(aa).summed();
     cout << "Initial energy: " << before << endl;
 
     Atom* a = aa->get_atom("CB");
@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     for (theta=step; theta<M_PI*2; theta += step)
     {
         bt->rotate(step);
-        during = -m.get_intermol_binding(aa);
+        during = -m.get_intermol_binding(aa).summed();
         cout << (theta*fiftyseven) << "deg: " << during << endl;
     }
 
@@ -47,6 +47,6 @@ int main(int argc, char** argv)
     mols[2] = nullptr;
 
     Molecule::conform_molecules(mols);
-    float after = -m.get_intermol_binding(aa);
+    float after = -m.get_intermol_binding(aa).summed();
     cout << "Final energy: " << after << endl;
 }

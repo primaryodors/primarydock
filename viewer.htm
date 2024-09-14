@@ -516,7 +516,13 @@ body.whtbk option.unknown
 
 #pocketsdd
 {
-	font-size: 13px;
+	font-size: 0.8em;
+}
+
+#pocketsdd .hilite
+{
+	font-weight: bold;
+	color: #0ef;
 }
 
 body.whtbk #seqdd
@@ -2629,6 +2635,7 @@ function apply_pdb(poresult)
 	var lres = 0;
 	var lstrandid = "A";
 	var tmpstr = "";
+	cavities = [];
 	for (i=0; i<result.length; i++)
 	{
 		var ln = result[i];
@@ -2857,6 +2864,7 @@ function load_remote_pdb(pdburl)
 			var lines = result.split("\n");
 			$('#posey').hide();
 
+			cavities = [];
 			for (i=0; i<lines.length; i++)
             {
                 var ln = lines[i];
@@ -3068,9 +3076,11 @@ function show_pockets()
 	for (i=0; i<n; i++)
 	{
 		if (typeof cavities[i] == 'undefined') break;
-		html += "<p><a onclick=\"show_hide_cavity("+i+", 1);\" style=\"cursor: pointer;\">";
+		html += "<a id=\"cavtgl"+i+"\" onclick=\"show_hide_cavity("+i+", 1);\" style=\"cursor: pointer;\"";
+		if (cavities[i]['shown']) html += " class=\"hilite\"";
+		html += "\">";
 		html += cavities[i]['residues'].toString().replaceAll(',',' ');
-		html += "</a></p>\n\n";
+		html += "</a><br>\n\n";
 	}
 
 	pocketsdd.innerHTML = html;
@@ -3260,10 +3270,10 @@ function show_cavity(cavno, cmode=1)
 			if (cavities[cavno][i]["metal"]) { red = 0.75; green = 0.6; blue = 0.5; }
 			else if (cavities[cavno][i]["chargen"] && cavities[cavno][i]["chargep"]) { red = 0.9; green = 0.9; blue = 0.9; }
 			else if (cavities[cavno][i]["chargen"]) { red = 0.75; green = 0.5; blue = 0.5; }
-			else if (cavities[cavno][i]["chargep"]) { red = 0.5; green = 0.5; blue = 0.75; }
-			else if (cavities[cavno][i]["hydro"]) { red = 0.5; green = 0.7; blue = 0.75; }
-			else if (cavities[cavno][i]["thio"]) { red = 0.75; green = 0.75; blue = 0.5; }
-			else if (cavities[cavno][i]["pi"]) { red = 0.55; green = 0.5; blue = 0.55; }
+			else if (cavities[cavno][i]["chargep"]) { red = 0.3; green = 0.4; blue = 0.75; }
+			else if (cavities[cavno][i]["hydro"]) { red = 0.3; green = 0.7; blue = 0.75; }
+			else if (cavities[cavno][i]["thio"]) { red = 0.75; green = 0.75; blue = 0.3; }
+			else if (cavities[cavno][i]["pi"]) { red = 0.55; green = 0.44; blue = 0.55; }
 			else { red = 0.6; green = 0.6; blue = 0.6; }
 			break;
 
@@ -3294,6 +3304,7 @@ function show_cavity(cavno, cmode=1)
 	cavities[cavno]['shapeComp'].addRepresentation("buffer", { opacity: 0.3 });
 	cavities[cavno]['shown'] = true;
 	last_clicked_cavity = cavities[cavno];
+	$('#cavtgl'+cavno).addClass('hilite');
 }
 
 function hide_cavity(cavno)
@@ -3303,6 +3314,7 @@ function hide_cavity(cavno)
 	cavities[cavno]['shapeComp'].removeAllRepresentations();
 	cavities[cavno]['shown'] = false;
 	last_clicked_cavity = false;
+	$('#cavtgl'+cavno).removeClass('hilite');
 }
 
 $("body").on("keyup", function(e, obj)
@@ -3544,6 +3556,7 @@ function loadFile(fileData, fileName = "")
                 	var i;
                 	var lines = fileData.split("\n");
                     var lres = 0;
+					cavities = [];
                     var tmpstr = "";
 					var ligtmp = "";
 					var strandid = "A";
@@ -3805,6 +3818,7 @@ function loadFile(fileData, fileName = "")
 
 				var lln = lines.length;
 				var lpose = -1, lnode = -1;
+				cavities = [];
 				for (i=0; i<lln; i++)
 				{
 					if (lines[i].substr(0,10) == "REMARK 821") process_cavity_ln(lines[i]);

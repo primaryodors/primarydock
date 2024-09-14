@@ -5,6 +5,25 @@
 #ifndef _INTERATOMIC
 #define _INTERATOMIC
 
+class Interaction
+{
+    public:
+    Interaction();
+    Interaction(double value);
+
+    float attractive = 0;
+    float repulsive = 0;
+
+    float summed() { return attractive-repulsive; }
+    
+    Interaction operator+(Interaction const& obj);
+    Interaction operator+=(Interaction const& obj);
+    Interaction operator+=(float const& f);
+    Interaction operator-=(float const& f);
+    Interaction operator*(double const& f);
+    bool improved(Interaction relative_to);
+};
+
 class InteratomicForce
 {
 public:
@@ -36,7 +55,7 @@ public:
     static void fetch_applicable(Atom* a, Atom* b, InteratomicForce** result);
     static float metal_compatibility(Atom* a, Atom* b);
     static float potential_binding(Atom* a, Atom* b);
-    static float total_binding(Atom* a, Atom* b);
+    static Interaction total_binding(Atom* a, Atom* b);
     static float optimal_distance(Atom* a, Atom* b);
     static float Lennard_Jones(Atom* atom1, Atom* atom2, float sigma = 0);
     static float distance_anomaly(Atom* a, Atom* b);

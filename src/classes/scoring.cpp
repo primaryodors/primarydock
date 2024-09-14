@@ -158,15 +158,15 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
 
         mc_bpotential = 0;
-        float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
-        float clash = ligand->get_intermol_clashes(reaches_spheroid[i]);
+        Interaction lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
+        float clash = lb.repulsive;
         if (ligand->clash_worst > worst_energy)
         {
             worst_energy = ligand->clash_worst;
             worst_clash_1 = ligand->clash1;
             worst_clash_2 = ligand->clash2;
         }
-        if (lb < 0 && clash > worst_nrg_aa)
+        if (lb.summed() < 0 && clash > worst_nrg_aa)
         {
             worst_nrg_aa = clash;
             #if _dbg_worst_energy
@@ -197,8 +197,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
         #endif
 
-        if (lb > 500) lb = 0;
-        lmkJmol[metcount] = lb;
+        if (lb.summed() > 500) lb = 0;
+        lmkJmol[metcount] = lb.summed();
         lmc[metcount] = -mc_bpotential / missed_connection.r;
 
         lma1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;
@@ -224,7 +224,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         limkJmol[metcount] = 0;
         
         metcount++;
-        btot += lb;
+        btot += lb.summed();
         // cout << *(reaches_spheroid[i]) << " adds " << lb << " to btot, making " << btot << endl;
 
         float lf = ligand->get_intermol_polar_sat(reaches_spheroid[i]);
@@ -247,7 +247,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             if (!mtlcoords[i].mtl) continue;
             Molecule lm("MTL");
             lm.add_existing_atom(mtlcoords[i].mtl);
-            float f = ligand->get_intermol_binding(&lm);
+            float f = ligand->get_intermol_binding(&lm).summed();
             btot += f;
             lmb += f;
         }
@@ -281,7 +281,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #if compute_missed_connections
     this->missed_connections = new float[metcount];
     #endif
-    ligand_self = ligand->get_intermol_binding(ligand) - ligand->total_eclipses();
+    ligand_self = ligand->get_intermol_binding(ligand).summed() - ligand->total_eclipses();
     A100 = protein->A100();
     kJmol += ligand_self;
     #if _dbg_internal_energy

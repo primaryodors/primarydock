@@ -2006,12 +2006,12 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                         if (r >= 1.333) continue;
                     }
 
-                    float f = InteratomicForce::total_binding(atoms[j], a);
+                    Interaction f = InteratomicForce::total_binding(atoms[j], a);
                     #if _dbg_cond_basic
                     found_f = f;
                     cout << "Total " << atoms[j]->name << "..." << a->name << " energy: " << -f << endl;
                     #endif
-                    if (f >= cond_bas_hbond_energy_threshold)
+                    if (f.summed() >= cond_bas_hbond_energy_threshold)
                     {
                         #if _show_cond_bas_hbond_energy || _dbg_cond_basic
                         cout << name << " can protonate because of " << -f << " hbond energy with " << found_mol->get_name() << "." << endl;
@@ -3383,7 +3383,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     return retval;
 }
 
-float AminoAcid::get_intermol_binding(AminoAcid* neighb, bool backbone_atoms_only)
+Interaction AminoAcid::get_intermol_binding(AminoAcid* neighb, bool backbone_atoms_only)
 {
     AminoAcid* neighbs[4];
     int i;
@@ -3392,11 +3392,11 @@ float AminoAcid::get_intermol_binding(AminoAcid* neighb, bool backbone_atoms_onl
     return get_intermol_binding(neighbs, backbone_atoms_only);
 }
 
-float AminoAcid::get_intermol_binding(AminoAcid** neighbs, bool backbone_atoms_only)
+Interaction AminoAcid::get_intermol_binding(AminoAcid** neighbs, bool backbone_atoms_only)
 {
     if (!neighbs) return 0;
     if (!neighbs[0]) return 0;
-    float retval = 0;
+    Interaction retval;
     int i;
     if (!backbone_atoms_only)
         for (i=0; neighbs[i]; i++)
@@ -3421,11 +3421,11 @@ float AminoAcid::get_intermol_binding(AminoAcid** neighbs, bool backbone_atoms_o
                 {
                     if (!neighbs[i]->atoms[k]->is_backbone) continue;
                     float r = neighbs[i]->atoms[k]->get_location().get_3d_distance(&aloc);
-                    float abind = InteratomicForce::total_binding(atoms[j], neighbs[i]->atoms[k]);
-                    if (abind && !isnan(abind) && !isinf(abind))
+                    Interaction abind = InteratomicForce::total_binding(atoms[j], neighbs[i]->atoms[k]);
+                    if (abind.summed() && !isnan(abind.summed()) && !isinf(abind.summed()))
                     {
                         retval += abind;
-                        atoms[j]->last_bind_energy += abind;
+                        atoms[j]->last_bind_energy += abind.summed();
                     }
                 }
             }

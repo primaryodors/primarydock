@@ -260,7 +260,7 @@ AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
     int bw50 = get_bw50(hxno);
     if (bw50 < 1)
     {
-        cout << "BW number not found: " << hxno << ".50." << endl;
+        cout << "BW number not found: " << hxno << "." << bwno << "." << endl;
         throw -1;
     }
 
@@ -2710,9 +2710,27 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
     k=m=0;
     for (i=0; i<n; i++)
     {
+        int ncr = mtlcoords[i].coordres.size();
+
+        // Obtain the alpha center.
+        Point pt4avg[ncr+2];
+        l=0;
+        for (j=0; j<ncr; j++)
+        {
+            if (!mtlcoords[i].coordres[j].resno) mtlcoords[i].coordres[j].resolve_resno(this);
+            Point respt = get_atom_location(mtlcoords[i].coordres[j].resno, "CA");
+            // cout << respt << endl;
+            pt4avg[l++] = respt;
+        }
+        Point alpcen = average_of_points(pt4avg, l);
+        // cout << alpcen << endl << endl << flush;
+
+        // Obtain the alpha normal.
+        SCoord alpnorm = compute_normal(pt4avg[0], pt4avg[1], pt4avg[2]);
+
         m_mcoords.push_back(mtlcoords[i]);
         Point lpt;
-        Molecule** lmc = new Molecule*[mtlcoords[i].coordres.size()+4];
+        Molecule** lmc = new Molecule*[ncr+4];
         lmc[0] = new Molecule("lcm");
         Atom* lmtl;
         if (!mtlcoords[i].mtl)
@@ -2726,8 +2744,8 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         metals[m++] = lmtl;
 
         l = 1;
-        Atom* coord_atoms[mtlcoords[i].coordres.size()+2];
-        for (j=0; j<mtlcoords[i].coordres.size(); j++)
+        Atom* coord_atoms[ncr+2];
+        for (j=0; j<ncr; j++)
         {
             mtlcoords[i].coordres[j].resolve_resno(this);
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
@@ -2774,11 +2792,17 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
             lmtl->move(lpt);
         }
 
+        if (lmtl->get_location().get_3d_distance(alpcen.add(alpnorm)) > lmtl->get_location().get_3d_distance(alpcen.subtract(alpnorm)))
+        {
+            alpnorm.r *= -1;
+            alpnorm = (SCoord)(Point)alpnorm;
+        }
+
         lmtl->aaletter = '\0';
         strcpy(lmtl->aa3let, "MTL");
         lmtl->residue = 0;
 
-        for (j=0; j<mtlcoords[i].coordres.size(); j++)
+        for (j=0; j<ncr; j++)
         {
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
             if (aa)
@@ -2795,11 +2819,13 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 
         for (l=0; l<30; l++)
         {
-            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            for (j=0; j<ncr; j++)
             {
                 if (coord_atoms[j])
                 {
                     SCoord v = coord_atoms[j]->get_location().subtract(lmtl->get_location());
+                    alpnorm.r = lmtl->get_location().get_3d_distance(alpcen);
+
                     if (v.r > 2.5)
                     {
                         v.r -= 2.5;
@@ -2809,16 +2835,61 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                 }
             }
 
+            SCoord drift = alpcen.add(alpnorm).subtract(lmtl->get_location());
+            drift.r *= 0.333;
+            // cout << drift << endl;
+            lmtl->move_rel(drift);
+            // lmtl->move(alpcen.add(alpnorm));
+
             Molecule::conform_molecules(lmc, 20);
+
+            for (j=0; j<ncr; j++)
+            {
+                if (coord_atoms[j])
+                {
+                    AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
+                    aa->minimize_internal_clashes();
+                    aa->conform_atom_to_location(coord_atoms[j]->name, lmtl->get_location(), 20, 2.29);
+                }
+            }
         }
 
-        for (j=0; j<mtlcoords[i].coordres.size(); j++)
+        Point pt(0,0,0);
+        for (j=0; j<ncr; j++)
+        {
+            if (coord_atoms[j])
+            {
+                pt = pt.add(coord_atoms[j]->get_location());
+            }
+        }
+        pt.multiply(1.0/ncr);
+        float acr = lmtl->get_location().get_3d_distance(alpcen);
+
+        if (ncr > 2)
+        {
+            SCoord canormal = compute_normal(coord_atoms[0]->get_location(), coord_atoms[1]->get_location(), coord_atoms[2]->get_location());
+            if (alpcen.get_3d_distance(pt.add(canormal)) < alpcen.get_3d_distance(pt.subtract(canormal)))
+                canormal = (SCoord)Point(0,0,0).subtract(canormal);
+            canormal.r = 2.29*sin(M_PI-tetrahedral) * 0.75;
+            pt = pt.add(canormal);
+        }
+        else pt.multiply_3d_distance(&alpcen, acr/pt.get_3d_distance(alpcen));
+        
+        lmtl->move(pt);
+        lmc[0]->movability = MOV_NONE;
+        Molecule::conform_molecules(lmc, 50);
+
+        for (j=0; j<ncr; j++)
         {
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
-            if (aa)
-            {
-                aa->movability = MOV_PINNED;
-            }
+            if (aa && aa->get_charge()) aa->movability = MOV_PINNED;
+        }
+        Molecule::conform_molecules(lmc, 50);
+
+        for (j=0; j<ncr; j++)
+        {
+            AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
+            if (aa) aa->movability = MOV_PINNED; 
         }
 
         lmc[0]->movability = MOV_PINNED;

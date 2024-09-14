@@ -226,12 +226,27 @@ AminoAcid* Protein::get_residue(BallesterosWeinstein bw)
 
 AminoAcid* Protein::get_residue_bw(const char* bwno)
 {
-    char buffer[16];
+    char buffer[strlen(bwno)+4];
     strcpy(buffer, bwno);
+
+    char* offset = buffer;
+    while (*offset >= 'A' && *offset <= 'Z') offset++;
+
     char* dot = strchr(buffer, '.');
     if (!dot) return get_residue(atoi(bwno));
     *dot = 0;
-    return get_residue_bw(atoi(buffer), atoi(dot+1));
+
+    AminoAcid* retval = get_residue_bw(atoi(offset), atoi(dot+1));
+    if (!retval) return nullptr;
+    if (offset == buffer) return retval;
+
+    int i;
+    for (i=0; buffer[i] >= 'A' && buffer[i] <= 'Z'; i++)
+    {
+        if (buffer[i] == retval->get_letter()) return retval;
+    }
+
+    return nullptr;
 }
 
 AminoAcid* Protein::get_residue_bw(int hxno, int bwno)

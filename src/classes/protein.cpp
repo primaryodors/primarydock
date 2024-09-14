@@ -2837,9 +2837,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 
             SCoord drift = alpcen.add(alpnorm).subtract(lmtl->get_location());
             drift.r *= 0.333;
-            // cout << drift << endl;
             lmtl->move_rel(drift);
-            // lmtl->move(alpcen.add(alpnorm));
 
             Molecule::conform_molecules(lmc, 20);
 

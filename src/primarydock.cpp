@@ -78,7 +78,8 @@ char outfname[256];
 Point pocketcen;
 std::ofstream *output = NULL;
 
-std::string CEN_buf = "";
+std::vector<std::string> CEN_buf;
+int cenbuf_idx = 0;
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
@@ -120,7 +121,7 @@ int maxh2o = 0;
 int omaxh2o = 0;
 bool flex = true;
 float kJmol_cutoff = 0.01;
-int pose, nodeno, iter;
+int pose=1, nodeno=0, iter=0;
 bool kcal = false;
 float drift = initial_drift;
 Molecule** gcfmols = NULL;
@@ -1042,8 +1043,8 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "CEN"))
     {
-        CEN_buf = origbuff;
-        optsecho = (std::string)"Center " + CEN_buf;
+        CEN_buf.push_back(origbuff);
+        optsecho = (std::string)"Center " + (std::string)origbuff;
         return 0;
     }
     else if (!strcmp(words[0], "COLORS"))
@@ -1650,15 +1651,32 @@ void attempt_priority_hbond()
     }
 }
 
+void choose_cen_buf()
+{
+    int i, n;
+
+    n = protein->get_end_resno();
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid* aa = protein->get_residue(i);
+        if (aa) aa->priority = false;
+    }
+
+    n = CEN_buf.size();
+    if (pose <= n) cenbuf_idx = pose-1;
+    else cenbuf_idx = rand() % n;
+}
 
 void apply_protein_specific_settings(Protein* p)
 {
     int i, j, n;
+    choose_cen_buf();
 
     char buffer[1024];
-    strcpy(buffer, CEN_buf.c_str());
+    strcpy(buffer, CEN_buf[cenbuf_idx].c_str());
     char** words = chop_spaced_words(buffer);
     pocketcen = pocketcen_from_config_words(words, nullptr);
+    loneliest = protein->find_loneliest_point(pocketcen, size);
     delete[] words;
 
     n = atomto.size();
@@ -2073,16 +2091,11 @@ int main(int argc, char** argv)
         required_contacts[i].resolve_resno(protein);
     }
 
-    if (!CEN_buf.length())
+    if (!CEN_buf.size())
     {
-        cout << "Error: no binding pocket center defined." << endl;
+        cout << "Error: no binding pocket centers defined." << endl;
         return 0xbadb19d;
     }
-
-    strcpy(buffer, CEN_buf.c_str());
-    char** words = chop_spaced_words(buffer);
-    pocketcen = pocketcen_from_config_words(words, nullptr);
-    loneliest = protein->find_loneliest_point(pocketcen, size);
 
     #if pocketcen_is_loneliest
     pocketcen = loneliest;
@@ -2398,7 +2411,7 @@ _try_again:
         freeze_bridged_residues();
 
         ligand->recenter(pocketcen);
-        // cout << "Centered ligand at " << pocketcen << endl;
+        // cout << "Centered ligand at " << pocketcen << endl << endl << flush;
 
         if (pdpst == pst_tumble_spheres)
         {
@@ -2526,7 +2539,7 @@ _try_again:
                 for (i=0; i<states.size(); i++)
                 {
                     strcpy(buffer, states[i].c_str());
-                    words = chop_spaced_words(buffer);
+                    char** words = chop_spaced_words(buffer);
                     if (atoi(words[1]) == nodeno)
                     {
                         int sr = atoi(words[2]), er = atoi(words[3]);
@@ -2562,7 +2575,7 @@ _try_again:
                     cout << "Error in config file: path node " << nodeno << " is missing." << endl;
                     return 0xbadc09f;
                 }
-                words = chop_spaced_words(buffer);
+                char** words = chop_spaced_words(buffer);
                 nodecen = pocketcen_from_config_words(&words[1], &nodecen);
 
                 #if _DBG_STEPBYSTEP

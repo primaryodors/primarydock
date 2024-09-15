@@ -364,7 +364,6 @@
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
 #define _dbg_eclipses 0
-#define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
 #define _dbg_groupsalign 0

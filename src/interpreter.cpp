@@ -2650,27 +2650,25 @@ int main(int argc, char** argv)
                 }
 
                 if (ncr < 2) raise_error("MCOORD requires at least 2 coordinating atoms.");
-                if (ncr < 3 && uses_fancy_options) raise_error("MCOORD with YO, YAr, or Th8 requires at least 3 coordinating atoms.");
-                if (uses_fancy_options) working->coordinate_metal(ma, ncr, resnos, cratoms);
-                else
+                if (uses_fancy_options) raise_error("MCOORD no longer supports YO, YAr, Th8, or per-atom coordinations.");
+
+                std::vector<MCoord> mtlcoords;
+                MCoord mc;
+                mc.Z = ma->get_Z();
+                mc.charge = elem_charge;
+                mc.mtl = ma;
+
+                for (l=0; l<ncr; l++)
                 {
-                    std::vector<MCoord> mtlcoords;
-                    MCoord mc;
-                    mc.Z = ma->get_Z();
-                    mc.charge = elem_charge;
-                    mc.mtl = ma;
-
-                    for (l=0; l<ncr; l++)
-                    {
-                        ResiduePlaceholder rp;
-                        rp.resno = resnos[l];
-                        mc.coordres.push_back(rp);
-                    }
-
-                    mtlcoords.push_back(mc);
-
-                    working->coordinate_metal(mtlcoords);
+                    ResiduePlaceholder rp;
+                    rp.resno = resnos[l];
+                    mc.coordres.push_back(rp);
                 }
+
+                mtlcoords.push_back(mc);
+
+                working->coordinate_metal(mtlcoords);
+                
             } // MCOORD
 
             else if (!strcmp(words[0], "MEASURE"))

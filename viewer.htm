@@ -3076,7 +3076,8 @@ function show_pockets()
 	for (i=0; i<n; i++)
 	{
 		if (typeof cavities[i] == 'undefined') break;
-		html += "<a id=\"cavtgl"+i+"\" onclick=\"show_hide_cavity("+i+", 1);\" style=\"cursor: pointer;\"";
+		var aa = sequence[getResMdlIdx(i, 'A')];
+		html += "<a id=\"cavtgl"+i+"\" onclick=\"show_hide_cavity("+aa+i+", 1);\" style=\"cursor: pointer;\"";
 		if (cavities[i]['shown']) html += " class=\"hilite\"";
 		html += "\">";
 		html += cavities[i]['residues'].toString().replaceAll(',',' ');

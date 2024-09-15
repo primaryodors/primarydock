@@ -659,7 +659,7 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
 {
     if (noAtoms(atoms)) return 0;
 
-    int i, j;
+    int i, j=-1;
     float best, r;
     for (i=0; atoms[i]; i++)
     {
@@ -672,6 +672,7 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
         }
     }
 
+    if (j<0) return nullptr;
     return atoms[j];
 }
 

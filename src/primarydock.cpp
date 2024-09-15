@@ -104,6 +104,7 @@ bool out_pdbdat_res = true;
 Protein* protein;
 Protein* ptemplt;
 Protein* ptplref;
+Protein* metald_prot = nullptr;
 int seql = 0;
 int addl_resno[256];
 const Region* regions;
@@ -496,7 +497,7 @@ void output_iter(int iter, Molecule** mols)
         fprintf(fp, "Pose: %d\nNode: %d\n\n", pose, liter);
         int foff = 0;
 
-        DockResult ldr(protein, ligand, size, nullptr, pose);
+        DockResult ldr(protein, ligand, size, nullptr, pose, waters);
         ldr.include_pdb_data = false;
         ldr.display_clash_atom1 = true;
         ldr.display_clash_atom2 = true;
@@ -1679,6 +1680,10 @@ void apply_protein_specific_settings(Protein* p)
     loneliest = protein->find_loneliest_point(pocketcen, size);
     delete[] words;
 
+    if (!p->get_metals_count() && metald_prot) p->copy_mcoords(metald_prot);
+
+    j=0;
+
     n = atomto.size();
     for (i=0; i<n; i++)
     {
@@ -2063,6 +2068,7 @@ int main(int argc, char** argv)
     {
         protein->pocketcen = pocketcen;
         mtlcoords = protein->coordinate_metal(mtlcoords);
+        metald_prot = protein;
 
         if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_metal.pdb";
@@ -2256,9 +2262,6 @@ int main(int argc, char** argv)
     i = poses*(triesleft+1)+8;
     j = pathnodes+2;
     DockResult dr[i][j];
-    #if _dbg_find_blasted_segfault
-    cout << "dr[" << i << "][" << j << "] allocated. " << dr << endl;
-    #endif
 
     float rgnxform_r[i][pathnodes+2][PROT_MAX_RGN], rgnxform_theta[i][pathnodes+2][PROT_MAX_RGN], rgnxform_y[i][pathnodes+2][PROT_MAX_RGN];
     float rgnrot_alpha[i][pathnodes+2][PROT_MAX_RGN], rgnrot_w[i][pathnodes+2][PROT_MAX_RGN], rgnrot_u[i][pathnodes+2][PROT_MAX_RGN];
@@ -2987,7 +2990,7 @@ _try_again:
             AminoAcid* aadbg = protein->get_residue(155);
             cout << aadbg->get_name() << " charge = " << aadbg->get_charge() << endl;
             #endif
-            dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount);
+            dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, waters);
             dr[drcount][nodeno].out_per_res_e = out_per_res_e;
             dr[drcount][nodeno].out_per_btyp_e = out_per_btyp_e;
             dr[drcount][nodeno].out_itemized_e_cutoff = out_itemized_e_cutoff;
@@ -3074,99 +3077,7 @@ _try_again:
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
-            
-            std::ostringstream pdbdat;
 
-            // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
-            n = ligand->get_atom_count();
-            int offset = n;
-            if (out_pdbdat_lig)
-            {
-                for (l=0; l<n; l++)
-                {
-                    Atom* a = ligand->get_atom(l);
-                    if (!a) continue;
-                    a->residue = pose;
-                    a->stream_pdb_line(pdbdat, 9000+l, true);
-                }
-                #if _DBG_STEPBYSTEP
-                if (debug) *debug << "Prepared ligand PDB." << endl;
-                #endif
-
-                if (waters)
-                {
-                    for (k=0; k<maxh2o; k++)
-                    {
-                        for (l=0; l<3; l++)
-                        {
-                            Atom* a = waters[k]->get_atom(l);
-                            if (!a) continue;
-                            a->residue = pose;
-                            a->stream_pdb_line(pdbdat, 9000+offset+l+3*k, true);
-                        }
-                    }
-                }
-            }
-
-            #if _dummy_atoms_for_debug
-            if (dummies.size())
-            {
-                for (k=0; k<dummies.size(); k++)
-                {
-                    dummies[k].stream_pdb_line(pdbdat, 9900+offset+l+3*k);
-                }
-            }
-            #endif
-
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, pocketcen, size, addl_resno);
-
-            if (out_pdbdat_res)
-            {
-                int en = protein->get_end_resno();
-                int resno;
-                for (resno = protein->get_start_resno(); resno <= en; resno++)
-                {
-                    AminoAcid* laa = protein->get_residue(resno);
-                    if (!laa) continue;
-                    if (!flex || !laa->been_flexed)
-                    {
-                        if (laa->distance_to(ligand) > 5) continue;
-                        for (k=0; reaches_spheroid[nodeno][k]; k++)
-                        {
-                            if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
-                            if (reaches_spheroid[nodeno][k] == laa) goto _afterall;
-                        }
-                        continue;
-                    }
-                    _afterall:
-                    n = laa->get_atom_count();
-                    for (l=0; l<n; l++)
-                    {
-                        laa->get_atom(l)->stream_pdb_line(
-                            pdbdat,
-                            laa->atno_offset+l
-                        );
-                    }
-                }
-                #if _DBG_STEPBYSTEP
-                if (debug) *debug << "Prepared flex PDBs." << endl;
-                #endif
-            }
-            else if (!out_pdbdat_lig) pdbdat << " ";
-
-            if (mtlcoords.size() && out_pdbdat_lig)
-            {
-                for (l=0; l<mtlcoords.size(); l++)
-                {
-                    mtlcoords[l].mtl->stream_pdb_line(
-                        pdbdat,
-                        9900+l
-                    );
-                }
-            }
-
-            dr[drcount][nodeno].pdbdat = pdbdat.str();
-            if (debug) *debug << "Prepared the PDB strings." << endl;
             dr[drcount][nodeno].auth = pose;
 
             if (!nodeno)

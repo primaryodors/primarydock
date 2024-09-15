@@ -372,14 +372,6 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
         residues[i]->save_pdb(os, offset);
         offset += residues[i]->get_atom_count();
     }
-    if (m_mcoord)
-    {
-        for (i=0; m_mcoord[i]; i++)
-        {
-            cout << "Saving " << m_mcoord[i]->metal->name << endl;
-            m_mcoord[i]->metal->save_pdb_line(os, ++offset);
-        }
-    }
     if (m_mcoords.size())
     {
         for (i=0; i<m_mcoords.size(); i++)
@@ -1572,6 +1564,34 @@ bool Protein::aa_ptr_in_range(AminoAcid* aaptr)
     else return true;
 }
 
+void Protein::copy_mcoords(Protein* cf)
+{
+    int i, j, n;
+
+    if (n = cf->m_mcoords.size()) for (i=0; i<n; i++)
+    {
+        MCoord mc = cf->m_mcoords[i];
+        if (mc.mtl) mc.mtl->move(mc.mtl_original_location);
+        this->m_mcoords.push_back(mc);
+    }
+
+    for (i=0; i<32; i++) mcoord_resnos[i] = cf->mcoord_resnos[i];
+    for (i=0; i<16; i++) metals[i] = cf->metals[i];
+
+    n = min(get_end_resno(), cf->get_end_resno());
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid* cfaa = cf->get_residue(i);
+        if (!cfaa) continue;
+        if (cfaa->m_mcoord)
+        {
+            AminoAcid* aa = get_residue(i);
+            if (!aa) continue;
+            aa->m_mcoord = cfaa->m_mcoord;
+        }
+    }
+}
+
 Molecule* Protein::metals_as_molecule()
 {
     Molecule* met=NULL;
@@ -2368,11 +2388,6 @@ void Protein::delete_sidechains(int startres, int endres)
 Protein* gmprot;
 Point gmtgt;
 
-void ext_mtl_coord_cnf_cb(int iter)
-{
-    gmprot->mtl_coord_cnf_cb(iter);
-}
-
 int Protein::get_metals_count()
 {
     if (!metals) return 0;
@@ -2380,305 +2395,6 @@ int Protein::get_metals_count()
     int i;
     for (i=0; metals[i]; i++);      // Get count.
     return i;
-}
-
-MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames)
-{
-    int i, j=0, k=0, l, n;
-    if (!m_mcoord)
-    {
-        m_mcoord = new MetalCoord*[2];
-        m_mcoord[0] = new MetalCoord();
-        m_mcoord[1] = NULL;
-    }
-    else
-    {
-        for (j=0; m_mcoord[j]; j++);	// Get count.
-        MetalCoord** nmc = new MetalCoord*[j+2];
-        for (i=0; i<j; i++) nmc[i] = m_mcoord[i];
-        nmc[j] = new MetalCoord();
-        nmc[j+1] = NULL;
-        delete[] m_mcoord;
-        m_mcoord = nmc;
-    }
-
-    for (k=0; metals[k]; k++);	// Get count.
-    metals[k++] = metal;
-    metals[k] = NULL;
-
-    m_mcoord[j]->metal = metal;
-    m_mcoord[j]->coord_res = new AminoAcid*[residues+2];
-    m_mcoord[j]->coord_atoms = new Atom*[residues+2];
-
-    int maxres = 0, minres = 0;
-    for (i=0; i<residues; i++)
-    {
-        if (resnos[i] > maxres) maxres = resnos[i];
-        if (!minres || resnos[i] < minres) minres = resnos[i];
-
-        char buffer[256];
-        sprintf(buffer, "REMARK 800 SITE MCOORD %d %s\n", resnos[i], metal->name);
-        add_remark(buffer);
-
-        m_mcoord[j]->coord_res[i] = get_residue(resnos[i]);
-        if (!m_mcoord[j]->coord_res[i])
-        {
-            cout << "Attempt to bind metal to residue " << resnos[i] << " not found in protein!" << endl;
-            throw 0xbad12e5d;
-        }
-        m_mcoord[j]->coord_res[i]->m_mcoord = m_mcoord[j];
-        if (i < res_anames.size())
-        {
-            m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i].c_str());
-            if (!m_mcoord[j]->coord_atoms[i])
-            {
-                cout << "Attempt to bind metal to " << resnos[i] << ":" << res_anames[i] << " not found in protein!" << endl;
-                throw 0xbada70b;
-            }
-        }
-    }
-    m_mcoord[j]->coord_res[residues] = NULL;
-    m_mcoord[j]->coord_atoms[residues] = NULL;
-
-    add_remark("REMARK 800\n");
-
-    // Get the plane of the coordinating atoms, then get the normal.
-    Point ptarr[3] =
-    {
-        m_mcoord[j]->coord_atoms[0]->get_location(),
-        m_mcoord[j]->coord_atoms[1]->get_location(),
-        m_mcoord[j]->coord_atoms[2]->get_location()
-    };
-    Point coordcen = average_of_points(ptarr, 3);
-    SCoord normal = compute_normal(ptarr[0], ptarr[1], ptarr[2]);
-    normal.r = 3;
-    Point pnormal = coordcen.add(normal), pantinormal = coordcen.subtract(normal);
-    int nc = 0, anc = 0;
-
-    // Iterate from minres to maxres, counting how many CA atoms are on each side of the plane and are within a threshold distance.
-    for (i = minres; i <= maxres; i++)
-    {
-        Atom* la = ca[i];
-        if (!la) continue;
-        Point lpt = la->get_location();
-        float nr = lpt.get_3d_distance(pnormal);
-        float anr = lpt.get_3d_distance(pantinormal);
-
-        // Don't sweat residues on the opposite side of the binding pocket if the coord atoms are on different helices.
-        if (nr > 7 || anr > 7) continue;
-
-        // If equidistant, don't count it.
-        if (nr < anr) nc++;
-        if (nr > anr) anc++;
-    }
-
-    // Choose the side of the plane with the fewest CA atoms and set gmtgt about 1A in that direction of plane center.
-    // If the two sides are the same, set gmtgt to coordcen.
-    // cout << "nc " << nc << " | anc " << anc << endl;
-    if (nc < anc)
-    {
-        normal.r = 7;
-        gmtgt = pnormal.add(normal);
-        metal->move(gmtgt);
-        gmtgt = pnormal;
-
-    }
-    else if (nc > anc)
-    {
-        normal.r = 7;
-        gmtgt = pantinormal.subtract(normal);
-        metal->move(gmtgt);
-        gmtgt = pantinormal;
-    }
-    else gmtgt = coordcen;
-
-    // Create an array of Molecules containing the coordinating residues and surrounding residues, with the metal as its own Molecule.
-    Atom* ma[2];
-    ma[0] = metal;
-    ma[1] = NULL;
-    Molecule m("Metal", ma);
-    m.movability = MOV_ALL;
-    Molecule* lmols[maxres-minres+8];
-    Molecule* lbkg[maxres-minres+8];
-    int lmolc=0, lbkgc=0;
-    lmols[lmolc++] = &m;
-    lbkg[lbkgc++] = &m;
-    for (n=0; n<residues; n++)
-    {
-        if (n>0 && resnos[n] == resnos[n-1]) continue;
-        AminoAcid* aa = get_residue(i);
-        if (aa)
-        {
-            lmols[lmolc++] = aa;
-        }
-    }
-    for (i=minres; i<=maxres; i++)
-    {
-        AminoAcid* aa = get_residue(i);
-        if (aa)
-        {
-            lbkg[lbkgc++] = aa;
-            if (i >= minres && i <= maxres)
-                aa->m_mcoord = m_mcoord[j];		// Sets the coordinating residues, and all in between residues, to backbone immovable.
-        }
-    }
-    lmols[lmolc] = nullptr;
-    lbkg[lbkgc] = nullptr;
-
-    // Make sure to set the coordinating residues so that their side chains are flexible.
-    for (i=0; m_mcoord[j]->coord_res[i]; i++)
-        m_mcoord[j]->coord_res[i]->movability = MOV_FLEXONLY;    
-
-    // Move the metal to the new center of all coordinating residues' CA.
-    Point pt4avg[residues+2];
-    l=0;
-    for (n=0; n<residues; n++)
-    {
-        Point respt = get_atom_location(resnos[n], "CA");
-
-        if (n>0 && resnos[n] == resnos[n-1]) continue;
-        else pt4avg[l++] = respt;
-    }
-    Point ptmtl = average_of_points(pt4avg, l);
-    metal->move(ptmtl);
-
-    // Flex the side chains to all be close to the alpha center.
-    int iter;
-    for (iter=0; iter<50; iter++)
-    {
-        for (i=0; i<residues; i++)
-        {
-            AminoAcid* aa = get_residue(resnos[i]);
-            if (aa)
-            {
-                Bond** bb = aa->get_rotatable_bonds();
-                if (bb)
-                {
-                    float rad = 0, step = 10*fiftyseventh;
-                    float bestrad, bestr, r;
-
-                    for (l=0; bb[l]; l++)
-                    {
-                        bestrad = 0;
-                        bestr = 999999;
-                        for (; rad < M_PI*2; rad += step)
-                        {
-                            bb[l]->rotate(step);
-                            r = 0;
-                            float clashes = 0;
-                            for (n=0; n<residues; n++)
-                            {
-                                // if (resnos[n] == resnos[i]) continue;
-                                // r += get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(get_atom_location(resnos[i], res_anames[i].c_str()));
-                                r += fabs(get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(ptmtl) - 2);      // VERY rough approximation.
-                                clashes += get_residue(resnos[n])->get_intermol_clashes(lbkg);
-                            }   // for n
-
-                            /*cout << iter << " " << *aa << ":"
-                            	 << bb[l]->atom->name << "-" << bb[l]->atom2->name
-                            	 << " " << rad*fiftyseven << "deg, r=" << r
-                            	 << ", clash=" << clashes << endl;*/
-
-                            r += 0.05*clashes;
-
-                            if (r < bestr)
-                            {
-                                bestrad = rad;
-                                bestr = r;
-                            }
-                        }
-
-                        if (bestrad) bb[l]->rotate(bestrad);
-
-                    }		// for (l=0; bb[l]; l++)
-                }		// if (bb)
-            }		// if (aa)
-        }		// for (i=0; i<residues; i++)
-    }		// for iter
-
-    // Multimol conform the array.
-    gmprot = this;
-    Molecule::conform_molecules(lmols, lbkg, 50); // &ext_mtl_coord_cnf_cb);
-    // metal->move(ptmtl);
-
-    // Flex the side chains to all be close to the metal.
-    ptmtl = metal->get_location();
-    for (iter=0; iter<50; iter++)
-    {
-        for (i=0; i<residues; i++)
-        {
-            AminoAcid* aa = get_residue(resnos[i]);
-            if (aa)
-            {
-                Bond** bb = aa->get_rotatable_bonds();
-                if (bb)
-                {
-                    float rad = 0, step = 10*fiftyseventh;
-                    float bestrad, bestr, r;
-
-                    for (l=0; bb[l]; l++)
-                    {
-                        bestrad = 0;
-                        bestr = 999999;
-                        for (; rad < M_PI*2; rad += step)
-                        {
-                            bb[l]->rotate(step);
-                            r = 0;
-                            float clashes = 0;
-                            for (n=0; n<residues; n++)
-                            {
-                                r += fabs(get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(ptmtl) - 2);      // VERY rough approximation.
-                                clashes += get_residue(resnos[n])->get_intermol_clashes(lbkg);
-                            }   // for n
-
-                            /*cout << iter << " " << *aa << ":"
-                            	 << bb[l]->atom->name << "-" << bb[l]->atom2->name
-                            	 << " " << rad*fiftyseven << "deg, r=" << r
-                            	 << ", clash=" << clashes << endl;*/
-
-                            r += 0.05*clashes;
-
-                            if (r < bestr)
-                            {
-                                bestrad = rad;
-                                bestr = r;
-                            }
-                        }
-
-                        if (bestrad) bb[l]->rotate(bestrad);
-
-                    }		// for (l=0; bb[l]; l++)
-                }		// if (bb)
-            }		// if (aa)
-        }		// for (i=0; i<residues; i++)
-    }		// for iter
-
-    // Move the metal to the new center of all coordinating atoms.
-    #if 0
-    l=0;
-    for (n=0; n<residues; n++)
-    {
-        Point respt = get_atom_location(resnos[n], res_anames[n].c_str());
-
-        if (n>0 && resnos[n] == resnos[n-1])
-        {
-            pt4avg[l-1].x = (pt4avg[l-1].x + respt.x)/2;
-            pt4avg[l-1].y = (pt4avg[l-1].y + respt.y)/2;
-            pt4avg[l-1].z = (pt4avg[l-1].z + respt.z)/2;
-        }
-        else
-            pt4avg[l++] = respt;
-    }
-    ptmtl = average_of_points(pt4avg, l);
-    #endif
-    metal->move(ptmtl);
-
-    // Set the coordinating residues' sidechains to immovable.
-    for (i=0; m_mcoord[j]->coord_res[i]; i++)
-        m_mcoord[j]->coord_res[i]->movability = MOV_NONE;
-
-    m_mcoord[j]->locked = true;
-    return m_mcoord[j];
 }
 
 Point Protein::get_region_bounds(int startres, int endres)
@@ -2891,22 +2607,11 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         }
 
         lmc[0]->movability = MOV_PINNED;
+        mtlcoords[i].mtl_original_location = lmtl->get_location();
     }
     metals[m] = nullptr;
 
     return mtlcoords;
-}
-
-void Protein::mtl_coord_cnf_cb(int iter)
-{
-    int i;
-    for (i=0; m_mcoord[i]; i++)
-    {
-        // SCoord delta(m_mcoord[i]->coord_atom_avg_loc().subtract(m_mcoord[i]->metal->get_location()));
-        SCoord delta(gmtgt.subtract(m_mcoord[i]->metal->get_location()));
-        delta.r *= 0.1;
-        m_mcoord[i]->metal->move_rel(&delta);
-    }
 }
 
 float Protein::get_helix_orientation(int startres, int endres)

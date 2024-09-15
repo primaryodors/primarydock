@@ -6,8 +6,6 @@
 
 #include <string>
 
-void ext_mtl_coord_cnf_cb(int iter);
-
 enum region_source
 {
     rgn_none,
@@ -51,6 +49,7 @@ struct MCoord
     int Z = 29;
     int charge = 2;
     Atom* mtl = nullptr;
+    Point mtl_original_location;
     std::vector<ResiduePlaceholder> coordres;
 };
 
@@ -78,7 +77,6 @@ public:
     void delete_sidechain(int resno);
     void delete_residues(int startres, int endres);
     void delete_sidechains(int startres, int endres);
-    MetalCoord* coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames);
     std::vector<MCoord> coordinate_metal(std::vector<MCoord> mtlcoords);
     void set_region(std::string name, int start, int end);
     void set_bw50(int helixno, int resno);
@@ -91,6 +89,7 @@ public:
     void save_pdb(FILE* outfile, Molecule* ligand = nullptr);
     void end_pdb(FILE* outfile);
     void revert_to_pdb();
+    void copy_mcoords(Protein* copyfrom);
 
     // Getters.
     int get_seq_length();
@@ -225,7 +224,6 @@ protected:
     region_source regions_from = rgn_none;
     char** remarks = nullptr;
     int remarksz = 0;
-    MetalCoord** m_mcoord = nullptr;
     std::vector<MCoord> m_mcoords;
     int Ballesteros_Weinstein[79];
     std::vector<AABridge> aabridges;
@@ -237,8 +235,6 @@ protected:
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);
-    friend void ext_mtl_coord_cnf_cb(int iter);
-    void mtl_coord_cnf_cb(int iter);
     void allocate_undo_poses();
     void save_undo_state();
 };

@@ -2491,7 +2491,6 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
                     }
                 }
 
-                aa->coordmtl = lmtl;
                 k++;
             }
         }
@@ -2548,7 +2547,8 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         {
             AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
             aa->conform_atom_to_location(coord_atoms[j]->name, lmtl->get_location(), 20, optimal[j]);
-            if (aa) aa->movability = MOV_PINNED; 
+            if (aa) aa->movability = MOV_PINNED;
+            aa->coordmtl = lmtl;
         }
 
         mtlcoords[i].mtl_original_location = lmtl->get_location();

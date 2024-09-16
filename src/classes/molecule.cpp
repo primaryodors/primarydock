@@ -3743,7 +3743,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             bool is_flexion_dbg_mol = (a->is_residue() == 107);
             if (is_flexion_dbg_mol) cout << a->name << " movability " << hex << a->movability << dec << endl << flush;
             #endif
-            if (((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN)) || a->movability == MOV_FLXDESEL)
+            if (((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN) && a->movability != MOV_PINNED) || a->movability == MOV_FLXDESEL)
             {
                 #if _dbg_asunder_atoms
                 if (!a->check_Greek_continuity()) throw 0xbadc0de;

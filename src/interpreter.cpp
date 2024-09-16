@@ -1761,7 +1761,8 @@ int main(int argc, char** argv)
                 if (!words[l]) raise_error("Insufficient parameters given for HELIX.");
                 sr = interpret_single_int(words[l]);
                 if (!words[l+1]) raise_error("Insufficient parameters given for HELIX.");
-                sa = er = interpret_single_int(words[l+1]);
+                er = interpret_single_int(words[l+1]);
+                sa = (er>sr) ? working->get_end_resno() : 1;
                 if (words[l+2]) sa = interpret_single_int(words[l+2]);
                 if (words[l+2] && words[l+3]) raise_error("Too many parameters given for HELIX.");
 
@@ -2548,7 +2549,7 @@ int main(int argc, char** argv)
                 bool force_tyrosine_O = false;
                 bool thiolate = false;
                 bool uses_fancy_options = false;
-                Atom** ba = nullptr;
+                Atom* ba = nullptr;
 
                 _yes_I_used_goto_for_this:
                 if (!strcmp(words[l], "YO"))
@@ -2634,11 +2635,11 @@ int main(int argc, char** argv)
                         }
                     }
 
-                    ba = aa->get_most_bindable(1, ma);
+                    ba = aa->get_one_most_bindable(mcoord);
 
-                    if (ba && ba[0])
+                    if (ba)
                     {
-                        cratoms.push_back(ba[0]->name);
+                        cratoms.push_back(ba->name);
                         cout << "Found metal coord atom " << *aa << ":" << cratoms[ncr] << endl;
                         ncr++;
                     }

@@ -2349,7 +2349,7 @@ _try_again:
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
-        if (frand(0,1) < 0.666) ligand->crumple(frand(0, square));
+        if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
 
         for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 

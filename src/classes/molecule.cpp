@@ -3135,7 +3135,7 @@ void Molecule::minimize_internal_clashes()
     base_internal_clashes = 0;
 
     int i, j, iter;
-    float clash = get_internal_clashes();
+    float clash = get_internal_clashes() + total_eclipses();
 
     if (!clash) return;		// Already zero, nothing to decrease to.
 
@@ -3157,7 +3157,7 @@ void Molecule::minimize_internal_clashes()
         for (i=0; i<numrb; i++)
         {
             b[i]->rotate(angle[i]);
-            float clash1 = get_internal_clashes();
+            float clash1 = get_internal_clashes() + total_eclipses();
 
             if (clash1 <= clash)
             {
@@ -3172,7 +3172,7 @@ void Molecule::minimize_internal_clashes()
         }
     }
 
-    base_internal_clashes = get_internal_clashes();
+    base_internal_clashes = get_internal_clashes() + total_eclipses();
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 

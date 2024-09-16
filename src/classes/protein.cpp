@@ -2590,15 +2590,32 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         else pt.multiply_3d_distance(&alpcen, acr/pt.get_3d_distance(alpcen));
         
         lmtl->move(pt);
-        lmc[0]->movability = MOV_NONE;
-        Molecule::conform_molecules(lmc, 50);
+        // lmc[0]->movability = MOV_NONE;
+        // Molecule::conform_molecules(lmc, 50);
 
-        for (j=0; j<ncr; j++)
+        for (l=0; l<20; l++)
         {
-            AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
-            if (aa && aa->get_charge()) aa->movability = MOV_PINNED;
+            pt.multiply(k=0);
+            for (j=0; j<ncr; j++)
+            {
+                AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
+                aa->movability = MOV_FLEXONLY;
+                Atom* mca = coord_atoms[j];
+                if (mca)
+                {
+                    aa->conform_atom_to_location(mca->name, lmtl->get_location(), 20);
+                    pt = pt.add(mca->get_location());
+                    k++;
+                }
+                aa->movability = MOV_PINNED;
+            }
+
+            if (k) pt.multiply(1.0/k);
+            SCoord v = alpnorm;
+            v.r = pt.get_3d_distance(alpcen) + 1.3;
+            pt = alpcen.add(v);
+            lmtl->move(pt);
         }
-        Molecule::conform_molecules(lmc, 50);
 
         for (j=0; j<ncr; j++)
         {

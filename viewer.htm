@@ -3076,12 +3076,32 @@ function show_pockets()
 	for (i=0; i<n; i++)
 	{
 		if (typeof cavities[i] == 'undefined') break;
-		var aa = sequence[getResMdlIdx(i, 'A')];
-		html += "<a id=\"cavtgl"+i+"\" onclick=\"show_hide_cavity("+aa+i+", 1);\" style=\"cursor: pointer;\"";
+		html += "<a id=\"cavtgl"+i+"\" onclick=\"show_hide_cavity("+i+", 1);\" style=\"cursor: pointer;\"";
 		if (cavities[i]['shown']) html += " class=\"hilite\"";
 		html += "\">";
-		html += cavities[i]['residues'].toString().replaceAll(',',' ');
-		html += "</a><br>\n\n";
+
+		var j;
+		for (j=0; j<cavities[i]['residues'].length; j++)
+		{
+			var resno = cavities[i]['residues'][j];
+			var aa = sequence[getResMdlIdx(resno, 'A')];
+			if (typeof aa == "string")
+			{
+				html += "<span style=\"color: #";
+				if ("DE".indexOf(aa) >= 0) html += "ff0000";
+				else if ("RK".indexOf(aa) >= 0) html += "0099ff";
+				else if ("STNQ".indexOf(aa) >= 0) html += "00ffcc";
+				else if ("FHWY".indexOf(aa) >= 0) html += "cc99cc";
+				else if ("CM".indexOf(aa) >= 0) html += "ffee00";
+				else html += "cccccc";
+				html += ";\">";
+				html += aa+resno+" ";
+				html += "</span>";
+			}
+			else html += resno+" ";
+		}
+
+		html += "</a><br><br>\n\n";
 	}
 
 	pocketsdd.innerHTML = html;

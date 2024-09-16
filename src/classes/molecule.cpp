@@ -2786,7 +2786,7 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
 
         InteratomicForce* ifs[32];
         InteratomicForce::fetch_applicable(a, atoms[i], ifs);
-        if (!ifs) continue;
+        if (!ifs[0]) continue;
 
         for (j=0; ifs[j]; j++)
         {
@@ -2816,12 +2816,10 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
                 partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + atoms[i]->get_electronegativity()) / 2 - 2.25));
             }
 
-            retval += partial;
+            if (partial > retval) retval = partial;
             n++;
         }
     }
-
-    if (n) retval /= n;
 
     return retval;
 }

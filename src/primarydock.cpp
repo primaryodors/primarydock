@@ -958,8 +958,6 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
         i++;
         for (; words[i]; i++)
         {
-            int n = strlen(words[i]);
-
             int j = interpret_resno(words[i]);
             if (!j) continue;
 

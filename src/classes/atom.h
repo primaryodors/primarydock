@@ -390,6 +390,7 @@ protected:
 };
 
 bool atoms_are_conjugated(Atom** atoms);
+Point average_of_atom_locs(Atom** atoms);
 
 static bool read_elem_syms = false;
 

@@ -2272,6 +2272,7 @@ float Molecule::get_internal_clashes()
         float avdW = atoms[i]->get_vdW_radius();
         for (j=i+1; atoms[j]; j++)
         {
+            if (atoms[i]->residue && atoms[i]->residue == atoms[j]->residue && !strcmp(atoms[i]->name, atoms[j]->name)) continue;
             if (atoms[i]->is_bonded_to(atoms[j]) || atoms[j]->is_bonded_to(atoms[i]))
             {
                 Bond* ab = atoms[i]->get_bond_between(atoms[j]);

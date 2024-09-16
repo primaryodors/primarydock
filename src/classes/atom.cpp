@@ -938,6 +938,21 @@ bool Atom::bond_to(Atom* latom2, float lcard)
     return false;
 }
 
+Point average_of_atom_locs(Atom** atoms)
+{
+    int i;
+    Point result(0,0,0);
+    if (!atoms) return result;
+
+    for (i=0; atoms[i]; i++)
+    {
+        result = result.add(atoms[i]->get_location());
+    }
+    if (i) result.multiply(1.0/i);
+
+    return result;
+}
+
 #define _dbg_polar_calc 0
 float Atom::is_polar()
 {

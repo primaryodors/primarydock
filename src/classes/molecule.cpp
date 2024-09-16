@@ -2807,6 +2807,7 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
 
             if (ifs[j]->get_type() == hbond)
             {
+                if (fabs(a->is_polar()) < hydrophilicity_cutoff || fabs(atoms[i]->is_polar()) < hydrophilicity_cutoff) continue;
                 partial *= fmin(fabs(a->is_polar()), fabs(atoms[i]->is_polar()));
             }
 
@@ -2817,11 +2818,17 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
                 partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + atoms[i]->get_electronegativity()) / 2 - 2.25));
             }
 
-            if (partial > retval) retval = partial;
+            if (ifs[j]->get_type() == vdW)
+            {
+                if (fabs(a->is_polar()) >= hydrophilicity_cutoff || fabs(atoms[i]->is_polar()) >= hydrophilicity_cutoff) continue;
+            }
+
+            retval += partial;
             n++;
         }
     }
 
+    if (n) retval /= n;
     return retval;
 }
 

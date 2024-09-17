@@ -1457,6 +1457,11 @@ void Atom::print_bond_angles()
     }
 }
 
+SCoord Bond::get_axis()
+{
+    return atom2->get_location().subtract(atom1->get_location());
+}
+
 bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
 {
     last_fail = bf_unknown;
@@ -1539,6 +1544,7 @@ _cannot_reverse_bondrot:
     #endif
 
     atom2->rotate_geometry(rot);
+    eclipse_hash = 0;
 
     for (i=0; moves_with_atom2[i]; i++)
     {

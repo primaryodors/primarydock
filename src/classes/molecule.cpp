@@ -709,50 +709,62 @@ float Molecule::total_eclipses()
     if (!atoms) return 0;
     float result = 0;
     int i, j, k, l, m, n;
-    for (i=0; atoms[i]; i++)
+    if (!rotatable_bonds) get_rotatable_bonds();
+    if (!rotatable_bonds) return 0;
+    while (!eclipse_hash) eclipse_hash = rand();
+
+    for (i=0; rotatable_bonds[i]; i++)
     {
-        if (atoms[i]->get_Z() < 2) continue;
-        Bond* abt[16];
-        atoms[i]->fetch_bonds(abt);
-        n = atoms[i]->get_geometry();
-        for (j=0; j<n; j++)
+        if (rotatable_bonds[i]->eclipse_hash == eclipse_hash)
+        {
+            result += rotatable_bonds[i]->eclipse_partial;
+            // cout << " " << name << flush;
+            continue;
+        }
+        else
+        {
+            rotatable_bonds[i]->eclipse_partial = 0;
+        }
+
+        Bond *abt[16], *bbt[16];
+        rotatable_bonds[i]->atom1->fetch_bonds(abt);
+        rotatable_bonds[i]->atom2->fetch_bonds(bbt);
+        m = rotatable_bonds[i]->atom1->get_geometry();
+        n = rotatable_bonds[i]->atom2->get_geometry();
+        SCoord axis = rotatable_bonds[i]->get_axis();
+
+        for (j=0; j<m; j++)
         {
             if (!abt[j]) continue;
             if (abt[j]->cardinality > 1) continue;
             if (!abt[j]->can_rotate) continue;
+            if (!abt[j]->atom1) continue;
             if (!abt[j]->atom2) continue;
             if (abt[j]->atom2->get_Z() < 2) continue;
-            if (atoms[i]->is_pi() && abt[j]->atom2->is_pi()) continue;
-            if (atoms[i]->is_backbone && abt[j]->atom2->is_backbone) continue;
-            SCoord axis = abt[j]->atom2->get_location().subtract(atoms[i]->get_location());
-            Bond* bbt[16];
-            abt[j]->atom2->fetch_bonds(bbt);
-            m = abt[j]->atom2->get_geometry();
-            for (k=0; k<m; k++)
+            if (abt[j]->atom1->is_pi() && abt[j]->atom2->is_pi()) continue;
+            if (abt[j]->atom1->is_backbone && abt[j]->atom2->is_backbone) continue;
+
+            for (l=0; l<n; l++)
             {
-                if (!bbt[k]) continue;
-                if (!bbt[k]->atom2) continue;
-                if (bbt[k]->atom2->get_Z() > 1) continue;
-                // if (bbt[k]->atom2 == atoms[i]) continue;
-                for (l=0; l<n; l++)
-                {
-                    if (l == j) continue;
-                    if (!abt[l]) continue;
-                    if (!abt[l]->atom2) continue;
-                    if (abt[l]->atom2->get_Z() > 1) continue;
-                    float theta = find_angle_along_vector(bbt[k]->atom2->get_location(), abt[l]->atom2->get_location(), atoms[i]->get_location(), axis);
-                    #if _dbg_eclipses
-                    cout << bbt[k]->atom2->name << " is " << (theta*fiftyseven) << "deg from " << abt[l]->atom2->name
-                        << " along the " << atoms[i]->name << " - " << abt[j]->atom2->name << " axis."
-                        << endl;
-                    #endif
-                    theta -= M_PI;
-                    while (theta < -hexagonal) theta += hexagonal;
-                    while (theta > hexagonal) theta -= hexagonal;
-                    result += fabs(theta);
-                }
+                if (!bbt[l]) continue;
+                if (bbt[l]->cardinality > 1) continue;
+                if (!bbt[l]->can_rotate) continue;
+                if (!bbt[l]->atom1) continue;
+                if (!bbt[l]->atom2) continue;
+                if (bbt[l]->atom2->get_Z() < 2) continue;
+                if (bbt[l]->atom1->is_pi() && bbt[l]->atom2->is_pi()) continue;
+                if (bbt[l]->atom1->is_backbone && bbt[l]->atom2->is_backbone) continue;
+
+                float theta = find_angle_along_vector(bbt[l]->atom2->get_location(), abt[j]->atom2->get_location(),
+                    abt[j]->atom1->get_location(), axis);
+                float f = 0.5 + 0.5 * cos(theta*3);
+                result += f;
+                rotatable_bonds[i]->eclipse_partial += f;
+                // cout << " " << name << flush;
             }
         }
+
+        rotatable_bonds[i]->eclipse_hash = eclipse_hash;
     }
 
     return result*eclipsing_kJmol_per_radian;
@@ -2204,7 +2216,7 @@ Bond** AminoAcid::get_rotatable_bonds()
 _found_aadef:
     Bond** retval = new Bond*[bonds+8];
     for (i=0; i<=bonds; i++) retval[i] = btemp[i];
-    retval[i] = 0;
+    retval[i] = nullptr;
     rotatable_bonds = retval;
 
     return retval;
@@ -3779,6 +3791,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         bool is_flexion_dbg_mol_bond = is_flexion_dbg_mol & !strcmp(bb[q]->atom2->name, "OG");
                         #endif
 
+                        benerg.repulsive += a->total_eclipses();
                         if (do_full_rotation && a->is_residue() /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
@@ -3792,6 +3805,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                     // group_realign(a, a->agroups);
                                 }
                                 tryenerg = cfmol_multibind(a, nearby);
+                                tryenerg.repulsive += a->total_eclipses();
 
                                 #if _dbg_mol_flexion
                                 if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;
@@ -3848,6 +3862,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             #endif
 
                             tryenerg = cfmol_multibind(a, nearby);
+                            tryenerg.repulsive += a->total_eclipses();
 
                             #if _dbg_mol_flexion
                             if (is_flexion_dbg_mol_bond) cout << "Trying " << (theta*fiftyseven) << "deg rotation...";

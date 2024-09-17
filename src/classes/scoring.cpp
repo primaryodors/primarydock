@@ -53,7 +53,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     // if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
 
     ligand->clear_atom_binding_energies();
-
+    // ligand->eclipse_hash = 0;
 
     float final_binding[end1];
     #if compute_vdw_repulsion
@@ -69,6 +69,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     postaa[0] = ligand;
     for (i=0; i<qpr; i++)
     {
+        // allres[i]->eclipse_hash = 0;
         postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
     }
 

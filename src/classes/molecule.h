@@ -262,6 +262,7 @@ public:
     float clash_worst = 0;
     Atom *best_intera = nullptr, *best_other_intera = nullptr;
     Molecule* best_interactor = nullptr;
+    int eclipse_hash = 0;
 
 protected:
 

@@ -379,7 +379,7 @@ if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (OR51E2 propionic acid) FAILED bad chosen.${NC}\n"
     cat testdata/received/cs_51e2_propa.received.txt
 else
-    RESULT=$(cat testdata/received/cs_51e2_propa.received.txt | grep -E " near C1:.*His180")
+    RESULT=$(cat testdata/received/cs_51e2_propa.received.txt | grep -E "C1 near [^|]* H180")
     if [ -z "$RESULT" ]; then
         printf "\n${RED}CS test (OR51E2 propionic acid) FAILED bad positioning.${NC}\n"
         cat testdata/received/cs_51e2_propa.received.txt
@@ -394,7 +394,7 @@ if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (OR51E1 caprylic acid) FAILED bad chosen.${NC}\n"
     cat testdata/received/cs_51e1_octa.received.txt
 else
-    RESULT=$(cat testdata/received/cs_51e1_octa.received.txt | grep -E " near C1:.* Gly111")
+    RESULT=$(cat testdata/received/cs_51e1_octa.received.txt | grep -E "C1 near [^|]* G111")
     if [ -z "$RESULT" ]; then
         printf "\n${RED}CS test (OR51E1 caprylic acid) FAILED bad positioning.${NC}\n"
         cat testdata/received/cs_51e1_octa.received.txt
@@ -403,7 +403,7 @@ else
     fi
 fi
 
-test/cs_test pdbs/TAAR/TAAR5.active.pdb sdf/trimethylamine.sdf cen 3.32! 6.48! nec | sed '/^#/d' > testdata/received/cs_taar5_tma.received.txt
+test/cs_test pdbs/TAAR/TAAR5.active.pdb sdf/trimethylamine.sdf cen 3.32! 6.48 nec | sed '/^#/d' > testdata/received/cs_taar5_tma.received.txt
 RESULT=$(cat testdata/received/cs_taar5_tma.received.txt | grep "Chose: Asp114 ~ ionic")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (TAAR5 trimethylamine) FAILED.${NC}\n"
@@ -420,7 +420,7 @@ if [ -z "$RESULT" ]; then
 else
     # TODO: Ideally, we want to check that for at least one pose, one of N1 or N7 is near Asp111 and the other near Asp201.
     # But recall that we also have the TAAR8 prediction test, which includes this requirement.
-    RESULT=$(cat testdata/received/cs_taar8_cad.received.txt | grep -E " near N7:.* Asp(11|20)1")
+    RESULT=$(cat testdata/received/cs_taar8_cad.received.txt | grep -E "(N1 near [^|]*D111 [^|]* | N7 near [^|]*D201)|(N1 near [^|]*D201 [^|]* | N7 near [^|]*D111)")
     if [ -z "$RESULT" ]; then
         printf "\n${RED}CS test (TAAR8 cadaverine) FAILED bad positioning.${NC}\n"
         cat testdata/received/cs_taar8_cad.received.txt
@@ -430,7 +430,7 @@ else
 fi
 
 test/cs_test pdbs/OR1/OR1A1.active.pdb sdf/3-octanone.sdf cen 3.37! 4.56 6.48 nec aoi O7 ioa | sed '/^#/d' > testdata/received/cs_1a1_3octon.received.txt
-RESULT=$(cat testdata/received/cs_1a1_3octon.received.txt | grep -E " near O7:.* Asn1(09|55)")
+RESULT=$(cat testdata/received/cs_1a1_3octon.received.txt | grep -E "O7 near [^|]* N1(09|55)")
 if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (OR1A1 3-octanone) FAILED.${NC}\n"
     cat testdata/received/cs_1a1_3octon.received.txt
@@ -444,7 +444,7 @@ if [ -z "$RESULT" ]; then
     printf "\n${RED}CS test (ADORA2A adenosine) FAILED bad chosen.${NC}\n"
     cat testdata/received/cs_adora2a_adsn.received.txt
 else
-    RESULT=$(cat testdata/received/cs_adora2a_adsn.received.txt | grep -E " near O[234]: .*(Ile274|Ser277|His278)")
+    RESULT=$(cat testdata/received/cs_adora2a_adsn.received.txt | grep -E "O[234] near [^|]*(I274|S277|H278)")
     if [ -z "$RESULT" ]; then
         printf "\n${RED}CS test (ADORA2A adenosine) FAILED bad positioning.${NC}\n"
         cat testdata/received/cs_adora2a_adsn.received.txt

@@ -595,10 +595,20 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         cs_res[j]->movability = mt;
     }
 
-    if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
+    ligand->movability = MOV_ALL;
+    float f = frand(0,1);
+    if (f < 0.333)
+    {
+        ligand->crumple(frand(0, square));
+        // cout << "\\/\\/ ";
+    }
+    else if (f < 0.666)
+    {
+        ligand->minimize_internal_clashes();
+        // cout << "---- ";
+    }
 
     // Place the ligand so that the atom group is centered in the binding pocket.
-    ligand->movability = MOV_ALL;
     Point agp = cs_lag[j]->get_center();
     SCoord mov = loneliest.subtract(agp);
     ligand->move(mov);

@@ -736,28 +736,20 @@ float Molecule::total_eclipses()
         for (j=0; j<m; j++)
         {
             if (!abt[j]) continue;
-            if (abt[j]->cardinality > 1) continue;
-            if (!abt[j]->can_rotate) continue;
             if (!abt[j]->atom1) continue;
             if (!abt[j]->atom2) continue;
-            if (abt[j]->atom2->get_Z() < 2) continue;
-            if (abt[j]->atom1->is_pi() && abt[j]->atom2->is_pi()) continue;
-            if (abt[j]->atom1->is_backbone && abt[j]->atom2->is_backbone) continue;
 
             for (l=0; l<n; l++)
             {
                 if (!bbt[l]) continue;
-                if (bbt[l]->cardinality > 1) continue;
-                if (!bbt[l]->can_rotate) continue;
                 if (!bbt[l]->atom1) continue;
                 if (!bbt[l]->atom2) continue;
-                if (bbt[l]->atom2->get_Z() < 2) continue;
-                if (bbt[l]->atom1->is_pi() && bbt[l]->atom2->is_pi()) continue;
-                if (bbt[l]->atom1->is_backbone && bbt[l]->atom2->is_backbone) continue;
 
                 float theta = find_angle_along_vector(bbt[l]->atom2->get_location(), abt[j]->atom2->get_location(),
                     abt[j]->atom1->get_location(), axis);
-                float f = 0.5 + 0.5 * cos(theta*3);
+                float f = 0.5 + 0.5 * cos(theta);
+                if (abt[j]->atom2->get_Z() > 1) f *= 1.25;
+                if (bbt[l]->atom2->get_Z() > 1) f *= 1.25;
                 result += f;
                 rotatable_bonds[i]->eclipse_partial += f;
                 // cout << " " << name << flush;
@@ -2038,7 +2030,7 @@ void Molecule::crumple(float theta)
         {
             float ltheta = frand(-theta, theta)*pow(frand(0,1),2);
             b[i]->rotate(ltheta);
-            if (get_internal_clashes() > int_clsh*4) b[i]->rotate(-ltheta);
+            if (get_internal_clashes() > clash_limit_per_aa*4) b[i]->rotate(-ltheta);
         }
         else if (b[i]->can_flip)
         {
@@ -2046,7 +2038,7 @@ void Molecule::crumple(float theta)
             if (frand(0,2) <= sint)
             {
                 b[i]->rotate(b[i]->flip_angle);
-                if (get_internal_clashes() > int_clsh*4) b[i]->rotate(b[i]->flip_angle);
+                if (get_internal_clashes() > clash_limit_per_aa*4) b[i]->rotate(b[i]->flip_angle);
             }
         }
     }
@@ -3164,7 +3156,28 @@ void Molecule::minimize_internal_clashes()
     float angle[numrb];
     for (i=0; i<numrb; i++) angle[i] = M_PI;
 
-    for (iter=0; iter<500; iter++)
+    for (i=0; i<numrb; i++)
+    {
+        float step = hexagonal / 20;
+        float theta = 0;
+        for (j=0; step*j < M_PI*2; j++)
+        {
+            b[i]->rotate(step);
+            float clash1 = get_internal_clashes() + total_eclipses();
+            // cout << (step*j*fiftyseven) << "deg " << clash1 << endl;
+
+            if (clash1 < clash)
+            {
+                clash = clash1;
+                theta = step*j;
+            }
+        }
+        b[i]->rotate(theta);
+        angle[i] = step/2;
+    }
+
+    clash = get_internal_clashes() + total_eclipses();
+    for (iter=0; iter<100; iter++)
     {
         for (i=0; i<numrb; i++)
         {

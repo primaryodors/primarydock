@@ -150,20 +150,21 @@ int main(int argc, char** argv)
             if (!a) cout << "ERROR: No atom named " << atoms_of_interest[i] << " found." << endl;
             else
             {
-                std::vector<AminoAcid*> nessami = p.get_residues_near(a->get_location(), 6);
+                std::vector<AminoAcid*> nessami = p.get_residues_near(a->get_location(), _INTERA_R_CUTOFF, false);
                 int j, m = nessami.size();
-                if (!m) cout << "No residues near " << a->name << endl;
+                if (!m) cout << a->name << " void | ";
                 else
                 {
-                    cout << m << " residues near " << a->name << ":";
+                    cout << a->name << " near";
                     for (j=0; j<m; j++)
                     {
-                        cout << " " << nessami[j]->get_name();
+                        cout << " " << nessami[j]->get_letter() << nessami[j]->get_residue_no();
                     }
-                    cout << endl;
+                    cout << " | ";
                 }
             }
         }
+        if (n) cout << endl;
 
         if (save_tmp_pdbs)
         {

@@ -1268,7 +1268,7 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
 {
     std::vector<AminoAcid*> retval;
 
-    float cb_tolerance_angle = 44 * fiftyseventh;
+    float cb_tolerance_angle = hexagonal;
     float tolerance_sine = sin(cb_tolerance_angle);
 
     if (!residues) return retval;
@@ -1280,7 +1280,8 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
 
     for (i=0; residues[i]; i++)
     {
-        float r = pt.get_3d_distance(residues[i]->get_atom_location("CA"));
+        Atom* nessamon = residues[i]->get_nearest_atom(pt);
+        float r = pt.get_3d_distance(nessamon->get_location());
 
         if (facing && residues[i]->get_atom("CB"))
         {

@@ -203,7 +203,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         #endif
 
         #if include_residue_eclipses
-        lb -= fmax(reaches_spheroid[i]->total_eclipses() - reaches_spheroid[i]->initial_eclipses, 0);
+        lb -= fmax(reaches_spheroid[i]->total_eclipses(true) - reaches_spheroid[i]->initial_eclipses, 0);
         #endif
 
         #if _dbg_51e2_ionic
@@ -299,7 +299,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #if compute_missed_connections
     this->missed_connections = new float[metcount];
     #endif
-    ligand_self = ligand->get_intermol_binding(ligand).summed() - ligand->total_eclipses();
+    ligand_self = ligand->get_intermol_binding(ligand).summed() - ligand->get_base_clashes() - ligand->total_eclipses(true);
     A100 = protein->A100();
     kJmol += ligand_self;
     #if _dbg_internal_energy

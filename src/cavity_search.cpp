@@ -284,7 +284,7 @@ int main(int argc, char** argv)
         strcpy(outfile, tmp);
     }
 
-    if (strlen(outfile)) cout << "Output file: " << outfile << endl;
+    if (strlen(outfile)) cout << "Generating " << outfile << "..." << endl;
     cout << endl;
 
 

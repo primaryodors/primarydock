@@ -59,6 +59,7 @@ public:
     ~Bond();
 
     bool rotate(float angle_radians, bool allow_backbone = false, bool skip_inverse_check = false);
+    SCoord get_axis();
     Point ring_rotate(float angle_radians, Atom* stop_at);
     void clear_moves_with_cache()
     {
@@ -74,6 +75,8 @@ public:
 
     Atom* atom1 = nullptr;
     Atom* atom2 = nullptr;
+    float eclipse_partial = 0;
+    int eclipse_hash = 0;
 
 protected:
     void fill_moves_with_cache();
@@ -390,6 +393,7 @@ protected:
 };
 
 bool atoms_are_conjugated(Atom** atoms);
+Point average_of_atom_locs(Atom** atoms);
 
 static bool read_elem_syms = false;
 

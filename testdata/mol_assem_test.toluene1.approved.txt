@@ -1,12 +1,12 @@
 Created empty molecule named Test.
 Minimizing internal clashes...
 Adjusted internal clashes: 0 cu.A.
-Atom C1 has bond angles: 120 120 120
-Atom c2 has bond angles: 120 120 120
-Atom c3 has bond angles: 120 120 120
-Atom c4 has bond angles: 120 120 120
-Atom c5 has bond angles: 120 120 120
-Atom c6 has bond angles: 120 120 120
-Atom C7 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
+Atom C1 has bond angles: 120.00 120.00 120.00
+Atom c2 has bond angles: 120.00 120.00 120.00
+Atom c3 has bond angles: 120.00 120.00 120.00
+Atom c4 has bond angles: 120.00 120.00 120.00
+Atom c5 has bond angles: 120.00 120.00 120.00
+Atom c6 has bond angles: 120.00 120.00 120.00
+Atom C7 has bond angles: 109.47 109.47 109.47 109.47 109.47 109.47
 Saved testdata/received/toluene1.received.sdf
 

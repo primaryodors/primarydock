@@ -53,10 +53,10 @@ function make_prediction($data)
             $data['A100'] = round($aa100, 4);
             $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns, 4);
         }
-        else if ($iscore > 0)
+        else if ($ienergy > 0)
         {
-            $data['Affinity'] = round($iscore, 4);
-            $data['A100'] = round(-$ienergy, 4);
+            $data['Affinity'] = round(-$ienergy, 4);
+            $data['A100'] = round($ia100, 4);
             $data['Predicted'] = 'Inverse Agonist';
             $data['DockScore'] = round(-$ienergy * ($baseline-$activation) * $ia100/20 * $ittns, 4);
         }

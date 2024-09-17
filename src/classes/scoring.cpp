@@ -15,14 +15,14 @@ DockResult::DockResult()
     ;
 }
 
-DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl_resno, int drcount)
+DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl_resno, int drcount, Molecule** waters)
 {
     int end1 = SPHREACH_MAX+4;
     AminoAcid* reaches_spheroid[end1];
     int sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, ligand->get_barycenter(), size, addl_resno);
     // cout << "sphres " << sphres << endl;
     Molecule* met = protein->metals_as_molecule();
-    int i, j;
+    int i, j, k, l, n;
 
     char metrics[end1][20];
     float lmkJmol[end1];
@@ -54,7 +54,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
     ligand->clear_atom_binding_energies();
 
-
     float final_binding[end1];
     #if compute_vdw_repulsion
     float final_vdWrepl[end1];
@@ -63,7 +62,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     for (i=0; i<end1; i++) final_binding[i] = 0;
     #endif
 
-    std::vector<AminoAcid*> allres = protein->get_residues_near(ligand->get_barycenter(), 100000);
+    std::vector<AminoAcid*> allres = protein->get_residues_near(ligand->get_barycenter(), 100000, false);
     int qpr = allres.size();
     Molecule* postaa[qpr];
     postaa[0] = ligand;
@@ -114,9 +113,28 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             {
                 Atom* a = ligand->get_atom(li);
                 if (!a) continue;
+                int aZ = a->get_Z();
+
+                if (aZ > 10 && a->get_family() == CHALCOGEN)
+                {
+                    if (met && !a->get_charge() && met->get_atom_count())
+                    {
+                        Atom* mtl = met->get_nearest_atom(a->get_location());
+                        if (mtl && mtl->is_metal() && mtl->distance_to(a) < _INTERA_R_CUTOFF)
+                        {
+                            Atom* H = a->is_bonded_to("H");
+                            if (H)
+                            {
+                                ligand->delete_atom(H);
+                                a->increment_charge(-1);
+                            }
+                        }
+                    }
+                }
+
                 float apol = a->is_polar();
                 if (fabs(apol) < hydrophilicity_cutoff) continue;
-                int aZ = a->get_Z();
+
                 if (sgn(apol) > 0 && aZ > 1) continue;
                 for (aai=0; aai<aan; aai++)
                 {
@@ -185,7 +203,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         #endif
 
         #if include_residue_eclipses
-        lb -= fmax(reaches_spheroid[i]->total_eclipses() - reaches_spheroid[i]->initial_eclipses, 0);
+        lb -= fmax(reaches_spheroid[i]->total_eclipses(true) - reaches_spheroid[i]->initial_eclipses, 0);
         #endif
 
         #if _dbg_51e2_ionic
@@ -281,7 +299,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #if compute_missed_connections
     this->missed_connections = new float[metcount];
     #endif
-    ligand_self = ligand->get_intermol_binding(ligand).summed() - ligand->total_eclipses();
+    ligand_self = ligand->get_intermol_binding(ligand).summed() - ligand->get_base_clashes() - ligand->total_eclipses(true);
     A100 = protein->A100();
     kJmol += ligand_self;
     #if _dbg_internal_energy
@@ -299,10 +317,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         kJmol += fin_total_binding_by_type[i];
         // cout << drcount << "|" << i << " ";
     }
-    // cout << endl;
-    #if _DBG_STEPBYSTEP
-    if (debug) *debug << "Filled btypes." << endl;
-    #endif
 
     // Populate the array.
     for (i=0; i<metcount; i++)
@@ -327,10 +341,73 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     metric[i] = new char[2];
     metric[i][0] = 0;
     metric[i+1] = 0;
-    #if _DBG_STEPBYSTEP
-    if (debug) *debug << "More metrics or something idfk." << endl;
-    #endif
 
+    std::ostringstream lpdbdat;
+
+    // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
+    n = ligand->get_atom_count();
+    int offset = n;
+    for (l=0; l<n; l++)
+    {
+        Atom* a = ligand->get_atom(l);
+        if (!a) continue;
+        a->residue = pose;
+        a->stream_pdb_line(lpdbdat, 9000+l, true);
+    }
+
+    if (waters)
+    {
+        for (k=0; waters[k]; k++)
+        {
+            for (l=0; l<3; l++)
+            {
+                Atom* a = waters[k]->get_atom(l);
+                if (!a) continue;
+                a->residue = pose;
+                a->stream_pdb_line(lpdbdat, 9000+offset+l+3*k, true);
+            }
+        }
+    }
+
+    int en = protein->get_end_resno();
+    int resno;
+    for (resno = protein->get_start_resno(); resno <= en; resno++)
+    {
+        AminoAcid* laa = protein->get_residue(resno);
+        if (!laa) continue;
+        if (!laa->been_flexed)
+        {
+            if (laa->distance_to(ligand) > 5) continue;
+            for (k=0; reaches_spheroid[k]; k++)
+            {
+                if (!protein->aa_ptr_in_range(reaches_spheroid[k])) continue;
+                if (reaches_spheroid[k] == laa) goto _afterall;
+            }
+            continue;
+        }
+        _afterall:
+        n = laa->get_atom_count();
+        for (l=0; l<n; l++)
+        {
+            laa->get_atom(l)->stream_pdb_line(
+                lpdbdat,
+                laa->atno_offset+l
+            );
+        }
+    }
+
+    if (mtlcoords.size())
+    {
+        for (l=0; l<mtlcoords.size(); l++)
+        {
+            mtlcoords[l].mtl->stream_pdb_line(
+                lpdbdat,
+                9900+l
+            );
+        }
+    }
+
+    this->pdbdat = lpdbdat.str();
 }
 
 std::ostream& operator<<(std::ostream& output, const DockResult& dr)

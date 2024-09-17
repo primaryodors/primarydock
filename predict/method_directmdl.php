@@ -21,7 +21,7 @@ chdir(__DIR__);
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1).
-$pose = 10;
+$pose = 15;
 $iter = 30;
 $elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
@@ -59,7 +59,7 @@ if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname)
 $fam = family_from_protid($protid);
 $pdbfname = $pdbfname_inactive;
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
-$cenres = substr($cenres_inactive, 8);
+$cenres = $cenres_inactive;
 
 prepare_receptor($pdbfname, "$flxr $iflxr");
 
@@ -76,7 +76,7 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 $pdbfname = $pdbfname_active;
 $outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
-$cenres = substr($cenres_active, 8);
+$cenres = $cenres_active;
 
 prepare_receptor($pdbfname, "$flxr $aflxr");
 $poses = process_dock("a");

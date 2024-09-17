@@ -12,7 +12,7 @@ class DockResult
 {
     public:
     DockResult();
-    DockResult(Protein* prot, Molecule* lig, Point size, int* addl_resno = nullptr, int pose = 1);
+    DockResult(Protein* prot, Molecule* lig, Point size, int* addl_resno = nullptr, int pose = 1, Molecule** waters = nullptr);
 
     int pose = 0;
     int auth = 0;

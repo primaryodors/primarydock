@@ -66,6 +66,7 @@ int main(int argc, char** argv)
         AminoAcid* a = p.get_residue_bw(argv[l]);
         if (!a) continue;
         pocket.push_back(a->get_CA_location());
+        if (strchr(argv[l], '!')) a->priority = true;
     }
 
     if (n = pocket.size())

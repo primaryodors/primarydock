@@ -78,7 +78,8 @@ char outfname[256];
 Point pocketcen;
 std::ofstream *output = NULL;
 
-std::string CEN_buf = "";
+std::vector<std::string> CEN_buf;
+int cenbuf_idx = 0;
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
@@ -103,6 +104,7 @@ bool out_pdbdat_res = true;
 Protein* protein;
 Protein* ptemplt;
 Protein* ptplref;
+Protein* metald_prot = nullptr;
 int seql = 0;
 int addl_resno[256];
 const Region* regions;
@@ -120,7 +122,7 @@ int maxh2o = 0;
 int omaxh2o = 0;
 bool flex = true;
 float kJmol_cutoff = 0.01;
-int pose, nodeno, iter;
+int pose=1, nodeno=0, iter=0;
 bool kcal = false;
 float drift = initial_drift;
 Molecule** gcfmols = NULL;
@@ -495,7 +497,7 @@ void output_iter(int iter, Molecule** mols)
         fprintf(fp, "Pose: %d\nNode: %d\n\n", pose, liter);
         int foff = 0;
 
-        DockResult ldr(protein, ligand, size, nullptr, pose);
+        DockResult ldr(protein, ligand, size, nullptr, pose, waters);
         ldr.include_pdb_data = false;
         ldr.display_clash_atom1 = true;
         ldr.display_clash_atom2 = true;
@@ -956,8 +958,6 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
         i++;
         for (; words[i]; i++)
         {
-            int n = strlen(words[i]);
-
             int j = interpret_resno(words[i]);
             if (!j) continue;
 
@@ -1042,8 +1042,8 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "CEN"))
     {
-        CEN_buf = origbuff;
-        optsecho = (std::string)"Center " + CEN_buf;
+        CEN_buf.push_back(origbuff);
+        optsecho = (std::string)"Center " + (std::string)origbuff;
         return 0;
     }
     else if (!strcmp(words[0], "COLORS"))
@@ -1650,16 +1650,37 @@ void attempt_priority_hbond()
     }
 }
 
+void choose_cen_buf()
+{
+    int i, n;
+
+    n = protein->get_end_resno();
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid* aa = protein->get_residue(i);
+        if (aa) aa->priority = false;
+    }
+
+    n = CEN_buf.size();
+    if (pose <= n) cenbuf_idx = pose-1;
+    else cenbuf_idx = rand() % n;
+}
 
 void apply_protein_specific_settings(Protein* p)
 {
     int i, j, n;
+    choose_cen_buf();
 
     char buffer[1024];
-    strcpy(buffer, CEN_buf.c_str());
+    strcpy(buffer, CEN_buf[cenbuf_idx].c_str());
     char** words = chop_spaced_words(buffer);
     pocketcen = pocketcen_from_config_words(words, nullptr);
+    loneliest = protein->find_loneliest_point(pocketcen, size);
     delete[] words;
+
+    if (!p->get_metals_count() && metald_prot) p->copy_mcoords(metald_prot);
+
+    j=0;
 
     n = atomto.size();
     for (i=0; i<n; i++)
@@ -1842,7 +1863,7 @@ void apply_protein_specific_settings(Protein* p)
 
 int main(int argc, char** argv)
 {
-    strcpy(splash, "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/        )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n");
+    strcpy(splash, "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()    __/  \\     )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n");
     char buffer[65536];
     int i, j;
 
@@ -2045,6 +2066,7 @@ int main(int argc, char** argv)
     {
         protein->pocketcen = pocketcen;
         mtlcoords = protein->coordinate_metal(mtlcoords);
+        metald_prot = protein;
 
         if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_metal.pdb";
@@ -2073,16 +2095,11 @@ int main(int argc, char** argv)
         required_contacts[i].resolve_resno(protein);
     }
 
-    if (!CEN_buf.length())
+    if (!CEN_buf.size())
     {
-        cout << "Error: no binding pocket center defined." << endl;
+        cout << "Error: no binding pocket centers defined." << endl;
         return 0xbadb19d;
     }
-
-    strcpy(buffer, CEN_buf.c_str());
-    char** words = chop_spaced_words(buffer);
-    pocketcen = pocketcen_from_config_words(words, nullptr);
-    loneliest = protein->find_loneliest_point(pocketcen, size);
 
     #if pocketcen_is_loneliest
     pocketcen = loneliest;
@@ -2243,9 +2260,6 @@ int main(int argc, char** argv)
     i = poses*(triesleft+1)+8;
     j = pathnodes+2;
     DockResult dr[i][j];
-    #if _dbg_find_blasted_segfault
-    cout << "dr[" << i << "][" << j << "] allocated. " << dr << endl;
-    #endif
 
     float rgnxform_r[i][pathnodes+2][PROT_MAX_RGN], rgnxform_theta[i][pathnodes+2][PROT_MAX_RGN], rgnxform_y[i][pathnodes+2][PROT_MAX_RGN];
     float rgnrot_alpha[i][pathnodes+2][PROT_MAX_RGN], rgnrot_w[i][pathnodes+2][PROT_MAX_RGN], rgnrot_u[i][pathnodes+2][PROT_MAX_RGN];
@@ -2335,7 +2349,7 @@ _try_again:
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
-        if (frand(0,1) < 0.666) ligand->crumple(frand(0, square));
+        // if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
 
         for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 
@@ -2398,7 +2412,7 @@ _try_again:
         freeze_bridged_residues();
 
         ligand->recenter(pocketcen);
-        // cout << "Centered ligand at " << pocketcen << endl;
+        // cout << "Centered ligand at " << pocketcen << endl << endl << flush;
 
         if (pdpst == pst_tumble_spheres)
         {
@@ -2526,7 +2540,7 @@ _try_again:
                 for (i=0; i<states.size(); i++)
                 {
                     strcpy(buffer, states[i].c_str());
-                    words = chop_spaced_words(buffer);
+                    char** words = chop_spaced_words(buffer);
                     if (atoi(words[1]) == nodeno)
                     {
                         int sr = atoi(words[2]), er = atoi(words[3]);
@@ -2562,7 +2576,7 @@ _try_again:
                     cout << "Error in config file: path node " << nodeno << " is missing." << endl;
                     return 0xbadc09f;
                 }
-                words = chop_spaced_words(buffer);
+                char** words = chop_spaced_words(buffer);
                 nodecen = pocketcen_from_config_words(&words[1], &nodecen);
 
                 #if _DBG_STEPBYSTEP
@@ -2974,7 +2988,7 @@ _try_again:
             AminoAcid* aadbg = protein->get_residue(155);
             cout << aadbg->get_name() << " charge = " << aadbg->get_charge() << endl;
             #endif
-            dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount);
+            dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, waters);
             dr[drcount][nodeno].out_per_res_e = out_per_res_e;
             dr[drcount][nodeno].out_per_btyp_e = out_per_btyp_e;
             dr[drcount][nodeno].out_itemized_e_cutoff = out_itemized_e_cutoff;
@@ -3061,99 +3075,7 @@ _try_again:
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
-            
-            std::ostringstream pdbdat;
 
-            // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
-            n = ligand->get_atom_count();
-            int offset = n;
-            if (out_pdbdat_lig)
-            {
-                for (l=0; l<n; l++)
-                {
-                    Atom* a = ligand->get_atom(l);
-                    if (!a) continue;
-                    a->residue = pose;
-                    a->stream_pdb_line(pdbdat, 9000+l, true);
-                }
-                #if _DBG_STEPBYSTEP
-                if (debug) *debug << "Prepared ligand PDB." << endl;
-                #endif
-
-                if (waters)
-                {
-                    for (k=0; k<maxh2o; k++)
-                    {
-                        for (l=0; l<3; l++)
-                        {
-                            Atom* a = waters[k]->get_atom(l);
-                            if (!a) continue;
-                            a->residue = pose;
-                            a->stream_pdb_line(pdbdat, 9000+offset+l+3*k, true);
-                        }
-                    }
-                }
-            }
-
-            #if _dummy_atoms_for_debug
-            if (dummies.size())
-            {
-                for (k=0; k<dummies.size(); k++)
-                {
-                    dummies[k].stream_pdb_line(pdbdat, 9900+offset+l+3*k);
-                }
-            }
-            #endif
-
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, pocketcen, size, addl_resno);
-
-            if (out_pdbdat_res)
-            {
-                int en = protein->get_end_resno();
-                int resno;
-                for (resno = protein->get_start_resno(); resno <= en; resno++)
-                {
-                    AminoAcid* laa = protein->get_residue(resno);
-                    if (!laa) continue;
-                    if (!flex || !laa->been_flexed)
-                    {
-                        if (laa->distance_to(ligand) > 5) continue;
-                        for (k=0; reaches_spheroid[nodeno][k]; k++)
-                        {
-                            if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
-                            if (reaches_spheroid[nodeno][k] == laa) goto _afterall;
-                        }
-                        continue;
-                    }
-                    _afterall:
-                    n = laa->get_atom_count();
-                    for (l=0; l<n; l++)
-                    {
-                        laa->get_atom(l)->stream_pdb_line(
-                            pdbdat,
-                            laa->atno_offset+l
-                        );
-                    }
-                }
-                #if _DBG_STEPBYSTEP
-                if (debug) *debug << "Prepared flex PDBs." << endl;
-                #endif
-            }
-            else if (!out_pdbdat_lig) pdbdat << " ";
-
-            if (mtlcoords.size() && out_pdbdat_lig)
-            {
-                for (l=0; l<mtlcoords.size(); l++)
-                {
-                    mtlcoords[l].mtl->stream_pdb_line(
-                        pdbdat,
-                        9900+l
-                    );
-                }
-            }
-
-            dr[drcount][nodeno].pdbdat = pdbdat.str();
-            if (debug) *debug << "Prepared the PDB strings." << endl;
             dr[drcount][nodeno].auth = pose;
 
             if (!nodeno)

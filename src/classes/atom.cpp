@@ -938,6 +938,21 @@ bool Atom::bond_to(Atom* latom2, float lcard)
     return false;
 }
 
+Point average_of_atom_locs(Atom** atoms)
+{
+    int i;
+    Point result(0,0,0);
+    if (!atoms) return result;
+
+    for (i=0; atoms[i]; i++)
+    {
+        result = result.add(atoms[i]->get_location());
+    }
+    if (i) result.multiply(1.0/i);
+
+    return result;
+}
+
 #define _dbg_polar_calc 0
 float Atom::is_polar()
 {
@@ -1435,11 +1450,16 @@ void Atom::print_bond_angles()
                 if (bonded_to[j].atom2)
                 {
                     float theta = find_3d_angle(bonded_to[i].atom2->location, bonded_to[j].atom2->location, location);
-                    cout << " " << (theta * fiftyseven);
+                    printf(" %.2f", theta * fiftyseven);
                 }
             }
         }
     }
+}
+
+SCoord Bond::get_axis()
+{
+    return atom2->get_location().subtract(atom1->get_location());
 }
 
 bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
@@ -1524,6 +1544,7 @@ _cannot_reverse_bondrot:
     #endif
 
     atom2->rotate_geometry(rot);
+    eclipse_hash = 0;
 
     for (i=0; moves_with_atom2[i]; i++)
     {

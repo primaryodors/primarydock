@@ -512,6 +512,10 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         // If the ligand can form a polar bond, it must form a polar bond.
         if (!cs_res[j]->priority && (ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
 
+        // If the ligand and residue have opposite charges, the bond is ionic (or mcoord) no matter what.
+        float rchg = cs_res[j]->get_charge(), lchg = cs_lag[j]->get_ionic();
+        if (fabs(lchg) >= 1 && fabs(rchg) >= 1 && cs_bt[j] != mcoord && sgn(lchg) == -sgn(rchg)) cs_bt[j] = ionic;
+
         int li, ln;
         float b, lmcb, bmcb = 0;
         Atom *ligmc, *rmet;

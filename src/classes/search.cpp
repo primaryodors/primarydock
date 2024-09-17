@@ -623,17 +623,6 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     lv.origin = agcen;
     ligand->rotate(lv, rot.a);
 
-    // Conform the side chain and ligand to each other, ignoring other residues.
-    if (!mtl)
-    {
-        Molecule* mm[3];
-        mm[0] = cs_res[j];
-        mm[1] = ligand;
-        mm[2] = nullptr;
-        ligand->movability = MOV_NORECEN;
-        Molecule::conform_molecules(mm, 200);
-    }
-
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.
     lv = (SCoord)resna.subtract(ligand->get_barycenter());

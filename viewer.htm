@@ -3123,7 +3123,7 @@ function showNode(n)
 			model[i].removeAllRepresentations();
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
-			if (spcfill || whtbk) lparam.opacity = 1;
+			lparam.opacity = 1;
 			if (is_ligand[i] && gspcfill_resnos.find((element) => element == 0) !== undefined)
 			{
 				lrep = "spacefill";

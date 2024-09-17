@@ -595,6 +595,8 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         cs_res[j]->movability = mt;
     }
 
+    if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
+
     // Place the ligand so that the atom group is centered in the binding pocket.
     ligand->movability = MOV_ALL;
     Point agp = cs_lag[j]->get_center();

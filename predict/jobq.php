@@ -29,7 +29,7 @@ foreach ($lines as $ln)
 if (!count($queue)) die("No jobs.\n");
 
 $procs = [];
-exec("ps -ef | grep \" bin/primarydock \" | grep -v grep", $procs);
+exec("ps -ef | grep \" bin/primarydock \" | grep -v \"sh -c \" | grep -v grep", $procs);
 if (count($procs) >= $max_concurrent) die("Maximum processes.\n");
 
 // Example:

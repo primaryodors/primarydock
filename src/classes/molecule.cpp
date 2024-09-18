@@ -759,6 +759,7 @@ float Molecule::total_eclipses(bool sb)
         rotatable_bonds[i]->eclipse_hash = eclipse_hash;
     }
 
+    if (base_eclipses > result) base_eclipses = result;
     return result - (sb?base_eclipses:0);
     #endif
 }

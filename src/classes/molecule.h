@@ -128,7 +128,7 @@ public:
     bool shielded(Atom* a, Atom* b) const;
     float correct_structure(int iters = 500);
     float close_loop(Atom** path, float closing_bond_cardinality);
-    float total_eclipses(bool subtract_baseline = false);
+    float total_eclipses();
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
     float distance_to(Molecule* other_mol);
     std::vector<Atom*> longest_dimension();
@@ -280,7 +280,6 @@ protected:
     bool immobile = false;
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
-    float base_eclipses = 0;
     std::string sdfgen_aboutline = "";
     Molecule** mandatory_connection = nullptr;
     float* last_mc_binding = nullptr;

@@ -701,7 +701,7 @@ std::vector<Atom*> Molecule::longest_dimension()
     return retval;
 }
 
-float Molecule::total_eclipses(bool sb)
+float Molecule::total_eclipses()
 {
     #if !include_eclipses
     return 0;
@@ -759,8 +759,7 @@ float Molecule::total_eclipses(bool sb)
         rotatable_bonds[i]->eclipse_hash = eclipse_hash;
     }
 
-    if (base_eclipses > result) base_eclipses = result;
-    return result - (sb?base_eclipses:0);
+    return result;
     #endif
 }
 
@@ -3148,7 +3147,6 @@ void Molecule::minimize_internal_clashes()
     if (!b || !b[0])
     {
         base_internal_clashes = get_internal_clashes();
-        base_eclipses = total_eclipses();
         return;		// No bonds to rotate.
     }
 
@@ -3200,7 +3198,6 @@ void Molecule::minimize_internal_clashes()
     }
 
     base_internal_clashes = get_internal_clashes();
-    base_eclipses = total_eclipses();
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 

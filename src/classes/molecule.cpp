@@ -731,35 +731,35 @@ float Molecule::total_eclipses(bool sb)
         rotatable_bonds[i]->atom2->fetch_bonds(bbt);
         m = rotatable_bonds[i]->atom1->get_geometry();
         n = rotatable_bonds[i]->atom2->get_geometry();
-        SCoord axis = rotatable_bonds[i]->get_axis();
 
         for (j=0; j<m; j++)
         {
             if (!abt[j]) continue;
             if (!abt[j]->atom1) continue;
             if (!abt[j]->atom2) continue;
+            if (abt[j]->atom2 == rotatable_bonds[i]->atom2) continue;
 
             for (l=0; l<n; l++)
             {
                 if (!bbt[l]) continue;
                 if (!bbt[l]->atom1) continue;
                 if (!bbt[l]->atom2) continue;
+                if (bbt[l]->atom2 == rotatable_bonds[i]->atom1) continue;
 
-                float theta = find_angle_along_vector(bbt[l]->atom2->get_location(), abt[j]->atom2->get_location(),
-                    abt[j]->atom1->get_location(), axis);
-                float f = 0.5 + 0.5 * cos(theta);
-                if (abt[j]->atom2->get_Z() > 1) f *= 1.25;
-                if (bbt[l]->atom2->get_Z() > 1) f *= 1.25;
-                result += f;
-                rotatable_bonds[i]->eclipse_partial += f;
-                // cout << " " << name << flush;
+                // This doesn't fit exactly the values from https://www.sas.upenn.edu/~kimg/mcephome/chem502/ethbutconform/ethbutmm2.html
+                // but for carbon-carbon energies, it's close enough.
+                float sigma = abt[j]->atom2->get_vdW_radius() + bbt[l]->atom2->get_vdW_radius();
+                float r = abt[j]->atom2->distance_to(bbt[l]->atom2);
+                float sigma_r = sigma / r;
+
+                result += Lennard_Jones_epsilon_x4 * pow(sigma_r, 12) / 2;
             }
         }
 
         rotatable_bonds[i]->eclipse_hash = eclipse_hash;
     }
 
-    return result*eclipsing_kJmol_per_radian - (sb?base_eclipses:0);
+    return result - (sb?base_eclipses:0);
     #endif
 }
 

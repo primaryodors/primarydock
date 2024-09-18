@@ -15038,39 +15038,36 @@
             {
                 "OR11H4":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9.2233008444309"
+                    "adjusted_curve_top": "6"
                 },
                 "OR11H6":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10.000000048089"
+                    "adjusted_curve_top": "6.5"
                 },
                 "OR11H7":
                 {
-                    "type": "ma",
                     "ec50": "-5",
-                    "adjusted_curve_top": "4.5631065483811"
+                    "adjusted_curve_top": "10"
                 },
                 "OR12D2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.7475727452815"
+                    "type": "na",
+                    "adjusted_curve_top": "0"
                 },
                 "OR4Q2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.7184465183795"
+                    "adjusted_curve_top": "2"
                 },
                 "OR52E4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.1359223471105"
+                    "adjusted_curve_top": "0"
                 },
                 "OR8A1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.427184432745"
+                    "adjusted_curve_top": "0"
                 }
             },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":

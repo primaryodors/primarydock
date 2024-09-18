@@ -109,7 +109,7 @@ used by the `make_prediction()` function to ascertain whether the odorant is lik
 
 Currently the only prediction method in use is `method_directmdl.php`.
 
-The `directmdl` method uses an X-ray crystallography, cryo-EM model, or homology model of the active state for the target
+The `directmdl` method uses an X-ray crystallography model, cryo-EM model, or homology model of the active state for the target
 receptor. It docks the ligand first in the inactive model (from AlphaFold) and then in the active model, and uses the delta
 of the ligand-receptor interaction energies to compute a predicted agonism score.
 

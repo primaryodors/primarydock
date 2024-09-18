@@ -40,8 +40,8 @@ All prediction results are stored in `predict/dock_results.json`, and dock files
 # Prediction Utilities
 
 The prediction scripts are written in PHP so that they can share include files with the web app, and so that they don't
-have to be added to the makefile like they would if they were written in C++. Despite their use of PHP, they are entirely
-command line tools and not web pages.
+have to be added to the makefile like they would if they were written in C++. Despite their use of PHP, these utilities
+are entirely command line tools and not web pages or web apps.
 
 `accuracy.php`
 This script tallies up the current set of predictions that have been run on the local machine and outputs a percentage of
@@ -61,7 +61,7 @@ This is a utility for running predictions against all *empirical* pairs for a gi
 a receptor ID, it will run predictions for all odorants that have been tested for that receptor, even non-agonists, but
 no untested odorants; conversely, if run for an odorant, it will predict all receptors whose responses (or lack thereof)
 are known for that odorant, but not any unknowns. This differs from the assay script which makes predictions for every
-receptor. Examples:
+receptor, even orphans. Examples:
 
 ```
 php -f predict/emp.php OR51E2
@@ -70,7 +70,7 @@ php -f predict/emp.php "(Z)-3-hexen-1-ol"
 
 `jobq.php`
 This script is designed to be run as a crontab. It will attemt to monitor CPU temperature (that feature requires
-`lm-sensors` to be installed otherwise it will default to a static number of concurrent processes) and it will run
+[`lm-sensors`](https://github.com/lm-sensors/lm-sensors) to be installed otherwise it will default to a static number of concurrent processes) and it will run
 predictions continuously in the background. Here is an example crontab entry:
 
 ```
@@ -109,12 +109,9 @@ used by the `make_prediction()` function to ascertain whether the odorant is lik
 
 Currently the only prediction method in use is `method_directmdl.php`.
 
-The `directmdl` method, by contrast, is used when a cryo-EM model of the active state is available for either the target
-receptor, or one that is deemed similar enough for the cryo-EM model to act as a substitute. Currently, only the OR51,
-OR52, and TAAR families are eligible for the `directmdl` method. It works by taking the backbone skeleton of the cryo-EM
-model and substituting its side chains with those from the target protein, using Ballesteros-Weinstein numbers to align
-the two sequences. Any residue which is conserved in both proteins is not replaced. This results in mostly good results for
-SCFA predictions in OR51E2, though predictions for other class I ORs and/or non-acidic ligands may be less optimal.
+The `directmdl` method uses an X-ray crystallography, cryo-EM model, or homology model of the active state for the target
+receptor. It docks the ligand first in the inactive model (from AlphaFold) and then in the active model, and uses the delta
+of the ligand-receptor interaction energies to compute a predicted agonism score.
 
 An example of the command line for running a prediction might be:
 

@@ -33,6 +33,71 @@ or `vina` as an extra command line argument like so:
 ./run_prediction.sh OR51E2 propionic_acid vina
 ```
 
+All prediction results are stored in `predict/dock_results.json`, and dock files and PDB models are generated in
+`output/{family}/{receptor}/`, for example `output/OR51/OR51E2/` when using the above examples.
+
+
+# Prediction Utilities
+
+The prediction scripts are written in PHP so that they can share include files with the web app, and so that they don't
+have to be added to the makefile like they would if they were written in C++. Despite their use of PHP, they are entirely
+command line tools and not web pages.
+
+`accuracy.php`
+This script tallies up the current set of predictions that have been run on the local machine and outputs a percentage of
+correct results.
+
+`assay.php`
+This script will run predictions for a given odorant against *every* odor receptor for which 3D models exist. This will
+take several days even on a fast computer. Simply call the script with the *name* of the odorant as the only argument,
+for example:
+
+```
+php -f predict/assay.php "(Z)-3-hexen-1-ol"
+```
+
+`emp.php`
+This is a utility for running predictions against all *empirical* pairs for a given receptor or odorant. If it is given
+a receptor ID, it will run predictions for all odorants that have been tested for that receptor, even non-agonists, but
+no untested odorants; conversely, if run for an odorant, it will predict all receptors whose responses (or lack thereof)
+are known for that odorant, but not any unknowns. This differs from the assay script which makes predictions for every
+receptor. Examples:
+
+```
+php -f predict/emp.php OR51E2
+php -f predict/emp.php "(Z)-3-hexen-1-ol"
+```
+
+`jobq.php`
+This script is designed to be run as a crontab. It will attemt to monitor CPU temperature (that feature requires
+`lm-sensors` to be installed otherwise it will default to a static number of concurrent processes) and it will run
+predictions continuously in the background. Here is an example crontab entry:
+
+```
+* * * * * php -f "/home/username/primarydock/predict/jobq.php"
+```
+Be sure to replace `/home/username/` with the path containing the `primarydock` root folder.
+
+The job queue depends on the existence of a text file named `jobq` in the PrimaryDock root dir. This text file will contain
+entries similar to these:
+
+```
+MAX 8
+PRDT OR1A2 *
+PRDT OR2M3 3-mercapto-2-methylpentan-1-ol
+```
+
+The first line tells the job queue to never run more than 8 concurrent instances of PrimaryDock. We recommend setting this
+to half the number of physical cores in your processor. The next line says to run predictions for OR1A2 against all
+empirically measured odorants for that receptor. It will do this one at a time (think of the asterisk as meaning "next" or
+"first odorant not processed yet"). Lastly, the third line says to predict the response of OR2M3 to a specific odorant.
+
+The progress of the job queue can be monitored using the `predict/job_status.php` script.
+
+`reevaluate.php`
+This script will go through all of the records in `predict/dock_results.json` and recalculate the dock scores. It is useful
+for debugging the prediction scoring algorithm.
+
 
 # Prediction Methods
 

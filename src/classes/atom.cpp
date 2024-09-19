@@ -1531,6 +1531,7 @@ bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
         if (mwb_total_binding < mwbi_total_binding)
         {
             bool result = inverse->rotate(-theta, allow_backbone, true);				// DANGER! RECURSION.
+            eclipse_hash = 0;
             last_fail = inverse->last_fail;
             return result;
         }
@@ -1545,6 +1546,7 @@ _cannot_reverse_bondrot:
 
     atom2->rotate_geometry(rot);
     eclipse_hash = 0;
+    inverse->eclipse_hash = 0;
 
     for (i=0; moves_with_atom2[i]; i++)
     {

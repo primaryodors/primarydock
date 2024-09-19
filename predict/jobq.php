@@ -41,7 +41,10 @@ if (count($procs) >= $max_concurrent) die("Maximum processes.\n");
 function uptodate($prot, $lig)
 {
     global $dock_results, $version, $dbg;
+    $lig = trim(str_replace(" ", "_", $lig));
+    if ($dbg) echo "Checking $prot $lig \n";
     if (!isset($dock_results[$prot][$lig])) return false;
+    if ($dbg) echo "$prot $lig {$dock_results[$prot][$lig]['version']} $version\n";
     if (@intval($dock_results[$prot][$lig]['version']) < $version) return false;
     return isset($dock_results[$prot][$lig]['Predicted']);
 }
@@ -89,7 +92,6 @@ foreach ($queue as $q)
 
     if (uptodate($prot, $lig)) continue;
     $lig = trim(str_replace(" ", "_", $lig));
-
     $already = running($prot, $lig);
 
     if (!$already)

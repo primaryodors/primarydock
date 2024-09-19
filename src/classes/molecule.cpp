@@ -752,7 +752,9 @@ float Molecule::total_eclipses()
                 float r = abt[j]->atom2->distance_to(bbt[l]->atom2);
                 float sigma_r = sigma / r;
 
-                result += Lennard_Jones_epsilon_x4 * pow(sigma_r, 12) / 2;
+                float f = Lennard_Jones_epsilon_x4 * pow(sigma_r, 12) / 2;
+                result += f;
+                rotatable_bonds[i]->eclipse_partial += f;
             }
         }
 

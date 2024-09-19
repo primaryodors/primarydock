@@ -40,19 +40,23 @@ if (count($procs) >= $max_concurrent) die("Maximum processes.\n");
 
 function uptodate($prot, $lig)
 {
-    global $dock_results, $version;
-    return isset($dock_results[$prot][$lig])
-        && intval($dock_results[$prot][$lig]['version']) >= $version
-        && isset($dock_results[$prot][$lig]['Predicted']);
+    global $dock_results, $version, $dbg;
+    $lig = trim(str_replace(" ", "_", $lig));
+    if ($dbg) echo "Checking $prot $lig \n";
+    if (!isset($dock_results[$prot][$lig])) return false;
+    if ($dbg) echo "$prot $lig {$dock_results[$prot][$lig]['version']} $version\n";
+    if (@intval($dock_results[$prot][$lig]['version']) < $version) return false;
+    return isset($dock_results[$prot][$lig]['Predicted']);
 }
 
 function running($prot, $lig)
 {
     global $procs, $dbg;
-    
+    $procs = [];
+    exec("ps -ef | grep \" bin/primarydock \" | grep -v \"sh -c \" | grep -v grep", $procs);
+
     foreach ($procs as $p)
     {
-        if ($dbg) echo "$p\n$prot | $lig\n\n";
         if (false!==strpos($p, ".{$prot}_") && false!==strpos($p, ".{$lig}.")) return true;
     }
 
@@ -73,18 +77,22 @@ foreach ($queue as $q)
         foreach (array_keys($pairs) as $oid)
         {
             $lig = $odors[$oid]['full_name'];
+            if ($dbg) echo uptodate($prot, $lig) ? "$prot $lig is up to date.\n" : "$prot $lig is NOT up to date.\n";
+            if ($dbg) echo running($prot, $lig) ? "$prot $lig is running.\n" : "$prot $lig is NOT running.\n";
             if (!uptodate($prot, $lig)) if (!running($prot, $lig)) break;
         }
     }
 
     $lig = @find_odorant($lig)["full_name"];
-    if (!$lig) continue;
-    $lig = trim(str_replace(" ", "_", $lig));
+    if (!$lig)
+    {
+        if ($dbg) echo "Ligand not found.\n";
+        continue;
+    }
 
     if (uptodate($prot, $lig)) continue;
-
+    $lig = trim(str_replace(" ", "_", $lig));
     $already = running($prot, $lig);
-    if ($dbg) echo "already? $already\n";
 
     if (!$already)
     {

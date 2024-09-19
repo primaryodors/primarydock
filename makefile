@@ -154,6 +154,9 @@ test/mcoord_test: src/test/mcoord_test.cpp $(OBJS)
 test/vdw_vertex_test: src/test/vdw_vertex_test.cpp $(OBJS)
 	$(CC) src/test/vdw_vertex_test.cpp $(OBJS) -o test/vdw_vertex_test $(CFLAGS)
 
+test/eclipse: src/test/eclipse.cpp $(OBJS)
+	$(CC) src/test/eclipse.cpp $(OBJS) -o test/eclipse $(CFLAGS)
+
 $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/search.o $(OBJDIR)/scoring.o
 	$(CC) src/primarydock.cpp $(OBJS) -o $(BINDIR)/primarydock $(CFLAGS)
 

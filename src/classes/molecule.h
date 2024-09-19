@@ -280,6 +280,7 @@ protected:
     bool immobile = false;
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
+    float base_eclipses = 0;
     std::string sdfgen_aboutline = "";
     Molecule** mandatory_connection = nullptr;
     float* last_mc_binding = nullptr;

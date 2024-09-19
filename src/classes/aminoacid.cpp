@@ -59,6 +59,7 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno, Protein* parent
     movability = MOV_FLEXONLY;
     from_pdb(instream, rno);
     base_internal_clashes = get_internal_clashes();
+    base_eclipses = total_eclipses();
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
     protein = parent;
@@ -730,6 +731,7 @@ void AminoAcid::establish_internal_clash_baseline()
 {
     base_internal_clashes = 0;
     base_internal_clashes = get_internal_clashes();
+    base_eclipses = total_eclipses();
 }
 
 

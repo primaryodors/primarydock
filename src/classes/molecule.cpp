@@ -761,7 +761,8 @@ float Molecule::total_eclipses()
         rotatable_bonds[i]->eclipse_hash = eclipse_hash;
     }
 
-    return result;
+    if (base_eclipses > result) base_eclipses = result;
+    return result - base_eclipses;
     #endif
 }
 
@@ -3138,7 +3139,7 @@ void Molecule::minimize_internal_clashes()
 {
     // cout << (name ? name : "(no name)");
     if (noAtoms(atoms)) return;
-    base_internal_clashes = 0;
+    base_internal_clashes = base_eclipses = 0;
 
     int i, j, iter;
     float clash = get_internal_clashes() + total_eclipses();
@@ -3149,6 +3150,7 @@ void Molecule::minimize_internal_clashes()
     if (!b || !b[0])
     {
         base_internal_clashes = get_internal_clashes();
+        base_eclipses = total_eclipses();
         return;		// No bonds to rotate.
     }
 
@@ -3200,6 +3202,7 @@ void Molecule::minimize_internal_clashes()
     }
 
     base_internal_clashes = get_internal_clashes();
+    base_eclipses = total_eclipses();
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 

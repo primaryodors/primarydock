@@ -184,7 +184,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             worst_clash_1 = ligand->clash1;
             worst_clash_2 = ligand->clash2;
         }
-        if (lb.summed() < 0 && clash > worst_nrg_aa)
+        if (/* lb.summed() < 0 && */ clash > worst_nrg_aa)
         {
             worst_nrg_aa = clash;
             #if _dbg_worst_energy
@@ -491,7 +491,8 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
 _btyp_unassigned:
 
     if (dr.do_output_colors) colorize(dr.kJmol);
-    output << "Total: " << -dr.kJmol*dr.energy_mult << endl << endl;
+    output << "Total: " << -dr.kJmol*dr.energy_mult << endl;
+    output << "Worst atom clash: " << dr.worst_energy*dr.energy_mult << endl;
     if (dr.do_output_colors) colorless();
 
     #if include_eclipses

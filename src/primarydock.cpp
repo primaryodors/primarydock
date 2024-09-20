@@ -1863,7 +1863,7 @@ void apply_protein_specific_settings(Protein* p)
 
 int main(int argc, char** argv)
 {
-    strcpy(splash, "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )                (__   \np   p                                           d   d                k           )   ()   \\__   \\     )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n");
+    strcpy(splash, "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )             /  (__   \np   p                                           d   d                k           )   ()   \\__   \\     )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n");
     char buffer[65536];
     int i, j;
 
@@ -2283,7 +2283,7 @@ int main(int argc, char** argv)
 
     found_poses = 0;
     int wrote_acvmx = -1, wrote_acvmr = -1;
-    float l_atom_clash_limit = clash_limit_per_atom - kJmol_cutoff;
+    float l_atom_clash_limit = clash_limit_per_atom; // - kJmol_cutoff;
 
     std::vector<std::shared_ptr<AtomGroup>> lagc;
     if (pdpst == pst_constrained)
@@ -3091,6 +3091,7 @@ _try_again:
                 // else cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " satisfactory." << endl << endl;
 
                 #if !_dbg_allow_excessive_aa_clashes
+                // cout << dr[drcount][nodeno].kJmol << " / " << dr[drcount][nodeno].worst_energy << endl << endl;
                 if (dr[drcount][nodeno].worst_energy > l_atom_clash_limit || dr[drcount][nodeno].worst_nrg_aa > clash_limit_per_aa)
                 {
                     #if _dbg_worst_energy

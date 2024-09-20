@@ -184,7 +184,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             worst_clash_1 = ligand->clash1;
             worst_clash_2 = ligand->clash2;
         }
-        if (lb.summed() < 0 && clash > worst_nrg_aa)
+        if (/* lb.summed() < 0 && */ clash > worst_nrg_aa)
         {
             worst_nrg_aa = clash;
             #if _dbg_worst_energy

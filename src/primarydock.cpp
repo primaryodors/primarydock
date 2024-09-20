@@ -2283,7 +2283,7 @@ int main(int argc, char** argv)
 
     found_poses = 0;
     int wrote_acvmx = -1, wrote_acvmr = -1;
-    float l_atom_clash_limit = clash_limit_per_atom - kJmol_cutoff;
+    float l_atom_clash_limit = clash_limit_per_atom; // - kJmol_cutoff;
 
     std::vector<std::shared_ptr<AtomGroup>> lagc;
     if (pdpst == pst_constrained)
@@ -3091,6 +3091,7 @@ _try_again:
                 // else cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " satisfactory." << endl << endl;
 
                 #if !_dbg_allow_excessive_aa_clashes
+                cout << dr[drcount][nodeno].worst_energy << endl << endl;
                 if (dr[drcount][nodeno].worst_energy > l_atom_clash_limit || dr[drcount][nodeno].worst_nrg_aa > clash_limit_per_aa)
                 {
                     #if _dbg_worst_energy

@@ -491,7 +491,8 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
 _btyp_unassigned:
 
     if (dr.do_output_colors) colorize(dr.kJmol);
-    output << "Total: " << -dr.kJmol*dr.energy_mult << endl << endl;
+    output << "Total: " << -dr.kJmol*dr.energy_mult << endl;
+    output << "Worst atom clash: " << dr.worst_energy*dr.energy_mult << endl;
     if (dr.do_output_colors) colorless();
 
     #if include_eclipses

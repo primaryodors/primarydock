@@ -3091,7 +3091,7 @@ _try_again:
                 // else cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " satisfactory." << endl << endl;
 
                 #if !_dbg_allow_excessive_aa_clashes
-                cout << dr[drcount][nodeno].worst_energy << endl << endl;
+                // cout << dr[drcount][nodeno].kJmol << " / " << dr[drcount][nodeno].worst_energy << endl << endl;
                 if (dr[drcount][nodeno].worst_energy > l_atom_clash_limit || dr[drcount][nodeno].worst_nrg_aa > clash_limit_per_aa)
                 {
                     #if _dbg_worst_energy

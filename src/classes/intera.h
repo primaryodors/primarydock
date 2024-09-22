@@ -82,7 +82,7 @@ protected:
     friend std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 };
 
-SCoord* get_geometry_for_pi_stack(SCoord* in_geometry);
+Vector* get_geometry_for_pi_stack(Vector* in_geometry);
 
 static InteratomicForce intertmp;
 static InteratomicForce* all_forces[_MAX_NUM_FORCES];
@@ -93,7 +93,7 @@ std::ostream& operator<<(std::ostream& os, const intera_type& it);
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& f);
 extern float total_binding_by_type[_INTER_TYPES_LIMIT];
 extern float minimum_searching_aniso;                       // Should be a small positive number for searching, and zero for scoring.
-extern SCoord missed_connection;
+extern Vector missed_connection;
 extern float mc_bpotential;
 
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);

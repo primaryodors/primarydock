@@ -293,7 +293,7 @@ void Cavity::compute_vdW_surface(float d)
     float step = halfstep * 2;
 
     int i, ivdW = 0;
-    SCoord v;
+    Vector v;
     for (i=0; i<pallocd && partials[i].s.radius; i++)
     {
         Point ploc = partials[i].s.center;
@@ -385,7 +385,7 @@ float Cavity::find_best_containment(Molecule* m)
     {
         for (j=0; j<3; j++)
         {
-            LocatedVector lv = (SCoord)axes[j];
+            LocatedVector lv = (Vector)axes[j];
             lv.origin = cen;
             besttheta=0;
             for (theta=0; theta < M_PI*2; theta += cav_360_step)

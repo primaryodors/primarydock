@@ -1506,12 +1506,12 @@ void GroupPair::align_groups(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp, 
 
         Point opposite = average_of_points(foravg, ln);
         // cout << opposite << endl << flush;
-        SCoord v = mloc.subtract(opposite);
+        Vector v = mloc.subtract(opposite);
         v.r = 2.5;
         Point target = mloc.add(v);
 
         Atom* a = gp[0]->ag->get_mcoord_atom();
-        SCoord mov_amt = target.subtract(a->get_location());
+        Vector mov_amt = target.subtract(a->get_location());
         mov_amt.r *= amount;
         lig->move(mov_amt);
 
@@ -1618,8 +1618,8 @@ void GroupPair::align_groups(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp, 
 
     if (n < 3) return;
     Point zcen = gp[0]->ag->get_center();
-    SCoord axis = gp[1]->ag->get_center().subtract(zcen);
-    lv = (SCoord)axis;
+    Vector axis = gp[1]->ag->get_center().subtract(zcen);
+    lv = (Vector)axis;
     lv.origin = zcen;
     float theta = find_angle_along_vector(gp[2]->ag->get_center(), gp[2]->scg->get_center(), zcen, axis);
     #if _dbg_groupsel || _dbg_groupsalign

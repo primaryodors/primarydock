@@ -13,7 +13,7 @@ using namespace std;
 float total_binding_by_type[_INTER_TYPES_LIMIT];
 float minimum_searching_aniso = 0;
 InteratomicForce* lif = nullptr;
-SCoord missed_connection(0,0,0);
+Vector missed_connection(0,0,0);
 float mc_bpotential = 0;
 
 #if _peratom_audit
@@ -570,9 +570,9 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
     retval[j] = nullptr;
 }
 
-SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
+Vector* get_geometry_for_pi_stack(Vector* in_geo)
 {
-    SCoord* retval = new SCoord[5];
+    Vector* retval = new Vector[5];
     int i;
     Point pt[5];
 
@@ -873,13 +873,13 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                 {
                     if (!ar[j]->is_conjugated() || !ar[j]->is_coplanar()) continue;
 
-                    SCoord anorm = ar[j]->get_normal();
+                    Vector anorm = ar[j]->get_normal();
                     for (k=0; br[k]; k++)
                     {
                         if (!br[k]->is_conjugated() || !br[k]->is_coplanar()) continue;
                         float lpart = 0;
 
-                        SCoord bnorm = br[k]->get_normal();
+                        Vector bnorm = br[k]->get_normal();
                         dp = forces[i]->get_dp();
                         float norm_theta = find_3d_angle(anorm, bnorm, Point(0,0,0));
                         lpart = forces[i]->kJ_mol * pow(0.5+0.5*cos(norm_theta*2), dp);
@@ -904,7 +904,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                         if (a->get_Z() == 1 && b->get_Z() > 1 && norm_theta > 60*fiftyseventh)
                         {
                             Point bcen = br[k]->get_center();
-                            SCoord proj = a->get_location().subtract(aheavy->get_location());
+                            Vector proj = a->get_location().subtract(aheavy->get_location());
                             proj.r = bcen.get_3d_distance(a->get_location());
 
                             float disp = a->get_location().add(proj).get_3d_distance(bcen);
@@ -914,7 +914,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                         else if (b->get_Z() == 1 && a->get_Z() > 1 && norm_theta > 60*fiftyseventh)
                         {
                             Point acen = ar[j]->get_center();
-                            SCoord proj = b->get_location().subtract(bheavy->get_location());
+                            Vector proj = b->get_location().subtract(bheavy->get_location());
                             proj.r = acen.get_3d_distance(b->get_location());
 
                             float disp = b->get_location().add(proj).get_3d_distance(acen);
@@ -952,8 +952,8 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
             #endif
 
             // Anisotropy.
-            SCoord* ageo = a->get_geometry_aligned_to_bonds();
-            SCoord* bgeo = b->get_geometry_aligned_to_bonds();
+            Vector* ageo = a->get_geometry_aligned_to_bonds();
+            Vector* bgeo = b->get_geometry_aligned_to_bonds();
             bool del_ageo=false, del_bgeo=false;
             int ag = a->get_geometry();
             int bg = b->get_geometry();
@@ -1019,7 +1019,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
 
             ag = abs(ag);
             bg = abs(bg);
-            SCoord avec[ag], bvec[bg];
+            Vector avec[ag], bvec[bg];
 
             Ring *ar = nullptr, *br = nullptr;
 
@@ -1074,7 +1074,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                     avec[0] = ar->get_normal();
                     avec[1] = avec[0];
                     avec[1] = avec[1].negate();
-                    for (j=2; j<ag; j++) avec[j] = SCoord(0,0,0);
+                    for (j=2; j<ag; j++) avec[j] = Vector(0,0,0);
                     ag = 2;
                 }
             }
@@ -1094,7 +1094,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                     bvec[0] = br->get_normal();
                     bvec[1] = bvec[0];
                     bvec[1] = bvec[1].negate();
-                    for (j=2; j<ag; j++) bvec[j] = SCoord(0,0,0);
+                    for (j=2; j<ag; j++) bvec[j] = Vector(0,0,0);
                     bg = 2;
                 }
             }
@@ -1184,7 +1184,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                         : r1*r1;
                 partial = aniso * force_eff_kJmol / rdecayed;
 
-                SCoord mc = bloc.subtract(aloc);
+                Vector mc = bloc.subtract(aloc);
                 mc.r = r - forces[i]->distance; // fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
 
                 #if compute_missed_connections

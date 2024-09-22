@@ -525,7 +525,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
 
                 float f = residues[i]->get_intermol_clashes(residues[j]);
                 result += f;
-                SCoord dpos = residues[j]->get_CA_location().subtract(residues[i]->get_CA_location());
+                Vector dpos = residues[j]->get_CA_location().subtract(residues[i]->get_CA_location());
                 dpos.r = f;
                 clashttl = clashttl.add(dpos);
                 float limit = unconnected_residue_mindist + sqrt(residues[i]->get_reach()) + sqrt(residues[j]->get_reach());
@@ -1530,7 +1530,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         pt1.y /= size.y;
         pt1.z /= size.z;
 
-        SCoord dir(&pt1);
+        Vector dir(&pt1);
 
         if (dir.r <= 1)
         {
@@ -2443,7 +2443,7 @@ BAD<MCoord> Protein::coordinate_metal(BAD<MCoord> mtlcoords)
         // cout << alpcen << endl << endl << flush;
 
         // Obtain the alpha normal.
-        SCoord alpnorm = compute_normal(pt4avg[0], pt4avg[1], pt4avg[2]);
+        Vector alpnorm = compute_normal(pt4avg[0], pt4avg[1], pt4avg[2]);
 
         m_mcoords.push_back(mtlcoords[i]);
         Point lpt;
@@ -2504,7 +2504,7 @@ BAD<MCoord> Protein::coordinate_metal(BAD<MCoord> mtlcoords)
             lpt.x /= l; lpt.y /= l; lpt.z /= l;
             l++;
 
-            SCoord tocen = pocketcen.subtract(lpt);
+            Vector tocen = pocketcen.subtract(lpt);
             tocen.r = 5;
             lpt = lpt.add(tocen);
 
@@ -2514,7 +2514,7 @@ BAD<MCoord> Protein::coordinate_metal(BAD<MCoord> mtlcoords)
         if (lmtl->get_location().get_3d_distance(alpcen.add(alpnorm)) > lmtl->get_location().get_3d_distance(alpcen.subtract(alpnorm)))
         {
             alpnorm.r *= -1;
-            alpnorm = (SCoord)(Point)alpnorm;
+            alpnorm = (Vector)(Point)alpnorm;
         }
 
         lmtl->aaletter = '\0';
@@ -2523,7 +2523,7 @@ BAD<MCoord> Protein::coordinate_metal(BAD<MCoord> mtlcoords)
 
         Point pt;
 
-        SCoord v = alpnorm;
+        Vector v = alpnorm;
         v.r = 4;
         pt = alpcen.add(v);
         lmtl->move(pt);
@@ -2538,7 +2538,7 @@ BAD<MCoord> Protein::coordinate_metal(BAD<MCoord> mtlcoords)
                 AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
                 aa->conform_atom_to_location(coord_atoms[j]->name, lmtl->get_location(), 20, optimal[j]);
                 float anomaly = lmtl->distance_to(coord_atoms[j]) - optimal[j];
-                SCoord motion = coord_atoms[j]->get_location().subtract(lmtl->get_location());
+                Vector motion = coord_atoms[j]->get_location().subtract(lmtl->get_location());
                 motion.r = anomaly/2;
                 lmtl->move_rel(motion);
             }
@@ -2605,7 +2605,7 @@ float Protein::get_helix_orientation(int startres, int endres)
         blkavg[i] = average_of_points(&ptarr[i], 10);
         if (i>0)
         {
-            SCoord v(blkavg[i].subtract(blkavg[i-1]));
+            Vector v(blkavg[i].subtract(blkavg[i-1]));
             retval += v.theta;
             j++;
         }
@@ -2661,7 +2661,7 @@ float Protein::orient_helix(int startres, int endres, int stopat, float angle, i
     return ha;
 }
 
-SCoord Protein::get_region_axis(int startres, int endres)
+Vector Protein::get_region_axis(int startres, int endres)
 {
     int rglen = endres-startres;
     if (rglen < 4) throw 0xbadc0de;     // TODO
@@ -2680,7 +2680,7 @@ SCoord Protein::get_region_axis(int startres, int endres)
 
     Point nterm = average_of_points(N, 4), cterm = average_of_points(C, 4);
 
-    return (SCoord)(cterm.subtract(nterm));
+    return (Vector)(cterm.subtract(nterm));
 }
 
 void Protein::set_region(std::string rgname, int start, int end)
@@ -2737,12 +2737,12 @@ Point Protein::get_region_center(int startres, int endres)
 void Protein::move_piece(int start_res, int end_res, Point new_center)
 {
     Point old_center = get_region_center(start_res, end_res);
-    SCoord move_amt = new_center.subtract(old_center);
+    Vector move_amt = new_center.subtract(old_center);
 
     move_piece(start_res, end_res, move_amt);
 }
 
-void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
+void Protein::move_piece(int start_res, int end_res, Vector move_amt)
 {
     save_undo_state();
 
@@ -2775,7 +2775,7 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Rotation rot, int 
     return rotate_piece(start_res, end_res, pivot, rot.v, rot.a);
 }
 
-LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoord axis, float theta)
+LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, Vector axis, float theta)
 {
     save_undo_state();
 
@@ -3229,7 +3229,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     }
 
     // Transform the target to bring its TM center to coincide with that of the current protein.
-    SCoord move_amt = xform_delta;
+    Vector move_amt = xform_delta;
     target->move_piece(1, 9999, move_amt);
 
     // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
@@ -3425,7 +3425,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
         // Perform the TM region transformation.
         Point transformation = rcen2.subtract(rcen1);
-        move_piece(rgstart0, rgend0, (SCoord)transformation);
+        move_piece(rgstart0, rgend0, (Vector)transformation);
         #if _dbg_homology
         cout << "Region " << hxno << " (" << rgstart0 << "-" << rgend0 << ")" << " transformed by " << transformation.magnitude() << "A" << endl;
         #endif
@@ -3555,7 +3555,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             int rgstart = get_region_start(buffer);
             int rgend = get_region_end(buffer);
 
-            SCoord transform;
+            Vector transform;
             Rotation rotation;
 
             region_optimal_positioning(rgstart, rgend, &transform, &rotation, nullptr);
@@ -3598,7 +3598,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             if (f < threshold) continue;
             if (hxno == 3) continue;
 
-            SCoord clashmov = last_int_clash_dir;
+            Vector clashmov = last_int_clash_dir;
             clashmov.r = -0.003 * (f - threshold);
             #if _dbg_homology
             cout << "Motion is " << clashmov.r << " A." << endl;
@@ -3710,7 +3710,7 @@ Interaction Protein::binding_to_nearby_residues(int resno)
 
 #define dbg_region_can_move 0
 
-float Protein::region_can_move(int startres, int endres, SCoord direction, bool repack, int isr, int ier)
+float Protein::region_can_move(int startres, int endres, Vector direction, bool repack, int isr, int ier)
 {
     int n = get_end_resno();
     Pose revert_to[n+1];
@@ -3884,7 +3884,7 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
     return result;
 }
 
-void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r, Protein** p)
+void Protein::region_optimal_positioning(int sr, int er, Vector* x, Rotation* r, Protein** p)
 {
     if (!x || !r)
     {
@@ -3924,7 +3924,7 @@ void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r,
                 /*float e = -aa.pmol->get_intermol_binding(reaching[j]);
                 if (e < clash_limit_per_aa) continue;*/
 
-                SCoord motion = aa.pmol->motion_to_optimal_contact(reaching[j]);
+                Vector motion = aa.pmol->motion_to_optimal_contact(reaching[j]);
                 if (fabs(motion.r) < 0.1) continue;
 
                 Point pt_temp = *x;
@@ -4053,7 +4053,7 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         
         // TODO: Write a way to copy an amino acid, including all atoms and bonds. For now:
         // Move the source CA to coincide with the dest CA.
-        SCoord motion = dCA->get_location().subtract(sCA->get_location());
+        Vector motion = dCA->get_location().subtract(sCA->get_location());
         source->movability = MOV_ALL;
         source->move(motion, true);
 
@@ -4065,20 +4065,20 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         source->rotate(lv, rot.a);
 
         // Rotate the source about the N-CA axis so that the C coincides with the dest C.
-        lv = (SCoord)sCA->get_location().subtract(sN->get_location());
+        lv = (Vector)sCA->get_location().subtract(sN->get_location());
         lv.origin = sCA->get_location();
         float theta = find_angle_along_vector(sC->get_location(), dC->get_location(), sCA->get_location(), lv);
         source->rotate(lv, theta);
 
         // Rotate the CA-N bond so that the HN coincides with the dest HN.
-        lv = (SCoord)sN->get_location().subtract(sCA->get_location());
+        lv = (Vector)sN->get_location().subtract(sCA->get_location());
         theta = find_angle_along_vector(sHN->get_location(), dHN->get_location(), sN->get_location(), lv);
         Bond* b = sCA->get_bond_between(sN);
         if (!b) cout << "WARNING - " << *source << ":" << sCA->name << " is not bonded to " << sN->name << endl;
         b->rotate(theta);
 
         // Rotate the CA-C bond so that the O coincides with the dest O.
-        lv = (SCoord)sC->get_location().subtract(sCA->get_location());
+        lv = (Vector)sC->get_location().subtract(sCA->get_location());
         theta = find_angle_along_vector(sO->get_location(), dO->get_location(), sC->get_location(), lv);
         b = sCA->get_bond_between(sC);
         if (!b) cout << "WARNING - " << *source << ":" << sCA->name << " is not bonded to " << sC->name << endl;

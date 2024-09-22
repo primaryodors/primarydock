@@ -825,7 +825,7 @@ int main(int argc, char** argv)
                 }
 
                 // Translate the range so that the starting average moves to the target start point.
-                SCoord motion = sp.subtract(sl);
+                Vector motion = sp.subtract(sl);
                 for (i=sr; i<=er; i++)
                 {
                     AminoAcid* aa = working->get_residue(i);
@@ -1134,7 +1134,7 @@ int main(int argc, char** argv)
                     float f = 0, clash_limit = 0;
                     Point center1 = working->get_region_center(sr1, er1);
                     Point center2 = working->get_region_center(sr2, er2);
-                    SCoord df = center2.subtract(center1);
+                    Vector df = center2.subtract(center1);
                     float dfr = df.r - unconnected_residue_mindist;
                     df.r = 0.5;
 
@@ -1268,7 +1268,7 @@ int main(int argc, char** argv)
 
                 int asr = 1, aer = 9999, bsr = 1, ber = 9999;
                 char *sa, *sb;
-                SCoord dir(0,0,0);
+                Vector dir(0,0,0);
                 char* outvar = nullptr;
                 float baseline;
 
@@ -1387,7 +1387,7 @@ int main(int argc, char** argv)
                     set_variable(outvar, s);
                     continue;
                 }
-                SCoord optimize = aa1->motion_to_optimal_contact(aa2);
+                Vector optimize = aa1->motion_to_optimal_contact(aa2);
 
                 /*Atom *atom1 = aa1->get_nearest_atom(aa2->get_CA_location()), *atom2 = aa2->get_nearest_atom(aa1->get_CA_location());
                 atom1 = aa1->get_nearest_atom(atom2->get_location());
@@ -2717,7 +2717,7 @@ int main(int argc, char** argv)
             else if (!strcmp(words[0], "MOVEREL"))
             {
                 l = 1;
-                SCoord movamt(0,0,0);
+                Vector movamt(0,0,0);
                 int sr, er;
                 if (words[l]) sr = interpret_single_int(words[l++]);
                 else raise_error("Not enough parameters given for MOVEREL.");
@@ -2896,7 +2896,7 @@ int main(int argc, char** argv)
                 int sr = working->get_start_resno(), er = working->get_end_resno(), piv = 0;
 
 				if (!words[1]) raise_error("Insufficient parameters given for ROTATE.");
-                SCoord axis = interpret_single_point(words[1]);
+                Vector axis = interpret_single_point(words[1]);
 				if (!words[2]) raise_error("Insufficient parameters given for ROTATE.");
                 float theta = interpret_single_float(words[2]) * fiftyseventh;
                 if (words[3])

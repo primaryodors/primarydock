@@ -42,7 +42,7 @@ class DynamicMotion
     DynamicType type;
     std::string name;
     BallesterosWeinstein start_resno, end_resno, fulcrum_resno, axis_resno;
-    SCoord axis;
+    Vector axis;
     float bias = 0;
     float minimum = 0;
 

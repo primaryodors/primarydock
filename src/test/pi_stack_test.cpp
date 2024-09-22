@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 
     // T-stacked.
     m2.recenter(Point(0,0,4.96));
-    SCoord axis = Point(1,0,0);
+    Vector axis = Point(1,0,0);
     m2.rotate(&axis, M_PI/2, false);
     e = -m1.get_intermol_binding(&m2).summed();
     cout << "T-stack energy: " << e << " kJ/mol." << endl;

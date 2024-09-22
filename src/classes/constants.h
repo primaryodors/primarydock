@@ -2,6 +2,8 @@
 #ifndef _CONSTANTS
 #define _CONSTANTS
 
+#define vector Vector
+
 #define fiftyseven (180.0/M_PI)
 #define fiftyseventh (M_PI/180)
 #define tetrahedral acos(-1.0/3)

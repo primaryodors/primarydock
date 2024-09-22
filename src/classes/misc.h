@@ -21,7 +21,7 @@ enum PoseSearchType
 // Default search algorithm if not specified by config file or command line args.
 #define default_search_algorithm pst_constrained
 
-struct SCoord;
+struct Vector;
 struct Point;
 struct LocatedVector;
 struct Rotation;
@@ -45,7 +45,7 @@ union Star
     const char* cpsz;
     void* p;
     Point* ppt;
-    SCoord* pv;
+    Vector* pv;
     Atom* pa;
     Atom** ppa;
     Bond* pb;

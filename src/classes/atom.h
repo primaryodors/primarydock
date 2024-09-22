@@ -59,7 +59,7 @@ public:
     ~Bond();
 
     bool rotate(float angle_radians, bool allow_backbone = false, bool skip_inverse_check = false);
-    SCoord get_axis();
+    Vector get_axis();
     Point ring_rotate(float angle_radians, Atom* stop_at);
     void clear_moves_with_cache()
     {
@@ -71,7 +71,7 @@ public:
     int count_heavy_moves_with_atom2();
     Bond* get_reversed();
     void compute_flip_capability();
-    void swing(SCoord newdir);		// Rotate atom2, and all its moves_with atoms, about atom1 so that the bond points to newdir.
+    void swing(Vector newdir);		// Rotate atom2, and all its moves_with atoms, about atom1 so that the bond points to newdir.
 
     Atom* atom1 = nullptr;
     Atom* atom2 = nullptr;
@@ -111,7 +111,7 @@ public:
     int get_overlap_count(Ring* ringb);
     RING_TYPE get_type();
     Point get_center();
-    SCoord get_normal();
+    Vector get_normal();
     LocatedVector get_center_and_normal();
     bool is_coplanar();
     bool is_conjugated();
@@ -282,20 +282,20 @@ public:
     {
         return move(&pt);
     }
-    bool move_rel(SCoord* v);
-    bool move_rel(SCoord v) { return move_rel(&v); }
+    bool move_rel(Vector* v);
+    bool move_rel(Vector v) { return move_rel(&v); }
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
-    SCoord* get_basic_geometry();
-    SCoord* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);
+    Vector* get_basic_geometry();
+    Vector* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);
     float get_geometric_bond_angle();
-    float get_bond_angle_anomaly(SCoord v, Atom* ignore = nullptr);	// Assume v is centered on current atom.
+    float get_bond_angle_anomaly(Vector v, Atom* ignore = nullptr);	// Assume v is centered on current atom.
     float distance_to(Atom* atom2)
     {
         if (!atom2) return -1;
         else return location.get_3d_distance(&atom2->location);
     };
     float similarity_to(Atom* atom2);
-    SCoord get_next_free_geometry(float lcard);
+    Vector get_next_free_geometry(float lcard);
     int get_idx_next_free_geometry();
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
     void clear_geometry_cache()
@@ -355,7 +355,7 @@ protected:
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
     bool geometry_dirty = true;
     int origgeo=0;
-    SCoord* geov=0;
+    vector* geov=0;
     float at_wt = 0;
     float vdW_rad = 0;
     float elecn = 0;

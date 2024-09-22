@@ -131,7 +131,7 @@ public:
     void save_pdb(FILE* outstream, int atomno_offset=0);
 
     // Spatial functions.
-    void aamove(SCoord move_amt);
+    void aamove(Vector move_amt);
     void recenter(Point new_location)
     {
         return;

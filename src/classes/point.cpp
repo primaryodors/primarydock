@@ -33,7 +33,7 @@ Point Point::add(Point* add_to)
     return retval;
 }
 
-Point Point::add(SCoord* add_to)
+Point Point::add(Vector* add_to)
 {
     Point rel(add_to);
     return add(&rel);
@@ -101,7 +101,7 @@ std::string Point::printable() const
     return buffer.str();
 }
 
-std::string SCoord::printable() const
+std::string Vector::printable() const
 {
     std::stringstream buffer;
     buffer << "[φ=" << phi*180/M_PI << ",θ=" << theta*180/M_PI << ",r=" << r << "]";
@@ -157,21 +157,21 @@ float Point::magnitude() const
     return sqrt(x*x + y*y + z*z);
 }
 
-Point::Point(SCoord* v)
+Point::Point(Vector* v)
 {
     x = v->r * sin(v->phi) *  cos(v->theta);
     z = v->r * cos(v->phi) *  cos(v->theta);
     y = v->r * sin(v->theta);
 }
 
-Point::Point(SCoord v)
+Point::Point(Vector v)
 {
     x = v.r * sin(v.phi) *  cos(v.theta);
     z = v.r * cos(v.phi) *  cos(v.theta);
     y = v.r * sin(v.theta);
 }
 
-SCoord::SCoord(const Point* from)
+Vector::Vector(const Point* from)
 {
     double pxz = from->x*from->x + from->z*from->z;
     r = sqrt(pxz + from->y*from->y);
@@ -180,7 +180,7 @@ SCoord::SCoord(const Point* from)
     theta = find_angle(pxz, from->y);
 }
 
-SCoord::SCoord(const Point from)
+Vector::Vector(const Point from)
 {
     double pxz = from.x*from.x + from.z*from.z;
     r = sqrt(pxz + from.y*from.y);
@@ -189,7 +189,7 @@ SCoord::SCoord(const Point from)
     theta = find_angle(pxz, from.y);
 }
 
-SCoord::SCoord(double lr, double ltheta, double lphi)
+Vector::Vector(double lr, double ltheta, double lphi)
 {
     r = lr;
     theta = ltheta;
@@ -376,12 +376,12 @@ float find_3d_angle(Point A, Point B, Point source)
     return find_3d_angle(&a, &b, &c);
 }
 
-float find_angle_along_vector(Point pt1, Point pt2, Point source, SCoord v)
+float find_angle_along_vector(Point pt1, Point pt2, Point source, Vector v)
 {
     return find_angle_along_vector(&pt1, &pt2, &source, &v);
 }
 
-float find_angle_along_vector(Point* pt1, Point* pt2, Point* source, SCoord* v)
+float find_angle_along_vector(Point* pt1, Point* pt2, Point* source, Vector* v)
 {
     Point vp(v);
 
@@ -411,12 +411,12 @@ Point rotate3D(Point* point, Point* source, Rotation* rot)
     return rotate3D(point, source, &rot->v, rot->a);
 }
 
-Point rotate3D(Point point, Point source, SCoord axis, float theta)
+Point rotate3D(Point point, Point source, Vector axis, float theta)
 {
     return rotate3D(&point, &source, &axis, theta);
 }
 
-Point rotate3D(Point* point, Point* source, SCoord* axis, float theta)
+Point rotate3D(Point* point, Point* source, Vector* axis, float theta)
 {
     // Originally from http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
 
@@ -467,7 +467,7 @@ Rotation align_points_3d(Point point, Point align, Point center)
 
 Rotation align_points_3d(Point* point, Point* align, Point* center)
 {
-    SCoord n = compute_normal(point, align, center);
+    Vector n = compute_normal(point, align, center);
 
     if (n.r < 0.0001)
     {
@@ -528,7 +528,7 @@ Rotation* align_2points_3d(Point* point1, Point* align1, Point* point2, Point* a
 
     Point point2a = rotate3D(point2, center, &retval[0]);
 
-    SCoord v = v_from_pt_sub(*align1, *center);
+    Vector v = v_from_pt_sub(*align1, *center);
     retval[1].v = v;
 
     // float theta = find_3d_angle(&point2a, align2, center);
@@ -550,7 +550,7 @@ Rotation* align_2points_3d(Point* point1, Point* align1, Point* point2, Point* a
     return retval;
 }
 
-SCoord compute_normal(Point* pt1, Point* pt2, Point* pt3)
+Vector compute_normal(Point* pt1, Point* pt2, Point* pt3)
 {
     Point U = pt2->subtract(pt1);
     Point V = pt3->subtract(pt1);
@@ -559,11 +559,11 @@ SCoord compute_normal(Point* pt1, Point* pt2, Point* pt3)
                 U.z * V.x - U.x * V.z,
                 U.x * V.y - U.y * V.x
             );
-    SCoord v(&pt);
+    Vector v(&pt);
     return v;
 }
 
-SCoord compute_normal(Point pt1, Point pt2, Point pt3)
+Vector compute_normal(Point pt1, Point pt2, Point pt3)
 {
     return compute_normal(&pt1, &pt2, &pt3);
 }
@@ -607,10 +607,10 @@ float sphere_inter_area(float r1, float r2, float d)
     return M_PI * a*a;
 }
 
-SCoord v_from_pt_sub(Point distal, Point reference)
+Vector v_from_pt_sub(Point distal, Point reference)
 {
     Point p = distal.subtract(&reference);
-    SCoord v(&p);
+    Vector v(&p);
     return v;
 }
 
@@ -619,25 +619,25 @@ float polygon_radius(float side_length, int num_sides)
     return side_length/(2.0*sin(M_PI/num_sides));
 }
 
-Point& Point::operator=(SCoord v)
+Point& Point::operator=(Vector v)
 {
     Point pt(&v);
     *this = pt;
     return *this;
 }
 
-SCoord& SCoord::operator=(Point p)
+Vector& Vector::operator=(Point p)
 {
-    SCoord v(&p);
+    Vector v(&p);
     *this = v;
     return *this;
 }
 
-SCoord SCoord::add(SCoord* v)
+Vector Vector::add(Vector* v)
 {
     Point pt(v);
     pt.add(this);
-    SCoord lv(&pt);
+    Vector lv(&pt);
     return lv;
 }
 
@@ -678,7 +678,7 @@ std::ostream& operator<<(std::ostream& os, const Point& p)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const SCoord& v)
+std::ostream& operator<<(std::ostream& os, const Vector& v)
 {
     os << v.printable();
     return os;

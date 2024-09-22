@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 
         if (cp)
         {
-            SCoord normal = m1.get_ring_normal(i);
+            Vector normal = m1.get_ring_normal(i);
             cout << "Ring normal: φ=" << (normal.phi * 180.0/M_PI) << "° θ=" << (normal.theta * 180.0/M_PI) << "°." << endl;
         }
     }
@@ -178,13 +178,13 @@ int main(int argc, char** argv)
     float im12 = m1.get_intermol_clashes(&m2);
     cout << "# Loaded test ligand. Intermol clashes: " << im12 << " cu. A." << endl;
 
-    SCoord v1(&pt1);
+    Vector v1(&pt1);
     float rotdeg = -30;
     m2.rotate(&v1, rotdeg * M_PI/180);
     cout << "# Rotated molecule 2 by " << rotdeg << " degrees. Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
 
     Point pt(0,0,1.0);
-    SCoord v(&pt);
+    Vector v(&pt);
     float ttlmv = 0;
     /*while (m1.get_intermol_clashes(&m2))
     {
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
     mols[1] = &m2;
     mols[2] = NULL;
     Molecule::conform_molecules(mols, 200, &iteration_callback);
-    SCoord optimize = m1.motion_to_optimal_contact(&m2);
+    Vector optimize = m1.motion_to_optimal_contact(&m2);
     cout << "# Optimization moves molecule 1 by " << optimize << endl;
     m1.move(optimize);
     #if _peratom_audit

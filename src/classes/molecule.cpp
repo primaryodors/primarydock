@@ -357,7 +357,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
     paths = nullptr;
 
     if (bondto->is_pi()) bondto->aromatize();
-    SCoord v = bondto->get_next_free_geometry(bcard);
+    Vector v = bondto->get_next_free_geometry(bcard);
     Atom* a = new Atom(elemsym);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
@@ -519,7 +519,7 @@ void Molecule::hydrogenate(bool steric_only)
             #endif
 
             /*atoms[i]->clear_geometry_cache();
-            SCoord v = atoms[i]->get_next_free_geometry(1);
+            Vector v = atoms[i]->get_next_free_geometry(1);
             v.r = InteratomicForce::covalent_bond_radius(atoms[i], H, 1);
             H->move(atoms[i]->get_location().add(v));*/
 
@@ -544,7 +544,7 @@ void Molecule::hydrogenate(bool steric_only)
                         /*Point axis = b0->atom2->get_location();
                         Point avoid = b1->atom2->get_location();
                         Point movable = H->get_location();
-                        SCoord v(axis.subtract(source));
+                        Vector v(axis.subtract(source));
 
                         Point visibly_moved = rotate3D(movable, source, v, M_PI);
                         float r_is = movable.get_3d_distance(avoid);
@@ -555,7 +555,7 @@ void Molecule::hydrogenate(bool steric_only)
                         Point movable = b1->atom2->get_location();
                         /*cout << "Getting normal of " << atoms[i]->name << " - "
                         	 << b0->atom2->name << " - " << b1->atom2->name << endl;*/
-                        SCoord axis = compute_normal(source, b0->atom2->get_location(), b1->atom2->get_location());
+                        Vector axis = compute_normal(source, b0->atom2->get_location(), b1->atom2->get_location());
                         Point plus  = rotate3D(movable, source, axis,  triangular);
                         Point minus = rotate3D(movable, source, axis, -triangular);
 
@@ -2291,7 +2291,7 @@ float Molecule::get_internal_clashes(bool sb)
 
                     if (c && d)
                     {
-                        SCoord axis = atoms[j]->get_location().subtract(atoms[i]->get_location());
+                        Vector axis = atoms[j]->get_location().subtract(atoms[i]->get_location());
                         float theta = find_angle_along_vector(c->get_location(), d->get_location(), atoms[i]->get_location(), axis);
                         float cpartial = 13.5 - 13.5 * cos(theta*2);
                         #if _dbg_internal_energy
@@ -2491,7 +2491,7 @@ void Molecule::mutual_closest_atoms(Molecule* mol, Atom** a1, Atom** a2)
     }
 }
 
-void Molecule::move(SCoord move_amt, bool override_residue)
+void Molecule::move(Vector move_amt, bool override_residue)
 {
     if (noAtoms(atoms)) return;
     if (immobile)
@@ -2604,7 +2604,7 @@ void Molecule::recenter(Point nl)
     if (movability <= MOV_NORECEN) return;
     Point loc = get_barycenter();
     Point rel = nl.subtract(&loc);
-    SCoord v(&rel);
+    Vector v(&rel);
     move(v);
 
     if (vdw_surface && vdw_vertex_count)
@@ -2619,7 +2619,7 @@ void Molecule::recenter(Point nl)
     }
 }
 
-void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
+void Molecule::rotate(Vector* Vector, float theta, bool bond_weighted)
 {
     if (noAtoms(atoms)) return;
     // cout << name << " Molecule::rotate()" << endl;
@@ -2642,7 +2642,7 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     {
         // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
-        Point nl  = rotate3D(&loc, &cen, SCoord, theta);
+        Point nl  = rotate3D(&loc, &cen, Vector, theta);
         atoms[i]->move(&nl);
     }
 
@@ -2651,7 +2651,7 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
         for (i=0; i<vdw_vertex_count; i++)
         {
             Point loc = vdw_surface[i];
-            Point nl  = rotate3D(&loc, &cen, SCoord, theta);
+            Point nl  = rotate3D(&loc, &cen, Vector, theta);
             vdw_surface[i] = nl;
         }
     }
@@ -3739,7 +3739,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 }
                 if (ptrnd.magnitude())
                 {
-                    LocatedVector axis = (SCoord)ptrnd;
+                    LocatedVector axis = (Vector)ptrnd;
                     axis.origin = a->get_barycenter(true);
                     float theta;
 
@@ -3983,7 +3983,7 @@ int Molecule::get_heavy_atom_count() const
 }
 
 #define dbg_optimal_contact 0
-SCoord Molecule::motion_to_optimal_contact(Molecule* l)
+Vector Molecule::motion_to_optimal_contact(Molecule* l)
 {
     Pose p;
     p.copy_state(this);
@@ -3991,8 +3991,8 @@ SCoord Molecule::motion_to_optimal_contact(Molecule* l)
     MovabilityType m = movability, lm = l->movability;
     movability = l->movability = MOV_FLEXONLY;
 
-    SCoord total_motion(0,0,0);
-    SCoord incremental_motion;
+    Vector total_motion(0,0,0);
+    Vector incremental_motion;
 
     Interaction energy = this->get_intermol_binding(l);
 
@@ -4056,7 +4056,7 @@ const Point* Molecule::obtain_vdW_surface(float d)
     float step = halfstep * 2;
 
     int i, ivdW = 0;
-    SCoord v;
+    Vector v;
     for (i=0; i<atcount && atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
@@ -4539,7 +4539,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
     if (ringsz<3) return;
     if (ringsz>6) return;
 
-    SCoord normal;
+    Vector normal;
     Point ringcen;
 
 	if (!ring_members || !ring_members[0])
@@ -4628,8 +4628,8 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
 float Molecule::fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length)
 {
     // Last-should-be and first-should-be positions.
-    SCoord lsbv = first->get_next_free_geometry(lcard);
-    SCoord fsbv = last->get_next_free_geometry(lcard);
+    Vector lsbv = first->get_next_free_geometry(lcard);
+    Vector fsbv = last->get_next_free_geometry(lcard);
     lsbv.r = fsbv.r = bond_length;
     Point  lsb  = first->get_location().add(&lsbv);
     Point  fsb  = last->get_location().add(&fsbv);
@@ -4955,7 +4955,7 @@ Point Molecule::get_bounding_box() const
 
     for (i=0; atoms[i]; i++)
     {
-        SCoord v(atoms[i]->get_location());
+        Vector v(atoms[i]->get_location());
         float r = atoms[i]->get_vdW_radius();
         Point pt(v);
 
@@ -4993,9 +4993,9 @@ Point Molecule::get_ring_center(int ringid)
     return rings[ringid]->get_center();
 }
 
-SCoord Molecule::get_ring_normal(int ringid)
+Vector Molecule::get_ring_normal(int ringid)
 {
-    if (!rings) return SCoord(0,0,0);
+    if (!rings) return Vector(0,0,0);
     return rings[ringid]->get_normal();
 }
 
@@ -5016,7 +5016,7 @@ void Molecule::recenter_ring(int ringid, Point new_ring_cen)
 {
     if (!rings) return;
     Point old_ring_cen = get_ring_center(ringid);
-    SCoord motion = new_ring_cen.subtract(old_ring_cen);
+    Vector motion = new_ring_cen.subtract(old_ring_cen);
     int i;
     Atom** ring_atoms = rings[ringid]->get_atoms();
     for (i=0; ring_atoms[i]; i++)
@@ -5096,7 +5096,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv, bool hemi)
     if (atoms[i]->get_Z() == 1 || atom2->get_Z() == 1) card = 1;
     float optimal_radius = InteratomicForce::covalent_bond_radius(atoms[i], atom2, card);
 
-    lv = (SCoord)atoms[i]->get_location().subtract(bloc);
+    lv = (Vector)atoms[i]->get_location().subtract(bloc);
     lv.origin = bloc;
 
     error += _SANOM_BOND_RADIUS_WEIGHT * (fabs(optimal_radius-lv.r)/optimal_radius);
@@ -5451,7 +5451,7 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
                             if (aparent)
                             {
                                 optimal = InteratomicForce::covalent_bond_radius(atoms[j], aparent, b0->cardinality);
-                                SCoord v = population[i][j].subtract(aparent->get_location());
+                                Vector v = population[i][j].subtract(aparent->get_location());
                                 v.r = optimal;
                                 population[i][j] = aparent->get_location().add(v);
                             }
@@ -5474,7 +5474,7 @@ float Molecule::evolve_structure(int gens, float mr, int ps)
 
                 anomaly += get_atom_bond_length_anomaly(aparent, atoms[j]);
 
-                SCoord v = atoms[j]->get_location().subtract(aparent->get_location());
+                Vector v = atoms[j]->get_location().subtract(aparent->get_location());
                 anomaly += aparent->get_bond_angle_anomaly(v, atoms[j]);
             }
             anomalies[i] = anomaly;

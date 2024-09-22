@@ -755,7 +755,7 @@ void AminoAcid::predict_previous_COCA(Point* retval)
     for (i=0; i<10; i++)
     {
         // Step 1: H-N-C angle.
-        SCoord axis = compute_normal(CA->get_location(), N->get_location(), HN->get_location());
+        Vector axis = compute_normal(CA->get_location(), N->get_location(), HN->get_location());
         float theta = find_angle_along_vector(HN->get_location(), prevCloc, N->get_location(), axis);
         float plus  = triangular - theta;
         float minus = triangular*2 - theta;
@@ -819,7 +819,7 @@ void AminoAcid::predict_previous_COCA(Point* retval)
         Point pt = CA->get_location();
         /*Rotation rot = align_points_3d(&prevOloc, &pt, &prevCloc);
         neighborCA = rotate3D(prevOloc, prevCloc, rot.v, -rot.a);*/
-        SCoord normal = compute_normal(prevCloc, prevOloc, N->get_location());
+        Vector normal = compute_normal(prevCloc, prevOloc, N->get_location());
         neighborCA = rotate3D(prevOloc, prevCloc, normal, triangular);
         if (neighborCA.get_3d_distance(N->get_location()) < 1) neighborCA = rotate3D(prevOloc, prevCloc, normal, -triangular);
         neighborCA = neighborCA.subtract(prevCloc);
@@ -852,7 +852,7 @@ void AminoAcid::predict_next_NHCA(Point* retval)
     for (i=0; i<10; i++)
     {
         // Step 1: O-C-N angle.
-        SCoord axis = compute_normal(CA->get_location(), C->get_location(), O->get_location());
+        Vector axis = compute_normal(CA->get_location(), C->get_location(), O->get_location());
         float theta = find_angle_along_vector(O->get_location(), nextNloc, C->get_location(), axis);
         float plus  = triangular - theta;
         float minus = triangular*2 - theta;
@@ -916,7 +916,7 @@ void AminoAcid::predict_next_NHCA(Point* retval)
         Point pt = CA->get_location();
         /*Rotation rot = align_points_3d(&nextHNloc, &pt, &nextNloc);
         neighborCA = rotate3D(nextHNloc, nextNloc, rot.v, -rot.a);*/
-        SCoord normal = compute_normal(nextNloc, nextHNloc, C->get_location());
+        Vector normal = compute_normal(nextNloc, nextHNloc, C->get_location());
         neighborCA = rotate3D(nextHNloc, nextNloc, normal, triangular);
         if (neighborCA.get_3d_distance(C->get_location()) < 1) neighborCA = rotate3D(nextHNloc, nextNloc, normal, -triangular);
         neighborCA = neighborCA.subtract(nextNloc);
@@ -958,7 +958,7 @@ void AminoAcid::attach_to_prediction(Point* predicted, bool CO)
 
     // Rotation: rotate the entire AA about its NH or CO axis to bring the CA in line with the predicted CA.
     lv.origin = CO ? get_atom_location("C") : get_atom_location("N");
-    SCoord axis = pt1.subtract(lv.origin);
+    Vector axis = pt1.subtract(lv.origin);
     float theta = find_angle_along_vector(get_atom_location("CA"), predicted[2], lv.origin, axis);
     lv.copy(axis);
     rotate(lv, -theta);
@@ -2190,7 +2190,7 @@ float AminoAcid::get_phi()
 
     if (!C0 || !N || !CA || !C1) return 0;
 
-    SCoord axis = CA->get_location().subtract(N->get_location());
+    Vector axis = CA->get_location().subtract(N->get_location());
 
     return find_angle_along_vector(C0->get_location(), C1->get_location(), CA->get_location(), axis);
 }
@@ -2211,7 +2211,7 @@ float AminoAcid::get_psi()
 
     if (!N0 || !CA || !C || !N1) return 0;
 
-    SCoord axis = C->get_location().subtract(CA->get_location());
+    Vector axis = C->get_location().subtract(CA->get_location());
 
     return find_angle_along_vector(N0->get_location(), N1->get_location(), CA->get_location(), axis);
 }
@@ -2232,7 +2232,7 @@ float AminoAcid::get_omega()
 
     if (!CA0 || !C || !N || !CA1) return 0;
 
-    SCoord axis = N->get_location().subtract(C->get_location());
+    Vector axis = N->get_location().subtract(C->get_location());
 
     return find_angle_along_vector(CA0->get_location(), CA1->get_location(), N->get_location(), axis);
 }
@@ -2262,7 +2262,7 @@ LocatedVector AminoAcid::get_phi_vector()
 {
     Atom* N  = get_atom("N");
     Atom* CA = get_atom("CA");
-    LocatedVector result = (SCoord)(N->get_location().subtract(CA->get_location()));
+    LocatedVector result = (Vector)(N->get_location().subtract(CA->get_location()));
     result.origin = CA->get_location();
     return result;
 }
@@ -2271,7 +2271,7 @@ LocatedVector AminoAcid::get_psi_vector()
 {
     Atom* CA = get_atom("CA");
     Atom* C  = get_atom("C");
-    LocatedVector result = (SCoord)(C->get_location().subtract(CA->get_location()));
+    LocatedVector result = (Vector)(C->get_location().subtract(CA->get_location()));
     result.origin = CA->get_location();
     return result;
 }
@@ -2695,7 +2695,7 @@ Point AminoAcid::get_reach_atom_location()
     return a->get_location();
 }
 
-void AminoAcid::aamove(SCoord move_amt)
+void AminoAcid::aamove(Vector move_amt)
 {
     if (movability < MOV_ALL) return;
     if (!atoms) return;
@@ -2859,7 +2859,7 @@ LocRotation AminoAcid::enforce_peptide_bond(bool cis)
     Point ptN = lN->get_location();
     Point ptH = lH->get_location();
 
-    SCoord v = ptN.subtract(ptC);
+    Vector v = ptN.subtract(ptC);
 
     // TODO: Refine the algorithm further so that coplanarity is enforced, including CA atoms, and bond angles as well.
     float theta, step=1.0*fiftyseventh, bestr = 0, besttheta=0;
@@ -3227,7 +3227,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         return retval;
     }
 
-    // Use the SCoord as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
+    // Use the Vector as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
     int i;
     float theta, step = 3, oldstep = 360;
     float bestrad=0, bestr;
@@ -3293,7 +3293,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
 
     if (aadef && aadef->proline_like) return retval;
 
-    // Determine the center of rotation and rotation SCoord.
+    // Determine the center of rotation and rotation Vector.
     switch (direction)
     {
     case N_asc:
@@ -3342,7 +3342,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     }
 
     rel = atom2->get_location().subtract(retval.origin);
-    SCoord v(rel);
+    Vector v(rel);
     retval.phi = v.phi;
     retval.theta = v.theta;
     retval.r = v.r;

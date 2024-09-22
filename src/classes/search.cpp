@@ -55,7 +55,7 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
         inner_sphere[i] = tsphres[i]->get_reach() / 3 + 1;
     }
 
-    const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
+    const Vector xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
     float loneliness=0, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
     const int ac = ligand->get_atom_count();
     Pose besp(ligand);
@@ -610,7 +610,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
     // Place the ligand so that the atom group is centered in the binding pocket.
     Point agp = cs_lag[j]->get_center();
-    SCoord mov = loneliest.subtract(agp);
+    Vector mov = loneliest.subtract(agp);
     ligand->move(mov);
 
     // Rotate the ligand so the atom group faces the chosen residue.
@@ -637,7 +637,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.
-    lv = (SCoord)resna.subtract(ligand->get_barycenter());
+    lv = (Vector)resna.subtract(ligand->get_barycenter());
     lv.origin = agcen;
     Pose best(ligand);
     best.copy_state(ligand);

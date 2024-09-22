@@ -105,14 +105,14 @@ Protein* metald_prot = nullptr;
 int seql = 0;
 int addl_resno[256];
 const Region* regions;
-SCoord region_clashes[85][3];
+Vector region_clashes[85][3];
 Molecule* ligand;
 std::string isomers[16];
 int iso_count = 0;
 Molecule** waters = nullptr;
 Molecule** owaters = nullptr;
 Point ligcen_target;
-SCoord path[256];
+Vector path[256];
 int pathnodes = 0;				// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
@@ -449,7 +449,7 @@ void do_pivotal_hbond_rot_and_scoot()
     #endif
 
     // Measure the distance between atoms and move the ligand to optimize that distance.
-    SCoord scooch = pivotal_hbond_aaa->get_location().subtract(pivotal_hbond_la->get_location());
+    Vector scooch = pivotal_hbond_aaa->get_location().subtract(pivotal_hbond_la->get_location());
     if (scooch.r > 2.0)
     {
         scooch.r -= 2.0;
@@ -463,7 +463,7 @@ void do_pivotal_hbond_rot_and_scoot()
     }
 
     // Rotate the ligand about the hbond in order to minimize the intermolecular energy.
-    SCoord v = pivotal_hbond_la->get_location().subtract(pivotal_hbond_aaa->get_location());
+    Vector v = pivotal_hbond_la->get_location().subtract(pivotal_hbond_aaa->get_location());
     lv = v;
     lv.origin = pivotal_hbond_aaa->get_location();
     float theta = 0, th, step = M_PI/50, clash;
@@ -552,7 +552,7 @@ void iteration_callback(int iter, Molecule** mols)
 
         Atom *ra, *la;
         cs_res[cs_idx]->mutual_closest_atoms(ligand, &ra, &la);
-        SCoord r = ra->get_location().subtract(la->get_location());
+        Vector r = ra->get_location().subtract(la->get_location());
         r.r -= 2.5;
         r.r *= frand(0.333,0.666);
         cswas.copy_state(ligand);
@@ -700,7 +700,7 @@ void iteration_callback(int iter, Molecule** mols)
             {
                 Point A = aa->get_CA_location();
                 foravg[l++] = A;
-                SCoord AB = A.subtract(ligand->get_nearest_atom(A)->get_location());
+                Vector AB = A.subtract(ligand->get_nearest_atom(A)->get_location());
                 AB.r = pow(c, 1.0/3);
                 softpush = softpush.add(AB);
                 if (AB.r > pushmax) pushmax = AB.r;
@@ -709,7 +709,7 @@ void iteration_callback(int iter, Molecule** mols)
 
         if (l)
         {
-            SCoord AB = softpush;
+            Vector AB = softpush;
             AB.r = pushmax;
             Point A = average_of_points(foravg, l);
             Point B = A.add(AB);
@@ -2261,7 +2261,7 @@ _try_again:
     regions = protein->get_regions();
     for (i=0; regions[i].start; i++)
     {
-        region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
+        region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = Vector(0,0,0);
     }
 
     n = mtlcoords.size();

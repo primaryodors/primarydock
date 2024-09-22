@@ -88,12 +88,12 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     int prot_seq_len = protein->get_end_resno();
     #if compute_clashdirs
     residue_clash = new float[prot_seq_len+8];
-    res_clash_dir = new SCoord[prot_seq_len+8];
+    res_clash_dir = new Vector[prot_seq_len+8];
 
     for (i=0; i<=prot_seq_len; i++)
     {
         residue_clash[i] = 0;
-        res_clash_dir[i] = SCoord(0,0,0);
+        res_clash_dir[i] = Vector(0,0,0);
     }
     #endif
 
@@ -161,7 +161,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
                     bond = heavy->get_bond_by_idx(0);
                     if (!bond || !bond->atom2 || !bond->can_rotate) continue;
 
-                    SCoord axis = heavy->get_location().subtract(bond->atom2->get_location());
+                    Vector axis = heavy->get_location().subtract(bond->atom2->get_location());
                     float theta = find_angle_along_vector(H->get_location(), target->get_location(), heavy->get_location(), axis);
                     if (targetH && heavy->distance_to(targetH) < target->distance_to(H)) theta += M_PI;
 
@@ -196,7 +196,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         if (lb > 0 && ligand->clash1 && ligand->clash2)
         {
             residue_clash[resno] += lb;
-            SCoord clashdir = ligand->clash2->get_location().subtract(ligand->clash1->get_location());
+            Vector clashdir = ligand->clash2->get_location().subtract(ligand->clash1->get_location());
             clashdir.r = ligand->clash1->get_vdW_radius() + ligand->clash2->get_vdW_radius() - ligand->clash1->distance_to(ligand->clash2);
             res_clash_dir[resno] = res_clash_dir[resno].add(clashdir);
         }

@@ -82,7 +82,7 @@ int main(int argc, char** argv)
     {
         target = p.get_residue(10)->get_CA_location();
         center = p.get_region_center(1, p.get_end_resno());
-        SCoord d = target.subtract(center);
+        Vector d = target.subtract(center);
         d.r = 3.5;
         target = target.add(d);
     }

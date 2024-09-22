@@ -145,15 +145,15 @@ public:
     Molecule** all_residues_as_molecules();
     Molecule** all_residues_as_molecules_except(Molecule** mm);
     Point get_region_center(int startres, int endres);
-    SCoord get_region_axis(int startres, int endres);
+    Vector get_region_axis(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
     Point estimate_pocket_size(BAD<AminoAcid*> ba);
     Interaction binding_to_nearby_residues(int resno);
     void minimize_residue_clashes(int resno);
-    float region_can_move(int startres, int endres, SCoord direction, bool repack = false, int ignore_startres = 0, int ignore_endres = 0);
+    float region_can_move(int startres, int endres, Vector direction, bool repack = false, int ignore_startres = 0, int ignore_endres = 0);
     float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false, float extra_clash_allowance = 0, int ignore_startres = 0, int ignore_endres = 0);     // Searches positive theta.
-    void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
+    void region_optimal_positioning(int startres, int endres, Vector* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
     void set_conditional_basicities();
     float A100();
     Atom* region_pivot_atom(Region region);
@@ -162,10 +162,10 @@ public:
     // Motion functions
     void upright();
     void move_piece(int start_res, int end_res, Point new_center);
-    void move_piece(int start_res, int end_res, SCoord move_amt);
+    void move_piece(int start_res, int end_res, Vector move_amt);
     LocRotation rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
     LocRotation rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res);
-    LocRotation rotate_piece(int start_res, int end_res, Point origin, SCoord axis, float theta);
+    LocRotation rotate_piece(int start_res, int end_res, Point origin, Vector axis, float theta);
 
     void rotate_backbone(int residue_no, bb_rot_dir direction, float angle);
     void conform_backbone(int startres, int endres, Atom* a, Point target, int iters = 50);
@@ -199,9 +199,9 @@ public:
 
     int mcoord_resnos[32];
 
-    SCoord last_uprighted_xform;
+    Vector last_uprighted_xform;
     LocRotation last_uprighted_A, last_uprighted_B;
-    SCoord last_int_clash_dir;
+    Vector last_int_clash_dir;
 
     AminoAcid *stop1, *stop2;
     Atom *stop1a, *stop2a;

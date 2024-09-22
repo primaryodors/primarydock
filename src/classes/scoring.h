@@ -32,7 +32,7 @@ class DockResult
     Atom* worst_clash_2 = nullptr;
     #if compute_clashdirs
     float* residue_clash = nullptr;
-    SCoord* res_clash_dir = nullptr;
+    Vector* res_clash_dir = nullptr;
     #endif
     #if compute_missed_connections
     float* missed_connections = 0;

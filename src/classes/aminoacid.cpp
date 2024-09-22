@@ -1053,12 +1053,12 @@ int AminoAcid::from_pdb(FILE* is, int rno)
         int thistell = ftell(is);
         strcpy(origbuf, buffer);
 
-        BAD<std::string> words;
+        std::string words[256];
+        int wordcount = 0;
 		int places[20] = {0, 6, 11, 17, 21, 22, 30, 38, 46, 54, 60, 76};
 		int i, j, k;
 		for (i=11; i>=0; i--)
 		{
-			// words[i] = new char[35];
 			j = places[i];
 
 			// Ltrim.
@@ -1068,16 +1068,15 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 			while (buffer[k]) k++;			// Find zero.
 			// Rtrim.
 			for (k--; buffer[k] == ' '; k--) buffer[k] = 0;
-			
-			// strcpy(words[i], &buffer[j]);
-            for (k=words.size(); k<=j; k++) words.push_back("");
+
             words[i] = &buffer[j];
+            wordcount++;
 			buffer[places[i]] = 0;
 		}
 
         try
         {
-            if (words.size())
+            if (wordcount)
             {
                 int offset = 1;
                 // cout << words[0] << endl;

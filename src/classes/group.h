@@ -48,7 +48,8 @@ class AtomGroup
 class ResidueGroup
 {
     public:
-    BAD<AminoAcid*> aminos;
+    AminoAcid* aminos[16];
+    int naminos = 0;
     bool metallic = false;
     Atom* metal = nullptr;
 
@@ -60,9 +61,9 @@ class ResidueGroup
     float hydrophilicity();
     float pi_stackability();
 
-    static BAD<std::shared_ptr<ResidueGroup>> get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
+    ResidueGroup** get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
 
-    static BAD<AminoAcid*> disqualified_residues;
+    static AminoAcid* disqualified_residues[1024];
 };
 
 class GroupPair
@@ -75,10 +76,10 @@ class GroupPair
     float get_weighted_potential();
     bool is_priority() { return priority; }
 
-    static BAD<std::shared_ptr<GroupPair>> pair_groups(BAD<std::shared_ptr<AtomGroup>> agroups, BAD<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen, float rel_stochasticity = 1);
-    static void align_groups(Molecule* ligand, BAD<std::shared_ptr<GroupPair>> group_pairs);
-    static void align_groups_noconform(Molecule* ligand, BAD<std::shared_ptr<GroupPair>> group_pairs);
-    static void align_groups(Molecule* ligand, BAD<std::shared_ptr<GroupPair>> group_pairs, bool do_conforms, float amount=1);    // Assumes the ligand is already centered in the pocket.
+    static GroupPair** pair_groups(AtomGroup** agroups, ResidueGroup** scgroups, Point pocketcen, float rel_stochasticity = 1);
+    static void align_groups(Molecule* ligand, GroupPair** group_pairs);
+    static void align_groups_noconform(Molecule* ligand, GroupPair** group_pairs);
+    static void align_groups(Molecule* ligand, GroupPair** group_pairs, bool do_conforms, float amount=1);    // Assumes the ligand is already centered in the pocket.
 
     void disqualify();
 
@@ -91,8 +92,11 @@ class GroupPair
 std::ostream& operator<<(std::ostream& os, const AtomGroup& ag);
 std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg);
 
-extern BAD<MCoord> mtlcoords;
-extern BAD<std::shared_ptr<GroupPair>> global_pairs;
-extern BAD<Moiety> predef_grp;
+extern MCoord mtlcoords[16];
+extern int nmetals;
+extern GroupPair* global_pairs[256];
+extern int nglobal_pairs;
+extern Moiety predef_grp[65536];
+extern int npredef_grp;
 
 #endif

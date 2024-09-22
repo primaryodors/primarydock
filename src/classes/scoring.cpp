@@ -73,11 +73,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
     for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = total_binding_by_type[i];
 
-    #if _peratom_audit
-    interaudit.clear();
-    interauditing = true;
-    #endif
-
     for (i=0; i<_INTER_TYPES_LIMIT; i++)
     {
         init_total_binding_by_type[i] = 0;
@@ -272,15 +267,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
         lmkJmol[metcount] = lmb;
     }
-
-    #if _peratom_audit
-    cout << endl << "Interatomic Audit:" << endl;
-    cout << "Total energy: " << -btot << endl;
-    int ian = interaudit.size(), iai;
-    for (iai=0; iai<ian; iai++) cout << interaudit[iai] << endl;
-    cout << endl << endl;
-    interauditing = false;
-    #endif
 
     if (btot > 100*ligand->get_atom_count()) btot = 0;
 

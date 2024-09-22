@@ -17,7 +17,8 @@ int main(int argc, char** argv)
 {
     int i, l, n;
     std::string filename;
-    BAD<std::string> atom_names;
+    std::string atom_names[256];
+    int nanames = 0;
 
     if (argc < 3)
     {
@@ -32,10 +33,10 @@ int main(int argc, char** argv)
             // TODO:
         }
         else if (!filename.length()) filename = argv[i];
-        else atom_names.push_back(argv[i]);
+        else atom_names[nanames++] = argv[i];
     }
 
-    if (!filename.length() || !atom_names.size())
+    if (!filename.length() || !nanames)
     {
         show_usage();
         return -1;
@@ -49,8 +50,7 @@ int main(int argc, char** argv)
     Molecule m("TheMolecule");
     m.from_sdf(buffer);
 
-    n = atom_names.size();
-    for (i=0; i<n; i++)
+    for (i=0; i<nanames; i++)
     {
         Atom* a = m.get_atom(atom_names[i].c_str());
         if (!a)

@@ -208,21 +208,10 @@ int main(int argc, char** argv)
     Vector optimize = m1.motion_to_optimal_contact(&m2);
     cout << "# Optimization moves molecule 1 by " << optimize << endl;
     m1.move(optimize);
-    #if _peratom_audit
-    interauditing = true;
-    #endif
     float final_clashes = m1.get_intermol_clashes(&m2);
 
     float energyLevel = m1.get_intermol_binding(&m2).summed();
     cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
-
-    #if _peratom_audit
-    cout << endl << "# Interatomic Audit:" << endl;
-    int ian = interaudit.size(), iai;
-    for (iai=0; iai<ian; iai++) cout << "# " << interaudit[iai] << endl;
-    cout << endl << endl;
-    interauditing = false;
-    #endif
 
     float nodist = 0;
     Atom* O = m1.get_atom("O6");

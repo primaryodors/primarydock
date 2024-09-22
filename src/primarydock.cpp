@@ -170,18 +170,25 @@ float pivotal_hbond_r = 0;
 Pose pullaway_undo;
 float last_ttl_bb_dist = 0;
 
-BAD<ResiduePlaceholder> required_contacts;
-BAD<std::string> bridges;
-BAD<std::string> atomto;
+ResiduePlaceholder required_contacts[16];
+int reqsr_n = 0;
+std::string bridges[256];
+int bridgn = 0;
+std::string atomto[256];
+int natomto = 0;
 std::string outpdb;
 int outpdb_poses = 0;
 
-BAD<int>flexible_resnos;
-BAD<ResiduePlaceholder>forced_flexible_resnos;
-BAD<ResiduePlaceholder>forced_static_resnos;
+int flexible_resnos[1024];
+int nflexres = 0;
+ResiduePlaceholder forced_flexible_resnos[256];
+int nforceflex = 0;
+ResiduePlaceholder forced_static_resnos[65536];
+int nforcestatic = 0;
 
 #if _dummy_atoms_for_debug
-BAD<Atom> dummies;
+Atom dummies[256];
+int ndummy = 0;
 #endif
 
 
@@ -192,12 +199,12 @@ void append_dummy(Point pt)
     a.move(pt);
 
     a.name = new char[8];
-    int i=dummies.size()+1;
+    int i=ndummy+1;
     sprintf(a.name, "HE%i", i);
 
     strcpy(a.aa3let, "DMY");
 
-    dummies.push_back(a);
+    dummies[ndummy++] = a;
     #endif
 }
 
@@ -325,9 +332,9 @@ void freeze_bridged_residues()
 {
     int i, l;
 
-    if (bridges.size())
+    if (bridgn)
     {
-        for (i=0; i<bridges.size(); i++)
+        for (i=0; i<bridgn; i++)
         {
             int resno1 = interpret_resno(bridges[i].c_str());
             if (!resno1) continue;
@@ -369,9 +376,9 @@ void freeze_bridged_residues()
         }
     }
 
-    if (forced_static_resnos.size())
+    if (nforcestatic)
     {
-        for (i=0; i<forced_static_resnos.size(); i++)
+        for (i=0; i<nforcestatic; i++)
         {
             forced_static_resnos[i].resolve_resno(protein);
             int resno = forced_static_resnos[i].resno;
@@ -398,7 +405,7 @@ void freeze_bridged_residues()
 void reconnect_bridges()
 {
     int i;
-    for (i=0; i<bridges.size(); i++)
+    for (i=0; i<bridgn; i++)
     {
         int resno1 = interpret_resno(bridges[i].c_str());
         if (!resno1) continue;
@@ -1028,13 +1035,13 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "ATOMTO"))
     {
-        atomto.push_back(origbuff);
+        atomto[natomto++] = origbuff;
     }
     else if (!strcmp(words[0], "BRIDGE"))
     {
         std::string str = words[1];
         str += (std::string)"|" + (std::string)words[2];
-        bridges.push_back(str);
+        bridges[bridgn++] = str;
         return 2;
     }
     else if (!strcmp(words[0], "CEN"))
@@ -1112,7 +1119,7 @@ int interpret_config_line(char** words)
         {
             ResiduePlaceholder rph;
             rph.set(words[i]);
-            forced_flexible_resnos.push_back(rph);
+            forced_flexible_resnos[nforceflex++] = rph;
             i++;
         }
         return i-1;
@@ -1124,7 +1131,7 @@ int interpret_config_line(char** words)
         {
             ResiduePlaceholder rph;
             rph.set(words[i]);
-            forced_static_resnos.push_back(rph);
+            forced_static_resnos[nforcestatic++] = rph;
             i++;
         }
         return i-1;
@@ -1359,7 +1366,7 @@ int interpret_config_line(char** words)
             ResiduePlaceholder rp;
             rp.set(words[i]);
             rp.node = reqrnode;
-            required_contacts.push_back(rp);
+            required_contacts[reqsr_n++] = rp;
         }
         return i-1;
     }
@@ -1644,8 +1651,7 @@ void apply_protein_specific_settings(Protein* p)
 
     j=0;
 
-    n = atomto.size();
-    for (i=0; i<n; i++)
+    for (i=0; i<natomto; i++)
     {
         char buffer[1024];
         strcpy(buffer, atomto[i].c_str());
@@ -2014,7 +2020,7 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    if (bridges.size())
+    if (bridgn)
     {
         reconnect_bridges();
 
@@ -2026,7 +2032,7 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    for (i=0; i<required_contacts.size(); i++)
+    for (i=0; i<reqsr_n; i++)
     {
         required_contacts[i].resolve_resno(protein);
     }
@@ -2221,15 +2227,16 @@ int main(int argc, char** argv)
     int wrote_acvmx = -1, wrote_acvmr = -1;
     float l_atom_clash_limit = clash_limit_per_atom; // - kJmol_cutoff;
 
-    BAD<std::shared_ptr<AtomGroup>> lagc;
+    AtomGroup** lagc;
+    int nlagc = 0;
     if (pdpst == pst_constrained)
     {
         ligand = &pose_ligands[1];
         lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
-        agqty = lagc.size();
-        if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
+        for (nlagc=0; lagc[nlagc]; nlagc++);
+        if (nlagc > MAX_CS_RES-2) nlagc = MAX_CS_RES-2;
         for (i=0; i<agqty; i++)
-            agc[i] = lagc.at(i).get();
+            agc[i] = lagc[i];
 
         if (mtlcoords.size())
         {
@@ -2287,13 +2294,12 @@ _try_again:
         float lig_min_int_clsh = ligand->get_internal_clashes();
         // if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
 
-        int rcn = required_contacts.size();
-        if (rcn)
+        if (reqsr_n)
         {
             ligand->delete_mandatory_connections();
             ligand->allocate_mandatory_connections(rcn);
 
-            for (i=0; i<rcn; i++)
+            for (i=0; i<reqsr_n; i++)
             {
                 if (required_contacts[i].node >= 0 && required_contacts[i].node != nodeno) continue;
                 Star s;
@@ -2366,7 +2372,7 @@ _try_again:
         nodecen.weight = 1;
 
         #if _dummy_atoms_for_debug
-        dummies.clear();
+        ndummy = 0;
         #endif
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
@@ -2527,9 +2533,9 @@ _try_again:
             // Flexion Selection
             if (flex && !nodeno)
             {
-                if (forced_static_resnos.size())
+                if (nforcestatic)
                 {
-                    for (i=0; i<forced_static_resnos.size(); i++)
+                    for (i=0; i<nforcestatic; i++)
                     {
                         forced_static_resnos[i].resolve_resno(protein);
                         AminoAcid* mvaa = protein->get_residue(forced_static_resnos[i].resno);
@@ -2544,7 +2550,7 @@ _try_again:
                 }
                 #if flexion_selection
 
-                flexible_resnos.clear();
+                nflexres = 0;
                 j = protein->get_end_resno();
                 for (i=protein->get_start_resno(); i<=j; i++)
                 {
@@ -2600,7 +2606,7 @@ _try_again:
                     {
                         if (!(reaches_spheroid[nodeno][besti]->movability & MOV_PINNED))
                             reaches_spheroid[nodeno][besti]->movability = MOV_FLEXONLY;
-                        flexible_resnos.push_back(reaches_spheroid[nodeno][besti]->get_residue_no());
+                        flexible_resnos[nflexres++] = reaches_spheroid[nodeno][besti]->get_residue_no());
                         #if _dbg_flexion_selection
                         cout << "Selected " << reaches_spheroid[nodeno][besti]->get_name()
                                 << " for flexion with a weight of " << bestwt << endl;
@@ -2610,21 +2616,21 @@ _try_again:
                 }
                 
                 #if _dbg_flexion_selection
-                cout << flexible_resnos.size() << " residues selected for flexion." << endl;
+                cout << nflexres << " residues selected for flexion." << endl;
                 #endif
 
                 freeze_bridged_residues();
 
-                if (forced_flexible_resnos.size())
+                if (forcednforceflex)
                 {
-                    for (i=0; i<forced_flexible_resnos.size(); i++)
+                    for (i=0; i<nforceflex; i++)
                     {
                         forced_flexible_resnos[i].resolve_resno(protein);
                         AminoAcid* mvaa = protein->get_residue(forced_flexible_resnos[i].resno);
                         if (mvaa)
                         {
                             mvaa->movability = MOV_FORCEFLEX;
-                            flexible_resnos.push_back(mvaa->get_residue_no());
+                            flexible_resnos[nflexres++] = mvaa->get_residue_no();
                             #if _dbg_flexion_selection
                             cout << mvaa->get_name() << " forced flexible." << endl;
                             #endif
@@ -2798,9 +2804,9 @@ _try_again:
 
             ligand->reset_conformer_momenta();
             
-            if (rcn)
+            if (reqsr_n)
             {
-                for (i=0; i<rcn; i++)
+                for (i=0; i<reqsr_n; i++)
                 {
                     Star s;
                     s.paa = protein->get_residue(required_contacts[i].resno);

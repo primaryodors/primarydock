@@ -141,28 +141,25 @@ Pose::~Pose()
 void Pose::reset()
 {
     sz = 0;
-    saved_atom_locs.clear();
-    saved_atom_Z.clear();
+    if (saved_atom_locs) delete saved_atom_locs;
+    saved_atom_locs = nullptr;
+    if (saved_atom_Z) delete saved_atom_Z;
+    saved_atom_Z = nullptr;
     saved_from = nullptr;
 }
 
 void Pose::copy_state(Molecule* m)
 {
     int i;
-    if (!saved_atom_locs.size() || saved_from != m)
+    if (!saved_atom_locs || saved_from != m)
     {
-        saved_atom_locs.clear();
-        saved_atom_Z.clear();
+        reset();
         saved_from = m;
         if (!m || !m->atoms) return;
 
         sz = m->get_atom_count();
-        for (i=0; i<=sz; i++)
-        {
-            Point pt;
-            saved_atom_locs.push_back(pt);
-            saved_atom_Z.push_back(0);
-        }
+        saved_atom_locs = new Point[sz+4];
+        saved_atom_Z = new int[sz+4];
     }
 
     for (i=0; m->atoms[i] && i<sz; i++)
@@ -175,11 +172,11 @@ void Pose::copy_state(Molecule* m)
 
 void Pose::restore_state(Molecule* m)
 {
-    if (!m || !m->atoms || !sz) return;
+    if (!m || !m->atoms || !sz || !saved_atom_locs) return;
     int i, n;
     if (m != saved_from)
     {
-        n = saved_atom_locs.size();
+        for (n=0; saved_atom_locs[n]; n++);
         for (i=0; i<n; i++)
         {
             if (i == n-1 && !m->atoms[i] && (saved_atom_Z[i] == 1)) break;
@@ -676,9 +673,10 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
     return atoms[j];
 }
 
-BAD<Atom*> Molecule::longest_dimension()
+Atom** Molecule::longest_dimension()
 {
-    BAD<Atom*> retval;
+    Atom** retval = new Atom*[3];
+    retval[0] = retval[1] = retval[2] = nullptr;
     if (!atoms) return retval;
     int i, j;
     float rmax = 0;
@@ -690,9 +688,8 @@ BAD<Atom*> Molecule::longest_dimension()
             float r = atoms[i]->distance_to(atoms[j]);
             if (r > rmax)
             {
-                retval.clear();
-                retval.push_back(atoms[i]);
-                retval.push_back(atoms[j]);
+                retval[0] = atoms[i]);
+                retval[1] = atoms[j]);
                 rmax = r;
             }
         }
@@ -3384,7 +3381,7 @@ Interaction Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 }
 
 void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**),
-    void (*group_realign)(Molecule*, BAD<std::shared_ptr<GroupPair>>),
+    void (*group_realign)(Molecule*, GroupPair**),
     void (*progress)(float))
 {
     int m, n;
@@ -3504,7 +3501,7 @@ Interaction Molecule::total_intermol_binding(Molecule** l)
 }
 
 void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**),
-    void (*group_realign)(Molecule*, BAD<std::shared_ptr<GroupPair>>),
+    void (*group_realign)(Molecule*, GroupPair**),
     void (*progress)(float))
 {
     if (!mm) return;

@@ -339,10 +339,6 @@
 // Should normally be 3:
 #define _bb_max_grp 3
 
-// For auditing binding energies between individual atoms:
-#define _peratom_audit 0
-#define _peratom_audit_nans 0
-
 // A short-term feature that can be used in case the bond reciprocity problem recurs. See issue #423.
 #define bond_reciprocity_fix 0
 

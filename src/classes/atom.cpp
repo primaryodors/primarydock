@@ -973,12 +973,9 @@ float Atom::is_polar()
                 cout << "# " << name << " conjugated to charge " << icc << endl;
                 #endif
 
-                BAD<Atom*> lca = get_conjugated_atoms();
+                Atom** lca = get_conjugated_atoms();
 
-                std::sort( lca.begin(), lca.end() );
-                lca.erase( std::unique( lca.begin(), lca.end() ), lca.end() );
-
-                n = lca.size();
+                for (n=0; lca[n]; n++);
                 #if _dbg_conj_chg
                 cout << "# " << n << " conjugated atoms total." << endl;
                 #endif
@@ -987,14 +984,11 @@ float Atom::is_polar()
                 {
                     if (lca[i]->family != family)
                     {
-                        BAD<Atom*>::iterator it;
-                        it = lca.begin();
-                        lca.erase(it+i);
+                        for (j=i; j<n; j++) lca[j] = lca[j+1];
                         n--;
                     }
                 }
 
-                n = lca.size();
                 #if _dbg_conj_chg
                 cout << "# " << n << " conjugated atoms of same family." << endl;
                 #endif
@@ -1008,6 +1002,7 @@ float Atom::is_polar()
                     #endif
                 }
 
+                delete[] lca;
                 return charge;
             }
         }
@@ -2624,13 +2619,14 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
     return false;
 }
 
-BAD<Atom*> casf;
-BAD<Atom*> Atom::get_conjugated_atoms(Atom* bir, Atom* c)
+Atom* casf[256];
+int ncasf = 0;
+Atom** Atom::get_conjugated_atoms(Atom* bir, Atom* c)
 {
     if (!c)
     {
-        casf.clear();
-        casf.push_back(this);
+        ncasf = 0;
+        casf[ncasf++] = this;
     }
     if (!is_pi()) return casf;
     if (!bir) bir = this;
@@ -2650,17 +2646,17 @@ BAD<Atom*> Atom::get_conjugated_atoms(Atom* bir, Atom* c)
             bonded_to[i].atom2->is_pi()
             )
         {
-            int n = casf.size();
-            casf.push_back(bonded_to[i].atom2);
+            casf[ncasf++] = bonded_to[i].atom2);
 
             // DANGER: RECURSION.
-            BAD<Atom*> lcasf = bonded_to[i].atom2->get_conjugated_atoms(bir, this);
+            Atom** lcasf = bonded_to[i].atom2->get_conjugated_atoms(bir, this);
         }
     }
 
     if (bir == this) recursion_counter = 0;
     else bir->recursion_counter--;
 
+    casf[ncasf] = 0;
     return casf;
 }
 

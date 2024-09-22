@@ -1,10 +1,14 @@
 
 #include "group.h"
 
-BAD<MCoord> mtlcoords;
-BAD<std::shared_ptr<GroupPair>> global_pairs;
-BAD<Moiety> predef_grp;
-BAD<AminoAcid*> ResidueGroup::disqualified_residues;
+MCoord mtlcoords[16];
+int nmetals = 0;
+GroupPair* global_pairs[256];
+int nglobal_pairs = 0;
+Moiety predef_grp[65536];
+int npredef_grp = 0;
+AminoAcid* ResidueGroup::disqualified_residues[1024];
+int ResidueGroup::ndisreq = 0;
 
 Point AtomGroup::get_center()
 {
@@ -104,7 +108,7 @@ Atom* AtomGroup::get_mcoord_atom()
 float AtomGroup::get_sum()
 {
     float retval = fabs(get_ionic()*60) + get_polarity()*25 + get_pi()*2;
-    if (mtlcoords.size()) retval += get_mcoord()*60 - get_polarity()*40;
+    if (nmetals) retval += get_mcoord()*60 - get_polarity()*40;
     return retval;
 }
 
@@ -269,15 +273,14 @@ float AtomGroup::bounds()
 
 Point ResidueGroup::get_center()
 {
-    int amsz = aminos.size();
-    if (!amsz) return Point(0,0,0);
+    if (!naminos) return Point(0,0,0);
 
     if (metallic) return metal->get_location();
 
     int i, j;
     j = 0;
     Point result(0,0,0);
-    for (i=0; i<amsz; i++)
+    for (i=0; i<naminos; i++)
     {
         Atom** aa = aminos[i]->get_most_bindable(1);
         if (!aa) continue;
@@ -296,14 +299,14 @@ Point ResidueGroup::get_center()
 
 Atom* ResidueGroup::get_nearest_atom(Point pt)
 {
-    int i, n = aminos.size();
+    int i;
 
-    if (n<1 || n>29) return nullptr;
+    if (naminos<1 || naminos>16) return nullptr;
 
     Atom* result = nullptr;
     float r = Avogadro;
 
-    for (i=0; i<n; i++)
+    for (i=0; i<naminos; i++)
     {
         Atom* a = aminos[i]->get_nearest_atom(pt);
         float r1 = a->get_location().get_3d_distance(pt);
@@ -331,11 +334,10 @@ float ResidueGroup::distance_to(Point pt)
 
 float ResidueGroup::pi_stackability()
 {
-    int amsz = aminos.size();
-    if (!amsz) return 0;
+    if (!naminos) return 0;
     float result = 0;
     int i;
-    for (i=0; i<amsz; i++)
+    for (i=0; i<naminos; i++)
     {
         result += aminos[i]->pi_stackability(false);
     }
@@ -346,12 +348,11 @@ float ResidueGroup::pi_stackability()
 
 float ResidueGroup::hydrophilicity()
 {
-    int amsz = aminos.size();
-    if (!amsz) return 0;
+    if (!naminos) return 0;
     float result = 0, divisor = 0;
     int i;
     bool has_acids = false, has_his = false;
-    for (i=0; i<amsz; i++)
+    for (i=0; i<naminos; i++)
     {
         float h = fabs(aminos[i]->hydrophilicity());
 
@@ -372,12 +373,11 @@ float ResidueGroup::hydrophilicity()
 
 float ResidueGroup::group_reach()
 {
-    int n = aminos.size();
-    if (!n) return 0;
+    if (!naminos) return 0;
     if (metallic) return 0;
     int i;
     float retval = 0;
-    for (i=0; i<n; i++)
+    for (i=0; i<naminos; i++)
     {
         float r = aminos[i]->get_reach();
         if (r > retval) retval = r;
@@ -389,12 +389,9 @@ float ResidueGroup::group_reach()
 void ResidueGroup::conform_to(Molecule* mol)
 {
     if (metallic) return;
+    if (!naminos) return;
 
-    int i, n;
-
-    n = aminos.size();
-    if (!n) return;
-
+    int i;
     for (i=0; i<n; i++)
     {
         MovabilityType mt = aminos[i]->movability;
@@ -572,9 +569,9 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
         }
     }
 
-    BAD<Atom*> bd = mol->longest_dimension();
+    Atom** bd = mol->longest_dimension();
     float ld;
-    if (bd.size() < 2) ld = 1;
+    if (!bd || !bd[0] || !bd[1]) ld = 1;
     else ld = bd[0]->distance_to(bd[1]);
 
     for (i=0; i<n; i++)
@@ -990,10 +987,12 @@ ResidueGroup** ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist,
         std::shared_ptr<ResidueGroup> g(new ResidueGroup());
         AminoAcid* aa = aalist[i];
 
-        m = disqualified_residues.size();
-        bool dq = false;
-        for (j=0; j<m; j++) if (disqualified_residues[j] == aa) dq = true;
-        if (dq) continue;
+        if (ndisreq)
+        {
+            bool dq = false;
+            for (j=0; j<ndisreq; j++) if (disqualified_residues[j] == aa) dq = true;
+            if (dq) continue;
+        }
 
         Atom* CB = aa->get_atom("CB");
         if (CB)
@@ -1010,7 +1009,7 @@ ResidueGroup** ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist,
             }
         }
 
-        g->aminos.push_back(aa);
+        g->aminos[g->naminos++] = aa;
         dirty[i] = true;
         #if _dbg_groupsel
         cout << "Building side chain group from " << aa->get_name() << endl;
@@ -1039,7 +1038,7 @@ ResidueGroup** ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist,
 
             if (aa->coordmtl && aa->coordmtl == bb->coordmtl)
             {
-                g->aminos.push_back(bb);
+                g->aminos[g->naminos++] = bb;
                 dirty[j] = true;
                 g->metallic = true;
                 g->metal = aa->coordmtl;
@@ -1106,7 +1105,7 @@ ResidueGroup** ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist,
             float simil = aa->similarity_to(bb);
             int simil_n = 1, i2;
 
-            for (i2=1; i2 < g->aminos.size(); i2++)
+            for (i2=1; i2 < g->naminos; i2++)
             {
                 simil += g->aminos[i2]->similarity_to(bb);
                 simil_n++;
@@ -1124,7 +1123,7 @@ ResidueGroup** ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist,
 
             if (simil >= group_simil_threshold)
             {
-                g->aminos.push_back(bb);
+                g->aminos[g->naminos++] = bb;
                 dirty[j] = true;
                 #if _dbg_groupsel
                 cout << "Adding " << bb->get_name() << " distance " << r << " similarity " << simil << " pocket angle " << (theta*fiftyseven) << endl;
@@ -1174,7 +1173,7 @@ std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg)
     {
         os << "residue_group[ ";
         int i;
-        for (i=0; i<scg.aminos.size(); i++) os << *scg.aminos[i] << " ";
+        for (i=0; i<scg.naminos; i++) os << *scg.aminos[i] << " ";
         os << "]";
     }
     catch (int ex)
@@ -1205,7 +1204,7 @@ float GroupPair::get_potential()
     if (potential) return potential;
     else
     {
-        int m = ag->atct, n = scg->aminos.size();
+        int m = ag->atct, n = scg->naminos;
         if (!m || !n) return 0;
 
         bool polar_atoms = (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff);
@@ -1351,8 +1350,7 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
 
             float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic*rel_stoch, 1.0+best_binding_stochastic*rel_stoch);
 
-            int r = retval.size();
-            for (l=0; l<r; l++)
+            for (l=0; l<retn; l++)
             {
                 float ra = retval[l]->ag->get_center().get_3d_distance(ag[i]->get_center());
                 float rs = retval[l]->scg->get_center().get_3d_distance(scg[j]->get_center());
@@ -1392,10 +1390,9 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
         #endif
         
         bool added = false;
-        int r = retval.size();
-        if (!r)
+        if (!retn)
         {
-            retval.push_back(pair);
+            retval[retn++] = pair;
             added = true;
             #if _dbg_groupsel
             cout << "Beginning result with " << *pair->ag << "-" << *pair->scg << endl;
@@ -1405,9 +1402,10 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
         {
             if  (pair->get_weighted_potential() > retval[l]->get_weighted_potential())
             {
-                BAD<std::shared_ptr<GroupPair>>::iterator it;
-                it = retval.begin();
-                retval.insert(it+l, pair);
+                int ll;
+                for (ll = retn; ll >= l; ll++) retval[ll+1] = retval[ll];
+                retval[l] = pair;
+                retn++;
                 added = true;
                 
                 #if _dbg_groupsel
@@ -1419,7 +1417,7 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
         }
         if (!added)
         {
-            retval.push_back(pair);
+            retval[retn++] = pair;
             added = true;
             #if _dbg_groupsel
             cout << "Appending to result " << *pair->ag << "-" << *pair->scg << endl;
@@ -1429,7 +1427,7 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
 
     #if _dbg_groupsel || _show_final_group_pairs
     cout << endl << endl << "Final pair assignments:" << endl;
-    for (i=0; i<retval.size(); i++)
+    for (i=0; i<retn; i++)
     {
         cout << *retval[i]->ag << "-" << *retval[i]->scg;
         if (retval[i]->priority) cout << " *";
@@ -1437,33 +1435,37 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
     }
     #endif
 
+    retval[retn] = nullptr;
     return retval;
 }
 
 void GroupPair::disqualify()
 {
     if (!scg) return;
-    if (!scg->aminos.size()) return;
-    int i, n = scg->aminos.size();
+    if (!scg->naminos) return;
+
+    int i, n = scg->naminos;
     for (i=0; i<n; i++)
     {
-        if (scg->aminos[i]) ResidueGroup::disqualified_residues.push_back(scg->aminos[i]);
+        if (scg->aminos[i]) ResidueGroup::disqualified_residues[ResidueGroup::ndisreq++] = scg->aminos[i];
     }
 }
 
-void GroupPair::align_groups(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp)
+void GroupPair::align_groups(Molecule* lig, GroupPair** gp)
 {
     GroupPair::align_groups(lig, gp, true);
 }
 
-void GroupPair::align_groups_noconform(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp)
+void GroupPair::align_groups_noconform(Molecule* lig, GroupPair** gp)
 {
     GroupPair::align_groups(lig, gp, false, bb_realign_amount);
 }
 
-void GroupPair::align_groups(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp, bool do_conforms, float amount)
+void GroupPair::align_groups(Molecule* lig, GroupPair** gp, bool do_conforms, float amount)
 {
-    int n = min((int)gp.size(), _bb_max_grp);
+    int n;
+    for (n=0; gp[n]; n++);
+    n = min(n, _bb_max_grp);
     if (n < 1) return;
     float r;
     Point origin;
@@ -1494,7 +1496,7 @@ void GroupPair::align_groups(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp, 
     if (gp[0]->scg->metallic)
     {
         int i, ln;
-        ln = gp[0]->scg->aminos.size();
+        ln = gp[0]->scg->naminos;
         Point foravg[ln+2];
         Point mloc = gp[0]->scg->metal->get_location();
         for (i=0; i<ln; i++)

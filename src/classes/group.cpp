@@ -445,9 +445,10 @@ int AtomGroup::heavy_atom_count()
     return result;
 }
 
-std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoord)
+AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoord)
 {
-    std::vector<std::shared_ptr<AtomGroup>> retval;
+    AtomGroup** retval = new AtomGroup*[256];
+    int retn = 0;
     if (!mol) return retval;
     int n = mol->get_atom_count();
     if (!n) return retval;
@@ -547,19 +548,20 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 }
 
                 g->remove_duplicates();
-                retval.push_back(g);
+                retval[retn++] = g;
 
                 if (g->atct > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atct
                     && (g->has_hbond_acceptors() || g->has_hbond_donors()))
                 {
-                    std::vector<std::shared_ptr<AtomGroup>> subg = make_hbond_subgroups(g);
-                    retval.insert(std::end(retval), std::begin(subg), std::end(subg));
+                    AtomGroup** subg = make_hbond_subgroups(g);
+                    for (j=0; subg[j]; j++) retval[retn++] =  subg[j];
                 }
             }
         }
     }
 
-    int groupcount = retval.size();
+    int groupcount = retn;
+    retval[retn] = nullptr;
     for (j=0; j<groupcount; j++)
     {
         int groupsize = retval[j]->atct;
@@ -729,13 +731,14 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         }
 
         bool added = false;
-        for (l=0; l < retval.size(); l++)
+        for (l=0; l < retn; l++)
         {
             if (g->get_sum() > retval[l]->get_sum())
             {
-                std::vector<std::shared_ptr<AtomGroup>>::iterator it;
-                it = retval.begin();
-                retval.insert(it+l, g);
+                int it;
+                for (it=retn; it>=l; it--) retval[it+1] = retval[it];
+                retval[l] = g;
+                retn++;
                 added = true;
                 break;
             }
@@ -743,7 +746,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         if (!added)
         {
             g->remove_duplicates();
-            retval.push_back(g);
+            retval[retn++] = g;
         }
         #if _dbg_groupsel
         cout << "Group complete." << endl << endl;
@@ -752,13 +755,13 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         if (g->atct > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atct
             && (g->has_hbond_acceptors() || g->has_hbond_donors()))
         {
-            std::vector<std::shared_ptr<AtomGroup>> subg = make_hbond_subgroups(g);
-            retval.insert(std::end(retval), std::begin(subg), std::end(subg));
+            AtomGroup** subg = make_hbond_subgroups(g);
+            int it;
+            for (it=0; subg[it]; it++) retval[retn++] = subg[it];
         }
     }
 
-    l = retval.size();
-    for (i=0; i<l; i++)
+    for (i=0; i<retn; i++)
     {
         int ni = retval[i]->atct;
         if (retval[i]->heavy_atom_count() == 1)
@@ -766,7 +769,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             int fam = retval[i]->atoms[0]->get_family();
             if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
         }
-        for (j=l-1; j>i; j--)
+        for (j=retn-1; j>i; j--)
         {
             if (retval[i]->get_center().get_3d_distance(retval[j]->get_center()) > ld/3) continue;
 
@@ -776,18 +779,17 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 int fam = retval[j]->atoms[0]->get_family();
                 if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
             }
-            int si = retval[i]->intersecting(retval[j].get());
+            int si = retval[i]->intersecting(retval[j]);
 
-            if (retval[i]->average_similarity(retval[j].get()) >= 0.5 && (si >= nj/2 || si >= ni/2))
+            if (retval[i]->average_similarity(retval[j]) >= 0.5 && (si >= nj/2 || si >= ni/2))
             {
                 #if _dbg_groupsel
                 cout << "Merging groups " << *retval[i] << " and " << *retval[j] << endl << endl;
                 #endif
-                retval[i]->merge(retval[j].get());
-                std::vector<std::shared_ptr<AtomGroup>>::iterator it;
-                it = retval.begin();
-                retval.erase(it+j);
-                l--;
+                retval[i]->merge(retval[j]);
+                int it;
+                for (it=j; it<retn; it++) retval[it] = retval[it+1];
+                retn--;
             }
         }
     }
@@ -808,7 +810,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 int fam = retval[j]->atoms[0]->get_family();
                 if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
             }
-            if (retval[i]->intersecting(retval[j].get()))
+            if (retval[i]->intersecting(retval[j]))
             {
                 for (k=0; k<ni; k++)
                 {
@@ -837,16 +839,17 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     return retval;
 }
 
-std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::shared_ptr<AtomGroup> g)
+AtomGroup** AtomGroup::make_hbond_subgroups(AtomGroup* g)
 {
-    std::vector<std::shared_ptr<AtomGroup>> retval;
+    AtomGroup** retval = new AtomGroup*[256];
+    int retn = 0;
     int j, l;
 
     for (l=0; l<g->atct; l++)
     {
         if (g->atoms[l]->get_family() == CHALCOGEN || g->atoms[l]->get_family() == PNICTOGEN || g->atoms[l]->get_family() == HALOGEN)
         {
-            std::shared_ptr<AtomGroup> g1(new AtomGroup());
+            AtomGroup* g1 = new AtomGroup();
             g1->atoms[g1->atct++] = g->atoms[l];
             g1->ligand = g->ligand;
 
@@ -868,7 +871,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::sha
                 }
             }
 
-            retval.push_back(g1);
+            retval[retn++] = g1;
 
             #if _dbg_groupsel
             cout << "Group complete." << endl << endl;
@@ -876,6 +879,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::make_hbond_subgroups(std::sha
         }
     }
 
+    retval[retn] = nullptr;
     return retval;
 }
 
@@ -966,9 +970,10 @@ void AtomGroup::merge(AtomGroup* mw)
     }
 }
 
-std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist, Point pcen)
+ResidueGroup** ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist, Point pcen)
 {
-    std::vector<std::shared_ptr<ResidueGroup>> retval;
+    ResidueGroup** retval = new ResidueGroup*[256];
+    int retn = 0;
     if (!aalist) return retval;
     int i, j, m, n;
     for (n=0; aalist[n]; n++);          // Get count.
@@ -1138,9 +1143,10 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
         cout << "Completed group." << endl << endl;
         #endif
 
-        retval.push_back(g);
+        retval[retn++] = g;
     }
 
+    retval[retn] = nullptr;
     return retval;
 }
 
@@ -1316,9 +1322,10 @@ float GroupPair::get_potential()
     }
 }
 
-std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::shared_ptr<AtomGroup>> ag, std::vector<std::shared_ptr<ResidueGroup>> scg, Point pcen, float rel_stoch)
+GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pcen, float rel_stoch)
 {
-    std::vector<std::shared_ptr<GroupPair>> retval;
+    GroupPair** retval = new GroupPair*[256];
+    int retn = 0;
 
     int m = ag.size(), n = scg.size();
     if (!m || !n) return retval;
@@ -1338,8 +1345,8 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         {
             if (sdirty[j]) continue;
             GroupPair pair;
-            pair.ag = ag[i];
-            pair.scg = scg[j];
+            pair.ag = ag[i].get();
+            pair.scg = scg[j].get();
             pair.pocketcen = pcen;
 
             float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic*rel_stoch, 1.0+best_binding_stochastic*rel_stoch);
@@ -1371,8 +1378,8 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         if (j1 < 0) continue;
 
         std::shared_ptr<GroupPair> pair(new GroupPair());
-        pair->ag = ag[i];
-        pair->scg = scg[j1];
+        pair->ag = ag[i].get();
+        pair->scg = scg[j1].get();
         pair->get_potential();          // Determines priority.
 
         adirty[i] = true;
@@ -1486,18 +1493,18 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
     if (gp[0]->scg->metallic)
     {
-        int i;
-        n = gp[0]->scg->aminos.size();
-        Point foravg[n+2];
+        int i, ln;
+        ln = gp[0]->scg->aminos.size();
+        Point foravg[ln+2];
         Point mloc = gp[0]->scg->metal->get_location();
-        for (i=0; i<n; i++)
+        for (i=0; i<ln; i++)
         {
             Atom* a = gp[0]->scg->aminos[i]->get_nearest_atom(mloc);
             foravg[i] = a->get_location();
             // cout << i << " " << a->residue << ":" << a->name << " @ " << foravg[i] << endl << flush;
         }
 
-        Point opposite = average_of_points(foravg, n);
+        Point opposite = average_of_points(foravg, ln);
         // cout << opposite << endl << flush;
         SCoord v = mloc.subtract(opposite);
         v.r = 2.5;
@@ -1539,7 +1546,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         try
         {
             if (n > 1 && gp.at(1) && gp[1]->scg && gp[1]->ag
-                && abs((long)gp[1]->ag.get() - (long)gp[1]->scg.get()) < memsanity)
+                && abs((long)gp[1]->ag - (long)gp[1]->scg) < memsanity)
                 r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
         }
         catch (...)

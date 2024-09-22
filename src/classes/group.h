@@ -37,8 +37,8 @@ class AtomGroup
     bool has_hbond_donors();
 
     int heavy_atom_count();
-    static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol, bool separate_metal_coord = false);
-    static std::vector<std::shared_ptr<AtomGroup>> make_hbond_subgroups(std::shared_ptr<AtomGroup> from_group);
+    static AtomGroup** get_potential_ligand_groups(Molecule* mol, bool separate_metal_coord = false);
+    static AtomGroup** make_hbond_subgroups(AtomGroup* from_group);
     void remove_duplicates();
 
     protected:
@@ -68,8 +68,8 @@ class ResidueGroup
 class GroupPair
 {
     public:
-    std::shared_ptr<AtomGroup> ag;
-    std::shared_ptr<ResidueGroup> scg;
+    AtomGroup* ag;
+    ResidueGroup* scg;
 
     float get_potential();
     float get_weighted_potential();

@@ -2335,7 +2335,7 @@ _try_again:
         metal_initlocs[i] = mtlcoords[i].mtl->get_location();
     }
 
-    float best_energy = 0;
+    float best_energy = 0, worst_atom_clash = 0;
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -3003,6 +3003,7 @@ _try_again:
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
             if ((pose==1 && !nodeno) || best_energy > -btot) best_energy = -btot;
+            if ((pose==1 && !nodeno) || dr[drcount][nodeno].worst_energy > worst_atom_clash) worst_atom_clash = dr[drcount][nodeno].worst_energy;
 
             #if compute_clashdirs
             n = protein->get_end_resno();
@@ -3346,6 +3347,10 @@ _exitposes:
     cout << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
     if (output) *output << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
     if (debug) *debug << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+
+    cout << "Worst atom clash: " << (kcal ? worst_atom_clash/_kcal_per_kJ : worst_atom_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (output) *output << "Worst atom clash: " << (kcal ? worst_atom_clash/_kcal_per_kJ : worst_atom_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (debug) *debug << "Worst atom clash: " << (kcal ? worst_atom_clash/_kcal_per_kJ : worst_atom_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
 
     #if compute_clashdirs
     if (regions)

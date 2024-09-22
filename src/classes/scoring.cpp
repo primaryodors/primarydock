@@ -62,14 +62,14 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     for (i=0; i<end1; i++) final_binding[i] = 0;
     #endif
 
-    BAD<AminoAcid*> allres = protein->get_residues_near(ligand->get_barycenter(), 100000, false);
-    int qpr = allres.size();
-    Molecule* postaa[qpr];
+    AminoAcid** allres = protein->get_residues_near(ligand->get_barycenter(), 100000, false);
+    Molecule* postaa[protein->get_seq_length()+4];
     postaa[0] = ligand;
-    for (i=0; i<qpr; i++)
+    for (i=0; i<allres[i]; i++)
     {
         postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
     }
+    delete allres;
 
     for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = total_binding_by_type[i];
 

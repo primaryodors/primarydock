@@ -55,21 +55,21 @@ int main(int argc, char** argv)
 
     int i, n, l;
 
-    BAD<std::shared_ptr<AtomGroup>> ligand_groups = AtomGroup::get_potential_ligand_groups(&m, true);
-
+    AtomGroup** ligand_groups = AtomGroup::get_potential_ligand_groups(&m, true);
     AminoAcid* reach_residues[SPHREACH_MAX+4];
     Point target, center;
-    BAD<Point> pocket;
+    Point pocket[32];
+    int npkt=0;
 
     for (l=3; l<argc; l++)
     {
         AminoAcid* a = p.get_residue_bw(argv[l]);
         if (!a) continue;
-        pocket.push_back(a->get_CA_location());
+        pocket[npkt++] = a->get_CA_location();
         if (strchr(argv[l], '!')) a->priority = true;
     }
 
-    if (n = pocket.size())
+    if (npkt)
     {
         target = Point(0,0,0);
         for (l=0; l<n; l++)
@@ -97,13 +97,13 @@ int main(int argc, char** argv)
     }
     cout << endl << "# " << endl;
 
-    BAD<std::shared_ptr<ResidueGroup>> sidechain_groups = ResidueGroup::get_potential_side_chain_groups(reach_residues, target);
+    ResidueGroup** sidechain_groups = ResidueGroup::get_potential_side_chain_groups(reach_residues, target);
     n = sidechain_groups.size();
     cout << "Sidechain groups:" << endl;
     for (i=0; i<n; i++) cout << *sidechain_groups[i] << endl;
     cout << endl;
 
-    BAD<std::shared_ptr<GroupPair>> pairs = GroupPair::pair_groups(ligand_groups, sidechain_groups, target, 0);
+    GroupPair** pairs = GroupPair::pair_groups(ligand_groups, sidechain_groups, target, 0);
     m.recenter(target);
     GroupPair::align_groups(&m, pairs);
     n = pairs.size();

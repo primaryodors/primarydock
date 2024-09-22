@@ -932,8 +932,8 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     set_clashables();
 
     int l;
-    BAD<std::string> rem_hx = get_remarks("650 HELIX");
-    for (l=0; l<rem_hx.size(); l++)
+    std::string* rem_hx = get_remarks("650 HELIX");
+    for (l=0; l<rem_hx[l].length(); l++)
     {
         char buffer[1024];
         char buffer1[1024];
@@ -945,7 +945,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         delete[] words;
     }
 
-    BAD<std::string> rem_st = get_remarks("800 SITE");
+    std::string* rem_st = get_remarks("800 SITE");
     for (l=0; l<rem_st.size(); l++)
     {
         char buffer[1024];
@@ -1150,20 +1150,21 @@ void Protein::add_remark(const char* remark)
     }
 }
 
-BAD<std::string> Protein::get_remarks(std::string search_for)
+std::string* Protein::get_remarks(std::string search_for)
 {
-    BAD<string> retval;
-    int i;
+    std::string* retval = new std::string[remarksz+2];
+    int i, retn=0;
     for (i=0; i<remarksz; i++)
     {
         if (!search_for.length() || strstr(remarks[i], search_for.c_str()))
         {
             char buffer[1024];
             strcpy(buffer, remarks[i]);
-            retval.push_back((std::string)buffer);
+            retval[retn++] = (std::string)buffer;
         }
     }
 
+    retval[retn] = "";
     return retval;
 }
 
@@ -1242,31 +1243,33 @@ void Protein::set_conditional_basicities()
 {
     if (!residues) return;
 
-    int i, j, l, n;
+    int i, j, l;
     for (i=0; residues[i]; i++)
     {
         if (!residues[i]->conditionally_basic()) continue;
 
-        BAD<AminoAcid*> nearby = get_residues_near(residues[i]->get_CA_location(), 10, true);
-        n = nearby.size();
-        if (!n) continue;
+        AminoAcid** nearby = get_residues_near(residues[i]->get_CA_location(), 10, true);
+        if (!nearby || !nearby[0]) continue;
 
         Molecule* mols[256];
         j = 0;
-        for (l=0; l<n; l++)
+        for (l=0; nearby[l]; l++)
         {
             if (nearby[l]->get_charge() > -0.25) continue;
             mols[j++] = (Molecule*)nearby[l];
         }
         mols[j] = nullptr;
+        delete nearby;
 
         residues[i]->set_conditional_basicity(mols);
     }
 }
 
-BAD<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)
+AminoAcid** Protein::get_residues_near(Point pt, float maxr, bool facing)
 {
-    BAD<AminoAcid*> retval;
+    AminoAcid** retval = new AminoAcid*[get_seq_length()+4];
+    int retn = 0;
+    retval[0] = nullptr;
 
     float cb_tolerance_angle = hexagonal;
     float tolerance_sine = sin(cb_tolerance_angle);
@@ -1293,7 +1296,7 @@ BAD<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)
 
         if (r <= maxr)
         {
-            retval.push_back(residues[i]);
+            retval[retn++] = residues[i]);
             #if _DBG_TUMBLE_SPHERES
             cout << residues[i]->get_3letter() << residues[i]->get_residue_no() << " ";
             #endif
@@ -1303,12 +1306,15 @@ BAD<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)
     cout << endl << endl;
     #endif
 
+    retval[retn] = nullptr;
     return retval;
 }
 
-BAD<AminoAcid*> Protein::get_contact_residues(Protein* op, float cd)
+AminoAcid** Protein::get_contact_residues(Protein* op, float cd)
 {
-    BAD<AminoAcid*> retval;
+    AminoAcid** retval = new AminoAcid*[get_seq_length()+4];
+    int retn=0;
+    retval[0] = nullptr;
 
     if (!residues) return retval;
     if (!op->residues) return retval;
@@ -1339,14 +1345,15 @@ BAD<AminoAcid*> Protein::get_contact_residues(Protein* op, float cd)
 
                 if (r < f)
                 {
-                    if (!adirty) retval.push_back(a);
-                    retval.push_back(b);
+                    if (!adirty) retval[retn++] = a;
+                    retval[retn++] = b;
                     adirty = dirty[j] = true;
                 }
             }
         }
     }
 
+    retval[retn] = nullptr;
     return retval;
 }
 
@@ -1377,10 +1384,11 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
     return 0;
 }
 
-BAD<AminoAcid*> Protein::get_residues_can_clash(int sr, int er)
+AminoAcid** Protein::get_residues_can_clash(int sr, int er)
 {
-    BAD<AminoAcid*> result;
-    int i, j;
+    AminoAcid** result = new AminoAcid*[get_seq_length()+4];
+    result[0] = nullptr;
+    int i, j, retn=0;
     bool already[get_seq_length()+4];
     for (i=0; residues[i]; i++) already[i] = false;
 
@@ -1396,12 +1404,13 @@ BAD<AminoAcid*> Protein::get_residues_can_clash(int sr, int er)
 
             if (aa->can_reach(residues[i]))
             {
-                result.push_back(residues[i]);
+                result[retn++] = residues[i];
                 already[i] = true;
             }
         }
     }
 
+    result[retn] = nullptr;
     return result;
 }
 
@@ -2418,11 +2427,11 @@ Point Protein::get_region_bounds(int startres, int endres)
     return retval;
 }
 
-BAD<MCoord> Protein::coordinate_metal(BAD<MCoord> mtlcoords)
+MCoord* Protein::coordinate_metal(MCoord* mtlcoords)
 {
     int i, j, k, l, m, n, q, miter, i2, j1;
 
-    n = mtlcoords.size();
+    for (n=0; mtlcoords[n].Z; n++);
 
     k=m=0;
     for (i=0; i<n; i++)
@@ -2445,7 +2454,8 @@ BAD<MCoord> Protein::coordinate_metal(BAD<MCoord> mtlcoords)
         // Obtain the alpha normal.
         Vector alpnorm = compute_normal(pt4avg[0], pt4avg[1], pt4avg[2]);
 
-        m_mcoords.push_back(mtlcoords[i]);
+        for (j=0; m_mcoords[j].Z; j++);
+        m_mcoords[j] = mtlcoords[i];
         Point lpt;
         Molecule** lmc = new Molecule*[ncr+4];
         lmc[0] = new Molecule("lcm");
@@ -2949,14 +2959,14 @@ Point Protein::find_loneliest_point(Point cen, Point sz)
     return retval;
 }
 
-Point Protein::estimate_pocket_size(BAD<AminoAcid*> ba)
+Point Protein::estimate_pocket_size(AminoAcid** ba)
 {
-    int i, n = ba.size();
-    if (!n) return Point();
+    int i;
+    if (!ba || !ba[0]) return Point();
     float cx, cy, cz;
 
     cx = cy = cz = 0;
-    for (i=0; i<n; i++)
+    for (i=0; ba[i]; i++)
     {
         Point pt = ba[i]->get_atom_location("CA");
         cx += pt.x;
@@ -2968,7 +2978,7 @@ Point Protein::estimate_pocket_size(BAD<AminoAcid*> ba)
 
     float sx, sy, sz, wx, wy, wz;
     sx = sy = sz = wx = wy = wz = 0;
-    for (i=0; i<n; i++)
+    for (i=0; ba[i]; i++)
     {
         Point pt = ba[i]->get_atom_location("CA").subtract(center);
         float mag = pt.magnitude();
@@ -2988,7 +2998,6 @@ Point Protein::estimate_pocket_size(BAD<AminoAcid*> ba)
     }
 
     Point size(sx/wx, sy/wy, sz/wz);
-
     return size;
 }
 
@@ -3196,7 +3205,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     Point xform_delta(0,0,0), center(0,0,0);
     int count = 0;
 
-    BAD<int> resnos1, resnos2;
+    int resnos1[256], resnos2[256], nr1=0, nr2=0;
 
     for (hxno = 1; hxno <= 7; hxno++)
     {
@@ -3217,8 +3226,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
                 center = center.add(caloc);
                 count++;
 
-                resnos1.push_back(resno1);
-                resnos2.push_back(resno2);
+                resnos1[nr1++] = resno1;
+                resnos2[nr2++] = resno2;
             }
         }
     }
@@ -3238,7 +3247,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     float theta = 0;
     Point axis(0,1,0);
     count = 0;
-    for (i=0; i<resnos1.size(); i++)
+    for (i=0; i<nr1; i++)
     {
         resno1 = resnos1[i];
         resno2 = resnos2[i];
@@ -3263,8 +3272,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     {
         count = 0;
         xform_delta = center = Point(0,0,0);
-        resnos1.clear();
-        resnos2.clear();
+        nr1 = nr2 = 0;
 
         for (hxno = 1; hxno <= 7; hxno++)
         {
@@ -3285,8 +3293,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
                     center = center.add(caloc);
                     count++;
 
-                    resnos1.push_back(resno1);
-                    resnos2.push_back(resno2);
+                    resnos1[nr1++] = resno1;
+                    resnos2[nr2++] = resno2;
                 }
             }
         }
@@ -3305,7 +3313,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         float theta = 0;
         Point axis(0,1,0);
         count = 0;
-        for (i=0; i<resnos1.size(); i++)
+        for (i=0; i<nr1; i++)
         {
             resno1 = resnos1[i];
             resno2 = resnos2[i];
@@ -4000,7 +4008,8 @@ BallesterosWeinstein Protein::get_bw_from_resno(int resno)
 int Protein::replace_side_chains_from_other_protein(Protein* other)
 {
     int i, j, l, n = other->get_end_resno(), num_applied = 0;
-    BAD<AARenumber> renumber_later;
+    AARenumber[1024] renumber_later;
+    int nrl = 0;
 
     for (i=1; i<=n; i++)
     {
@@ -4017,7 +4026,7 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         {
             rn.aa = dest;
             rn.new_resno = source->get_residue_no();
-            renumber_later.push_back(rn);
+            renumber_later[nrl++] = rn;
 
             /*add_remark( (std::string)"REMARK 999 "
                 + (std::string)dest->get_aa_definition()->_3let + std::to_string(dest->get_residue_no())
@@ -4097,7 +4106,7 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
                 rn.aa = dest;
                 rn.new_resno = source->get_residue_no();
                 rn.replace_with = source;
-                renumber_later.push_back(rn);
+                renumber_later[nrl++] = rn;
 
                 break;
             }
@@ -4118,8 +4127,7 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         num_applied++;
     }
 
-    n = renumber_later.size();
-    for (i=n-1; i>=0; i--)
+    for (i=nrl-1; i>=0; i--)
     {
         if (!renumber_later[i].replace_with)
         {

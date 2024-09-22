@@ -7,8 +7,9 @@
 // with the integers, then loop through them accumulating
 // into a float variable!
 
-float vector_traditional_forloop(int n) {
-    BAD<int> integers;
+float vector_traditional_forloop(int n)
+{
+    std::vector<int> integers;
 
     for (int i = 1; i <= n; i++)
         integers.push_back(i);
@@ -20,8 +21,9 @@ float vector_traditional_forloop(int n) {
     return sum;
 }
 
-float vector_ranged_forloop(int n) {
-    BAD<int> integers;
+float vector_ranged_forloop(int n)
+{
+    std::vector<int> integers;
 
     for (int i = 1; i <= n; i++)
         integers.push_back(i);
@@ -33,8 +35,9 @@ float vector_ranged_forloop(int n) {
     return sum;
 }
 
-float vector_preallocated_ranged_forloop(int n) {
-    BAD<int> integers(n);
+float vector_preallocated_ranged_forloop(int n)
+{
+    std::vector<int> integers(n);
 
     for (int i = 1; i <= n; i++)
         integers[i-1] = i;
@@ -47,7 +50,8 @@ float vector_preallocated_ranged_forloop(int n) {
 }
 
 
-float array_stack_allocation(int n) {
+float array_stack_allocation(int n)
+{
     int integers[n];
 
     for (int i = 0; i < n; i++)
@@ -60,7 +64,8 @@ float array_stack_allocation(int n) {
     return sum;
 }
 
-float array_heap_allocation(int n) {
+float array_heap_allocation(int n)
+{
     int* integers = new int[n];
 
     for (int i = 0; i < n; i++)

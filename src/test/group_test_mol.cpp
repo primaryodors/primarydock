@@ -33,13 +33,13 @@ int main(int argc, char** argv)
     }
     else m.from_smiles("CCO");
 
-    BAD<std::shared_ptr<AtomGroup>> mgrp = AtomGroup::get_potential_ligand_groups(&m);
+    AtomGroup** mgrp = AtomGroup::get_potential_ligand_groups(&m);
 
-    int i, n;
-    n = mgrp.size();
+    int i;
 
-    for (i=0; i<n; i++)
+    for (i=0; i<mgrp[i]; i++)
     {
         cout << *mgrp[i] << endl;
     }
+    delete mgrp;
 }

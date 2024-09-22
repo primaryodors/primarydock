@@ -5,8 +5,9 @@ int main(int argc, char** argv)
 {
     Protein p("Test Receptor");
     Molecule m("Test Ligand");
-    BAD<BallesterosWeinstein> pocketcen_res;
-    BAD<std::string> atoms_of_interest;
+    BallesterosWeinstein pocketcen_res[256];
+    int nbsr=0;
+    std::string atoms_of_interest[256];
     bool priorities[256];
 
     bool save_tmp_pdbs = false;
@@ -60,8 +61,8 @@ int main(int argc, char** argv)
                 else if (!strcasecmp(argv[i], "*")) break;
                 else
                 {
-                    if (argv[i][strlen(argv[i])-1] == '!') priorities[pocketcen_res.size()] = true;
-                    pocketcen_res.push_back(argv[i]);
+                    if (argv[i][strlen(argv[i])-1] == '!') priorities[nbsr] = true;
+                    pocketcen_res[nbsr++] = argv[i];
                 }
             }
         }
@@ -89,22 +90,20 @@ int main(int argc, char** argv)
 
     if (p.get_bw50(6))
     {
-        int pcn = pocketcen_res.size();
-        if (!pcn)
+        if (!nbsr)
         {
-            pocketcen_res.push_back("3.33");
-            pocketcen_res.push_back("3.37");
-            pocketcen_res.push_back("5.43");
-            pocketcen_res.push_back("6.48");
-            pocketcen_res.push_back("7.38");
-            pcn = pocketcen_res.size();
+            pocketcen_res[nbsr++] = "3.33");
+            pocketcen_res[nbsr++] = ("3.37");
+            pocketcen_res[nbsr++] = ("5.43");
+            pocketcen_res[nbsr++] = ("6.48");
+            pocketcen_res[nbsr++] = ("7.38");
         }
 
         AminoAcid* aa;
-        Point pt4avg[pcn+2];
+        Point pt4avg[nbsr+2];
         
         int j=0;
-        for (i=0; i<pcn; i++)
+        for (i=0; i<nbsr; i++)
         {
             aa = p.get_residue(pocketcen_res[i]);
             if (aa)
@@ -121,7 +120,7 @@ int main(int argc, char** argv)
     loneliest = p.find_loneliest_point(pocketcen, size);
     cout << "Loneliest point = " << loneliest << endl;
 
-    BAD<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords.size() > 0);
+    AtomGroup** lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords[0].Z > 0);
     agqty = lagc.size();
     if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
     for (i=0; i<agqty; i++)
@@ -150,7 +149,7 @@ int main(int argc, char** argv)
             if (!a) cout << "ERROR: No atom named " << atoms_of_interest[i] << " found." << endl;
             else
             {
-                BAD<AminoAcid*> nessami = p.get_residues_near(a->get_location(), _INTERA_R_CUTOFF, false);
+                AminoAcid** nessami = p.get_residues_near(a->get_location(), _INTERA_R_CUTOFF, false);
                 int j, m = nessami.size();
                 if (!m) cout << a->name << " void | ";
                 else
@@ -162,6 +161,7 @@ int main(int argc, char** argv)
                     }
                     cout << " | ";
                 }
+                delete nessami;
             }
         }
         if (n) cout << endl;

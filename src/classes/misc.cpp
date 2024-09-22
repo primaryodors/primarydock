@@ -185,6 +185,14 @@ float frand(float lmin, float lmax)
     return f+lmin;
 }
 
+int ptrarray_length(void** array)
+{
+    if (!array) return 0;
+    int i;
+    for (i=0; array[i]; i++);
+    return i;
+}
+
 // http://www.sjsu.edu/faculty/gerstman/StatPrimer/correlation.pdf
 float Pearson_correlation(float* xarr, float* yarr, int length)
 {

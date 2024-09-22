@@ -204,7 +204,7 @@ int main(int argc, char** argv)
                 {
                     ResiduePlaceholder rp;
                     rp.resno = mcr[l];
-                    mc.coordres.push_back(rp);
+                    mc.coordres[mc.ncr++] = rp;
                     AminoAcid* aa = p.get_residue(rp.resno);
                     Atom* a = aa->get_one_most_bindable(mcoord);
                     aa->conform_atom_to_location(a->name, mcen);

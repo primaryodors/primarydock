@@ -59,6 +59,7 @@ union Star
     Conjugation* pcon;
 };
 
+int ptrarray_length(void** array);
 int in_array(void* needle, void** haystack);
 int in_array(int needle, int* haystack);
 int in_array(Star needle, Star* haystack);

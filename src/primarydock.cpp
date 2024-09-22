@@ -269,7 +269,7 @@ MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
     int i, j;
     for (i=0; i<n; i++)
     {
-        m = mtlcoords[i].coordres.size();
+        m = mtlcoords[i].ncr;
         for (j=0; j<m; j++)
         {
             if (mtlcoords[i].coordres[j].resno == aa->is_residue()) return &mtlcoords[i];
@@ -1211,7 +1211,7 @@ int interpret_config_line(char** words)
             if (words[i][0] == '#') break;
             ResiduePlaceholder rp;
             rp.set(words[i]);
-            mcr.coordres.push_back(rp);
+            mcr.coordres[mcr.ncr++] = rp;
         }
 
         mtlcoords.push_back(mcr);
@@ -2242,7 +2242,7 @@ int main(int argc, char** argv)
         {
             for (i=0; i<mtlcoords.size(); i++)
             {
-                for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                for (j=0; j<mtlcoords[i].ncr; j++)
                 {
                     AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
                     if (aa)
@@ -2324,7 +2324,7 @@ _try_again:
             {
                 for (i=0; i<mtlcoords.size(); i++)
                 {
-                    for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                    for (j=0; j<mtlcoords[i].ncr; j++)
                     {
                         AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
                         if (aa)
@@ -2824,7 +2824,7 @@ _try_again:
                 int j1;
                 for (j=0; j<n; j++)
                 {
-                    int n1 = mtlcoords[j].coordres.size();
+                    int n1 = mtlcoords[j].ncr;
                     for (j1=0; j1<n1; j1++)
                     {
                         AminoAcid* aa = protein->get_residue(mtlcoords[j].coordres[j1].resno);

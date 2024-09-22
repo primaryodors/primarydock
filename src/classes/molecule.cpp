@@ -176,7 +176,7 @@ void Pose::restore_state(Molecule* m)
     int i, n;
     if (m != saved_from)
     {
-        for (n=0; saved_atom_locs[n]; n++);
+        for (n=0; saved_atom_locs[n].magnitude(); n++);
         for (i=0; i<n; i++)
         {
             if (i == n-1 && !m->atoms[i] && (saved_atom_Z[i] == 1)) break;
@@ -688,8 +688,8 @@ Atom** Molecule::longest_dimension()
             float r = atoms[i]->distance_to(atoms[j]);
             if (r > rmax)
             {
-                retval[0] = atoms[i]);
-                retval[1] = atoms[j]);
+                retval[0] = atoms[i];
+                retval[1] = atoms[j];
                 rmax = r;
             }
         }
@@ -3815,7 +3815,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             for (theta=_fullrot_steprad; theta < M_PI*2; theta += _fullrot_steprad)
                             {
                                 bb[q]->rotate(_fullrot_steprad, false);
-                                if (a->agroups.size() && group_realign)
+                                if (ptrarray_length((void**)a->agroups) && group_realign)
                                 {
                                     // group_realign(a, a->agroups);
                                 }
@@ -3838,7 +3838,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 bb[q]->rotate(best_theta, false);
                                 a->been_flexed = true;
 
-                                if (a->agroups.size() && group_realign)
+                                if (ptrarray_length((void**)a->agroups) && group_realign)
                                 {
                                     // group_realign(a, a->agroups);
                                 }
@@ -3873,7 +3873,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             else bb[q]->rotate(theta, false);
 
                             #if bb_realign_flexions
-                            if (!a->is_residue() && a->agroups.size() && group_realign) group_realign(a, a->agroups);
+                            if (!a->is_residue() && ptrarray_length((void**)a->agroups) && group_realign) group_realign(a, a->agroups);
                             #endif
 
                             tryenerg = cfmol_multibind(a, nearby);

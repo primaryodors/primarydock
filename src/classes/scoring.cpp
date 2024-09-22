@@ -65,7 +65,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     AminoAcid** allres = protein->get_residues_near(ligand->get_barycenter(), 100000, false);
     Molecule* postaa[protein->get_seq_length()+4];
     postaa[0] = ligand;
-    for (i=0; i<allres[i]; i++)
+    for (i=0; allres[i]; i++)
     {
         postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
     }
@@ -249,13 +249,12 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     }
     // cout << btot << endl;
 
-    int mcn;
-    if (mcn = mtlcoords.size())         // Assignment, not comparison.
+    if (nmetals)
     {
         strcpy(metrics[metcount], "Metals");
         float lmb = 0;
 
-        for (i=0; i<mcn; i++)
+        for (i=0; i<nmetals; i++)
         {
             if (!mtlcoords[i].mtl) continue;
             Molecule lm("MTL");
@@ -382,9 +381,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
     }
 
-    if (mtlcoords.size())
+    if (nmetals)
     {
-        for (l=0; l<mtlcoords.size(); l++)
+        for (l=0; l<nmetals; l++)
         {
             mtlcoords[l].mtl->stream_pdb_line(
                 lpdbdat,

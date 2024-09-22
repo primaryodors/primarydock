@@ -2664,7 +2664,7 @@ int main(int argc, char** argv)
                 {
                     ResiduePlaceholder rp;
                     rp.resno = resnos[l];
-                    mc.coordres.push_back(rp);
+                    mc.coordres[mc.ncr++] = rp;
                 }
 
                 mtlcoords.push_back(mc);

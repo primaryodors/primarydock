@@ -64,6 +64,7 @@ class ResidueGroup
     ResidueGroup** get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
 
     static AminoAcid* disqualified_residues[1024];
+    static int ndisreq;
 };
 
 class GroupPair

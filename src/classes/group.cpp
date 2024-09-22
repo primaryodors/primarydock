@@ -342,7 +342,7 @@ float ResidueGroup::pi_stackability()
         result += aminos[i]->pi_stackability(false);
     }
 
-    result /= amsz;
+    result /= naminos;
     return result;
 }
 
@@ -392,7 +392,7 @@ void ResidueGroup::conform_to(Molecule* mol)
     if (!naminos) return;
 
     int i;
-    for (i=0; i<n; i++)
+    for (i=0; i<naminos; i++)
     {
         MovabilityType mt = aminos[i]->movability;
         if (!(mt & MOV_FORBIDDEN))
@@ -453,7 +453,7 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
     mol->identify_rings();
     mol->identify_cages();
 
-    if (!predef_grp.size())
+    if (!npredef_grp)
     {
         FILE* fp = fopen("data/moieties.dat", "rb");
         if (!fp) throw 0xffff;
@@ -465,7 +465,7 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
             {
                 Moiety m;
                 m.pattern = buffer;
-                predef_grp.push_back(m);
+                predef_grp[npredef_grp++] = m;
             }
         }
         fclose(fp);
@@ -475,8 +475,7 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
 
-    int n1 = predef_grp.size();
-    for (i=0; i<n1; i++)
+    for (i=0; i<npredef_grp; i++)
     {
         Atom* matches[n*32];
         int times = predef_grp[i].contained_by(mol, matches);
@@ -545,12 +544,12 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
                 }
 
                 g->remove_duplicates();
-                retval[retn++] = g;
+                retval[retn++] = g.get();
 
                 if (g->atct > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atct
                     && (g->has_hbond_acceptors() || g->has_hbond_donors()))
                 {
-                    AtomGroup** subg = make_hbond_subgroups(g);
+                    AtomGroup** subg = make_hbond_subgroups(g.get());
                     for (j=0; subg[j]; j++) retval[retn++] =  subg[j];
                 }
             }
@@ -734,7 +733,7 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
             {
                 int it;
                 for (it=retn; it>=l; it--) retval[it+1] = retval[it];
-                retval[l] = g;
+                retval[l] = g.get();
                 retn++;
                 added = true;
                 break;
@@ -743,7 +742,7 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
         if (!added)
         {
             g->remove_duplicates();
-            retval[retn++] = g;
+            retval[retn++] = g.get();
         }
         #if _dbg_groupsel
         cout << "Group complete." << endl << endl;
@@ -752,7 +751,7 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
         if (g->atct > 2 && g->atoms[0]->num_rings() && g->get_pi() > 0.5*g->atct
             && (g->has_hbond_acceptors() || g->has_hbond_donors()))
         {
-            AtomGroup** subg = make_hbond_subgroups(g);
+            AtomGroup** subg = make_hbond_subgroups(g.get());
             int it;
             for (it=0; subg[it]; it++) retval[retn++] = subg[it];
         }
@@ -1142,7 +1141,7 @@ ResidueGroup** ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist,
         cout << "Completed group." << endl << endl;
         #endif
 
-        retval[retn++] = g;
+        retval[retn++] = g.get();
     }
 
     retval[retn] = nullptr;
@@ -1326,7 +1325,7 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
     GroupPair** retval = new GroupPair*[256];
     int retn = 0;
 
-    int m = ag.size(), n = scg.size();
+    int m = ptrarray_length((void**)ag), n = ptrarray_length((void**)scg);
     if (!m || !n) return retval;
 
     int i, j, l;
@@ -1344,8 +1343,8 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
         {
             if (sdirty[j]) continue;
             GroupPair pair;
-            pair.ag = ag[i].get();
-            pair.scg = scg[j].get();
+            pair.ag = ag[i];
+            pair.scg = scg[j];
             pair.pocketcen = pcen;
 
             float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic*rel_stoch, 1.0+best_binding_stochastic*rel_stoch);
@@ -1376,8 +1375,8 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
         if (j1 < 0) continue;
 
         std::shared_ptr<GroupPair> pair(new GroupPair());
-        pair->ag = ag[i].get();
-        pair->scg = scg[j1].get();
+        pair->ag = ag[i];
+        pair->scg = scg[j1];
         pair->get_potential();          // Determines priority.
 
         adirty[i] = true;
@@ -1392,19 +1391,19 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
         bool added = false;
         if (!retn)
         {
-            retval[retn++] = pair;
+            retval[retn++] = pair.get();
             added = true;
             #if _dbg_groupsel
             cout << "Beginning result with " << *pair->ag << "-" << *pair->scg << endl;
             #endif
         }
-        else for (l=0; l<r; l++)
+        else for (l=0; l<retn; l++)
         {
             if  (pair->get_weighted_potential() > retval[l]->get_weighted_potential())
             {
                 int ll;
                 for (ll = retn; ll >= l; ll++) retval[ll+1] = retval[ll];
-                retval[l] = pair;
+                retval[l] = pair.get();
                 retn++;
                 added = true;
                 
@@ -1417,7 +1416,7 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
         }
         if (!added)
         {
-            retval[retn++] = pair;
+            retval[retn++] = pair.get();
             added = true;
             #if _dbg_groupsel
             cout << "Appending to result " << *pair->ag << "-" << *pair->scg << endl;
@@ -1547,7 +1546,7 @@ void GroupPair::align_groups(Molecule* lig, GroupPair** gp, bool do_conforms, fl
         float r1 = 0;
         try
         {
-            if (n > 1 && gp.at(1) && gp[1]->scg && gp[1]->ag
+            if (n > 1 && gp[1] && gp[1]->scg && gp[1]->ag
                 && abs((long)gp[1]->ag - (long)gp[1]->scg) < memsanity)
                 r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
         }

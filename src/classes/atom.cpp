@@ -2646,7 +2646,7 @@ Atom** Atom::get_conjugated_atoms(Atom* bir, Atom* c)
             bonded_to[i].atom2->is_pi()
             )
         {
-            casf[ncasf++] = bonded_to[i].atom2);
+            casf[ncasf++] = bonded_to[i].atom2;
 
             // DANGER: RECURSION.
             Atom** lcasf = bonded_to[i].atom2->get_conjugated_atoms(bir, this);

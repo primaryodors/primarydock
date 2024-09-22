@@ -51,6 +51,7 @@ struct MCoord
     Atom* mtl = nullptr;
     Point mtl_original_location;
     ResiduePlaceholder coordres[16];
+    int ncr = 0;
 };
 
 struct AARenumber
@@ -225,9 +226,12 @@ protected:
     char** remarks = nullptr;
     int remarksz = 0;
     MCoord m_mcoords[16];
+    int n_mcoords = 0;
     int Ballesteros_Weinstein[79];
     AABridge aabridges[32];
+    int nbridge = 0;
     Bond* connections[256];
+    int nconn=0;
     Pose origpdb_residues[1024];
     char pdbchain = ' ';
     Pose** undo_poses = nullptr;

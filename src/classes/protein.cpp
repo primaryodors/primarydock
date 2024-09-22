@@ -92,7 +92,7 @@ Protein::Protein(const char* lname)
 
 Protein::~Protein()
 {
-    connections.clear();
+    nconn = 0;
 
     delete[] remarks;
     remarksz = 0;
@@ -372,9 +372,9 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
         residues[i]->save_pdb(os, offset);
         offset += residues[i]->get_atom_count();
     }
-    if (m_mcoords.size())
+    if (n_mcoords)
     {
-        for (i=0; i<m_mcoords.size(); i++)
+        for (i=0; i<n_mcoords; i++)
         {
             if (!m_mcoords[i].mtl) continue;
             cout << "Saving " << m_mcoords[i].mtl->name << endl;
@@ -397,9 +397,9 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
 
     // Example CONECT syntax:
     // CONECT  487 1056
-    if (connections.size())
+    if (nconn)
     {
-        for (i=0; i<connections.size(); i++)
+        for (i=0; i<nconn; i++)
         {
             if (!connections[i]->atom1 || !connections[i]->atom2) continue;
 
@@ -602,7 +602,7 @@ void Protein::find_residue_initial_bindings()
 {
     if (!residues) return;
 
-    aabridges.clear();
+    nbridge = 0;
     
     int i, j, k;
     for (i=0; residues[i]; i++)
@@ -657,7 +657,7 @@ void Protein::find_residue_initial_bindings()
         if (ib >= 5)
         {
             if (residues[i]->movability != MOV_FORCEFLEX) residues[i]->movability = min(residues[i]->movability, MOV_PINNED);
-            if (maxb >= 5) aabridges.push_back(aab);
+            if (maxb >= 5) aabridges[nbridge++] = aab;
         }
 
         #if _debug_locks
@@ -703,8 +703,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     if (ca) delete[] ca;
     // if (res_reach) delete res_reach;         // This was causing a segfault.
 
-    origpdb_residues.clear();
-    connections.clear();
+    nconn = 0;
 
     Atom* pdba[65536];
 
@@ -777,10 +776,9 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                         restmp[rescount++] = aa;
                         restmp[rescount] = NULL;
                         prevaa = aa;
-                        Pose aap, filler;
+                        Pose aap;
                         aap.copy_state(aa);
-                        for (; origpdb_residues.size() < aa->get_residue_no(); origpdb_residues.push_back(filler));
-                        origpdb_residues.push_back(aap);
+                        origpdb_residues[aa->get_residue_no()] = aap;
                         goto _found_AA;
                     }
                 }
@@ -832,7 +830,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                 {
                     pdba[a1]->bond_to(pdba[a2], 1);
                     Bond* b = pdba[a1]->get_bond_between(pdba[a2]);
-                    if (b) connections.push_back(b);
+                    if (b) connections[nconn++] = b;
                 }
             }
             
@@ -946,7 +944,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     }
 
     std::string* rem_st = get_remarks("800 SITE");
-    for (l=0; l<rem_st.size(); l++)
+    for (l=0; l<rem_st[l].length(); l++)
     {
         char buffer[1024];
         char buffer1[1024];
@@ -1023,7 +1021,7 @@ void Protein::revert_to_pdb()
 {
     if (!residues) return;
     int i, n;
-    n = origpdb_residues.size();
+    n = get_end_resno();
     if (!n) return;
 
     for (i=1; i<n; i++)
@@ -1296,7 +1294,7 @@ AminoAcid** Protein::get_residues_near(Point pt, float maxr, bool facing)
 
         if (r <= maxr)
         {
-            retval[retn++] = residues[i]);
+            retval[retn++] = residues[i];
             #if _DBG_TUMBLE_SPHERES
             cout << residues[i]->get_3letter() << residues[i]->get_residue_no() << " ";
             #endif
@@ -1578,11 +1576,11 @@ void Protein::copy_mcoords(Protein* cf)
 {
     int i, j, n;
 
-    if (n = cf->m_mcoords.size()) for (i=0; i<n; i++)
+    if (n = cf->n_mcoords) for (i=0; i<n; i++)
     {
         MCoord mc = cf->m_mcoords[i];
         if (mc.mtl) mc.mtl->move(mc.mtl_original_location);
-        this->m_mcoords.push_back(mc);
+        this->m_mcoords[n_mcoords++] = mc;
     }
 
     for (i=0; i<32; i++) mcoord_resnos[i] = cf->mcoord_resnos[i];
@@ -2436,7 +2434,7 @@ MCoord* Protein::coordinate_metal(MCoord* mtlcoords)
     k=m=0;
     for (i=0; i<n; i++)
     {
-        int ncr = mtlcoords[i].coordres.size();
+        int ncr = mtlcoords[i].ncr;
 
         // Obtain the alpha center.
         Point pt4avg[ncr+2];
@@ -2454,8 +2452,7 @@ MCoord* Protein::coordinate_metal(MCoord* mtlcoords)
         // Obtain the alpha normal.
         Vector alpnorm = compute_normal(pt4avg[0], pt4avg[1], pt4avg[2]);
 
-        for (j=0; m_mcoords[j].Z; j++);
-        m_mcoords[j] = mtlcoords[i];
+        m_mcoords[n_mcoords++] = mtlcoords[i];
         Point lpt;
         Molecule** lmc = new Molecule*[ncr+4];
         lmc[0] = new Molecule("lcm");
@@ -2974,7 +2971,8 @@ Point Protein::estimate_pocket_size(AminoAcid** ba)
         cz += pt.z;
     }
 
-    Point center(cx/n, cy/n, cz/n);
+    if (!i) i++;
+    Point center(cx/i, cy/i, cz/i);
 
     float sx, sy, sz, wx, wy, wz;
     sx = sy = sz = wx = wy = wz = 0;
@@ -3080,7 +3078,7 @@ bool Protein::disulfide_bond(int resno1, int resno2)
                                 res2->delete_atom(H2);
                                 if (S1->bond_to(S2, 1))
                                 {
-                                    connections.push_back(S1->get_bond_between(S2));
+                                    connections[nconn++] = S1->get_bond_between(S2);
                                     result = true;
                                 }
                                 goto _next_S1;
@@ -4008,7 +4006,7 @@ BallesterosWeinstein Protein::get_bw_from_resno(int resno)
 int Protein::replace_side_chains_from_other_protein(Protein* other)
 {
     int i, j, l, n = other->get_end_resno(), num_applied = 0;
-    AARenumber[1024] renumber_later;
+    AARenumber renumber_later[1024];
     int nrl = 0;
 
     for (i=1; i<=n; i++)

@@ -48,7 +48,7 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
 
         if (found)
         {
-            tsphres.erase(tsphres.begin()+i);
+            for (j=i; j<tsphsz; j++) tsphres[j] = tsphres[j+1];
             tsphsz--;
             continue;
         }
@@ -346,11 +346,12 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
 
 void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_cen, AminoAcid** reaches_spheroid)
 {
-    AtomGroup** lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+    AtomGroup** lagc = AtomGroup::get_potential_ligand_groups(ligand, nmetals > 0);
     ResidueGroup** scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid, l_pocket_cen);
-    global_pairs = GroupPair::pair_groups(lagc, scg, l_pocket_cen);
+    GroupPair** local_pairs = GroupPair::pair_groups(lagc, scg, l_pocket_cen);
+    for (nglobal_pairs=0; local_pairs[nglobal_pairs]; nglobal_pairs++) global_pairs[nglobal_pairs] = local_pairs[nglobal_pairs];
 
-    if (global_pairs.size() > 2)
+    if (nglobal_pairs > 2)
     {
         // If the 2nd group is closer to the 1st group than the 3rd group is, swap the 2nd and 3rd groups.
         Point grpcen1 = global_pairs[0]->ag->get_center(),
@@ -362,7 +363,7 @@ void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_
 
         if (r12 < r13)
         {
-            std::shared_ptr<GroupPair> tmpg = global_pairs[2];
+            GroupPair* tmpg = global_pairs[2];
             global_pairs[2] = global_pairs[1];
             global_pairs[1] = tmpg;
         }

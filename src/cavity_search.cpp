@@ -211,7 +211,7 @@ int main(int argc, char** argv)
                 }
 
                 mtlcoords[mtlcoordn++] = mc;
-                mtlcoords[mtlcoordn] = nullptr;
+                mtlcoords[mtlcoordn].Z = 0;
 
                 p.coordinate_metal(mtlcoords);
             }

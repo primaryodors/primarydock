@@ -20,6 +20,7 @@ class Search
 
 extern Point size, loneliest;
 extern int exclusion[1024];
+extern int nexcl;
 
 extern AtomGroup ligand_groups[3];
 extern ResidueGroup sc_groups[3];

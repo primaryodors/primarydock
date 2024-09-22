@@ -264,7 +264,7 @@ float teleport_water(Molecule* mol)
 MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
 {
     int m, n;
-    if (!(n = mtlcoords.size())) return nullptr;
+    if (!(n = nmetals)) return nullptr;
 
     int i, j;
     for (i=0; i<n; i++)
@@ -1102,7 +1102,7 @@ int interpret_config_line(char** words)
         int excls = atoi(words[i++]);
         int excle = atoi(words[i++]);
 
-        for (i=excls; i<=excle; i++) exclusion.push_back(i);
+        for (i=excls; i<=excle; i++) exclusion[nexcl++] = i;
         optsecho = "Exclude range " + to_string(excls) + (std::string)"-" + to_string(excle);
         return i-1;
     }
@@ -1214,7 +1214,7 @@ int interpret_config_line(char** words)
             mcr.coordres[mcr.ncr++] = rp;
         }
 
-        mtlcoords.push_back(mcr);
+        mtlcoords[nmetals++] = mcr;
         return i-1;
     }
     else if (!strcmp(words[0], "MOVIE"))
@@ -1946,7 +1946,7 @@ int main(int argc, char** argv)
     Pose tmp_pdb_residue[poses+1][protein->get_end_resno()+1];
     Pose tmp_pdb_waters[poses+1][omaxh2o+1];
     Pose tmp_pdb_ligand[poses+1];
-    Point tmp_pdb_metal_locs[poses+1][mtlcoords.size()+1];
+    Point tmp_pdb_metal_locs[poses+1][nmetals+1];
 
     if (tplset)
     {
@@ -2006,10 +2006,10 @@ int main(int argc, char** argv)
 
     int l, j1, i2, miter;
 
-    if (mtlcoords.size())
+    if (nmetals)
     {
         protein->pocketcen = pocketcen;
-        mtlcoords = protein->coordinate_metal(mtlcoords);
+        protein->coordinate_metal(mtlcoords);
         metald_prot = protein;
 
         if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
@@ -2232,15 +2232,15 @@ int main(int argc, char** argv)
     if (pdpst == pst_constrained)
     {
         ligand = &pose_ligands[1];
-        lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+        lagc = AtomGroup::get_potential_ligand_groups(ligand, nmetals > 0);
         for (nlagc=0; lagc[nlagc]; nlagc++);
         if (nlagc > MAX_CS_RES-2) nlagc = MAX_CS_RES-2;
         for (i=0; i<agqty; i++)
             agc[i] = lagc[i];
 
-        if (mtlcoords.size())
+        if (nmetals)
         {
-            for (i=0; i<mtlcoords.size(); i++)
+            for (i=0; i<nmetals; i++)
             {
                 for (j=0; j<mtlcoords[i].ncr; j++)
                 {
@@ -2271,7 +2271,7 @@ _try_again:
         region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = Vector(0,0,0);
     }
 
-    n = mtlcoords.size();
+    n = nmetals;
     Point metal_initlocs[n+4];
     for (i=0; i<n; i++)
     {
@@ -2297,7 +2297,7 @@ _try_again:
         if (reqsr_n)
         {
             ligand->delete_mandatory_connections();
-            ligand->allocate_mandatory_connections(rcn);
+            ligand->allocate_mandatory_connections(reqsr_n);
 
             for (i=0; i<reqsr_n; i++)
             {
@@ -2320,9 +2320,9 @@ _try_again:
             fclose(pf);
             apply_protein_specific_settings(protein);
 
-            if (mtlcoords.size())
+            if (nmetals)
             {
-                for (i=0; i<mtlcoords.size(); i++)
+                for (i=0; i<nmetals; i++)
                 {
                     for (j=0; j<mtlcoords[i].ncr; j++)
                     {
@@ -2343,7 +2343,7 @@ _try_again:
             apply_protein_specific_settings(protein);
         }
 
-        n = mtlcoords.size();
+        n = nmetals;
         for (i=0; i<n; i++)
         {
             mtlcoords[i].mtl->move(metal_initlocs[i]);
@@ -2606,7 +2606,7 @@ _try_again:
                     {
                         if (!(reaches_spheroid[nodeno][besti]->movability & MOV_PINNED))
                             reaches_spheroid[nodeno][besti]->movability = MOV_FLEXONLY;
-                        flexible_resnos[nflexres++] = reaches_spheroid[nodeno][besti]->get_residue_no());
+                        flexible_resnos[nflexres++] = reaches_spheroid[nodeno][besti]->get_residue_no();
                         #if _dbg_flexion_selection
                         cout << "Selected " << reaches_spheroid[nodeno][besti]->get_name()
                                 << " for flexion with a weight of " << bestwt << endl;
@@ -2621,7 +2621,7 @@ _try_again:
 
                 freeze_bridged_residues();
 
-                if (forcednforceflex)
+                if (nforceflex)
                 {
                     for (i=0; i<nforceflex; i++)
                     {
@@ -2654,10 +2654,10 @@ _try_again:
             for (i=0; i<sphres; i++)
             {
                 #if use_exclusions
-                if (exclusion.size()
-                        &&
-                        std::find(exclusion.begin(), exclusion.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=exclusion.end()
-                   )
+                bool found = false;
+                int resno = reaches_spheroid[nodeno][i]->get_residue_no();
+                if (nexcl) for (j=0; j<nexcl && !found; j++) if (exclusion[j] == resno) found = true;
+                if (found)
                 {
                     for (j=i; j<sphres; j++) reaches_spheroid[nodeno][j] = reaches_spheroid[nodeno][j+1];
                     sphres--;
@@ -2684,7 +2684,7 @@ _try_again:
                 {
                     Search::do_best_binding(protein, ligand, ligcen_target, reaches_spheroid[nodeno]);
 
-                    int gpn = global_pairs.size();
+                    int gpn = nglobal_pairs;
                     for (l=0; l<3 && l<gpn; l++)
                     {
                         ligand_groups[l] = *(global_pairs[l]->ag);
@@ -2699,7 +2699,7 @@ _try_again:
 
                             cout << "- ";
 
-                            n = global_pairs[l]->scg->aminos.size();
+                            n = global_pairs[l]->scg->naminos;
                             for (j2=0; j2<n; j2++)
                                 cout << global_pairs[l]->scg->aminos[j2]->get_name() << " ";
 
@@ -2818,7 +2818,7 @@ _try_again:
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
 
-            n = mtlcoords.size();
+            n = nmetals;
             if (n)
             {
                 int j1;
@@ -2870,7 +2870,7 @@ _try_again:
                         tmp_pdb_waters[pose][j].copy_state(waters[j]);
                     }
                 }
-                n = mtlcoords.size();
+                n = nmetals;
                 for (j=0; j < n; j++)
                 {
                     tmp_pdb_metal_locs[pose][j] = mtlcoords[j].mtl->get_location();
@@ -2940,7 +2940,7 @@ _try_again:
             if (pdpst == pst_best_binding && out_bb_pairs)
             {
                 dr[drcount][nodeno].miscdata += (std::string)"Best-Binding Pairs:\n";
-                for (i=0; i<3 && i<global_pairs.size(); i++)
+                for (i=0; i<3 && i<nglobal_pairs; i++)
                 {
                     n = global_pairs[i]->ag->atct;
                     int j2;
@@ -2949,7 +2949,7 @@ _try_again:
                     
                     dr[drcount][nodeno].miscdata += (std::string)"- ";
 
-                    n = global_pairs[i]->scg->aminos.size();
+                    n = global_pairs[i]->scg->naminos;
                     for (j2=0; j2<n; j2++)
                         dr[drcount][nodeno].miscdata += (std::string)global_pairs[i]->scg->aminos[j2]->get_name() + (std::string)" ";
                     
@@ -3183,7 +3183,7 @@ _try_again:
                                 }
                             }
 
-                            n1 = mtlcoords.size();
+                            n1 = nmetals;
                             for (j1=0; j1 < n1; j1++)
                             {
                                 mtlcoords[j1].mtl->move(tmp_pdb_metal_locs[pose][j1]);

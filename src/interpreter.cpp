@@ -114,7 +114,7 @@ float contact_energy(Protein* a, Protein* b, bool repack = false, int a_from = 0
     float f=0;
 
     char cha = a->get_pdb_chain(), chb = b->get_pdb_chain();
-    int i, j=0, n = vca.size();
+    int i, j=0, n = ptrarray_length((void**)vca);
     int aend = a->get_end_resno(), bend = b->get_end_resno();
     bool a_dirty[aend+1], b_dirty[bend+1];
 
@@ -1636,7 +1636,7 @@ int main(int argc, char** argv)
                 _goto:
                 if (!words[1]) raise_error("Insufficient parameters given for GOTO.");
                 sprintf(buffer1, "%s:", words[1]);
-                for (n=0; n<script_lines.size(); n++)
+                for (n=0; n<program_size; n++)
                 {
                     if (script_lines[n][0] == '#') continue;
 
@@ -2493,7 +2493,7 @@ int main(int argc, char** argv)
 				set_variable(buffer, sv);
 
                 std::string* rem_hx = working->get_remarks("650 HELIX");
-                for (l=0; rem_hx[l]; l++)
+                for (l=0; rem_hx[l].length(); l++)
                 {
                     strcpy(buffer, rem_hx[l].c_str());
                     char** words = chop_spaced_words(buffer);
@@ -2654,7 +2654,6 @@ int main(int argc, char** argv)
                 if (ncr < 2) raise_error("MCOORD requires at least 2 coordinating atoms.");
                 if (uses_fancy_options) raise_error("MCOORD no longer supports YO, YAr, Th8, or per-atom coordinations.");
 
-                std::vector<MCoord> mtlcoords;
                 MCoord mc;
                 mc.Z = ma->get_Z();
                 mc.charge = elem_charge;
@@ -2667,8 +2666,7 @@ int main(int argc, char** argv)
                     mc.coordres[mc.ncr++] = rp;
                 }
 
-                mtlcoords.push_back(mc);
-
+                mtlcoords[nmetals++] = mc;
                 working->coordinate_metal(mtlcoords);
                 
             } // MCOORD

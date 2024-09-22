@@ -98,7 +98,7 @@ int main(int argc, char** argv)
     cout << endl << "# " << endl;
 
     ResidueGroup** sidechain_groups = ResidueGroup::get_potential_side_chain_groups(reach_residues, target);
-    n = sidechain_groups.size();
+    n = ptrarray_length((void**)sidechain_groups);
     cout << "Sidechain groups:" << endl;
     for (i=0; i<n; i++) cout << *sidechain_groups[i] << endl;
     cout << endl;
@@ -106,7 +106,7 @@ int main(int argc, char** argv)
     GroupPair** pairs = GroupPair::pair_groups(ligand_groups, sidechain_groups, target, 0);
     m.recenter(target);
     GroupPair::align_groups(&m, pairs);
-    n = pairs.size();
+    n = ptrarray_length((void**)pairs);
     cout << "Group pairs:" << endl;
     for (i=0; i<n; i++) cout << *(pairs[i]->ag) << " ~ " << *(pairs[i]->scg) << endl;
     cout << endl;

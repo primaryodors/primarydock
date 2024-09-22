@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 
     int i;
 
-    for (i=0; i<mgrp[i]; i++)
+    for (i=0; mgrp[i]; i++)
     {
         cout << *mgrp[i] << endl;
     }

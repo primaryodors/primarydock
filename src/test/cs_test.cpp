@@ -8,6 +8,7 @@ int main(int argc, char** argv)
     BallesterosWeinstein pocketcen_res[256];
     int nbsr=0;
     std::string atoms_of_interest[256];
+    int naoi=0;
     bool priorities[256];
 
     bool save_tmp_pdbs = false;
@@ -50,7 +51,7 @@ int main(int argc, char** argv)
             {
                 if (!strcasecmp(argv[i], "ioa")) break;
                 else if (!strcasecmp(argv[i], "*")) break;
-                else atoms_of_interest.push_back(argv[i]);
+                else atoms_of_interest[naoi++] = argv[i];
             }
         }
         else if (!strcasecmp(argv[i], "cen"))
@@ -92,11 +93,11 @@ int main(int argc, char** argv)
     {
         if (!nbsr)
         {
-            pocketcen_res[nbsr++] = "3.33");
-            pocketcen_res[nbsr++] = ("3.37");
-            pocketcen_res[nbsr++] = ("5.43");
-            pocketcen_res[nbsr++] = ("6.48");
-            pocketcen_res[nbsr++] = ("7.38");
+            pocketcen_res[nbsr++] = "3.33";
+            pocketcen_res[nbsr++] = "3.37";
+            pocketcen_res[nbsr++] = "5.43";
+            pocketcen_res[nbsr++] = "6.48";
+            pocketcen_res[nbsr++] = "7.38";
         }
 
         AminoAcid* aa;
@@ -121,10 +122,10 @@ int main(int argc, char** argv)
     cout << "Loneliest point = " << loneliest << endl;
 
     AtomGroup** lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords[0].Z > 0);
-    agqty = lagc.size();
+    agqty = ptrarray_length((void**)lagc);
     if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
     for (i=0; i<agqty; i++)
-        agc[i] = lagc.at(i).get();
+        agc[i] = lagc[i];
     int n = p.get_end_resno();
     Search::prepare_constrained_search(&p, &m, loneliest);
     n = cs_res_qty;
@@ -142,7 +143,7 @@ int main(int argc, char** argv)
         float r = cs_res[cs_idx]->get_CA_location().get_3d_distance(loneliest) - cs_res[cs_idx]->get_reach();
         cout << "Chose: " << cs_res[cs_idx]->get_name() << " ~ " << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << " r = " << r << endl;
 
-        n = atoms_of_interest.size();
+        n = naoi;
         for (i=0; i<n; i++)
         {
             Atom* a = m.get_atom(atoms_of_interest[i].c_str());
@@ -150,7 +151,7 @@ int main(int argc, char** argv)
             else
             {
                 AminoAcid** nessami = p.get_residues_near(a->get_location(), _INTERA_R_CUTOFF, false);
-                int j, m = nessami.size();
+                int j, m = ptrarray_length((void**)nessami);
                 if (!m) cout << a->name << " void | ";
                 else
                 {

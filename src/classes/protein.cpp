@@ -932,7 +932,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     set_clashables();
 
     int l;
-    std::vector<std::string> rem_hx = get_remarks("650 HELIX");
+    BAD<std::string> rem_hx = get_remarks("650 HELIX");
     for (l=0; l<rem_hx.size(); l++)
     {
         char buffer[1024];
@@ -945,7 +945,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         delete[] words;
     }
 
-    std::vector<std::string> rem_st = get_remarks("800 SITE");
+    BAD<std::string> rem_st = get_remarks("800 SITE");
     for (l=0; l<rem_st.size(); l++)
     {
         char buffer[1024];
@@ -1150,9 +1150,9 @@ void Protein::add_remark(const char* remark)
     }
 }
 
-std::vector<std::string> Protein::get_remarks(std::string search_for)
+BAD<std::string> Protein::get_remarks(std::string search_for)
 {
-    std::vector<string> retval;
+    BAD<string> retval;
     int i;
     for (i=0; i<remarksz; i++)
     {
@@ -1247,7 +1247,7 @@ void Protein::set_conditional_basicities()
     {
         if (!residues[i]->conditionally_basic()) continue;
 
-        std::vector<AminoAcid*> nearby = get_residues_near(residues[i]->get_CA_location(), 10, true);
+        BAD<AminoAcid*> nearby = get_residues_near(residues[i]->get_CA_location(), 10, true);
         n = nearby.size();
         if (!n) continue;
 
@@ -1264,9 +1264,9 @@ void Protein::set_conditional_basicities()
     }
 }
 
-std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)
+BAD<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)
 {
-    std::vector<AminoAcid*> retval;
+    BAD<AminoAcid*> retval;
 
     float cb_tolerance_angle = hexagonal;
     float tolerance_sine = sin(cb_tolerance_angle);
@@ -1306,9 +1306,9 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
     return retval;
 }
 
-std::vector<AminoAcid*> Protein::get_contact_residues(Protein* op, float cd)
+BAD<AminoAcid*> Protein::get_contact_residues(Protein* op, float cd)
 {
-    std::vector<AminoAcid*> retval;
+    BAD<AminoAcid*> retval;
 
     if (!residues) return retval;
     if (!op->residues) return retval;
@@ -1377,9 +1377,9 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
     return 0;
 }
 
-std::vector<AminoAcid*> Protein::get_residues_can_clash(int sr, int er)
+BAD<AminoAcid*> Protein::get_residues_can_clash(int sr, int er)
 {
-    std::vector<AminoAcid*> result;
+    BAD<AminoAcid*> result;
     int i, j;
     bool already[get_seq_length()+4];
     for (i=0; residues[i]; i++) already[i] = false;
@@ -2418,7 +2418,7 @@ Point Protein::get_region_bounds(int startres, int endres)
     return retval;
 }
 
-std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
+BAD<MCoord> Protein::coordinate_metal(BAD<MCoord> mtlcoords)
 {
     int i, j, k, l, m, n, q, miter, i2, j1;
 
@@ -2949,7 +2949,7 @@ Point Protein::find_loneliest_point(Point cen, Point sz)
     return retval;
 }
 
-Point Protein::estimate_pocket_size(std::vector<AminoAcid*> ba)
+Point Protein::estimate_pocket_size(BAD<AminoAcid*> ba)
 {
     int i, n = ba.size();
     if (!n) return Point();
@@ -3196,7 +3196,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     Point xform_delta(0,0,0), center(0,0,0);
     int count = 0;
 
-    std::vector<int> resnos1, resnos2;
+    BAD<int> resnos1, resnos2;
 
     for (hxno = 1; hxno <= 7; hxno++)
     {
@@ -4000,7 +4000,7 @@ BallesterosWeinstein Protein::get_bw_from_resno(int resno)
 int Protein::replace_side_chains_from_other_protein(Protein* other)
 {
     int i, j, l, n = other->get_end_resno(), num_applied = 0;
-    std::vector<AARenumber> renumber_later;
+    BAD<AARenumber> renumber_later;
 
     for (i=1; i<=n; i++)
     {

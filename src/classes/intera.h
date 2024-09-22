@@ -99,7 +99,7 @@ extern float mc_bpotential;
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 
 #if _peratom_audit
-extern std::vector<std::string> interaudit;
+extern BAD<std::string> interaudit;
 extern bool interauditing;
 #endif
 

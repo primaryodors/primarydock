@@ -5,8 +5,8 @@ int main(int argc, char** argv)
 {
     Protein p("Test Receptor");
     Molecule m("Test Ligand");
-    std::vector<BallesterosWeinstein> pocketcen_res;
-    std::vector<std::string> atoms_of_interest;
+    BAD<BallesterosWeinstein> pocketcen_res;
+    BAD<std::string> atoms_of_interest;
     bool priorities[256];
 
     bool save_tmp_pdbs = false;
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
     loneliest = p.find_loneliest_point(pocketcen, size);
     cout << "Loneliest point = " << loneliest << endl;
 
-    std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords.size() > 0);
+    BAD<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords.size() > 0);
     agqty = lagc.size();
     if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
     for (i=0; i<agqty; i++)
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
             if (!a) cout << "ERROR: No atom named " << atoms_of_interest[i] << " found." << endl;
             else
             {
-                std::vector<AminoAcid*> nessami = p.get_residues_near(a->get_location(), _INTERA_R_CUTOFF, false);
+                BAD<AminoAcid*> nessami = p.get_residues_near(a->get_location(), _INTERA_R_CUTOFF, false);
                 int j, m = nessami.size();
                 if (!m) cout << a->name << " void | ";
                 else

@@ -973,7 +973,7 @@ float Atom::is_polar()
                 cout << "# " << name << " conjugated to charge " << icc << endl;
                 #endif
 
-                std::vector<Atom*> lca = get_conjugated_atoms();
+                BAD<Atom*> lca = get_conjugated_atoms();
 
                 std::sort( lca.begin(), lca.end() );
                 lca.erase( std::unique( lca.begin(), lca.end() ), lca.end() );
@@ -987,7 +987,7 @@ float Atom::is_polar()
                 {
                     if (lca[i]->family != family)
                     {
-                        std::vector<Atom*>::iterator it;
+                        BAD<Atom*>::iterator it;
                         it = lca.begin();
                         lca.erase(it+i);
                         n--;
@@ -2624,8 +2624,8 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
     return false;
 }
 
-std::vector<Atom*> casf;
-std::vector<Atom*> Atom::get_conjugated_atoms(Atom* bir, Atom* c)
+BAD<Atom*> casf;
+BAD<Atom*> Atom::get_conjugated_atoms(Atom* bir, Atom* c)
 {
     if (!c)
     {
@@ -2654,7 +2654,7 @@ std::vector<Atom*> Atom::get_conjugated_atoms(Atom* bir, Atom* c)
             casf.push_back(bonded_to[i].atom2);
 
             // DANGER: RECURSION.
-            std::vector<Atom*> lcasf = bonded_to[i].atom2->get_conjugated_atoms(bir, this);
+            BAD<Atom*> lcasf = bonded_to[i].atom2->get_conjugated_atoms(bir, this);
         }
     }
 

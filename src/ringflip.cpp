@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 {
     int i, l, n;
     std::string filename;
-    std::vector<std::string> atom_names;
+    BAD<std::string> atom_names;
 
     if (argc < 3)
     {

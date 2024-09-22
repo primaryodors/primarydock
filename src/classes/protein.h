@@ -50,7 +50,7 @@ struct MCoord
     int charge = 2;
     Atom* mtl = nullptr;
     Point mtl_original_location;
-    std::vector<ResiduePlaceholder> coordres;
+    BAD<ResiduePlaceholder> coordres;
 };
 
 struct AARenumber
@@ -77,7 +77,7 @@ public:
     void delete_sidechain(int resno);
     void delete_residues(int startres, int endres);
     void delete_sidechains(int startres, int endres);
-    std::vector<MCoord> coordinate_metal(std::vector<MCoord> mtlcoords);
+    BAD<MCoord> coordinate_metal(BAD<MCoord> mtlcoords);
     void set_region(std::string name, int start, int end);
     void set_bw50(int helixno, int resno);
     void renumber_residues(int startres, int endres, int new_startres);
@@ -116,7 +116,7 @@ public:
     Point get_atom_location(int resno, const char* aname);
     void add_remark(const char* remark);
     void add_remark(std::string new_remark);
-    std::vector<std::string> get_remarks(std::string search_for = "");
+    BAD<std::string> get_remarks(std::string search_for = "");
     int get_bw50(int helixno);
     int search_sequence(const int start_resno, const int end_resno, const char* search_for, const int threshold = -1, int* similarity = nullptr);
 
@@ -130,7 +130,7 @@ public:
     float get_intermol_clashes(Molecule* ligand);
     Interaction get_intermol_binding(Molecule* ligand);
     AminoAcid** get_residues_can_clash(int resno);
-    std::vector<AminoAcid*> get_residues_can_clash(int start_resno, int end_resno);
+    BAD<AminoAcid*> get_residues_can_clash(int start_resno, int end_resno);
     int get_residues_can_clash_ligand
     (	AminoAcid** reaches_spheroid,
         Molecule* ligand,
@@ -140,15 +140,15 @@ public:
         bool ignore_priority = false
     );
 
-    std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
-    std::vector<AminoAcid*> get_contact_residues(Protein* other_prot, float contact_distance = 2.5);
+    BAD<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
+    BAD<AminoAcid*> get_contact_residues(Protein* other_prot, float contact_distance = 2.5);
     Molecule** all_residues_as_molecules();
     Molecule** all_residues_as_molecules_except(Molecule** mm);
     Point get_region_center(int startres, int endres);
     SCoord get_region_axis(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
-    Point estimate_pocket_size(std::vector<AminoAcid*> ba);
+    Point estimate_pocket_size(BAD<AminoAcid*> ba);
     Interaction binding_to_nearby_residues(int resno);
     void minimize_residue_clashes(int resno);
     float region_can_move(int startres, int endres, SCoord direction, bool repack = false, int ignore_startres = 0, int ignore_endres = 0);
@@ -224,11 +224,11 @@ protected:
     region_source regions_from = rgn_none;
     char** remarks = nullptr;
     int remarksz = 0;
-    std::vector<MCoord> m_mcoords;
+    BAD<MCoord> m_mcoords;
     int Ballesteros_Weinstein[79];
-    std::vector<AABridge> aabridges;
-    std::vector<Bond*> connections;
-    std::vector<Pose> origpdb_residues;
+    BAD<AABridge> aabridges;
+    BAD<Bond*> connections;
+    BAD<Pose> origpdb_residues;
     char pdbchain = ' ';
     Pose** undo_poses = nullptr;
     bool mass_undoable = false;

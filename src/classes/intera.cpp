@@ -17,7 +17,7 @@ SCoord missed_connection(0,0,0);
 float mc_bpotential = 0;
 
 #if _peratom_audit
-std::vector<std::string> interaudit;
+BAD<std::string> interaudit;
 bool interauditing = false;
 #endif
 

@@ -33,7 +33,7 @@ int main(int argc, char** argv)
     }
     else m.from_smiles("CCO");
 
-    std::vector<std::shared_ptr<AtomGroup>> mgrp = AtomGroup::get_potential_ligand_groups(&m);
+    BAD<std::shared_ptr<AtomGroup>> mgrp = AtomGroup::get_potential_ligand_groups(&m);
 
     int i, n;
     n = mgrp.size();

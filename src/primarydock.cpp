@@ -78,13 +78,10 @@ char outfname[256];
 Point pocketcen;
 std::ofstream *output = NULL;
 
-std::vector<std::string> CEN_buf;
+std::string CEN_buf[256];
 int cenbuf_idx = 0;
-std::vector<std::string> pathstrs;
-std::vector<std::string> states;
-
-std::vector<std::string> dyn_strings;
-std::vector<DynamicMotion> dyn_motions;
+int cenbuf_size = 0;
+std::string pathstrs[256];
 
 bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
@@ -110,7 +107,8 @@ int addl_resno[256];
 const Region* regions;
 SCoord region_clashes[85][3];
 Molecule* ligand;
-std::vector<std::string> isomers;
+std::string isomers[16];
+int iso_count = 0;
 Molecule** waters = nullptr;
 Molecule** owaters = nullptr;
 Point ligcen_target;
@@ -138,11 +136,15 @@ bool do_output_colors = false;
 
 bool softdock = false;
 float softness = 0;
-std::vector<Region> softrgns;
-std::vector<Atom*> softrgpiva;
-std::vector<int> softrgn_allowed;
-std::vector<float> softrgn_initclash;
-std::vector<ResiduePlaceholder> soft_nodelete_start, soft_nodelete_end;
+Region softrgns[16];
+int softrg_count = 0;
+Atom* softrgpiva[16];
+int softrgn_allowed[16];
+int softrg_allowed_count = 0;
+float softrgn_initclash[16];
+int softrg_initc_n = 0;
+ResiduePlaceholder soft_nodelete_start[16], soft_nodelete_end[16];
+int soft_nodelete_n = 0;
 char splash[16384];
 
 AminoAcid*** reaches_spheroid = nullptr;
@@ -157,8 +159,9 @@ std::string copyfrom_filename;
 char copyfrom_ligname[5] = {0,0,0,0,0};
 int copyfrom_resno = -1;
 Bond retain_bindings[4];
-std::vector<int> center_resnos;
-std::vector<int> priority_resnos;
+int center_resnos[256];
+int priority_resnos[16];
+int pri_res_n = 0;
 
 Atom* pivotal_hbond_aaa = nullptr;
 Atom* pivotal_hbond_la = nullptr;
@@ -167,19 +170,18 @@ float pivotal_hbond_r = 0;
 Pose pullaway_undo;
 float last_ttl_bb_dist = 0;
 
-std::vector<AcvBndRot> active_bond_rots;
-std::vector<ResiduePlaceholder> required_contacts;
-std::vector<std::string> bridges;
-std::vector<std::string> atomto;
+BAD<ResiduePlaceholder> required_contacts;
+BAD<std::string> bridges;
+BAD<std::string> atomto;
 std::string outpdb;
 int outpdb_poses = 0;
 
-std::vector<int>flexible_resnos;
-std::vector<ResiduePlaceholder>forced_flexible_resnos;
-std::vector<ResiduePlaceholder>forced_static_resnos;
+BAD<int>flexible_resnos;
+BAD<ResiduePlaceholder>forced_flexible_resnos;
+BAD<ResiduePlaceholder>forced_static_resnos;
 
 #if _dummy_atoms_for_debug
-std::vector<Atom> dummies;
+BAD<Atom> dummies;
 #endif
 
 
@@ -682,8 +684,7 @@ void iteration_callback(int iter, Molecule** mols)
 
     float progress = (float)iter / iters;
 
-    n = softrgns.size();
-    if (n && iter>8) for (i=0; i<n; i++)
+    if (softrg_count && iter>8) for (i=0; i<softrg_count; i++)
     {
         Point softpush(0,0,0);
         Point foravg[softrgns[i].end-softrgns[i].start+16];
@@ -717,10 +718,10 @@ void iteration_callback(int iter, Molecule** mols)
             rot.a = fmin(rot.a, 0.1*softness*fiftyseventh);
 
             float c1;
-            if (i >= softrgn_initclash.size())
+            if (i >= softrg_initc_n)
             {
                 c1 = protein->get_internal_clashes(softrgns[i].start, softrgns[i].end);
-                softrgn_initclash.push_back(c1);
+                softrgn_initclash[softrg_initc_n++] = c1;
             }
             else c1 = softrgn_initclash[i];
 
@@ -951,25 +952,30 @@ void update_progressbar(float percentage)
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
 {
-    int i=1;
+    int i, j;
+
+    for (i=0; i<256; i++) center_resnos[i] = 0;
+
     Point local_pocketcen;
+    i = 1;
     if (!strcmp(words[i], "RES"))
     {
+        int sz = 0;
         i++;
         for (; words[i]; i++)
         {
-            int j = interpret_resno(words[i]);
+            j = interpret_resno(words[i]);
             if (!j) continue;
 
-            center_resnos.push_back(j);
+            center_resnos[sz++] = j;
         }
 
-        int sz = center_resnos.size(), div=0;
+        int div=0;
         Point foravg[sz + 2];
         for (i=0; i<sz; i++)
         {
-            #if pocketcen_from_reach_atoms
             AminoAcid* aa = protein->get_residue(center_resnos[i]);
+            #if pocketcen_from_reach_atoms
             if (aa)
             {
                 foravg[i] = aa->get_reach_atom_location();
@@ -978,6 +984,7 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
             #else
             foravg[div++] = protein->get_atom_location(center_resnos[i], "CA");
             #endif
+            if (aa && aa->priority) priority_resnos[pri_res_n++] = aa->get_residue_no();
         }
 
         return average_of_points(foravg, div?:1);
@@ -1015,16 +1022,6 @@ int interpret_config_line(char** words)
     optsecho = "";
 
     if (0) { ; }
-    else if (!strcmp(words[0], "ACVBROT"))
-    {
-        AcvBndRot abr;
-        abr.resno = atoi(words[1]);
-        abr.aname = words[2];
-        abr.bname = words[3];
-        abr.theta = atof(words[4]) * fiftyseventh;
-        active_bond_rots.push_back(abr);
-        optsecho = (std::string)"Active bond rotation " + (std::string)words[2] + (std::string)"-" + (std::string)words[3];
-    }
     else if (!strcmp(words[0], "APPENDPROT") || !strcmp(words[0], "OPEND"))
     {
         append_pdb = true;
@@ -1042,7 +1039,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "CEN"))
     {
-        CEN_buf.push_back(origbuff);
+        CEN_buf[cenbuf_size++] = origbuff;
         optsecho = (std::string)"Center " + (std::string)origbuff;
         return 0;
     }
@@ -1179,7 +1176,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "ISO"))
     {
-        isomers.push_back(words[1]);
+        isomers[iso_count++] = words[1];
         return 1;
     }
     else if (!strcmp(words[0], "SMILES"))
@@ -1257,8 +1254,6 @@ int interpret_config_line(char** words)
         if (nodeno)
         {
             if ((nodeno) > pathnodes) pathnodes = nodeno;
-
-            pathstrs.resize(nodeno+1);
             pathstrs[nodeno] = origbuff;
         }
         optsecho = "Path node set #" + to_string(nodeno);
@@ -1460,7 +1455,7 @@ int interpret_config_line(char** words)
             else
             {
                 int j = atoi(words[i]);
-                if (j) softrgn_allowed.push_back(j);
+                if (j) softrgn_allowed[softrg_allowed_count++] = j;
                 #if _dbg_soft
                 cout << "Allowed soft region: " << j << endl;
                 #endif
@@ -1472,15 +1467,9 @@ int interpret_config_line(char** words)
         ResiduePlaceholder rpsr, rper;
         rpsr.set(words[1]);
         rper.set(words[2]);
-        soft_nodelete_start.push_back(rpsr);
-        soft_nodelete_end.push_back(rper);
+        soft_nodelete_start[soft_nodelete_n] = rpsr;
+        soft_nodelete_end[soft_nodelete_n++] = rper;
         return 2;
-    }
-    else if (!strcmp(words[0], "STATE"))
-    {
-        states.push_back(origbuff);
-        optsecho = "Added state " + (std::string)origbuff;
-        return 0;
     }
     else if (!strcmp(words[0], "TEMPLATE"))
     {
@@ -1532,38 +1521,11 @@ void read_config_file(FILE* pf)
     }
 }
 
-void prepare_acv_bond_rots()
-{
-    int i;
-    if (active_bond_rots.size())
-    {
-        for (i=0; i<active_bond_rots.size(); i++)
-        {
-            active_bond_rots[i].atom1 = protein->get_atom(active_bond_rots[i].resno, active_bond_rots[i].aname.c_str());
-            active_bond_rots[i].atom2 = protein->get_atom(active_bond_rots[i].resno, active_bond_rots[i].bname.c_str());
-
-            if (!active_bond_rots[i].atom1) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].aname
-                << " not found in protein!" << endl;
-            if (!active_bond_rots[i].atom2) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].bname
-                << " not found in protein!" << endl;
-
-            if (active_bond_rots[i].atom1 && active_bond_rots[i].atom2)
-            {
-                active_bond_rots[i].bond = active_bond_rots[i].atom1->get_bond_between(active_bond_rots[i].atom2);
-                #if _debug_active_bond_rot
-                active_bond_rots[i].bond->echo_on_rotate = true;
-                #endif
-            }
-            else active_bond_rots[i].bond = nullptr;
-        }
-    }
-}
-
 void attempt_priority_hbond()
 {
     int i, j, m, n;
 
-    n = priority_resnos.size();
+    for (n=0; priority_resnos[n]; n++);
     for (i=0; i<n; i++)
     {
         AminoAcid* aa = protein->get_residue(priority_resnos[i]);
@@ -1661,7 +1623,7 @@ void choose_cen_buf()
         if (aa) aa->priority = false;
     }
 
-    n = CEN_buf.size();
+    n = cenbuf_size;
     if (pose <= n) cenbuf_idx = pose-1;
     else cenbuf_idx = rand() % n;
 }
@@ -1725,32 +1687,9 @@ void apply_protein_specific_settings(Protein* p)
         delete[] words;
     }
 
-    dyn_motions.clear();
-    n = dyn_strings.size();
-    for (i=0; i<n; i++)
-    {
-        DynamicMotion dyn(protein);
-        char buffer[1024];
-        strcpy(buffer, dyn_strings[i].c_str());
-        char** words = chop_spaced_words(buffer);
-        AminoAcid* aa1 = protein->get_residue_bw(words[1]);
-        AminoAcid* aa2 = protein->get_residue_bw(words[2]);
-        int resno1 = aa1->get_residue_no();
-        int resno2 = aa2->get_residue_no();
-        dyn.name = (std::string)words[1] + (std::string)"-" + (std::string)words[2];
-        dyn.type = dyn_bend;
-        dyn.start_resno.from_string(resno1<resno2 ? words[1] : words[2]);
-        dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
-        dyn.fulcrum_resno.from_string(words[1]);
-        dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
-        dyn.bias = 30*fiftyseventh;
-        dyn_motions.push_back(dyn);
-    }
-
     if (softdock)
     {
-        int sndn = soft_nodelete_start.size();
-        for (i=0; i<sndn; i++)
+        for (i=0; i<soft_nodelete_n; i++)
         {
             if (!soft_nodelete_start[i].resno) soft_nodelete_start[i].resolve_resno(protein);
             if (!soft_nodelete_end[i].resno) soft_nodelete_end[i].resolve_resno(protein);
@@ -1775,7 +1714,7 @@ void apply_protein_specific_settings(Protein* p)
             if (i >= protein->get_region_start(rgname.c_str()) && i <= protein->get_region_end(rgname.c_str())) continue;
 
             bool snfound = false;
-            for (j=0; j<sndn; j++)
+            for (j=0; j<soft_nodelete_n; j++)
             {
                 if (i >= soft_nodelete_start[j].resno && i <= soft_nodelete_end[j].resno)
                 {
@@ -1800,9 +1739,9 @@ void apply_protein_specific_settings(Protein* p)
             if (!helixed) protein->delete_residue(i);
         }
 
-        if (!softrgns.size()) for (i=1; i<=n; i++)
+        if (!softrg_count) for (i=1; i<=n; i++)
         {
-            softrgn_initclash.clear();
+            softrg_initc_n = 0;
             if (protein->get_residue(i))
             {
                 Region r;
@@ -1820,11 +1759,10 @@ void apply_protein_specific_settings(Protein* p)
                             int l = (i+j-1)/2;
                             BallesterosWeinstein bw = protein->get_bw_from_resno(l);
 
-                            int m;
-                            if (m = softrgn_allowed.size())         // assignment not comparison
+                            if (softrg_allowed_count)
                             {
                                 allowed = false;
-                                for (l=0; l<m; l++) if (bw.helix_no == softrgn_allowed[l]) allowed = true;
+                                for (l=0; l<softrg_allowed_count; l++) if (bw.helix_no == softrgn_allowed[l]) allowed = true;
                             }
 
                             if (allowed)
@@ -1832,8 +1770,8 @@ void apply_protein_specific_settings(Protein* p)
                                 Atom* a = protein->region_pivot_atom(r);
                                 if (a)
                                 {
-                                    softrgns.push_back(r);
-                                    softrgpiva.push_back(a);
+                                    softrgns[softrg_count] = r;
+                                    softrgpiva[softrg_count++] = a;
                                     #if _dbg_soft
                                     cout << "Region " << r.start << "-" << r.end << " bw " << bw.helix_no << " pivots about " << a->residue << ":" << a->name << endl;
                                     #endif
@@ -2088,14 +2026,12 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    prepare_acv_bond_rots();
-
     for (i=0; i<required_contacts.size(); i++)
     {
         required_contacts[i].resolve_resno(protein);
     }
 
-    if (!CEN_buf.size())
+    if (!cenbuf_size)
     {
         cout << "Error: no binding pocket centers defined." << endl;
         return 0xbadb19d;
@@ -2148,9 +2084,9 @@ int main(int argc, char** argv)
         case 's':
         case 'S':
             // SDF
-            if (isomers.size())
+            if (iso_count)
             {
-                i = rand() % isomers.size();
+                i = rand() % iso_count;
                 ligname = get_fttl_no_path_or_ext(isomers[i].c_str());
                 ligand->set_name(ligname.c_str());
                 lligfname = isomers[i].c_str();
@@ -2168,9 +2104,9 @@ int main(int argc, char** argv)
 
         case 'p':
         case 'P':
-            if (isomers.size())
+            if (iso_count)
             {
-                i = rand() % isomers.size();
+                i = rand() % iso_count;
                 ligname = get_fttl_no_path_or_ext(isomers[i].c_str());
                 ligand->set_name(ligname.c_str());
                 lligfname = isomers[i].c_str();
@@ -2285,7 +2221,7 @@ int main(int argc, char** argv)
     int wrote_acvmx = -1, wrote_acvmr = -1;
     float l_atom_clash_limit = clash_limit_per_atom; // - kJmol_cutoff;
 
-    std::vector<std::shared_ptr<AtomGroup>> lagc;
+    BAD<std::shared_ptr<AtomGroup>> lagc;
     if (pdpst == pst_constrained)
     {
         ligand = &pose_ligands[1];
@@ -2350,8 +2286,6 @@ _try_again:
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
         // if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
-
-        for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 
         int rcn = required_contacts.size();
         if (rcn)
@@ -2448,7 +2382,6 @@ _try_again:
                 maxh2o = omaxh2o;
             }
 
-            // if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
             if (echo_progress) cout << (time(NULL) - began) << " seconds: starting pose " << pose << " node " << nodeno << "..." << endl;
@@ -2537,38 +2470,6 @@ _try_again:
             #endif
             if (nodeno)
             {
-                for (i=0; i<states.size(); i++)
-                {
-                    strcpy(buffer, states[i].c_str());
-                    char** words = chop_spaced_words(buffer);
-                    if (atoi(words[1]) == nodeno)
-                    {
-                        int sr = atoi(words[2]), er = atoi(words[3]);
-                        float theta = atof(words[4]) * fiftyseventh;
-
-                        Point sloc = protein->get_atom_location(sr, "CA"),
-                              eloc = protein->get_atom_location(er, "CA");
-
-                        LocatedVector lv = (SCoord)(sloc.subtract(eloc));
-                        lv.origin = sloc;
-
-                        int resno;
-                        for (resno = sr; resno <= er; resno++)
-                        {
-                            AminoAcid* aa = protein->get_residue(resno);
-                            if (aa)
-                            {
-                                MovabilityType mt = aa->movability;
-                                aa->movability = MOV_ALL;
-
-                                aa->rotate(lv, theta);
-
-                                aa->movability = mt;
-                            }
-                        }
-                    }
-                }
-
                 // nodecen = nodecen.add(&path[nodeno]);
                 strcpy(buffer, pathstrs[nodeno].c_str());
                 if (!strlen(buffer))
@@ -3000,7 +2901,7 @@ _try_again:
             dr[drcount][nodeno].out_vdw_repuls = out_vdw_repuls;
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
-            if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
+            if (iso_count) dr[drcount][nodeno].isomer = ligand->get_name();
 
             if ((pose==1 && !nodeno) || best_energy > -btot) best_energy = -btot;
             if ((pose==1 && !nodeno) || dr[drcount][nodeno].worst_energy > worst_atom_clash) worst_atom_clash = dr[drcount][nodeno].worst_energy;
@@ -3058,19 +2959,6 @@ _try_again:
                 std:stringstream stst;
                 stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl;
                 dr[drcount][nodeno].miscdata += stst.str();
-            }
-
-            if (dyn_motions.size())
-            {
-                dr[drcount][nodeno].miscdata += (std::string)"Dynamic Motions:\n";
-                for (i=0; i<dyn_motions.size(); i++)
-                {
-                    dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i].name
-                        + (std::string)" "
-                        + std::to_string(dyn_motions[i].get_total_applied())
-                        + (std::string)"\n";
-                }
-                dr[drcount][nodeno].miscdata += (std::string)"\n";
             }
 
             #if _DBG_STEPBYSTEP

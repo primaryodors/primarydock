@@ -8,7 +8,7 @@
 // into a float variable!
 
 float vector_traditional_forloop(int n) {
-    std::vector<int> integers;
+    BAD<int> integers;
 
     for (int i = 1; i <= n; i++)
         integers.push_back(i);
@@ -21,7 +21,7 @@ float vector_traditional_forloop(int n) {
 }
 
 float vector_ranged_forloop(int n) {
-    std::vector<int> integers;
+    BAD<int> integers;
 
     for (int i = 1; i <= n; i++)
         integers.push_back(i);
@@ -34,7 +34,7 @@ float vector_ranged_forloop(int n) {
 }
 
 float vector_preallocated_ranged_forloop(int n) {
-    std::vector<int> integers(n);
+    BAD<int> integers(n);
 
     for (int i = 1; i <= n; i++)
         integers[i-1] = i;

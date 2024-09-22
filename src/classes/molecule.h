@@ -66,8 +66,8 @@ public:
 
 protected:
     int sz = 0;
-    std::vector<Point> saved_atom_locs;
-    std::vector<int> saved_atom_Z;
+    BAD<Point> saved_atom_locs;
+    BAD<int> saved_atom_Z;
     Molecule* saved_from = nullptr;
 };
 
@@ -131,7 +131,7 @@ public:
     float total_eclipses();
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
     float distance_to(Molecule* other_mol);
-    std::vector<Atom*> longest_dimension();
+    BAD<Atom*> longest_dimension();
     float get_atom_bond_length_anomaly(Atom* atom, Atom* ignore = nullptr);
     float evolve_structure(int generations = _evolution_default_generations, float mutation_rate = _default_mutation_rate, int pop_size = _default_population_size);
 
@@ -205,17 +205,17 @@ public:
 
     static void conform_molecules(Molecule** molecules, int iterations = 50,
         void (*callback)(int, Molecule**) = nullptr,
-        void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr,
+        void (*group_realign)(Molecule*, BAD<std::shared_ptr<GroupPair>>) = nullptr,
         void (*progress)(float) = nullptr
         );
     
     static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50,
         void (*callback)(int, Molecule**) = nullptr,
-        void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr,
+        void (*group_realign)(Molecule*, BAD<std::shared_ptr<GroupPair>>) = nullptr,
         void (*progress)(float) = nullptr
         );
     
-    // static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
+    // static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, BAD<std::shared_ptr<GroupPair>>) = nullptr);
     void conform_atom_to_location(int atom_idx, Point target, int iterations = 50, float optimal_distance = 0);
     void conform_atom_to_location(const char* atom_name, Point target, int iterations = 20, float optimal_distance = 0);
     SCoord motion_to_optimal_contact(Molecule* ligand);
@@ -257,7 +257,7 @@ public:
     int springy_bondct = 0;
     bool been_flexed = false;
     bool priority = false;
-    std::vector<std::shared_ptr<GroupPair>> agroups;
+    BAD<std::shared_ptr<GroupPair>> agroups;
     Molecule** mclashables = nullptr;
     Atom *clash1 = nullptr, *clash2 = nullptr;
     float clash_worst = 0;

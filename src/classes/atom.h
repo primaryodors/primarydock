@@ -236,7 +236,7 @@ public:
 
     bool is_conjugated_to(Atom* a, Atom* break_if_reach = nullptr, Atom* caller = nullptr);
     float is_conjugated_to_charge(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
-    std::vector<Atom*> get_conjugated_atoms(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
+    BAD<Atom*> get_conjugated_atoms(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
 
     // Ring membership.
     int num_rings();

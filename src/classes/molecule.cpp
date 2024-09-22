@@ -676,9 +676,9 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
     return atoms[j];
 }
 
-std::vector<Atom*> Molecule::longest_dimension()
+BAD<Atom*> Molecule::longest_dimension()
 {
-    std::vector<Atom*> retval;
+    BAD<Atom*> retval;
     if (!atoms) return retval;
     int i, j;
     float rmax = 0;
@@ -3384,7 +3384,7 @@ Interaction Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 }
 
 void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**),
-    void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>),
+    void (*group_realign)(Molecule*, BAD<std::shared_ptr<GroupPair>>),
     void (*progress)(float))
 {
     int m, n;
@@ -3504,7 +3504,7 @@ Interaction Molecule::total_intermol_binding(Molecule** l)
 }
 
 void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**),
-    void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>),
+    void (*group_realign)(Molecule*, BAD<std::shared_ptr<GroupPair>>),
     void (*progress)(float))
 {
     if (!mm) return;

@@ -40,11 +40,12 @@ struct ScriptVar
 };
 
 string script_fname = "";
-std::vector<string> script_lines;
+string script_lines[65536];
+int program_size = 0;
 ScriptVar script_var[_VARNUM_MASK+1];
 int vars = 0;
 int program_counter = 0;
-std::vector<int> call_stack;
+int call_stack[256];
 int stack_pointer = 0;
 
 Protein* strands[26];
@@ -109,7 +110,7 @@ bool download_file(std::string url, std::string destination)
 
 float contact_energy(Protein* a, Protein* b, bool repack = false, int a_from = 0, int a_to = 0, int b_from = 0, int b_to = 0)
 {
-    std::vector<AminoAcid*> vca = a->get_contact_residues(b, 2);
+    AminoAcid** vca = a->get_contact_residues(b, 2);
     float f=0;
 
     char cha = a->get_pdb_chain(), chb = b->get_pdb_chain();
@@ -688,6 +689,7 @@ int main(int argc, char** argv)
 
     if (pf = fopen(script_fname.c_str(), "rb"))
     {
+        program_counter = 0;
         while (!feof(pf))
         {
             char buffer[1024];
@@ -696,15 +698,15 @@ int main(int argc, char** argv)
             if (buffer[0]) // && buffer[0] != '#')
             {
                 while (strlen(buffer) && buffer[strlen(buffer)-1] <= ' ') buffer[strlen(buffer)-1] = '\0';
-                script_lines.push_back(buffer);
+                script_lines[program_size++] = buffer;
             }
         }
 
         fclose(pf);
     }
 
-
-    while (program_counter < script_lines.size())
+    program_counter = 0;
+    while (program_counter < program_size)
     {
         // cout << endl << "Process line " << program_counter << "... " << flush;
         char buffer[1024];
@@ -1625,8 +1627,7 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "GOSUB"))
             {
-                call_stack.push_back(program_counter);
-                stack_pointer = call_stack.size();
+                call_stack[stack_pointer++] = program_counter;
                 goto _goto;
             }   // GOSUB
 
@@ -1661,7 +1662,6 @@ int main(int argc, char** argv)
                 if (!stack_pointer) raise_error("RETURN without GOSUB.");
                 stack_pointer--;
                 program_counter = call_stack[stack_pointer];
-                call_stack.erase(call_stack.begin()+stack_pointer);
             }   // RETURN
 
             else if (!strcmp(words[0], "HELICES"))
@@ -2492,8 +2492,8 @@ int main(int argc, char** argv)
                 strcpy(sv.psz, working->get_sequence().c_str());
 				set_variable(buffer, sv);
 
-                std::vector<std::string> rem_hx = working->get_remarks("650 HELIX");
-                for (l=0; l<rem_hx.size(); l++)
+                std::string* rem_hx = working->get_remarks("650 HELIX");
+                for (l=0; rem_hx[l]; l++)
                 {
                     strcpy(buffer, rem_hx[l].c_str());
                     char** words = chop_spaced_words(buffer);
@@ -2545,7 +2545,8 @@ int main(int argc, char** argv)
                 int elem_charge=0;
                 int ncr=0;						// number of coordinating residues.
                 int resnos[13];					// more than the task will ever conceivably require.
-                std::vector<string> cratoms;	// coordinating residue atoms.																						oh god I hooked up with this guy once who used kratom and after we both finished goddamn all he did was yipyapyipyapyipyap all night until finally I said babe, I n**d my sleep, and I musta finally dozed off at something like 5am, yeah kinda like the song. Then it's morning and he goes home and a hot drummer/songwriter is coming over to audition for my rock band that day and I'm running on 3 hours of sleep, what a way to make a first impression, thank flying spaghetti monster our guitarist was my roommate because at least someone in the house was awake. Ahhh, my 30s, when I still had (false) hope. Good times, those.
+                string cratoms[16];	            // coordinating residue atoms.
+                int cratcount = 0;
                 bool force_tyrosine_O = false;
                 bool thiolate = false;
                 bool uses_fancy_options = false;
@@ -2621,13 +2622,13 @@ int main(int argc, char** argv)
                         {
                             n = rr->get_atom_count();
                             // Get members 1 and 1+floor(n/2).
-                            cratoms.push_back(rr->get_atom(1)->name);
+                            cratoms[cratcount++] = rr->get_atom(1)->name;
                             cout << "Found metal coord atom " << *aa << ":" << cratoms[ncr] << endl;
                             ncr++;
 
                             resnos[ncr] = k;
                             j = 1 + (n/2);
-                            cratoms.push_back(rr->get_atom(j)->name);
+                            cratoms[cratcount++] = rr->get_atom(j)->name;
                             cout << "Found metal coord atom " << *aa << ":" << cratoms[ncr] << endl;
                             ncr++;
 
@@ -2639,7 +2640,7 @@ int main(int argc, char** argv)
 
                     if (ba)
                     {
-                        cratoms.push_back(ba->name);
+                        cratoms[cratcount++] = ba->name;
                         cout << "Found metal coord atom " << *aa << ":" << cratoms[ncr] << endl;
                         ncr++;
                     }

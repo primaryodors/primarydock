@@ -1,10 +1,10 @@
 
 #include "group.h"
 
-std::vector<MCoord> mtlcoords;
-std::vector<std::shared_ptr<GroupPair>> global_pairs;
-std::vector<Moiety> predef_grp;
-std::vector<AminoAcid*> ResidueGroup::disqualified_residues;
+BAD<MCoord> mtlcoords;
+BAD<std::shared_ptr<GroupPair>> global_pairs;
+BAD<Moiety> predef_grp;
+BAD<AminoAcid*> ResidueGroup::disqualified_residues;
 
 Point AtomGroup::get_center()
 {
@@ -572,7 +572,7 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
         }
     }
 
-    std::vector<Atom*> bd = mol->longest_dimension();
+    BAD<Atom*> bd = mol->longest_dimension();
     float ld;
     if (bd.size() < 2) ld = 1;
     else ld = bd[0]->distance_to(bd[1]);
@@ -1405,7 +1405,7 @@ GroupPair** GroupPair::pair_groups(AtomGroup** ag, ResidueGroup** scg, Point pce
         {
             if  (pair->get_weighted_potential() > retval[l]->get_weighted_potential())
             {
-                std::vector<std::shared_ptr<GroupPair>>::iterator it;
+                BAD<std::shared_ptr<GroupPair>>::iterator it;
                 it = retval.begin();
                 retval.insert(it+l, pair);
                 added = true;
@@ -1451,17 +1451,17 @@ void GroupPair::disqualify()
     }
 }
 
-void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
+void GroupPair::align_groups(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp)
 {
     GroupPair::align_groups(lig, gp, true);
 }
 
-void GroupPair::align_groups_noconform(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
+void GroupPair::align_groups_noconform(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp)
 {
     GroupPair::align_groups(lig, gp, false, bb_realign_amount);
 }
 
-void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms, float amount)
+void GroupPair::align_groups(Molecule* lig, BAD<std::shared_ptr<GroupPair>> gp, bool do_conforms, float amount)
 {
     int n = min((int)gp.size(), _bb_max_grp);
     if (n < 1) return;

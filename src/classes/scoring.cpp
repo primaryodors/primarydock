@@ -62,7 +62,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     for (i=0; i<end1; i++) final_binding[i] = 0;
     #endif
 
-    std::vector<AminoAcid*> allres = protein->get_residues_near(ligand->get_barycenter(), 100000, false);
+    BAD<AminoAcid*> allres = protein->get_residues_near(ligand->get_barycenter(), 100000, false);
     int qpr = allres.size();
     Molecule* postaa[qpr];
     postaa[0] = ligand;

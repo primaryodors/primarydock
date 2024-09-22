@@ -19,7 +19,7 @@ class Search
 };
 
 extern Point size, loneliest;
-extern std::vector<int> exclusion;
+extern BAD<int> exclusion;
 
 extern AtomGroup ligand_groups[3];
 extern ResidueGroup sc_groups[3];

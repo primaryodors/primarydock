@@ -3,7 +3,7 @@
 
 Point loneliest;
 Point size(10,10,10);
-std::vector<int> exclusion;
+BAD<int> exclusion;
 AtomGroup ligand_groups[3];
 ResidueGroup sc_groups[3];
 
@@ -22,7 +22,7 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
     float lig_min_int_clsh = ligand->get_internal_clashes();
 
     // Begin tumble sphere behavior.
-    std::vector<AminoAcid*> tsphres = protein->get_residues_near(l_pocket_cen, size.magnitude()+6);
+    BAD<AminoAcid*> tsphres = protein->get_residues_near(l_pocket_cen, size.magnitude()+6);
     int tsphsz = tsphres.size();
     float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
 
@@ -385,7 +385,7 @@ void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_
         #endif
 
         global_pairs[0]->disqualify();
-        std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid, l_pocket_cen);
+        BAD<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid, l_pocket_cen);
         global_pairs = GroupPair::pair_groups(lagc, scg, l_pocket_cen);
         GroupPair::align_groups(ligand, global_pairs, false, 1);
     }

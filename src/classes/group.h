@@ -48,7 +48,7 @@ class AtomGroup
 class ResidueGroup
 {
     public:
-    std::vector<AminoAcid*> aminos;
+    BAD<AminoAcid*> aminos;
     bool metallic = false;
     Atom* metal = nullptr;
 
@@ -60,9 +60,9 @@ class ResidueGroup
     float hydrophilicity();
     float pi_stackability();
 
-    static std::vector<std::shared_ptr<ResidueGroup>> get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
+    static BAD<std::shared_ptr<ResidueGroup>> get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
 
-    static std::vector<AminoAcid*> disqualified_residues;
+    static BAD<AminoAcid*> disqualified_residues;
 };
 
 class GroupPair
@@ -75,10 +75,10 @@ class GroupPair
     float get_weighted_potential();
     bool is_priority() { return priority; }
 
-    static std::vector<std::shared_ptr<GroupPair>> pair_groups(std::vector<std::shared_ptr<AtomGroup>> agroups, std::vector<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen, float rel_stochasticity = 1);
-    static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);
-    static void align_groups_noconform(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);
-    static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs, bool do_conforms, float amount=1);    // Assumes the ligand is already centered in the pocket.
+    static BAD<std::shared_ptr<GroupPair>> pair_groups(BAD<std::shared_ptr<AtomGroup>> agroups, BAD<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen, float rel_stochasticity = 1);
+    static void align_groups(Molecule* ligand, BAD<std::shared_ptr<GroupPair>> group_pairs);
+    static void align_groups_noconform(Molecule* ligand, BAD<std::shared_ptr<GroupPair>> group_pairs);
+    static void align_groups(Molecule* ligand, BAD<std::shared_ptr<GroupPair>> group_pairs, bool do_conforms, float amount=1);    // Assumes the ligand is already centered in the pocket.
 
     void disqualify();
 
@@ -91,8 +91,8 @@ class GroupPair
 std::ostream& operator<<(std::ostream& os, const AtomGroup& ag);
 std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg);
 
-extern std::vector<MCoord> mtlcoords;
-extern std::vector<std::shared_ptr<GroupPair>> global_pairs;
-extern std::vector<Moiety> predef_grp;
+extern BAD<MCoord> mtlcoords;
+extern BAD<std::shared_ptr<GroupPair>> global_pairs;
+extern BAD<Moiety> predef_grp;
 
 #endif

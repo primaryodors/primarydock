@@ -191,7 +191,8 @@ int main(int argc, char** argv)
             {
                 Point mcen = average_of_points(mcraloc, mcrq);
                 cout << "Performing metal coordination (3 residues)..." << endl << flush;
-                std::vector<MCoord> mtlcoords;
+                MCoord mtlcoords[16];
+                int mtlcoordn = 0;
                 MCoord mc;
                 mc.Z = Atom::Z_from_esym(esym);
                 mc.charge = charge;
@@ -209,7 +210,8 @@ int main(int argc, char** argv)
                     aa->conform_atom_to_location(a->name, mcen);
                 }
 
-                mtlcoords.push_back(mc);
+                mtlcoords[mtlcoordn++] = mc;
+                mtlcoords[mtlcoordn] = nullptr;
 
                 p.coordinate_metal(mtlcoords);
             }

@@ -127,6 +127,22 @@ Pose::Pose()
     reset();
 }
 
+Pose::Pose(const Pose& p)
+{
+    sz = p.sz;
+    saved_atom_locs = new Point[sz + 4];
+    saved_atom_Z = new int[sz+4];
+
+    int i;
+    for (i=0; i<sz; i++)
+    {
+        saved_atom_locs[i] = p.saved_atom_locs[i];
+        saved_atom_Z[i] = p.saved_atom_Z[i];
+    }
+
+    saved_from = p.saved_from;
+}
+
 Pose::Pose(Molecule* m)
 {
     reset();
@@ -136,6 +152,27 @@ Pose::Pose(Molecule* m)
 Pose::~Pose()
 {
     if (saved_atom_locs) delete[] saved_atom_locs;
+    saved_atom_locs = nullptr;
+}
+
+Pose& Pose::operator=(const Pose& p)
+{
+    if (&p == this) return *this;
+
+    reset();
+    sz = p.sz;
+    saved_atom_locs = new Point[sz + 4];
+    saved_atom_Z = new int[sz+4];
+
+    int i;
+    for (i=0; i<sz; i++)
+    {
+        saved_atom_locs[i] = p.saved_atom_locs[i];
+        saved_atom_Z[i] = p.saved_atom_Z[i];
+    }
+
+    saved_from = p.saved_from;
+    return *this;
 }
 
 void Pose::reset()

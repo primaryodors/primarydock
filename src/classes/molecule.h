@@ -57,8 +57,10 @@ class Pose
 {
 public:
     Pose();
+    Pose(const Pose& p);
     Pose(Molecule* from_mol);
     ~Pose();
+    Pose& operator=(const Pose& p);
     void copy_state(Molecule* from_mol);
     void restore_state(Molecule* to_mol);
     float total_atom_motions();

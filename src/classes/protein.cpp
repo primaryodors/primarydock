@@ -63,7 +63,6 @@ Protein::Protein()
 {
     aaptrmin.n = aaptrmax.n = 0;
 
-    residues = nullptr;
     sequence = nullptr;
     ca = nullptr;
     res_reach = nullptr;
@@ -79,7 +78,6 @@ Protein::Protein(const char* lname)
     name = lname;
     aaptrmin.n = aaptrmax.n = 0;
 
-    residues = nullptr;
     sequence = nullptr;
     ca = nullptr;
     res_reach = nullptr;
@@ -101,11 +99,10 @@ Protein::~Protein()
 bool Protein::add_residue(const int resno, const char aaletter)
 {
     int i;
+    arrlimit = 1024;
 
-    if (!residues)
+    if (!sequence)
     {
-        arrlimit = resno+1024;
-        residues = new AminoAcid*[arrlimit];
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];
         res_reach = new float[arrlimit];
@@ -120,33 +117,7 @@ bool Protein::add_residue(const int resno, const char aaletter)
     }
     else if (resno >= arrlimit)
     {
-        AminoAcid** oldres = residues;
-        char* oldseq = sequence;
-        Atom** oldca = ca;
-        float* oldreach = res_reach;
-        arrlimit = resno+1024;
-        residues = new AminoAcid*[arrlimit];
-        sequence = new char[arrlimit];
-        ca = new Atom*[arrlimit];
-        res_reach = new float[arrlimit];
-
-        for (i=0; i<arrlimit; i++)
-        {
-            residues[i] = NULL;
-            sequence[i] = 0;
-            ca[i] = NULL;
-            res_reach[i] = 0;
-        }
-
-        for (i=0; oldres[i]; i++)
-        {
-            residues[i] = oldres[i];
-            sequence[i] = oldseq[i];
-            ca[i] = oldca[i];
-            res_reach[i] = oldreach[i];
-        }
-        residues[i] = 0;
-        sequence[i] = 0;
+        throw 0xbadda7a;
     }
 
     i = resno-1;
@@ -698,7 +669,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     char buffer[1024];
     Atom* a;
 
-    if (residues) delete[] residues;
     if (sequence) delete[] sequence;
     if (ca) delete[] ca;
     // if (res_reach) delete res_reach;         // This was causing a segfault.
@@ -878,7 +848,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     }
 
     int arrlimit = rescount+1;
-    residues 	= new AminoAcid*[arrlimit];
     sequence 	= new char[arrlimit];
     ca       	= new Atom*[arrlimit];
     res_reach	= new float[arrlimit];

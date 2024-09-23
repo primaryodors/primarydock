@@ -1002,7 +1002,6 @@ float Atom::is_polar()
                     #endif
                 }
 
-                delete[] lca;
                 return charge;
             }
         }

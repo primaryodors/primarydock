@@ -214,7 +214,7 @@ protected:
     int arrlimit = 0;
     std::string name;
     char* sequence = nullptr;
-    AminoAcid** residues = nullptr;
+    AminoAcid* residues[1024];
     AminoAcid*** res_can_clash = nullptr;
     float* res_reach = nullptr;
     Atom* metals[16];

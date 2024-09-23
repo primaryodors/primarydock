@@ -2235,8 +2235,9 @@ int main(int argc, char** argv)
         lagc = AtomGroup::get_potential_ligand_groups(ligand, nmetals > 0);
         for (nlagc=0; lagc[nlagc]; nlagc++);
         if (nlagc > MAX_CS_RES-2) nlagc = MAX_CS_RES-2;
-        for (i=0; i<agqty; i++)
-            agc[i] = lagc[i];
+        agqty=0;
+        for (i=0; i<nlagc; i++)
+            agc[agqty++] = lagc[i];
 
         if (nmetals)
         {
@@ -2910,7 +2911,7 @@ _try_again:
             if (iso_count) dr[drcount][nodeno].isomer = ligand->get_name();
 
             if ((pose==1 && !nodeno) || best_energy > -btot) best_energy = -btot;
-            if ((pose==1 && !nodeno) || dr[drcount][nodeno].worst_energy > worst_atom_clash) worst_atom_clash = dr[drcount][nodeno].worst_energy;
+            if ((pose==1 && !nodeno) || dr[drcount][nodeno].worst_energy < worst_atom_clash) worst_atom_clash = dr[drcount][nodeno].worst_energy;
 
             #if compute_clashdirs
             n = protein->get_end_resno();

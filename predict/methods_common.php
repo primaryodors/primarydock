@@ -23,7 +23,7 @@ echo "Method is $method.\n";
 $result = $output = false;
 chdir(__DIR__);
 chdir("..");
-exec("make primarydock", $output, $result);
+exec("make primarydock pepteditor", $output, $result);
 if ($result) die("Build fail.\n".print_r($output, true));
 
 // Configurable variables

@@ -572,6 +572,7 @@ AtomGroup** AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoor
     float ld;
     if (!bd || !bd[0] || !bd[1]) ld = 1;
     else ld = bd[0]->distance_to(bd[1]);
+    delete bd;
 
     for (i=0; i<n; i++)
     {

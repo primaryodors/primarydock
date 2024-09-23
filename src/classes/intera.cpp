@@ -1315,7 +1315,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
 
 _canstill_clash:
     float sigma;
-    float local_clash_allowance = global_clash_allowance;
+    float local_clash_allowance = (a->is_pi() || b->is_pi()) ? pi_clash_allowance : global_clash_allowance;
 
     #if ignore_double_hydrogen_clashes
     if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0)
@@ -1358,7 +1358,7 @@ _canstill_clash:
 
 float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
 {
-    float local_clash_allowance = global_clash_allowance;
+    float local_clash_allowance = (atom1->is_pi() || atom2->is_pi()) ? pi_clash_allowance : global_clash_allowance;
     if (atom1->get_Z() == 1 && atom2->get_Z() == 1) local_clash_allowance *= double_hydrogen_clash_allowance_multiplier;
 
     if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - local_clash_allowance;

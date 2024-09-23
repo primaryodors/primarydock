@@ -135,13 +135,13 @@ Pose::Pose(Molecule* m)
 
 Pose::~Pose()
 {
-    //
+    if (saved_atom_locs) delete[] saved_atom_locs;
 }
 
 void Pose::reset()
 {
     sz = 0;
-    if (saved_atom_locs) delete saved_atom_locs;
+    if (saved_atom_locs) delete[] saved_atom_locs;
     saved_atom_locs = nullptr;
     if (saved_atom_Z) delete saved_atom_Z;
     saved_atom_Z = nullptr;

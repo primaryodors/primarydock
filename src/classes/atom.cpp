@@ -212,6 +212,7 @@ int Atom::Z_from_esym(const char* elem_sym)
 Atom::Atom(const char* elem_sym)
 {
     Z = Z_from_esym(elem_sym);
+    btnc[0] = 0;
 
     reciprocity = false;
     used = 0;
@@ -231,6 +232,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
     location.y = l_location->y;
     location.z = l_location->z;
     location.weight = at_wt;
+    btnc[0] = 0;
 
     Z = Z_from_esym(elem_sym);
 
@@ -253,6 +255,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
     location.z = l_location->z;
     location.weight = at_wt;
     charge = origchg = lcharge;
+    btnc[0] = 0;
 
     Z = Z_from_esym(elem_sym);
 
@@ -273,6 +276,7 @@ Atom::Atom(FILE* is)
     char buffer[1024], res3let[5];
     int resno=0;
     init_nulls(buffer, 1024);
+    btnc[0] = 0;
 
     while (1)
     {
@@ -450,12 +454,6 @@ const char* Atom::get_elem_sym()
     return elem_syms[Z];
 }
 
-Point Atom::get_location()
-{
-    Point pt = location;
-    return pt;
-}
-
 void Bond::fetch_moves_with_atom2(Atom** result)
 {
     int i;
@@ -482,7 +480,7 @@ bool Atom::move(Point* pt)
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
 
-    if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
+    if (isnan(pt->x + pt->y + pt->z))
     {
         return false;
     }
@@ -501,20 +499,11 @@ bool Atom::move_rel(Vector* v)
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
 
-    if (isnan(v->phi) || isnan(v->theta) || isnan(v->r))
+    if (isnan(v->phi + v->theta + v->r))
     {
         return false;
     }
 
-    /*if (name && !strcmp(name, "CB"))
-    {
-    	Bond* b = get_bond_between("CA");
-    	if (b && b->atom2)
-    	{
-    		float r = b->atom2->get_location().get_3d_distance(location.add(v));
-    		if (r > 1.55) throw 0x7e57196;
-    	}
-    }*/
     move(location.add(v));
     return true;
 }
@@ -528,7 +517,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     palin->fetch_moves_with_atom2(atoms);
     if (!atoms[0]) return 0;
 
-    if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
+    if (isnan(pt->x + pt->y + pt->z))
     {
         return false;
     }
@@ -704,17 +693,23 @@ int Atom::get_bonded_heavy_atoms_count()
 float Atom::is_bonded_to(Atom* latom2)
 {
     if (!bonded_to) return 0;
-    int i;
+    if (btnc[0] && !strstr(btnc, latom2->name)) return false;
+
+    int i, retval=0;
+    std::string btnames = "";
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].atom2
             && abs(reinterpret_cast<long>(bonded_to[i].atom2) - reinterpret_cast<long>(bonded_to)) < memsanity
             && bonded_to[i].atom2->get_Z() > 0 && bonded_to[i].atom2->get_Z() <= 118)
         {
-            if (bonded_to[i].atom2 == latom2) return bonded_to[i].cardinality;
+            btnames += (std::string)bonded_to[i].atom2->name + (std::string)" ";
+            if (bonded_to[i].atom2 == latom2) retval = bonded_to[i].cardinality;
         }
     }
-    return 0;
+
+    strcpy(btnc, btnames.c_str());
+    return retval;
 }
 
 bool Atom::shares_bonded_with(Atom* atom2)
@@ -776,6 +771,34 @@ int Atom::num_bonded_to(const char* element)
                )
                 j++;
     return j;
+}
+
+Atom* Atom::is_bonded_to_Z(const int Z)
+{
+    if (!bonded_to) return 0;
+    int i;
+    for (i=0; i<geometry; i++)
+        if (bonded_to[i].atom2)
+            if (Z<0
+                ||
+                bonded_to[i].atom2->get_Z() == Z
+               )
+                return bonded_to[i].atom2;
+    return 0;
+}
+
+Atom* Atom::is_bonded_to_Z(const int Z, const int cardinality)
+{
+    if (!bonded_to) return 0;
+    int i;
+    for (i=0; i<geometry; i++)
+        if (bonded_to[i].atom2 && bonded_to[i].cardinality == cardinality)
+            if (Z<0
+                ||
+                bonded_to[i].atom2->get_Z() == Z
+               )
+                return bonded_to[i].atom2;
+    return 0;
 }
 
 int Atom::num_bonded_to_in_ring(const char* element, Ring* member_of)

@@ -145,32 +145,35 @@ public:
 
     // Basic getters.
     const char* get_elem_sym();
-    int get_Z()
+    inline int get_Z()
     {
         return Z;
     }
-    int get_family()
+    inline int get_family()
     {
         return family;
     }
-    int get_valence()
+    inline int get_valence()
     {
         return valence;
     }
-    int get_geometry()
+    inline int get_geometry()
     {
         return geometry;
     }
-    Point get_location();
-    float get_vdW_radius()
+    inline Point get_location()
+    {
+        return location;
+    }
+    inline float get_vdW_radius()
     {
         return vdW_rad;
     }
-    float get_atomic_weight()
+    inline float get_atomic_weight()
     {
         return at_wt;
     }
-    float get_electronegativity()
+    inline float get_electronegativity()
     {
         return elecn;
     }
@@ -217,6 +220,8 @@ public:
     Atom* is_bonded_to(const char* element, const int cardinality);
     Atom* is_bonded_to(const int family);
     Atom* is_bonded_to(const int family, const int cardinality);
+    Atom* is_bonded_to_Z(const int Z);
+    Atom* is_bonded_to_Z(const int Z, const int cardinality);
     Atom* is_bonded_to_pi(const int family, const bool other_atoms_pi);
 
     int num_bonded_to(const char* element);
@@ -380,6 +385,8 @@ protected:
     Ring** member_of = nullptr;
     int recursion_counter = 0;
     bool is_imidazole_like = false;     // Rings having a pKa near the biological pH of 7.4, that aromatic pnictogens can protonate.
+
+    char btnc[256];                     // Bonded-To Name Cache.
 
     static void read_elements();
     void figure_out_valence();

@@ -46,9 +46,7 @@ Point Point::subtract(const Point subtracted)
     retval.y = y - subtracted.y;
     retval.z = z - subtracted.z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    if (isnan(retval.x + retval.y + retval.z)) retval.x = retval.y = retval.z = 0;
 
     return retval;
 }
@@ -60,9 +58,7 @@ Point Point::subtract(const Point* subtracted)
     retval.y = y - subtracted->y;
     retval.z = z - subtracted->z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    if (isnan(retval.x + retval.y + retval.z)) retval.x = retval.y = retval.z = 0;
 
     return retval;
 }
@@ -74,9 +70,7 @@ Point Point::negate()
     retval.y = -y;
     retval.z = -z;
 
-    if (isnan(retval.x)) retval.x = 0;
-    if (isnan(retval.y)) retval.y = 0;
-    if (isnan(retval.z)) retval.z = 0;
+    if (isnan(retval.x + retval.y + retval.z)) retval.x = retval.y = retval.z = 0;
 
     return retval;
 }
@@ -87,9 +81,7 @@ float Point::get_3d_distance(const Point* reference)
           dy = y - reference->y,
           dz = z - reference->z;
 
-    if (isnan(dx)) dx = 0;
-    if (isnan(dy)) dy = 0;
-    if (isnan(dz)) dz = 0;
+    if (isnan(dx + dy + dz)) dx = dy = dz = 0;
 
     return sqrt(dx*dx + dy*dy + dz*dz);
 }
@@ -201,7 +193,7 @@ float Point::get_distance_to_line(Point a, Point b)
 {
     float r2 = pow(a.get_3d_distance(b), 2);
     if (!r2) return get_3d_distance(a);
-    
+
     float t = fmax(0, fmin(1,  ((x - a.x) * (b.x - a.x) + (y - a.y) * (b.y - a.y) + (z - a.z) * (b.z - a.z)) / r2));
     Point p(a.x + t * (b.x-a.x), a.y + t * (b.y-a.y), a.z + t * (b.z-a.z));
     

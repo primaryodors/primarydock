@@ -349,7 +349,7 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
 }
 
 #define _dbg_applicable 0
-void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** retval)
+void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** retval, bool sc)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
     if (!a || !b)
@@ -474,22 +474,23 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
 
     for (i=0; look[i]; i++)
     {
+        if (sc && look[i]->type == covalent) continue;
         if (	(	(look[i]->Za == Za || look[i]->Za == any_element)
                     &&
                     (	!look[i]->bZa
                         ||
-                        (!look[i]->aritybZa && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa)))
+                        (!look[i]->aritybZa && a->is_bonded_to_Z(look[i]->bZa))
                         ||
-                        ( look[i]->aritybZa && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa), look[i]->aritybZa))
+                        ( look[i]->aritybZa && a->is_bonded_to_Z(look[i]->bZa, look[i]->aritybZa))
                     )
                     &&
                     (look[i]->Zb == Zb || look[i]->Zb == any_element)
                     &&
                     (	!look[i]->bZb
                         ||
-                        (!look[i]->aritybZb && b->is_bonded_to(Atom::esym_from_Z(look[i]->bZb)))
+                        (!look[i]->aritybZb && b->is_bonded_to_Z(look[i]->bZb))
                         ||
-                        ( look[i]->aritybZb && b->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb))
+                        ( look[i]->aritybZb && b->is_bonded_to_Z(look[i]->bZb, look[i]->aritybZb))
                     )
              )
                 ||
@@ -497,18 +498,18 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
                     &&
                     (	!look[i]->bZb
                         ||
-                        (!look[i]->aritybZb && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb)))
+                        (!look[i]->aritybZb && a->is_bonded_to_Z(look[i]->bZb))
                         ||
-                        ( look[i]->aritybZb && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb))
+                        ( look[i]->aritybZb && a->is_bonded_to_Z(look[i]->bZb, look[i]->aritybZb))
                     )
                     &&
                     (look[i]->Za == Zb || look[i]->Za == any_element)
                     &&
                     (	!look[i]->bZa
                         ||
-                        (!look[i]->aritybZa && b->is_bonded_to(Atom::esym_from_Z(look[i]->bZa)))
+                        (!look[i]->aritybZa && b->is_bonded_to_Z(look[i]->bZa))
                         ||
-                        ( look[i]->aritybZa && b->is_bonded_to(Atom::esym_from_Z(look[i]->bZa), look[i]->aritybZa))
+                        ( look[i]->aritybZa && b->is_bonded_to_Z(look[i]->bZa, look[i]->aritybZa))
                     )
                 )
            )
@@ -1403,20 +1404,20 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
         if (all_forces[i]->type == covalent && fabs(all_forces[i]->arity - cardinality) < 0.1)
             if (	(	all_forces[i]->Za == a->get_Z()
                         &&
-                        (	!all_forces[i]->bZa || a->is_bonded_to(Atom::esym_from_Z(all_forces[i]->bZa)))
+                        (	!all_forces[i]->bZa || a->is_bonded_to_Z(all_forces[i]->bZa))
                         &&
                         all_forces[i]->Zb == b->get_Z()
                         &&
-                        (	!all_forces[i]->bZb || b->is_bonded_to(Atom::esym_from_Z(all_forces[i]->bZb)))
+                        (	!all_forces[i]->bZb || b->is_bonded_to_Z(all_forces[i]->bZb))
                  )
                     ||
                     (	all_forces[i]->Za == b->get_Z()
                         &&
-                        (	!all_forces[i]->bZa || b->is_bonded_to(Atom::esym_from_Z(all_forces[i]->bZa)))
+                        (	!all_forces[i]->bZa || b->is_bonded_to_Z(all_forces[i]->bZa))
                         &&
                         all_forces[i]->Zb == a->get_Z()
                         &&
-                        (	!all_forces[i]->bZb || a->is_bonded_to(Atom::esym_from_Z(all_forces[i]->bZb)))
+                        (	!all_forces[i]->bZb || a->is_bonded_to_Z(all_forces[i]->bZb))
                     )
                )
             {
@@ -1460,20 +1461,20 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
         if (all_forces[i]->type == btype)
             if (	(	all_forces[i]->Za == a->get_Z()
                         &&
-                        (	!all_forces[i]->bZa || a->is_bonded_to(Atom::esym_from_Z(all_forces[i]->bZa)))
+                        (	!all_forces[i]->bZa || a->is_bonded_to_Z(all_forces[i]->bZa))
                         &&
                         all_forces[i]->Zb == b->get_Z()
                         &&
-                        (	!all_forces[i]->bZb || b->is_bonded_to(Atom::esym_from_Z(all_forces[i]->bZb)))
+                        (	!all_forces[i]->bZb || b->is_bonded_to_Z(all_forces[i]->bZb))
                  )
                     ||
                     (	all_forces[i]->Za == b->get_Z()
                         &&
-                        (	!all_forces[i]->bZa || b->is_bonded_to(Atom::esym_from_Z(all_forces[i]->bZa)))
+                        (	!all_forces[i]->bZa || b->is_bonded_to_Z(all_forces[i]->bZa))
                         &&
                         all_forces[i]->Zb == a->get_Z()
                         &&
-                        (	!all_forces[i]->bZb || a->is_bonded_to(Atom::esym_from_Z(all_forces[i]->bZb)))
+                        (	!all_forces[i]->bZb || a->is_bonded_to_Z(all_forces[i]->bZb))
                     )
                )
             {

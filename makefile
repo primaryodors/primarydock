@@ -26,13 +26,13 @@ ic: $(DIRS) $(OBJS) $(BINDIR)/ic
 CC=g++
 
 # Default CFLAGS - release mode
-# CFLAGS=-O -Wwrite-strings -fextended-identifiers -std=c++14
+CFLAGS=-O -Wwrite-strings -fextended-identifiers -std=c++14
 
 # Debug CFLAGS - allows gdb, valgrind
 # CFLAGS=-g -Wwrite-strings -fextended-identifiers -std=c++14
 
 # For gprof
-CFLAGS=-g -pg -Wwrite-strings -fextended-identifiers -std=c++14
+# CFLAGS=-g -pg -Wwrite-strings -fextended-identifiers -std=c++14
 
 # For code coverage instrumentation, switch to these CFLAGS (slower performance):
 # CFLAGS=-g -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage

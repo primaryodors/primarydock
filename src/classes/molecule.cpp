@@ -3017,37 +3017,38 @@ Interaction Molecule::get_intermol_binding(Molecule** ligands, bool subtract_cla
                                 << " = " << abind << " kJ/mol." << endl;
                         }
                         #endif
-                        if ((abind.attractive || abind.repulsive) && !isnan(abind.summed()) && !isinf(abind.summed()))
+                        float abs = abind.summed();
+                        if ((abind.attractive || abind.repulsive) && !isnan(abs) && !isinf(abs))
                         {
-                            if (abind.summed() > 0 && minimum_searching_aniso && ligands[l]->priority) abind.attractive *= 1.5;
+                            if (abs > 0 && minimum_searching_aniso && ligands[l]->priority) abind.attractive *= 1.5;
                             kJmol += abind;
 
-                            if (abind.summed() > best_atom_energy)
+                            if (abs > best_atom_energy)
                             {
-                                best_atom_energy = abind.summed();
+                                best_atom_energy = abs;
                                 best_intera = atoms[i];
                                 best_interactor = ligands[l];
                                 best_other_intera = ligands[l]->atoms[j];
                             }
 
-                            atoms[i]->last_bind_energy += abind.summed();
+                            atoms[i]->last_bind_energy += abs;
                             if (abind.attractive > atoms[i]->strongest_bind_energy)
                             {
                                 atoms[i]->strongest_bind_energy = abind.attractive;
                                 atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
                             }
 
-                            if (abind.summed() < 0 && abind.repulsive > clash_worst)
+                            if (abs < 0 && abind.repulsive > clash_worst)
                             {
                                 clash_worst = abind.repulsive;
                                 clash1 = atoms[i];
                                 clash2 = ligands[l]->atoms[j];
                             }
 
-                            if (abind.summed() < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
+                            if (abs < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
-                                ptd.multiply(fmin(fabs(-abind.summed()) / 1000, 1));
+                                ptd.multiply(fmin(fabs(-abs) / 1000, 1));
                                 lmx += lmpush * sgn(ptd.x);
                                 lmy += lmpush * sgn(ptd.y);
                                 lmz += lmpush * sgn(ptd.z);

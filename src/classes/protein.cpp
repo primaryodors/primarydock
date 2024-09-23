@@ -181,13 +181,23 @@ AminoAcid* Protein::get_residue(int resno)
     if (!resno) return 0;
     if (!residues) return 0;
 
-    int i;
-    for (i=0; residues[i]; i++)
+    int i = resno-1;
+    while (!residues[i])
     {
-        if (residues[i]->get_residue_no() == resno) return residues[i];
+        i--;
+        if (i<0) return nullptr;
+    }
+    int rno = residues[i]->get_residue_no();
+    if (rno == resno) return residues[i];
+    int j=sgn(resno-rno);
+    for (; residues[i]; i+=j)
+    {
+        rno = residues[i]->get_residue_no();
+        if (rno == resno) return residues[i];
+        if (!i) break;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 AminoAcid* Protein::get_residue(BallesterosWeinstein bw)

@@ -1105,6 +1105,7 @@ bool Atom::is_metal()
 
 bool Atom::is_pi()
 {
+    if (cached_pi_good) return cached_pi;
     if (!bonded_to) return false;
 
     int i, n;
@@ -1124,14 +1125,16 @@ bool Atom::is_pi()
         if (bonded_to[0].atom2 && bonded_to[0].atom2->Z > 1) return bonded_to[0].atom2->is_pi();
     }
 
-    if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return true;
-    if (family == CHALCOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(PNICTOGEN)) return true;
+    if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return cached_pi_good = cached_pi = true;
+    if (family == CHALCOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(PNICTOGEN)) return cached_pi_good = cached_pi = true;
 
     for (i=0; i<valence; i++)
     {
-        if (bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2) return true;
+        if (bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2) return cached_pi_good = cached_pi = true;
     }
-    return false;
+
+    cached_pi_good = true;
+    return cached_pi = false;
 }
 
 bool Atom::is_amide()

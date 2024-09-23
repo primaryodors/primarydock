@@ -368,6 +368,8 @@ protected:
     float polarity = 0;					// maximum potential relative to -OH...H-.
     bool polar_calcd = false;
     int thiol = 0;
+    bool cached_pi = false;
+    bool cached_pi_good = false;
     Bond* bonded_to = nullptr;
     bool reciprocity = false;
     int family=0;

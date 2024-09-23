@@ -690,6 +690,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
     float achg = a->get_charge(), bchg = b->get_charge()
         , apol = a->is_polar(), bpol = b->is_polar();
     int aZ = a->get_Z(), bZ = b->get_Z();
+    bool api = a->is_pi(), bpi = b->is_pi();
 
     #if auto_pK_protonation
     if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
@@ -832,8 +833,8 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
         // https://chemistry.stackexchange.com/questions/42085/can-an-amide-nitrogen-be-a-hydrogen-bond-acceptor
         if (forces[i]->type == hbond)
         {
-            if  (   (aZ == 1 && b->get_family() == PNICTOGEN && (b->is_pi() && b->get_bonded_atoms_count() > 2) ) 
-                 || (bZ == 1 && a->get_family() == PNICTOGEN && (a->is_pi() && a->get_bonded_atoms_count() > 2) )
+            if  (   (aZ == 1 && b->get_family() == PNICTOGEN && (bpi && b->get_bonded_atoms_count() > 2) ) 
+                 || (bZ == 1 && a->get_family() == PNICTOGEN && (api && a->get_bonded_atoms_count() > 2) )
                  || (aZ == 1 && bchg > hydrophilicity_cutoff)
                  || (bZ == 1 && achg > hydrophilicity_cutoff)
                 )
@@ -855,7 +856,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
         bool stacked_pi_rings = false;
 
         #if _enhanced_pi_stacking
-        if (forces[i]->type == pi && a->is_pi() && b->is_pi())
+        if (forces[i]->type == pi && api && bpi)
         {
             Ring** ar = aheavy->get_rings();
             Ring** br = bheavy->get_rings();
@@ -1207,8 +1208,8 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                 // https://www.sciencedirect.com/science/article/abs/pii/S0009261497011172
                 // https://web.archive.org/web/20200305164852id_/https://boris.unibe.ch/134571/1/1NpOH-Hydbond_JCP_resub.pdf
                 // TODO: Replace this with better data in bindings.dat. THE FOLLOWING IS A GROSS OVERSIMPLIFICATION.
-                if (a->is_pi() && !a->is_amide() && !b->is_pi()) partial *= 21.8 / 37.6;
-                if (b->is_pi() && !b->is_amide() && !a->is_pi()) partial *= 21.8 / 37.6;
+                if (api && !a->is_amide() && !bpi) partial *= 21.8 / 37.6;
+                if (bpi && !b->is_amide() && !api) partial *= 21.8 / 37.6;
             }
 
             if (forces[i]->type == mcoord)
@@ -1315,7 +1316,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
 
 _canstill_clash:
     float sigma;
-    float local_clash_allowance = (a->is_pi() || b->is_pi()) ? pi_clash_allowance : global_clash_allowance;
+    float local_clash_allowance = (api || bpi) ? pi_clash_allowance : global_clash_allowance;
 
     #if ignore_double_hydrogen_clashes
     if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0)

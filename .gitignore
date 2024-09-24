@@ -4,6 +4,7 @@
 !*.*
 
 *.o
+*.cav
 *_test
 metal
 podock

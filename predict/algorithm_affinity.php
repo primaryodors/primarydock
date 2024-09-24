@@ -32,6 +32,7 @@ function make_prediction($data)
 
         $aenergy = floatval(@$data['a_Pose1']);
         $ienergy = floatval(@$data['i_Pose1']);
+        $afound = floatval(@$data['a_POSES']) / intval($poses);
 
         $aeq = equilibrium(0, $aenergy);                    // how much of the active-state population will be ligand-bound
         $ieq = equilibrium(0, $ienergy);                    // how much of the inactive-state population will be ligand-bound
@@ -44,7 +45,7 @@ function make_prediction($data)
         $ittns = floatval(@$data['i_occlusion'] ?: 1);
 
         $data['DockScore'] = 0;
-        if ($activation >= $baseline) $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns, 4);
+        if ($activation >= $baseline) $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns * $afound, 4);
 
         if ($activation >= $baseline && $data['DockScore'] > 0)
         {

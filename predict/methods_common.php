@@ -821,7 +821,7 @@ heredoc;
         }
 
         if (!$retvar && $num_poses && !file_exists("tmp/nodelete")) unlink($cnfname);
-        else echo "WARNING: Not deleting a temporary config file in tmp/ because you have selected the debug \"nodelete\" behavior.\n"
+        else echo "WARNING: Not deleting a temporary config file in tmp/.\n"
             ."You should periodically check the tmp/ folder and manually clean out old files that are no longer necessary to keep.\n";
 
         break;

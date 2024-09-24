@@ -2335,7 +2335,7 @@ _try_again:
         metal_initlocs[i] = mtlcoords[i].mtl->get_location();
     }
 
-    float best_energy = 0;
+    float best_energy = 0, best_worst_clash = 0;
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -2805,16 +2805,16 @@ _try_again:
                 else if (pdpst == pst_constrained)
                 {
                     int csiter, ultimate_csidx=0;
-                    float best_energy;
+                    float lbest_energy;
                     Pose best_cslig;
                     best_cslig.copy_state(ligand);
                     for (csiter=0; csiter<5; csiter++)
                     {
                         Search::do_constrained_search(protein, ligand);
                         float cse = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])).summed();
-                        if (!csiter || cse > best_energy)
+                        if (!csiter || cse > lbest_energy)
                         {
-                            best_energy = cse;
+                            lbest_energy = cse;
                             best_cslig.copy_state(ligand);
                             ultimate_csidx = cs_idx;
                         }
@@ -3003,6 +3003,7 @@ _try_again:
             if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
 
             if ((pose==1 && !nodeno) || best_energy > -btot) best_energy = -btot;
+            if ((pose==1 && !nodeno) || best_worst_clash > dr[drcount][nodeno].worst_energy) best_worst_clash = dr[drcount][nodeno].worst_energy;
 
             #if compute_clashdirs
             n = protein->get_end_resno();
@@ -3346,6 +3347,10 @@ _exitposes:
     cout << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
     if (output) *output << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
     if (debug) *debug << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+
+    cout << "Best worst clash: " << (kcal ? best_worst_clash/_kcal_per_kJ : best_worst_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (output) *output << "Best worst clash: " << (kcal ? best_worst_clash/_kcal_per_kJ : best_worst_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (debug) *debug << "Best worst clash: " << (kcal ? best_worst_clash/_kcal_per_kJ : best_worst_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
 
     #if compute_clashdirs
     if (regions)

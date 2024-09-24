@@ -130,8 +130,6 @@ Pose::Pose()
 Pose::Pose(const Pose& p)
 {
     sz = p.sz;
-    saved_atom_locs = new Point[sz + 4];
-    saved_atom_Z = new int[sz+4];
 
     int i;
     for (i=0; i<sz; i++)
@@ -151,7 +149,8 @@ Pose::Pose(Molecule* m)
 
 Pose::~Pose()
 {
-    if (saved_atom_locs) delete[] saved_atom_locs;
+    delete saved_atom_locs;
+    delete saved_atom_Z;
     saved_atom_locs = nullptr;
 }
 
@@ -161,8 +160,6 @@ Pose& Pose::operator=(const Pose& p)
 
     reset();
     sz = p.sz;
-    saved_atom_locs = new Point[sz + 4];
-    saved_atom_Z = new int[sz+4];
 
     int i;
     for (i=0; i<sz; i++)
@@ -177,26 +174,23 @@ Pose& Pose::operator=(const Pose& p)
 
 void Pose::reset()
 {
+    if (!saved_atom_locs) saved_atom_locs = new Point[128];
+    if (!saved_atom_Z) saved_atom_Z = new int[128];
     sz = 0;
-    if (saved_atom_locs) delete[] saved_atom_locs;
-    saved_atom_locs = nullptr;
-    if (saved_atom_Z) delete saved_atom_Z;
-    saved_atom_Z = nullptr;
+    saved_atom_locs[0].multiply(0);
+    saved_atom_Z[0] = 0;
     saved_from = nullptr;
 }
 
 void Pose::copy_state(Molecule* m)
 {
     int i;
-    if (!saved_atom_locs || saved_from != m)
+    if (!saved_atom_Z[0] || saved_from != m)
     {
-        reset();
         saved_from = m;
         if (!m || !m->atoms) return;
 
         sz = m->get_atom_count();
-        saved_atom_locs = new Point[sz+4];
-        saved_atom_Z = new int[sz+4];
     }
 
     for (i=0; m->atoms[i] && i<sz; i++)
@@ -209,7 +203,7 @@ void Pose::copy_state(Molecule* m)
 
 void Pose::restore_state(Molecule* m)
 {
-    if (!m || !m->atoms || !sz || !saved_atom_locs) return;
+    if (!m || !m->atoms || !sz || !saved_atom_Z[0]) return;
     int i, n;
     if (m != saved_from)
     {

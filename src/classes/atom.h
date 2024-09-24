@@ -386,8 +386,6 @@ protected:
     int recursion_counter = 0;
     bool is_imidazole_like = false;     // Rings having a pKa near the biological pH of 7.4, that aromatic pnictogens can protonate.
 
-    char btnc[256];                     // Bonded-To Name Cache.
-
     static void read_elements();
     void figure_out_valence();
 

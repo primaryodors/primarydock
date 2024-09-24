@@ -212,7 +212,6 @@ int Atom::Z_from_esym(const char* elem_sym)
 Atom::Atom(const char* elem_sym)
 {
     Z = Z_from_esym(elem_sym);
-    btnc[0] = 0;
 
     reciprocity = false;
     used = 0;
@@ -232,7 +231,6 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
     location.y = l_location->y;
     location.z = l_location->z;
     location.weight = at_wt;
-    btnc[0] = 0;
 
     Z = Z_from_esym(elem_sym);
 
@@ -255,7 +253,6 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
     location.z = l_location->z;
     location.weight = at_wt;
     charge = origchg = lcharge;
-    btnc[0] = 0;
 
     Z = Z_from_esym(elem_sym);
 
@@ -276,7 +273,6 @@ Atom::Atom(FILE* is)
     char buffer[1024], res3let[5];
     int resno=0;
     init_nulls(buffer, 1024);
-    btnc[0] = 0;
 
     while (1)
     {
@@ -693,22 +689,18 @@ int Atom::get_bonded_heavy_atoms_count()
 float Atom::is_bonded_to(Atom* latom2)
 {
     if (!bonded_to) return 0;
-    if (btnc[0] && !strstr(btnc, latom2->name)) return false;
 
     int i, retval=0;
-    std::string btnames = "";
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].atom2
             && abs(reinterpret_cast<long>(bonded_to[i].atom2) - reinterpret_cast<long>(bonded_to)) < memsanity
-            && bonded_to[i].atom2->get_Z() > 0 && bonded_to[i].atom2->get_Z() <= 118)
+            && bonded_to[i].atom2->Z > 0 && bonded_to[i].atom2->Z <= 118)
         {
-            btnames += (std::string)bonded_to[i].atom2->name + (std::string)" ";
-            if (bonded_to[i].atom2 == latom2) retval = bonded_to[i].cardinality;
+            if (bonded_to[i].atom2 == latom2) return bonded_to[i].cardinality;
         }
     }
 
-    strcpy(btnc, btnames.c_str());
     return retval;
 }
 

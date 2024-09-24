@@ -785,7 +785,7 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
     no_polar_repuls:
     ;
 
-    bool atoms_are_bonded = a->is_bonded_to(b);
+    bool atoms_are_bonded = (r<3) ? a->is_bonded_to(b) : false;
 
     if (a->residue && b->residue && a->is_backbone && b->is_backbone)
         if (abs(a->residue - b->residue) == 1)

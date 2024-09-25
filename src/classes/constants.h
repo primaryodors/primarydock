@@ -389,7 +389,6 @@
 #define _dbg_multiflex 0
 #define _dbg_null_flexions 0
 #define _dbg_path_search 0
-#define _dbg_piext_binding_angle 0
 #define _dbg_point_avg 0
 #define _dbg_polsat 0
 #define _dbg_repack 0

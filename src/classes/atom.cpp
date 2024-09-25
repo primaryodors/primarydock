@@ -2060,21 +2060,12 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
             SCoord B1 = bonded_to[1].atom2->location.subtract(this->location);
             float theta = find_angle_along_vector(geov[1], B1, center, B0);
 
-            /*Point pt1 = rotate3D(geov[1], center, B0,  theta);
-            Point pt2 = rotate3D(geov[1], center, B0, -theta);
-
-            if (pt2.get_3d_distance(B0) > pt1.get_3d_distance(B0)) theta = -theta;
-            */
-
             Point old = geov[1];
             for (i=1; i<=geometry; i++)
             {
                 geov[i] = rotate3D(geov[i], center, B0, theta);
             }
             Point nouiion = geov[1];
-
-            /*float f = find_3d_angle(geov[1], B1, center);
-            if (f > 3.0*fiftyseventh) throw 0xbada962e;*/
         }
     }
 

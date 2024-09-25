@@ -987,41 +987,6 @@ Interaction InteratomicForce::total_binding(Atom* a, Atom* b)
                     del_bgeo = true;
                 }
             }
-            else if (forces[i]->type != ionic && (api || bpi))
-            {
-                if (api)
-                {
-                    SCoord BA = b->get_location().subtract(a->get_location());
-                    SCoord* lageob = a->get_geometry_aligned_to_bonds();
-                    float lbtheta;
-                    for (j=0; j<ag; j++)
-                    {
-                        float lf = find_3d_angle(BA, lageob[j], Point(0,0,0));
-                        if (!j || lf < lbtheta) lbtheta = lf;
-                    }
-                    #if _dbg_piext_binding_angle
-                    cout << a->residue << ":" << a->name << " ~ " << b->residue << ":" << b->name
-                        << " " << forces[i]->type << "-pi angle " << lbtheta*fiftyseven << "deg" << endl;
-                    #endif
-                    if (lbtheta > hexagonal/2) continue;
-                }
-                if (bpi)
-                {
-                    SCoord AB = a->get_location().subtract(b->get_location());
-                    SCoord* lbgeob = b->get_geometry_aligned_to_bonds();
-                    float lbtheta;
-                    for (j=0; j<bg; j++)
-                    {
-                        float lf = find_3d_angle(AB, lbgeob[j], Point(0,0,0));
-                        if (!j || lf < lbtheta) lbtheta = lf;
-                    }
-                    #if _dbg_piext_binding_angle
-                    cout << a->residue << ":" << a->name << " ~ " << b->residue << ":" << b->name
-                        << " " << forces[i]->type << "-pi angle " << lbtheta*fiftyseven << "deg" << endl;
-                    #endif
-                    if (lbtheta > hexagonal/2) continue;
-                }
-            }
 
             float dpa, dpb;
 

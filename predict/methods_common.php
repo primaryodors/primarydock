@@ -34,7 +34,8 @@ $metrics_to_process =
 [
   "BENERG" => "BindingEnergy",
   "BENERG.rgn" => "BindingEnergy.rgn",
-  "POSES" => "POSES"
+  "POSES" => "POSES",
+  "WCLASH" => "WCLASH"
 ];
 
 // Load data
@@ -1086,7 +1087,19 @@ heredoc;
             if (isset($metrics_to_process[$mode]))
             {
                 $wmode = $metrics_to_process[$mode];
-                $outdata[$metrics_prefix.$wmode] = intval($ln);
+                $pettia = explode(':',$ln);
+                $outdata[$metrics_prefix.$wmode] = intval(@$pettia[1]);
+            }
+            continue;
+        }
+        else if (false !== strpos($ln, "Best worst clash"))
+        {
+            $mode = "WCLASH";
+            if (isset($metrics_to_process[$mode]))
+            {
+                $wmode = $metrics_to_process[$mode];
+                $pettia = explode(':',$ln);
+                $outdata[$metrics_prefix.$wmode] = floatval(@$pettia[1]);
             }
             continue;
         }

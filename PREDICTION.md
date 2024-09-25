@@ -161,6 +161,7 @@ Available parameters for `$metrics_to_process` include:
 - `ACVTH.TMR1` thru `ACVTH.TMR7`
                           Angles of helix rotations performed for a "soft dock", in which the helices are allowed to move.
 - `POSES`                 Total number of poses found.
+- `WCLASH`                Smallest per-pose maximum interatomic clash energy.
 - `CALOC.rgn`             Average relative motion of alpha carbon atoms within each region as a result of a "soft dock".
 
 For keys ending with `.rgn`, the `rgn` will be replaced with the actual region name. For example, if the method PHP

@@ -32,7 +32,8 @@ function make_prediction($data)
 
         $aenergy = floatval(@$data['a_Pose1']);
         $ienergy = floatval(@$data['i_Pose1']);
-        $afound = floatval(@$data['a_POSES']) / intval($poses);
+        $afound = floatval(@$data['a_POSES']) / intval($pose);
+        $ifound = floatval(@$data['i_POSES']) / intval($pose);
 
         $aeq = equilibrium(0, $aenergy);                    // how much of the active-state population will be ligand-bound
         $ieq = equilibrium(0, $ienergy);                    // how much of the inactive-state population will be ligand-bound
@@ -52,14 +53,14 @@ function make_prediction($data)
             $data['Predicted'] = 'Agonist';
             $data['Affinity'] = round(-$aenergy, 4);
             $data['A100'] = round($aa100, 4);
-            $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns, 4);
+            $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns * $afound, 4);
         }
         else if ($ienergy > 0)
         {
             $data['Affinity'] = round(-$ienergy, 4);
             $data['A100'] = round($ia100, 4);
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = round(-$ienergy * ($baseline-$activation) * $ia100/20 * $ittns, 4);
+            $data['DockScore'] = round(-$ienergy * ($baseline-$activation) * $ia100/20 * $ittns * $ifound, 4);
         }
         else
         {

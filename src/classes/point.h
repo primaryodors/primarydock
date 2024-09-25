@@ -168,6 +168,7 @@ float find_angle_along_vector(Point pt1, Point pt2, Point source, SCoord v);
 Point rotate3D(Point* point, Point* source, SCoord* axis, float theta);
 Point rotate3D(Point point, Point source, SCoord axis, float theta);
 Point rotate3D(Point* point, Point* source, Rotation* rot);
+Point rotate3D(Point point, Point source, Rotation rot);
 
 Rotation align_points_3d(Point* point, Point* align, Point* center);
 Rotation align_points_3d(Point point, Point align, Point center);

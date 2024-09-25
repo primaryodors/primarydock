@@ -34,8 +34,10 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     int metcount = 0;
     float btot = 0;
     float pstot = 0;
-    char* lma1n[end1];
-    char* lma2n[end1];
+    char* lmba1n[end1];
+    char* lmba2n[end1];
+    char* lmca1n[end1];
+    char* lmca2n[end1];
     float lmc[end1];
 
     for (i=0; i<end1; i++)
@@ -219,8 +221,10 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         lmkJmol[metcount] = lb.summed();
         lmc[metcount] = -mc_bpotential / missed_connection.r;
 
-        lma1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;
-        lma2n[metcount] = ligand->clash2 ? ligand->clash2->name : nullptr;
+        lmba1n[metcount] = ligand->best_intera ? ligand->best_intera->name : nullptr;
+        lmba2n[metcount] = ligand->best_other_intera ? ligand->best_other_intera->name : nullptr;
+        lmca1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;
+        lmca2n[metcount] = ligand->clash2 ? ligand->clash2->name : nullptr;
 
         BallesterosWeinstein bw = protein->get_bw_from_resno(resno);
         if (bw.helix_no)
@@ -294,8 +298,10 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     this->mvdWrepl       = new float[metcount];
     this->imvdWrepl       = new float[metcount];
     #endif
-    this->m_atom1_name     = new const char*[metcount];
-    this->m_atom2_name      = new const char*[metcount];
+    this->mb_atom1_name     = new const char*[metcount];
+    this->mb_atom2_name      = new const char*[metcount];
+    this->mc_atom1_name       = new const char*[metcount];
+    this->mc_atom2_name        = new const char*[metcount];
     #if compute_missed_connections
     this->missed_connections = new float[metcount];
     #endif
@@ -329,8 +335,10 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         mvdWrepl[i] = lmvdWrepl[i];
         imvdWrepl[i] = limvdWrepl[i];
         #endif
-        m_atom1_name[i] = lma1n[i];
-        m_atom2_name[i] = lma2n[i];
+        mb_atom1_name[i] = lmba1n[i];
+        mb_atom2_name[i] = lmba2n[i];
+        mc_atom1_name[i] = lmca1n[i];
+        mc_atom2_name[i] = lmca2n[i];
         #if compute_missed_connections
         missed_connections[i] = lmc[i];
         #endif
@@ -442,8 +450,13 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
 
             if (dr.do_output_colors) colorize(dr.mkJmol[l]);
             output << dr.metric[l] << ": " << -dr.mkJmol[l]*dr.energy_mult;
-            if (dr.display_clash_atom1) output << " " << (dr.m_atom1_name[l] ? dr.m_atom1_name[l] : "-");
-            if (dr.display_clash_atom2) output << " " << (dr.m_atom2_name[l] ? dr.m_atom2_name[l] : "-");
+            if (dr.display_binding_atoms) output << " |";
+            if (dr.display_binding_atoms) output << " " << (dr.mb_atom1_name[l] ? dr.mb_atom1_name[l] : "-");
+            if (dr.display_binding_atoms) output << " " << (dr.mb_atom2_name[l] ? dr.mb_atom2_name[l] : "-");
+            if (dr.display_clash_atoms) output << " |";
+            if (dr.display_clash_atoms) output << " " << (dr.mc_atom1_name[l] ? dr.mc_atom1_name[l] : "-");
+            if (dr.display_clash_atoms && dr.mc_atom1_name[l] && dr.mc_atom2_name[l]) output << " clash";
+            if (dr.display_clash_atoms) output << " " << (dr.mc_atom2_name[l] ? dr.mc_atom2_name[l] : "-");
             output << endl;
             if (dr.do_output_colors) colorless();
         }

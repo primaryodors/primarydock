@@ -2043,57 +2043,38 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
     }
     geov = get_basic_geometry();
 
-    Point center;
+    Point center(0,0,0);
     int i, j, k, l;
 
-    // #259 fix:
-    for (i=0; i<geometry; i++)
+    if (bonded_to && bonded_to[0].atom2)
     {
-        if (bonded_to[i].atom2)
+        SCoord B0 = bonded_to[0].atom2->location.subtract(this->location);
+        Rotation rot = align_points_3d(geov[0], B0, center);
+        for (i=0; i<=geometry; i++)
         {
-            Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].atom2->location, location);
-            for (l=0; l<geometry; l++)
+            geov[i] = rotate3D(geov[i], center, rot);
+        }
+
+        if (geometry>1 && bonded_to[1].atom2)
+        {
+            SCoord B1 = bonded_to[1].atom2->location.subtract(this->location);
+            float theta = find_angle_along_vector(geov[1], B1, center, B0);
+
+            /*Point pt1 = rotate3D(geov[1], center, B0,  theta);
+            Point pt2 = rotate3D(geov[1], center, B0, -theta);
+
+            if (pt2.get_3d_distance(B0) > pt1.get_3d_distance(B0)) theta = -theta;
+            */
+
+            Point old = geov[1];
+            for (i=1; i<=geometry; i++)
             {
-                Point pt = geov[l];
-                geov[l] = rotate3D(&pt, &center, &rot);
+                geov[i] = rotate3D(geov[i], center, B0, theta);
             }
+            Point nouiion = geov[1];
 
-            for (j=i+1; j<geometry; j++)
-            {
-                if (abs((__int64_t)(bonded_to) - (__int64_t)bonded_to[j].atom2) > memsanity) break;
-                if (bonded_to[j].atom2)
-                {
-                    float theta = find_angle_along_vector(location.add(geov[j]), bonded_to[j].atom2->location, location, geov[i]);
-                    for (l=0; l<geometry; l++)
-                        geov[l] = rotate3D(geov[l], center, geov[i], theta);
-                    
-                    for (k=j+1; k<geometry; k++)
-                    {
-                        if (bonded_to[k].atom2)
-                        {
-                            for (l=j+1; l<geometry; l++)
-                            {
-                                if (!bonded_to[l].atom2)
-                                {
-                                    float ktheta = find_3d_angle(bonded_to[k].atom2->location, location.add(geov[k]), location);
-                                    float ltheta = find_3d_angle(bonded_to[k].atom2->location, location.add(geov[l]), location);
-
-                                    if (ltheta < ktheta)
-                                    {
-                                        SCoord swap = geov[l];
-                                        geov[l] = geov[k];
-                                        geov[k] = swap;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    goto _exit_search;
-                }
-            }
-
-            goto _exit_search;
+            /*float f = find_3d_angle(geov[1], B1, center);
+            if (f > 3.0*fiftyseventh) throw 0xbada962e;*/
         }
     }
 

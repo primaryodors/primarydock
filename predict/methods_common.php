@@ -1087,8 +1087,7 @@ heredoc;
             if (isset($metrics_to_process[$mode]))
             {
                 $wmode = $metrics_to_process[$mode];
-                $pettia = explode(':',$ln);
-                $outdata[$metrics_prefix.$wmode] = intval(@$pettia[1]);
+                $outdata[$metrics_prefix.$wmode] = intval($ln);
             }
             continue;
         }

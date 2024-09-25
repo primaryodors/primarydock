@@ -499,8 +499,7 @@ void output_iter(int iter, Molecule** mols)
 
         DockResult ldr(protein, ligand, size, nullptr, pose, waters);
         ldr.include_pdb_data = false;
-        ldr.display_clash_atom1 = true;
-        ldr.display_clash_atom2 = true;
+        ldr.display_clash_atoms = true;
         std::stringstream stst;
         stst << ldr;
         fprintf(fp, "%s\n", stst.str().c_str());

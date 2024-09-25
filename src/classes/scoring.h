@@ -37,8 +37,10 @@ class DockResult
     #if compute_missed_connections
     float* missed_connections = 0;
     #endif
-    const char** m_atom1_name = nullptr;
-    const char** m_atom2_name = nullptr;
+    const char** mb_atom1_name = nullptr;
+    const char** mb_atom2_name = nullptr;
+    const char** mc_atom1_name = nullptr;
+    const char** mc_atom2_name = nullptr;
     std::string pdbdat;
     std::string isomer;
     std::string miscdata;
@@ -50,8 +52,8 @@ class DockResult
     float A100 = 0;
     bool do_output_colors = false;
     bool include_pdb_data = true;
-    bool display_clash_atom1 = false;
-    bool display_clash_atom2 = false;
+    bool display_binding_atoms = false;
+    bool display_clash_atoms = false;
     float energy_mult = 1;
 
     bool out_per_res_e = true;

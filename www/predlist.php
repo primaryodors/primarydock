@@ -37,6 +37,7 @@ foreach ($dock_results as $rcpid => $results)
         $newp['p'] = $dr['DockScore'];
         $ep = best_empirical_pair($rcpid, $oid, true);
         $newp['a'] = $ep;
+        $newp['s'] = (isset($dr['Actual']) && @$dr['Actual'] != '(unknown)') ? (((@$dr['Predicted'] == 'Agonist') == (@$dr['Actual'] == 'Agonist')) ? "Y" : "N") : "?";
         $newp['d'] = $dr['CalculateDate'];
         $predictions[] = $newp;
     }
@@ -69,10 +70,8 @@ $filter_svgdat = "m 0,0 $fw,$fh 0,$nih $nw,$nt 0,-$noh $fw,-$fh Z"
 <table class="liglist">
     <tr><th>Receptor</th>
         <th>Odorant</th>
-        <th>ec50</th>
-        <th>Adj. Top</th>
-        <th>Prediction</th>
         <th>Date</th>
+        <th>Successful?</td>
     </tr>
 <?php
 
@@ -95,11 +94,20 @@ foreach ($predictions as $p)
         echo " <a href=\"predlist.php?o={$p['o']}\"><svg height=\"13px\" viewBox=\"0 0 80 90\" xmlns=\"http://www.w3.org/2000/svg\"><path fill=\"#50cea8\" d=\"$filter_svgdat\"></path></svg></a>";
     echo "</td>\n";
 
-    echo "<td>".(@$p['a']['ec50'] ?: "-")."</td>\n";
-    echo "<td>".(isset($p['a']['adjusted_curve_top']) ? round($p['a']['adjusted_curve_top'], 3) : "-")."</td>\n";
-    echo "<td>{$p['p']}</td>\n";
-
     echo @"<td>{$p['d']}</td>\n";
+
+    switch ($p['s'])
+    {
+        case 'Y':
+            $ps = "<span style=\"color: #0c0; font-weight: bold;\">Yes</span>";
+            break;
+        case 'N':
+            $ps = "<span style=\"color: #f00; font-weight: bold;\">No</span>";
+            break;
+        default:
+            $ps = "<span style=\"color: #9cf;\">???</span>";
+    }
+    echo @"<td>$ps</td>\n";
 }
 
 

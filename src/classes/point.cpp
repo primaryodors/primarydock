@@ -406,6 +406,11 @@ float find_angle_along_vector(Point* pt1, Point* pt2, Point* source, SCoord* v)
     return a2 - a1;
 }
 
+Point rotate3D(Point point, Point source, Rotation rot)
+{
+    return rotate3D(point, source, rot.v, rot.a);
+}
+
 Point rotate3D(Point* point, Point* source, Rotation* rot)
 {
     return rotate3D(point, source, &rot->v, rot->a);

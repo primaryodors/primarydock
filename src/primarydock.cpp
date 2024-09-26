@@ -499,8 +499,7 @@ void output_iter(int iter, Molecule** mols)
 
         DockResult ldr(protein, ligand, size, nullptr, pose, waters);
         ldr.include_pdb_data = false;
-        ldr.display_clash_atom1 = true;
-        ldr.display_clash_atom2 = true;
+        ldr.display_clash_atoms = true;
         std::stringstream stst;
         stst << ldr;
         fprintf(fp, "%s\n", stst.str().c_str());
@@ -1863,7 +1862,7 @@ void apply_protein_specific_settings(Protein* p)
 
 int main(int argc, char** argv)
 {
-    strcpy(splash, "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )             /  (__   \np   p                                           d   d                k           )   ()   \\__   \\__   )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\n                                       yyyyyy\n\n");
+    strcpy(splash, "\n                                                                                      __       ____  \npppp                                            ddd                               ,-_/  `-_--_/    \\  \np   p         i                                 d  d                 k            )             /  (__   \np   p                                           d   d                k           )   ()   \\__   \\__   )   \npppp  r rrr  iii  mmm mm   aaaa   r rrr  y   y  d   d   ooo    ccc   k   k      /      \\__/  \\__/    /  \np     rr      i   m  m  m      a  rr     y   y  d   d  o   o  c   c  k  k      (       /  \\__/  \\   (  \np     r       i   m  m  m   aaaa  r      y   y  d   d  o   o  c      blm        \\    ()        _     )  \np     r       i   m  m  m  a   a  r      y   y  d  d   o   o  c   c  k  k        )     __     / \\   /  \np     r      iii  m  m  m   aaaa  r       yyyy  ddd     ooo    ccc   k   k       \\____/  `---'   \\__)  \n                                             y\nprimaryodors.org molecular docker      yyyyyy\n\n");
     char buffer[65536];
     int i, j;
 

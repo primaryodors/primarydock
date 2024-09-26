@@ -247,8 +247,9 @@ public:
     Ring* in_same_ring_as(Atom* b, Ring* ignore = nullptr);
     void aromatize()
     {
-        geometry=3;
+        geometry = 3;
         // if (valence>3) valence--;
+        geometry_dirty = true;
         if (bonded_to)
         {
             int i;
@@ -269,7 +270,7 @@ public:
                 }
             }
         }
-        geov=0;
+        geov=nullptr;
     }
 
     // Serialization

@@ -92,8 +92,8 @@ int main(int argc, char** argv)
 
     DockResult dr(&p, &m, Point(10000,10000,10000));
     dr.include_pdb_data = false;
-    dr.display_clash_atom1 = true;
-    dr.display_clash_atom2 = true;
+    dr.display_binding_atoms = true;
+    dr.display_clash_atoms = true;
     cout << dr;
 }
 

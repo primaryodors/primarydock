@@ -1127,6 +1127,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                     Point aloc(atof(words[5+offset].c_str()), atof(words[6+offset].c_str()),atof(words[7+offset].c_str()));
 
+                    if (get_atom(words[2].c_str())) continue;
                     Atom* a = add_atom(esym, words[2].c_str(), &aloc, 0, 0);
                     a->pdbidx = atoi(words[1].c_str());
                     added++;
@@ -1139,6 +1140,12 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                        )
                         a->is_backbone = true;
                     else a->is_backbone = false;
+
+                    if (   !strcmp(a->name, "N")
+                            // || !strcmp(a->name, "C")
+                            || !strcmp(a->name, "O")
+                       )
+                        a->aromatize();
 
                     a->residue = atoi(words[4+offset].c_str())+rno;
                     strcpy(a->aa3let, words[3].c_str());
@@ -1395,6 +1402,31 @@ _return_added:
         }
         rings[i] = nullptr;
     }
+
+    int i, j;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->get_Z() < 2) continue;
+        int ag = atoms[i]->get_geometry();
+        if (ag < 4) continue;
+        Bond *b0 = atoms[i]->get_bond_by_idx(0), *b1 = atoms[i]->get_bond_by_idx(1), *b2 = atoms[i]->get_bond_by_idx(2);
+        if (!b0 || !b1 || !b2) continue;
+        if (b0->atom2 && b1->atom2 && b2->atom2)
+        {
+            float copl = are_points_planar(atoms[i]->get_location(),
+                b0->atom2->get_location(),
+                b1->atom2->get_location(),
+                b2->atom2->get_location()
+                );
+            if (copl <= 1) atoms[i]->aromatize();
+        }
+        else if (b0->atom2 && b1->atom2)
+        {
+            float theta = find_3d_angle(b0->atom2->get_location(), b1->atom2->get_location(), atoms[i]->get_location());
+            if (fabs(theta - triangular) < fabs(theta-tetrahedral)) atoms[i]->aromatize();
+        }
+    }
+
     // identify_rings();
     identify_conjugations();
 

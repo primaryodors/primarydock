@@ -55,6 +55,21 @@ int main (int argc, char** argv)
              << find_3d_angle(ptrot8, ptref, pt5)*fiftyseven << " degrees apart."
              << endl;
     }
+
+    SCoord axis(1.0, fiftyseventh*-53, fiftyseventh*281);
+    for (f=0; f<M_PI*2; f+=0.1)
+    {
+        ptrot8 = rotate3D(ptref, pt5, axis, f);
+        float th3d = find_3d_angle(ptrot8, ptref, pt5);
+        float thvec = find_angle_along_vector(ptrot8, ptref, pt5, axis);
+        Point ptrot9 = rotate3D(ptrot8, pt5, axis, thvec);
+
+        cout << "Rotation " << (f*fiftyseven)
+            << " find_3d_angle() gives " << (th3d*fiftyseven) << "deg"
+            << " find_angle_along_vector() gives " << (thvec*fiftyseven) << "deg"
+            << " putitback anomaly = " << ptrot9.get_3d_distance(ptref)
+            << endl;
+    }
 }
 
 

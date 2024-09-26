@@ -10,7 +10,8 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 	$(OBJDIR)/search.o $(OBJDIR)/cavity.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
-	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test test/cs_test test/mcoord_test test/vdw_vertex_test
+	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test test/cs_test test/mcoord_test test/vdw_vertex_test \
+	  test/ageo_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic \
 	 $(BINDIR)/score_pdb $(BINDIR)/ramachandran $(BINDIR)/ringflip $(BINDIR)/cavity_search
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
@@ -135,6 +136,9 @@ test/amino_test: src/test/amino_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o
 
 test/protein_test: src/test/protein_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/test/protein_test.cpp $(OBJS) -o test/protein_test $(CFLAGS)
+
+test/ageo_test: src/test/ageo_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+	$(CC) src/test/ageo_test.cpp $(OBJS) -o test/ageo_test $(CFLAGS)
 
 test/backbone_test: src/test/backbone_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/test/backbone_test.cpp $(OBJS) -o test/backbone_test $(CFLAGS)

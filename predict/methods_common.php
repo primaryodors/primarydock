@@ -722,7 +722,7 @@ heredoc;
         }
 
         if ($fam == "TAAR") $nodel .= "\nNODEL 45.60 5.38";
-        else $nodel .= "\nNODEL 45.51 45.59";
+        else $nodel .= "\nNODEL 45.49 45.59";
 
         if ($isomers)
         {

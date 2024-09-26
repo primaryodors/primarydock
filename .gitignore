@@ -9,9 +9,13 @@ metal
 podock
 primarydock
 *.config
+*.cav
 *.dat
 *.pdb
 *.sdf
+hm/OR[0-9][A-Z][0-9].*
+hm/OR[0-9][A-Z]?[0-9].*
+hm/OR5[0-9][A-Z][0-9].*
 *~
 cmake-*
 .idea/

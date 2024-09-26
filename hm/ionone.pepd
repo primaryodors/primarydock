@@ -1,0 +1,59 @@
+
+LET $rcpid = "OR51E2"
+
+LET $inpf = "pdbs/OR51/OR51E2.upright.pdb"
+
+LET $mdld = "hm/OR51E2.BL00010008.pdb"
+
+LOAD $inpf A I
+LOAD $mdld A A
+
+BWCOPY I A
+
+STRAND I
+UPRIGHT I
+BWCENTER
+
+STRAND A
+
+IF $5.58 != "Y" GOTO _not_57_hbond
+IF $7.53 != "Y" GOTO _not_57_hbond
+MEASURE %5.58 "OH" %7.53 "OH" &d57
+ECHO "Y5.58 and Y7.53 are " &d57 "A apart."
+IF &d57 > 5.5 FAIL "Y57 distance is too great."
+_not_57_hbond:
+
+A100 &a100
+ECHO "A100 Score: " &a100
+IF &a100 < 10 FAIL "A100 score too low."
+
+IF HELIX %45.51 GOTO _exr2_helix_ok
+IF HELIX %45.52 GOTO _exr2_helix_ok
+IF HELIX %45.53 GOTO _exr2_helix_ok
+IF HELIX %45.54 GOTO _exr2_helix_ok
+IF HELIX %45.55 GOTO _exr2_helix_ok
+IF HELIX %45.56 GOTO _exr2_helix_ok
+IF HELIX %45.57 GOTO _exr2_helix_ok
+SAVE "hm/failed.pdb"
+FAIL "No EXR2 helix."
+_exr2_helix_ok:
+
+DELETE 1 %1.20
+HYDRO
+UPRIGHT A
+BWCENTER
+ATOMTO %6.59 EXTENT @4.57
+MINC
+ATOMTO %6.59 EXTENT @4.57
+
+# LET $mdlf = "pdbs/" + $rcpid
+# LET $mdlf += ".models.pdb"
+# SAVE $mdlf
+
+UNCHAIN I
+UNCHAIN O
+STRAND A
+
+LET $outf = "pdbs/OR51/OR51E2.active.pdb"
+SAVE $outf
+

@@ -16,6 +16,8 @@ primarydock
 hm/OR[0-9][A-Z][0-9].*
 hm/OR[0-9][A-Z]?[0-9].*
 hm/OR5[0-9][A-Z][0-9].*
+hm/TAAR[0-9].*
+hm/VN1R[0-9].*
 *~
 cmake-*
 .idea/

@@ -63,9 +63,13 @@ foreach ($prots as $rcpid => $p)
     fwrite($f, json_encode_pretty($results));
     fclose($f);    
 
-    do_5wind($acvfn, $w5step);
+    unlink($acvfn);
+    copy($bkpfn, $acvfn);
+    exec("git commit -am \"Update.\"");
+    exec("git push");
+    do_5wind($acvfn, $w5);
   }
-  
+
   unlink($acvfn);
   rename($bkpfn, $acvfn);
 }

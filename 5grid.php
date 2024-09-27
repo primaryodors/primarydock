@@ -26,9 +26,11 @@ foreach ($prots as $rcpid => $p)
   if ($type == "MS4A") continue;
 
   // Find strongest ligand. If orphan receptor or only weak ligands, skip.
-  $pairs = all_empirical_pairs_for_receptor($rcpid, true, true);
+  $pairs = all_empirical_pairs_for_receptor($rcpid, false, true);
   // print_r($pairs); exit;
   $oid = array_keys($pairs)[0];
+  if (isset($pairs[$oid]['adjusted_curve_top']) && floatval($pairs[$oid]['adjusted_curve_top']) < 4) continue;
+  else if (isset($pairs[$oid]['ec50']) && floatval($pairs[$oid]['ec50']) > -4) continue;
   $lig = $odors[$oid]['full_name'];
 
   $initw5 =  -5;

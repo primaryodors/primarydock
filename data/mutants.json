@@ -374,7 +374,7 @@
     },
     "OR51E1":
     {
-        "F266A":
+        "F265A":
         {
             "butyric acid": "-",
             "pelargonic acid": "-",
@@ -382,7 +382,7 @@
             "isovaleric acid": "-",
             "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
         },
-        "R265A":
+        "R264A":
         {
             "butyric acid": "lf",
             "pelargonic acid": "lf",
@@ -390,7 +390,7 @@
             "isovaleric acid": "lf",
             "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
         },
-        "H264A":
+        "H263A":
         {
             "butyric acid": "-",
             "pelargonic acid": "nc",
@@ -398,7 +398,7 @@
             "isovaleric acid": "-",
             "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
         },
-        "L203A":
+        "L202A":
         {
             "butyric acid": "-",
             "pelargonic acid": "-",
@@ -406,7 +406,7 @@
             "isovaleric acid": "-",
             "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
         },
-        "Y201A":
+        "Y200A":
         {
             "butyric acid": "lf",
             "pelargonic acid": "lf",
@@ -414,7 +414,7 @@
             "isovaleric acid": "lf",
             "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
         },
-        "V255G":
+        "V254G":
         {
             "butyric acid": "+",
             "pelargonic acid": "+",

@@ -65,13 +65,13 @@ foreach ($prots as $rcpid => $p)
 
     unlink($acvfn);
     copy($bkpfn, $acvfn);
-    exec("git commit -am \"Update.\"");
-    exec("git push");
     do_5wind($acvfn, $w5);
   }
 
   unlink($acvfn);
   rename($bkpfn, $acvfn);
+  exec("git commit -am \"Update.\"");
+  exec("git push");
 }
 
 

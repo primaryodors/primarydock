@@ -10,6 +10,7 @@ podock
 primarydock
 *.config
 *.cav
+*.cvty
 *.dat
 *.pdb
 *.sdf

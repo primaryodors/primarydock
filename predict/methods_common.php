@@ -685,14 +685,14 @@ heredoc;
             $caver = resno_from_bw($protid, "7.56");
 
             $fam = family_from_protid($protid);
-            $cavfname = "pdbs/$fam/$protid.upright.cav";
+            $cavfname = "pdbs/$fam/$protid.upright.cvty";
             if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
             {
                 $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
                 echo "$cmd\n";
                 passthru($cmd);
             }
-            $cavfname = "pdbs/$fam/$protid.active.cav";
+            $cavfname = "pdbs/$fam/$protid.active.cvty";
             if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
             {
                 $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
@@ -1218,7 +1218,21 @@ heredoc;
                     if (strtolower($outdata['Predicted']) == 'agonist') exec("play agonist.mp3 &");
                     else exec("play non-agonist.mp3 &");
                 }
-                else exec("play fail.mp3 &");
+                else
+                {
+                    $d = dir(getcwd());
+                    $failsound = [];
+                    while (false !== ($entry = $d->read()))
+                    {
+                        if (substr(strtolower($entry), 0, 4) == "fail")
+                        {
+                            $ext = substr($entry, strrpos($entry, '.'));
+                            if ($ext == '.mp3' || $ext == '.wav') $failsound[] = $entry;
+                        }
+                    }
+                    $fn = count($failsound) ? $failsound[rand(0, count($failsound))] : "fail.mp3";
+                    exec("play $fn &");
+                }
             }
         }
     }

@@ -259,7 +259,7 @@ int main(int argc, char** argv)
             cout << "\t\tamino acid letters are optional." << endl << endl;
 
             cout << "-o, --output\tSpecifies a destination filename for the output data. " << endl;
-            cout << "\t\tTypically, this file would end in a .cav extension." << endl << endl;
+            cout << "\t\tTypically, this file would end in a .cvty extension." << endl << endl;
 
             cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be searched." << endl << endl;
 
@@ -319,7 +319,7 @@ int main(int argc, char** argv)
         for (j=0; j<n; j++)
         {
             CPartial* part = cavities[i].get_partial_by_idx(j);
-            if (fp) fprintf(fp, "%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %4d\n", i, 
+            if (fp) fprintf(fp, "%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %s\n", i, 
                 part->s.center.x,
                 part->s.center.y,
                 part->s.center.z,
@@ -331,9 +331,9 @@ int main(int argc, char** argv)
                 part->thio     ? 'S' : ' ',
                 part->pi       ? 'P' : ' ',
                 part->priority ? '!' : ' ',
-                part->resno
+                part->resnos_as_string(protein).c_str()
                 );
-            else printf("%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %4d\n", i, 
+            else printf("%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %s\n", i, 
                 part->s.center.x,
                 part->s.center.y,
                 part->s.center.z,
@@ -345,7 +345,7 @@ int main(int argc, char** argv)
                 part->thio     ? 'S' : ' ',
                 part->pi       ? 'P' : ' ',
                 part->priority ? '!' : ' ',
-                part->resno
+                part->resnos_as_string(protein).c_str()
                 );
         }
     }

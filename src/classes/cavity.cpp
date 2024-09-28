@@ -46,7 +46,6 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                     if (r < rmin || !i)
                     {
                         rmin = r;
-                        working.resno = a->residue;
                     }
                     if (r < min_partial_radius) break;
 
@@ -87,7 +86,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     for (i=0; i<pmax; i++)
     {
         if (parts[i].s.center.magnitude() == 0) break;
-        if (parts[i].resno && (parts[i].resno < sr || parts[i].resno > er)) continue;
+        // if (parts[i].resno && (parts[i].resno < sr || parts[i].resno > er)) continue;
         bool glommed = false;
         for (l=0; l<j; l++)
         {
@@ -461,4 +460,25 @@ float Cavity::find_best_containment(Molecule* m)
     }
 
     return bestviol;
+}
+
+std::string CPartial::resnos_as_string(Protein* p)
+{
+    int i, j, n = p->get_end_resno();
+    bool intersect[n+4];
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid* aa = p->get_residue(i);
+        if (!aa)
+        {
+            intersect[i] = false;
+            continue;
+        }
+        j = aa->atoms_inside_sphere(s, nullptr, 1.1);
+        intersect[i] = (j>0);
+    }
+
+    std::string result;
+    for (i=1; i<=n; i++) if (intersect[i]) result += (std::string)(result.length() ? " " : "") + std::to_string(i);
+    return result;
 }

@@ -2592,8 +2592,16 @@ function process_cavity_ln(ln)
 	cavdata['priority'] = pieces[7].indexOf('!') >= 0;
 	cavities[cavno].push(cavdata);
 
-	var resno = parseInt(pieces[8]);
-	if (!isNaN(resno)) cavities[cavno]['residues'][resno] = resno;
+	var n = pieces.length;
+	if (n > 8)
+	{
+		var i;
+		for (i=8; i<n; i++)
+		{
+			var resno = parseInt(pieces[i]);
+			if (!isNaN(resno)) cavities[cavno]['residues'][resno] = resno;
+		}
+	}
 }
 
 function finish_cavity_lines()

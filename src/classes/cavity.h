@@ -20,7 +20,8 @@ struct CPartial
     bool polar = false;
     bool thio = false;
     bool pi = false;
-    int resno = 0;
+    // int resno = 0;
+    std::string resnos_as_string(Protein* p);
 };
 
 class Cavity

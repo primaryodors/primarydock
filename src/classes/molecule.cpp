@@ -766,6 +766,24 @@ float Molecule::total_eclipses()
     #endif
 }
 
+int Molecule::atoms_inside_sphere(Sphere s, bool* bi, float rm)
+{
+    if (!atoms) return 0;
+    int numfound = 0;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        float r = s.center.get_3d_distance(atoms[i]->get_location());
+        if (r <= s.radius*rm + atoms[i]->get_vdW_radius())
+        {
+            numfound++;
+            if (bi) bi[i] = true;
+        }
+    }
+
+    return numfound;
+}
+
 float Molecule::bindability_by_type(intera_type t, bool ib)
 {
     if (!atoms) return 0;

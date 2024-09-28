@@ -96,7 +96,7 @@ if (@$_REQUEST['view'] == "dock")
     if (!file_exists($dock)) die("Something went wrong.");
     $txt = file_get_contents($dock);
 
-    $cavfn = "../pdbs/$fam/$protid.".($mode=='active'?$mode:"upright").".cav";
+    $cavfn = "../pdbs/$fam/$protid.".($mode=='active'?$mode:"upright").".cvty";
     if (file_exists($cavfn))
     {
         $lines = explode("\n", $txt);

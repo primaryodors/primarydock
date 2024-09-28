@@ -1,0 +1,347 @@
+{
+    "OR51E2":
+    {
+        "F155A":
+        {
+            "acetic acid": "-",
+            "propionic acid": "-",
+            "butyric acid": "nc",
+            "valeric acid": "+",
+            "caproic acid": "+",
+            "oenanthic acid": "+",
+            "caprylic acid": "+",
+            "pelargonic acid": "+",
+            "capric acid": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "L158A":
+        {
+            "acetic acid": "-",
+            "propionic acid": "-",
+            "butyric acid": "+",
+            "valeric acid": "+",
+            "caproic acid": "+",
+            "oenanthic acid": "+",
+            "caprylic acid": "+",
+            "pelargonic acid": "nc",
+            "capric acid": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "S242A":
+        {
+            "propionic acid": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y291A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "H243A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "R121A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y217A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "V252A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "P253A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "R150A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F250A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "S111A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "D209A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y251A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F250Y":
+        {
+            "propionic acid": "mx",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F250H":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y251F":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y251H":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Q181E":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Q181D":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Q181N":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        }
+    },
+    "TAAR1":
+    {
+        "C5S":
+        {
+            "beta-phenethylamine": "nc",
+            "tyramine": "nc",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C13S":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C88S":
+        {
+            "beta-phenethylamine": "nc",
+            "tyramine": "nc",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C96S":
+        {
+            "beta-phenethylamine": "lf",
+            "tyramine": "lf",
+            "3-iodothyronamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C178S":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "nc",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C88S/C178S":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "H63L":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "-",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "R83H":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "D103N":
+        {
+            "beta-phenethylamine": "lf",
+            "tyramine": "lf",
+            "3-iodothyronamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "W264F":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "S107C":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "V184P":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "T194A":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "nc",
+            "3-iodothyronamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "I290N":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "nc",
+            "3-iodothyronamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "I290Y":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "F195T":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "-",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "T271A":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "T271N":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        }
+    },
+    "mTAAR5":
+    {
+        "C17S":
+        {
+            "trimethylamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C24S":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C99S":
+        {
+            "trimethylamine": "+",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "D114A":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C118A":
+        {
+            "trimethylamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C188S":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "W265A":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "Y295A":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        }
+    },
+    "mTAAR9":
+    {
+        "C14S":
+        {
+            "spermidine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C22S":
+        {
+            "spermidine": "mx",
+            "beta-phenethylamine": "mx",
+            "N,N-dimethylcyclohexylamine": "lf",
+            "cadaverine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C97S":
+        {
+            "spermidine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "D112A":
+        {
+            "spermidine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C116A":
+        {
+            "spermidine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C186S":
+        {
+            "spermidine": "mx",
+            "beta-phenethylamine": "mx",
+            "N,N-dimethylcyclohexylamine": "lf",
+            "cadaverine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "W271A":
+        {
+            "spermidine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "Y301A":
+        {
+            "spermidine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        }
+    }
+}

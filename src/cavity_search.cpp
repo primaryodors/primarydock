@@ -73,7 +73,7 @@ int main(int argc, char** argv)
     buffer[0] = 0;
     for (i=1; i<argc; i++)
     {
-        if (buffer[0] != '-' || !buffer[1]) strcpy(buffer, argv[i]);
+        if (buffer[0] != '-' || !buffer[1] || buffer[1] == '-') strcpy(buffer, argv[i]);
         if ((buffer[0] == '-' && buffer[1] == 'p') || !strcmp(buffer, "--prot") || !strcmp(buffer, "--protein"))
         {
             i++;
@@ -214,6 +214,17 @@ int main(int argc, char** argv)
                 p.coordinate_metal(mtlcoords);
             }
         }
+        else if (!strcmp(buffer, "--xmax")) cav_xmax = atof(argv[++i]);
+        else if (!strcmp(buffer, "--ymax")) cav_ymax = atof(argv[++i]);
+        else if (!strcmp(buffer, "--zmax")) cav_zmax = atof(argv[++i]);
+        else if (!strcmp(buffer, "--xmin")) cav_xmin = atof(argv[++i]);
+        else if (!strcmp(buffer, "--ymin")) cav_ymin = atof(argv[++i]);
+        else if (!strcmp(buffer, "--zmin")) cav_zmin = atof(argv[++i]);
+        else if (!strcmp(buffer, "--xyrlim")) cav_xyrlim = atof(argv[++i]);
+        else if (!strcmp(buffer, "--xzrlim")) cav_xzrlim = atof(argv[++i]);
+        else if (!strcmp(buffer, "--yzrlim")) cav_yzrlim = atof(argv[++i]);
+        else if (!strcmp(buffer, "--sr")) cav_resmin = atoi(argv[++i]);
+        else if (!strcmp(buffer, "--er")) cav_resmax = atoi(argv[++i]);
         else if ((buffer[0] == '-' && buffer[1] == 'h') || !strcmp(buffer, "--help"))
         {
             cout << "Usage:" << endl << endl;

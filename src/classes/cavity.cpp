@@ -1,14 +1,19 @@
 
 #include "cavity.h"
 
+float cav_xmax = Avogadro, cav_xmin = -Avogadro, cav_ymax = Avogadro, cav_ymin = -Avogadro, cav_zmax = Avogadro, cav_zmin = -Avogadro;
+float cav_xyrlim = Avogadro, cav_xzrlim = Avogadro, cav_yzrlim = Avogadro;
+int cav_resmin = -99999, cav_resmax = 99999;
+
 int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
 {
     if (!p || !cavs) return 0;
     if (cmax < 1) return 0;
 
-    int i, j, l, sr = p->get_start_resno(), er = p->get_end_resno();
+    int i, j, l, sr = max(p->get_start_resno(), cav_resmin), er = min(p->get_end_resno(), cav_resmax);
     float x, y, z, step, yoff = 0, zoff = 0;
     Point pcen = p->get_region_center(sr, er), pbox = p->get_region_bounds(sr, er);
+
     step = cav_xyz_step;
     AminoAcid* can_clash[SPHREACH_MAX+4];
     Molecule dummy("DUMMY");
@@ -82,6 +87,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     for (i=0; i<pmax; i++)
     {
         if (parts[i].s.center.magnitude() == 0) break;
+        if (parts[i].resno && (parts[i].resno < sr || parts[i].resno > er)) continue;
         bool glommed = false;
         for (l=0; l<j; l++)
         {
@@ -107,6 +113,18 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     j=0;
     for (i=0; i<l; i++)
     {
+        Point cen = tmpcav[i].get_center();
+        if (cen.x < cav_xmin || cen.x > cav_xmax) continue;
+        if (cen.y < cav_ymin || cen.y > cav_ymax) continue;
+        if (cen.z < cav_zmin || cen.z > cav_zmax) continue;
+
+        float r = sqrt(pow(cen.x - pcen.x, 2) + pow(cen.y - pcen.y, 2));
+        if (r > cav_xyrlim) continue;
+        r = sqrt(pow(cen.x - pcen.x, 2) + pow(cen.z - pcen.z, 2));
+        if (r > cav_xzrlim) continue;
+        r = sqrt(pow(cen.y - pcen.y, 2) + pow(cen.z - pcen.z, 2));
+        if (r > cav_yzrlim) continue;
+
         if (tmpcav[i].count_partials() >= cav_min_partials
             && (!any_priority || tmpcav[i].priority)
             ) cavs[j++] = tmpcav[i];

@@ -681,11 +681,24 @@ heredoc;
                 if ($resno) $cenresno[] = $resno;
             }
 
+            $cavsr = resno_from_bw($protid, "1.28");
+            $caver = resno_from_bw($protid, "7.56");
+
             $fam = family_from_protid($protid);
             $cavfname = "pdbs/$fam/$protid.upright.cav";
-            if (!file_exists($cavfname)) passthru("bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname");
+            if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
+            {
+                $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
+                echo "$cmd\n";
+                passthru($cmd);
+            }
             $cavfname = "pdbs/$fam/$protid.active.cav";
-            if (!file_exists($cavfname)) passthru("bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname");
+            if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
+            {
+                $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
+                echo "$cmd\n";
+                passthru($cmd);
+            }
 
             $cenresno = implode(" ", $cenresno);
             $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
@@ -734,7 +747,7 @@ heredoc;
         else $iso = "";
 
         $excl1 = resno_from_bw($protid, "2.37");
-        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 1 2 3 4 45 5 6 7" : "";
+        $soft = /*(($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 1 2 3 4 45 5 6 7" :*/ "";
 
         $configf = <<<heredoc
 

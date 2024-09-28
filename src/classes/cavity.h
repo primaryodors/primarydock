@@ -49,4 +49,8 @@ class Cavity
     int vdw_vertex_count = 0;
 };
 
+extern float cav_xmax, cav_xmin, cav_ymax, cav_ymin, cav_zmax, cav_zmin, cav_xyrlim, cav_xzrlim, cav_yzrlim;
+extern int cav_resmin, cav_resmax;
+
 #endif
+

@@ -1,4 +1,55 @@
 {
+    "OR2W1":
+    {
+        "M81V":
+        {
+            "methyl benzoate": "lf",
+            "ethyl cyclohexane-carboxylate": "lf",
+            "ethyl 2-methyl-propanoate": "lf",
+            "delta-octalactone": "lf",
+            "dipropyl disulfide": "lf",
+            "dipropyl trisulfide": "lf",
+            "3-ethylphenol": "lf",
+            "2-methoxy-5-methylphenol": "lf",
+            "4-methoxy-2-methyl-2-butanethiol": "lf",
+            "(E)-2-heptenal": "lf",
+            "(Z)-2-octenal": "lf",
+            "(Z)-4-decenal": "lf",
+            "2-nonanone": "-",
+            "2-acetylpyrazine": "lf",
+            "geraniol": "lf",
+            "(S)-limonene": "lf",
+            "alpha-phellandrene": "lf",
+            "alpha-terpineol": "lf",
+            "(+)-sabinene": "lf",
+            "1-p-menthene-8-thiol": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680"
+        },
+        "D296N":
+        {
+            "4-vinylphenol": "-",
+            "ethyl hexanoate": "-",
+            "1,8-cineole": "-",
+            "3-ethylphenol": "-",
+            "2-methoxy-5-methylphenol": "-",
+            "4-methoxy-2-methyl-2-butanethiol": "-",
+            "2-acetylpyrazine": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680"
+        }
+    },
+    "OR5AN1":
+    {
+        "Y260F":
+        {
+            "muscone": "lf",
+            "ref": "https:\/\/doi.org\/10.1073\/pnas.1713026115"
+        },
+        "Y279A":
+        {
+            "cyclopentadecanone": "lf",
+            "ref": "https:\/\/doi.org\/10.1073\/pnas.1713026115"
+        }
+    },
     "OR51E2":
     {
         "F155A":

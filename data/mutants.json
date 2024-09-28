@@ -1,4 +1,165 @@
 {
+    "OR2M3":
+    {
+        "T105H":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "T105I":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "T105A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "G109C":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "G109R":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C112S":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C112A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C202S":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C202A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C203S":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C203A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C203Y":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C241A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "H244A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        }
+    },
+    "OR2T11":
+    {
+        "S5A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "A30G":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "M56A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "M66A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "V92A":
+        {
+            "tert-butanethiol": "nc",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "M115A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "M133A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "R135A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "C138A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "S190A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "T213A":
+        {
+            "tert-butanethiol": "nc",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "T221A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "C238S":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "H241R":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "P265A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "V270A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "G296A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        }
+    },
     "OR2W1":
     {
         "M81V":
@@ -25,6 +186,90 @@
             "1-p-menthene-8-thiol": "lf",
             "ref": "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680"
         },
+        "M105H":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "S109C":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "S109A":
+        {
+            "2-phenylethanethiol": "-",
+            "3-mercaptohexyl acetate": "-",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C112A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202S":
+        {
+            "2-phenylethanethiol": "-",
+            "3-mercaptohexyl acetate": "nc",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202C":
+        {
+            "2-phenylethanethiol": "-",
+            "3-mercaptohexyl acetate": "+",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202C/G203C":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202C/G203C/C241A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202C/G203C/H244A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "Y252A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "Y259A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "-",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "Y252A/Y259A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
         "D296N":
         {
             "4-vinylphenol": "-",
@@ -37,8 +282,36 @@
             "ref": "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680"
         }
     },
+    "OR5K1":
+    {
+        "F62L":
+        {
+            "trimethylpyrazine": "nc",
+            "ref": "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R"
+        }
+    },
     "OR5AN1":
     {
+        "G3A":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "M60L":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "G162A":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "T247K":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
         "Y260F":
         {
             "muscone": "lf",
@@ -48,10 +321,66 @@
         {
             "cyclopentadecanone": "lf",
             "ref": "https:\/\/doi.org\/10.1073\/pnas.1713026115"
+        },
+        "T280L":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "L289F":
+        {
+            "muscenone": "-",
+            "musk ketone": "-",
+            "musk xylol": "-",
+            "civettone": "-",
+            "globanone": "-",
+            "cyclopentadecanone": "-",
+            "muscone": "-",
+            "cyclopentadecanol": "lf",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016",
+                "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1"
+            ]
         }
     },
     "OR51E2":
     {
+        "S258":
+        {
+            "propionic acid": "kb!",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "R262":
+        {
+            "propionic acid": "kb!",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "H104":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F155":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "H180":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Q181":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "G198":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
         "F155A":
         {
             "acetic acid": "-",

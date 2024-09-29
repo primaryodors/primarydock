@@ -269,7 +269,7 @@ function prepare_ligand($lig_name)
 
 function prepare_outputs()
 {
-    global $ligname, $dock_metals, $prots, $protid, $fam, $outfname, $pdbfname, $docker;
+    global $ligname, $dock_metals, $prots, $protid, $fam, $outfname, $pdbfname, $docker, $mresnos;
     global $binding_pockets, $mutants, $cavities_a, $cavities_i, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
     global $atomto, $excl, $nodel, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
@@ -441,7 +441,11 @@ function prepare_outputs()
         foreach ($cavities_i as $cavno => $resnos)
         {
             $temp = [];
-            foreach ($resnos as $rno) $temp[] = bw_from_resno($protid, $rno);
+            foreach ($resnos as $rno)
+            {
+                $lbw = bw_from_resno($protid, $rno);
+                if (intval($lbw)) $temp[] = $lbw;
+            }
             $cavities_i[$cavno] = $temp;
         }
 
@@ -467,7 +471,11 @@ function prepare_outputs()
         foreach ($cavities_a as $cavno => $resnos)
         {
             $temp = [];
-            foreach ($resnos as $rno) $temp[] = bw_from_resno($protid, $rno);
+            foreach ($resnos as $rno)
+            {
+                $lbw = bw_from_resno($protid, $rno);
+                if (intval($lbw)) $temp[] = $lbw;
+            }
             $cavities_a[$cavno] = $temp;
         }
 
@@ -503,19 +511,55 @@ function prepare_outputs()
 
                     $lbw = bw_from_resno($mutantid, $rno);
                     $lbwp = $priority ? ($lbw . '!') : $lbw;
-                    $mresnos[$lbw] = $lbwp;
+                    $mresnos["$lbw"] = $lbwp;
                 }
             }
-            print_r($mresnos);
+            // print_r($mresnos);
         }
 
         // Now prioritize cavities that contain mutant residues.
+        function how_many_mres($lcavity)
+        {
+            global $mresnos;
+            $result = 0;
+            foreach ($lcavity as $lbw) if (isset($mresnos["$lbw"]))
+            {
+                $result++;
+                if (substr($mresnos["$lbw"], -1) == '!') $result+=10;
+            }
+            return $result;
+        }
 
-        // Add exclamation points to any residues identified as "lf" or "kb!" in the mutant data.
+        function mutcavsort($a, $b)
+        {
+            $amut = how_many_mres($a);
+            $bmut = how_many_mres($b);
+            if ($amut == $bmut) return 0;
+            else return ($amut > $bmut) ? -1 : 1;
+        }
 
-        // Select the top 3 cavities and use them as your multipocket.
+        usort($cavities_i, "mutcavsort");
+        usort($cavities_a, "mutcavsort");
+        // print_r($cavities_a);
+
+        // Select the top 3 cavities and use them as your multipocket. Add exclamation points to any cavity residues identified as priority.
+        $cenres_inactive = "";
+        for ($i=0; $i<3; $i++)
+        {
+            if (!isset($cavities_i[$i])) $break;
+            foreach ($cavities_i[$i] as $k => $v) if (@substr($mresnos[$v],-1) == '!') $cavities_i[$i][$k] .= '!';
+            $cenres_inactive .= "CEN RES ".implode(' ',$cavities_i[$i])."\n";
+        }
+        $cenres_active = "";
+        for ($i=0; $i<3; $i++)
+        {
+            if (!isset($cavities_a[$i])) $break;
+            foreach ($cavities_a[$i] as $k => $v) if (@substr($mresnos[$v],-1) == '!') $cavities_a[$i][$k] .= '!';
+            $cenres_active .= "CEN RES ".implode(' ',$cavities_a[$i])."\n";
+        }
+        // echo "$cenres_active\n";
     }
-    if ($mbp && (isset($mbp["pocket"]) || (isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))))
+    else if ($mbp && (isset($mbp["pocket"]) || (isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))))
     {
         if (isset($mbp["pocket"]))
         {

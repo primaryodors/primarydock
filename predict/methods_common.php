@@ -15,6 +15,9 @@ die_if_too_hot();
 echo date("Y-m-d H:i:s.u\n");
 
 $clashcomp = [];
+$mutants = [];
+$cavities_a = [];
+$cavities_i = [];
 
 $method = explode("_", $_SERVER['PHP_SELF'])[1];
 $method = explode(".", $method)[0];
@@ -267,7 +270,7 @@ function prepare_ligand($lig_name)
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname, $docker;
-    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
+    global $binding_pockets, $mutants, $cavities_a, $cavities_i, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
     global $atomto, $excl, $nodel, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
@@ -393,7 +396,84 @@ function prepare_outputs()
             }
         }
     }
+
+    $fam = family_from_protid($protid);
+    $cavfname = "pdbs/$fam/$protid.upright.cvty";
+    if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
+    {
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
+        echo "$cmd\n";
+        passthru($cmd);
+    }
+    $cavfname = "pdbs/$fam/$protid.active.cvty";
+    if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
+    {
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
+        echo "$cmd\n";
+        passthru($cmd);
+    }
     
+    if ($mbp && isset($mbp["cvty"]) && @$mbp["cvty"])
+    {
+        $mutants = json_decode(file_get_contents("data/mutants.json"), true);
+        $c = explode("\n", file_get_contents("pdbs/$fam/$protid.upright.cvty"));
+        $cavities_i = [];
+        foreach ($c as $ln)
+        {
+            $cavno = intval(substr($ln, 0, 4));
+            $resnos = explode(" ", substr($ln, 48));
+            if (isset($cavities_i[$cavno]))
+            {
+                $resnos = array_unique(array_merge($resnos, $cavities_i[$cavno]));
+                sort($resnos);
+                $cavities_i[$cavno] = $resnos;
+            }
+            else
+            {
+                sort($resnos);
+                $cavities_i[$cavno] = $resnos;
+            }
+        }
+
+        foreach ($cavities_i as $cavno => $resnos)
+        {
+            $temp = [];
+            foreach ($resnos as $rno) $temp[] = bw_from_resno($protid, $rno);
+            $cavities_i[$cavno] = $temp;
+        }
+
+        $c = explode("\n", file_get_contents("pdbs/$fam/$protid.active.cvty"));
+        $cavities_a = [];
+        foreach ($c as $ln)
+        {
+            $cavno = intval(substr($ln, 0, 4));
+            $resnos = explode(" ", substr($ln, 48));
+            if (isset($cavities_a[$cavno]))
+            {
+                $resnos = array_unique(array_merge($resnos, $cavities_a[$cavno]));
+                sort($resnos);
+                $cavities_a[$cavno] = $resnos;
+            }
+            else
+            {
+                sort($resnos);
+                $cavities_a[$cavno] = $resnos;
+            }
+        }
+
+        foreach ($cavities_a as $cavno => $resnos)
+        {
+            $temp = [];
+            foreach ($resnos as $rno) $temp[] = bw_from_resno($protid, $rno);
+            $cavities_a[$cavno] = $temp;
+        }
+
+        // Now prioritize cavities that contain residues from the mutants file. Remember to convert to BW numbers.
+
+        // Add exclamation points to any residues identified as "lf" or "kb!" in the mutant data.
+
+        // Select the top 3 cavities and use them as your multipocket.
+    }
     if ($mbp && (isset($mbp["pocket"]) || (isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))))
     {
         if (isset($mbp["pocket"]))
@@ -458,6 +538,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     if (!file_exists("tmp")) mkdir("tmp");
     $modelfname = preg_replace("/.dock$/", ".model%o.pdb", $outfname);
     $retvar = 0;
+    $fam = family_from_protid($protid);
 
     switch(strtolower($docker))
     {
@@ -683,22 +764,6 @@ heredoc;
 
             $cavsr = resno_from_bw($protid, "1.28");
             $caver = resno_from_bw($protid, "7.56");
-
-            $fam = family_from_protid($protid);
-            $cavfname = "pdbs/$fam/$protid.upright.cvty";
-            if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
-            {
-                $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
-                echo "$cmd\n";
-                passthru($cmd);
-            }
-            $cavfname = "pdbs/$fam/$protid.active.cvty";
-            if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
-            {
-                $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
-                echo "$cmd\n";
-                passthru($cmd);
-            }
 
             $cenresno = implode(" ", $cenresno);
             $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";

@@ -85,6 +85,11 @@
             "(S)-(-)-citronellol": "+",
             "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
         },
+        "R128H":
+        {
+            "caproic acid": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
         "G152A":
         {
             "(R)-carvone": "-",
@@ -112,6 +117,11 @@
                 "https:\/\/doi.org\/10.1007\/s00018-017-2576-z",
                 "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
             ]
+        },
+        "V233M":
+        {
+            "caproic acid": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
         },
         "Y250F":
         {
@@ -172,6 +182,11 @@
         {
             "(S)-(-)-citronellol": "-",
             "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "P285S":
+        {
+            "caproic acid": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
         }
     },
     "OR1A2":
@@ -217,6 +232,14 @@
             "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
         }
     },
+    "OR1C1":
+    {
+        "A67V":
+        {
+            "linalool": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
     "OR1N2":
     {
         "W23R/V230G/T287M":
@@ -225,6 +248,29 @@
             "(Z)-ambrettolide": "+",
             "dihydroambrettolide": "+",
             "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjae015"
+        }
+    },
+    "OR2A25":
+    {
+        "S75N":
+        {
+            "linalool": "nc",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "S75N/A209P":
+        {
+            "linalool": "nc",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "S75N/V82A/A209P":
+        {
+            "linalool": "nc",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "A209P":
+        {
+            "linalool": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
         }
     },
     "OR2J3":
@@ -644,7 +690,12 @@
             "2-methoxy-5-methylphenol": "-",
             "4-methoxy-2-methyl-2-butanethiol": "-",
             "2-acetylpyrazine": "-",
-            "ref": "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680"
+            "caproic acid": "-",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680",
+                "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+            ]
         }
     },
     "OR2AG1":
@@ -830,6 +881,14 @@
             "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjac037"
         }
     },
+    "OR6Y1":
+    {
+        "H11R/R16H/F32L/I35V/I122V/M176T/A197S/M202L/M259T":
+        {
+            "diacetyl": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
     "OR7D4":
     {
         "D52G":
@@ -904,6 +963,89 @@
         {
             "androstenone": "-",
             "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        }
+    },
+    "OR10G4":
+    {
+        "A9V/M134V/V195E/R235G/K295Q":
+        {
+            "isoeugenol": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "L24P/V195E":
+        {
+            "isoeugenol": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "T62I/Y101C/M134V/G146S/P181S/V195E/R235G/K295Q":
+        {
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR10G7":
+    {
+        "T5S":
+        {
+            "guaiacol": "+",
+            "isoeugenol": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "T13M":
+        {
+            "guaiacol": "-",
+            "isoeugenol": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "T5S/I28V":
+        {
+            "guaiacol": "+",
+            "isoeugenol": "nc",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "T5S/A18V/P19Q/G20A":
+        {
+            "guaiacol": "+",
+            "isoeugenol": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR10G9":
+    {
+        "A90T/M134V":
+        {
+            "guaiacol": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "A90V/Q172R/H228R":
+        {
+            "guaiacol": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "A9V/T62I/Q172R/Y176C/V200L/L204V/H228R":
+        {
+            "guaiacol": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR10J5":
+    {
+        "R233W":
+        {
+            "bourgeonal": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR11A1":
+    {
+        "M80T":
+        {
+            "2-ethylfenchol": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "A165T":
+        {
+            "2-ethylfenchol": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
         }
     },
     "OR51B2":

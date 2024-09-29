@@ -635,11 +635,14 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     lv.origin = agcen;
     ligand->rotate(lv, rot.a);
 
+    ligand->find_mutual_max_bind_potential(cs_res[j]);
+
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.
     lv = (SCoord)resna.subtract(ligand->get_barycenter());
     lv.origin = agcen;
     Pose best(ligand);
+    ligand->enforce_stays();
     best.copy_state(ligand);
     float least_clash;
     float theta = 0;
@@ -655,10 +658,12 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         }
 
         ligand->rotate(lv, cs_360_step);
+        ligand->enforce_stays();
     }
 
     best.restore_state(ligand);
     ligand->movability = MOV_ALL;
+    ligand->enforce_stays();
 }
 
 void Search::copy_ligand_position_from_file(Protein* protein, Molecule* ligand, const char* filename, const char* ligname, int resno)

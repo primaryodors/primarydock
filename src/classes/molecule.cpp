@@ -2857,6 +2857,49 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     return retval;
 }
 
+void Molecule::find_mutual_max_bind_potential(Molecule* other)
+{
+    int i, j, m = get_atom_count(), n = other->get_atom_count();
+    if (!m || !n) return;
+
+    float best_potential = 0;
+    for (i=0; i<m; i++)
+    {
+        for (j=0; j<n; j++)
+        {
+            float b = InteratomicForce::potential_binding(atoms[i], other->atoms[j]);
+            float r = atoms[i]->distance_to(other->atoms[j]);
+            b += 2.0/r;
+            if (b > best_potential)
+            {
+                best_potential = b;
+                stay_close_mine = atoms[i];
+                stay_close_other = other->atoms[j];
+                stay_close_limit  = InteratomicForce::optimal_distance(atoms[i], other->atoms[j]);
+            }
+        }
+    }
+}
+
+bool Molecule::check_stays()
+{
+    if (!stay_close_mine || !stay_close_other) return true;
+    float r = stay_close_mine->distance_to(stay_close_other);
+    return (r < stay_close_limit);
+}
+
+void Molecule::enforce_stays(float amt)
+{
+    if (!stay_close_mine || !stay_close_other) return;
+    SCoord movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
+    movamt.r -= InteratomicForce::optimal_distance(stay_close_mine, stay_close_other);
+    movamt.r *= amt;
+    MovabilityType wasmov = movability;
+    movability = MOV_ALL;
+    move(movamt);
+    movability = wasmov;
+}
+
 Interaction Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 {
     Molecule* ligands[4];
@@ -3398,6 +3441,8 @@ Interaction Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
             result += f;
         }
     }
+
+    if (a->stay_close_mine && a->stay_close_other) result.stays_distance = fmax(0, a->stay_close_mine->distance_to(a->stay_close_other) - a->stay_close_limit);
     return result;
 }
 
@@ -3609,6 +3654,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         a->move(motion);
                         // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
                         tryenerg = cfmol_multibind(a, nearby);
+                        
 
                         if (tryenerg.improved(benerg))
                         {
@@ -3648,6 +3694,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     a->move(motion);
 
                     tryenerg = cfmol_multibind(a, nearby);
+                    
 
                     #if _dbg_fitness_plummet
                     if (!i) cout << "(linear motion try " << -tryenerg << ") ";
@@ -3680,6 +3727,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         a->move(motion);
 
                         tryenerg = cfmol_multibind(a, nearby);
+                        
 
                         if (tryenerg.improved(benerg))
                         {
@@ -3700,6 +3748,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         }
                     }
                 }
+
+                a->enforce_stays(0.333);
             }       // If can recenter.
             #if _dbg_linear_motion
             else
@@ -3728,6 +3778,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
 
                     tryenerg = cfmol_multibind(a, nearby);
+                    
 
                     if (tryenerg.improved(benerg))
                     {
@@ -3770,6 +3821,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                     a->rotate(&axis, theta);
                     tryenerg = cfmol_multibind(a, nearby);
+                    
 
                     if (tryenerg.improved(benerg))
                     {
@@ -3842,6 +3894,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 }
                                 tryenerg = cfmol_multibind(a, nearby);
                                 tryenerg.repulsive += a->total_eclipses();
+                                
 
                                 #if _dbg_mol_flexion
                                 if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;

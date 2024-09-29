@@ -223,6 +223,9 @@ public:
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
+    void find_mutual_max_bind_potential(Molecule* other);
+    bool check_stays();
+    void enforce_stays(float amount=1);
 
     float get_springy_bond_satisfaction();
 
@@ -265,6 +268,8 @@ public:
     Atom *best_intera = nullptr, *best_other_intera = nullptr;
     Molecule* best_interactor = nullptr;
     int eclipse_hash = 0;
+    Atom *stay_close_mine = nullptr, *stay_close_other = nullptr;
+    float stay_close_limit = Avogadro;
 
 protected:
 

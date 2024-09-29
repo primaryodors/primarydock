@@ -269,7 +269,7 @@ function prepare_ligand($lig_name)
 
 function prepare_outputs()
 {
-    global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname, $docker;
+    global $ligname, $dock_metals, $prots, $protid, $fam, $outfname, $pdbfname, $docker;
     global $binding_pockets, $mutants, $cavities_a, $cavities_i, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
     global $atomto, $excl, $nodel, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
@@ -397,6 +397,9 @@ function prepare_outputs()
         }
     }
 
+    $cavsr = resno_from_bw($protid, "1.28");
+    $caver = resno_from_bw($protid, "7.56");
+
     $fam = family_from_protid($protid);
     $cavfname = "pdbs/$fam/$protid.upright.cvty";
     if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
@@ -468,7 +471,45 @@ function prepare_outputs()
             $cavities_a[$cavno] = $temp;
         }
 
-        // Now prioritize cavities that contain residues from the mutants file. Remember to convert to BW numbers.
+        // Get the list of residues from the mutants file, converted to BW numbers.
+        $mresnos = [];
+        $mutantid = false;
+        if (isset($mutants[$protid])) $mutantid = $protid;
+        if ($mutantid)
+        {
+            foreach ($mutants[$mutantid] as $resnos => $effects)
+            {
+                $resnos = explode("/", $resnos);
+                $temp = [];
+
+                $priority = false;
+                $effect = false;
+
+                foreach ($effects as $odor => $eff)
+                {
+                    if ($odor == 'ref') continue;
+                    if ($eff != 'nc') $effect = true;
+                    if ($eff == "lf" || $eff == "kb!") $priority = true;
+                }
+
+                if (!$effect) continue;
+
+                foreach ($resnos as $snp)
+                {
+                    $fromaa = substr($snp, 0, 1);
+                    $rno = intval(substr($snp, 1));
+                    $actualaa = @substr($prots[$mutantid]['sequence'], $rno-1, 1);
+                    if ($actualaa != $fromaa) die("ERROR: mutants.json says $mutantid:$rno should be $fromaa but it's $actualaa in the data.\n");
+
+                    $lbw = bw_from_resno($mutantid, $rno);
+                    $lbwp = $priority ? ($lbw . '!') : $lbw;
+                    $mresnos[$lbw] = $lbwp;
+                }
+            }
+            print_r($mresnos);
+        }
+
+        // Now prioritize cavities that contain mutant residues.
 
         // Add exclamation points to any residues identified as "lf" or "kb!" in the mutant data.
 
@@ -761,9 +802,6 @@ heredoc;
                 $resno = resno_from_bw($protid, $bw);
                 if ($resno) $cenresno[] = $resno;
             }
-
-            $cavsr = resno_from_bw($protid, "1.28");
-            $caver = resno_from_bw($protid, "7.56");
 
             $cenresno = implode(" ", $cenresno);
             $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";

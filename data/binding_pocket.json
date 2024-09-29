@@ -189,6 +189,10 @@
     {
         "pocket": "STNQ3.37! STNQ5.43! 6.55 7.41"
     },
+    "OR51E2":
+    {
+        "cvty": true
+    },
     "OR5[12][A-Z]{1,2}[0-9]{1,2}":
     {
         "odorophores":

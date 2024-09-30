@@ -1440,8 +1440,7 @@ float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
 
 bool Interaction::improved(Interaction rel)
 {
-    if (stays_distance > rel.stays_distance) return false;
-    if (summed() < -clash_limit_per_aa*10) return rel.repulsive > repulsive;
+    if (rel.repulsive >= clash_limit_per_aa*100 || summed() < -clash_limit_per_aa*10) return rel.repulsive > repulsive;
     return attractive > rel.attractive || repulsive < rel.repulsive;
 }
 

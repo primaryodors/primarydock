@@ -585,6 +585,9 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     }
 
     Atom* mtl = (cs_bt[j] == mcoord) ? cs_res[j]->coordmtl : nullptr;
+    ligand->find_mutual_max_bind_potential(cs_res[j]);
+    if (mtl) ligand->stay_close_other = mtl;
+    // cout << *cs_res[j] << endl << endl;
 
     // Point residue toward where ligand will be, unless using pi stacking.
     if (cs_bt[j] != pi && cs_bt[j] != mcoord)
@@ -613,20 +616,11 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     SCoord mov = loneliest.subtract(agp);
     ligand->move(mov);
 
-    // Rotate the ligand so the atom group faces the chosen residue.
-    Point resca = mtl ? mtl->get_location() : cs_res[j]->get_CA_location();
-    Point agcen = cs_lag[j]->get_center();
-    Rotation rot = align_points_3d(agcen, resca, ligand->get_barycenter());
-    LocatedVector lv = rot.v;
-    lv.origin = ligand->get_barycenter();
-    ligand->rotate(lv, rot.a);
-
-    // Move the ligand so that the atom group is at the optimal distance to the residue.
-    Point resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
-    agcen = cs_lag[j]->get_center();
-    mov = resna.subtract(agcen);
-    mov.r -= mtl ? 2.5 : 1;
-    if (mov.r > 0) ligand->move(mov);
+    Rotation rot;
+    LocatedVector lv;
+    Point agcen;
+    Point resna;
+    ligand->enforce_stays();
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
     agcen = cs_lag[j]->get_center();
@@ -635,14 +629,11 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     lv.origin = agcen;
     ligand->rotate(lv, rot.a);
 
-    ligand->find_mutual_max_bind_potential(cs_res[j]);
-
     // Perform a monaxial 360° rotation about the residue and the imaginary line between ligand barycenter and residue,
     // and look for the rotamer with the smallest clash total.
     lv = (SCoord)resna.subtract(ligand->get_barycenter());
     lv.origin = agcen;
     Pose best(ligand);
-    ligand->enforce_stays();
     best.copy_state(ligand);
     float least_clash;
     float theta = 0;
@@ -658,12 +649,10 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         }
 
         ligand->rotate(lv, cs_360_step);
-        ligand->enforce_stays();
     }
 
     best.restore_state(ligand);
     ligand->movability = MOV_ALL;
-    ligand->enforce_stays();
 }
 
 void Search::copy_ligand_position_from_file(Protein* protein, Molecule* ligand, const char* filename, const char* ligname, int resno)

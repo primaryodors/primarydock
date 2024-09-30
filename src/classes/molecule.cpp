@@ -2891,13 +2891,25 @@ bool Molecule::check_stays()
 void Molecule::enforce_stays(float amt)
 {
     if (!stay_close_mine || !stay_close_other) return;
+
+    Rotation rot = align_points_3d(stay_close_mine->get_location(), stay_close_other->get_location(), get_barycenter());
+    LocatedVector lv = rot.v;
+    lv.origin = get_barycenter();
+    rotate(lv, rot.a*amt);
+
     SCoord movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
-    movamt.r -= InteratomicForce::optimal_distance(stay_close_mine, stay_close_other);
+    // cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl;
+    float optimal = InteratomicForce::optimal_distance(stay_close_mine, stay_close_other);
+    // cout << "Should be " << optimal << endl;
+    movamt.r -= optimal;
     movamt.r *= amt;
+    // cout << movamt << endl;
     MovabilityType wasmov = movability;
     movability = MOV_ALL;
     move(movamt);
-    movability = wasmov;
+    movability = wasmov;movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
+    // cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl << endl;
+
 }
 
 Interaction Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
@@ -3442,8 +3454,7 @@ Interaction Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
         }
     }
 
-    if (a->stay_close_mine && a->stay_close_other) result.stays_distance = fmax(0, a->stay_close_mine->distance_to(a->stay_close_other) - a->stay_close_limit);
-    return result;
+   return result;
 }
 
 void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**),
@@ -3749,7 +3760,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     }
                 }
 
-                a->enforce_stays(0.333);
+                a->enforce_stays(0.1);
             }       // If can recenter.
             #if _dbg_linear_motion
             else

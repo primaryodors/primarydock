@@ -2881,13 +2881,6 @@ void Molecule::find_mutual_max_bind_potential(Molecule* other)
     }
 }
 
-bool Molecule::check_stays()
-{
-    if (!stay_close_mine || !stay_close_other) return true;
-    float r = stay_close_mine->distance_to(stay_close_other);
-    return (r < stay_close_limit);
-}
-
 void Molecule::enforce_stays(float amt)
 {
     if (!stay_close_mine || !stay_close_other) return;
@@ -3759,8 +3752,6 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         }
                     }
                 }
-
-                a->enforce_stays(0.1);
             }       // If can recenter.
             #if _dbg_linear_motion
             else

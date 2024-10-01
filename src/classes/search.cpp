@@ -493,7 +493,12 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
     n = cs_res_qty;
     any_resnos_priority = false;
-    for (l=0; l<n; l++) if (cs_res[l]->priority) any_resnos_priority = true;
+    for (l=0; l<n; l++)
+    {
+        cs_res[l] = protein->get_residue(cs_res[l]->get_residue_no());
+        if (cs_res[l]->priority) any_resnos_priority = true;
+        cs_lag[l]->update_atom_pointers(ligand);
+    }
 
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     n = cs_res_qty;
@@ -587,39 +592,30 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     Atom* mtl = (cs_bt[j] == mcoord) ? cs_res[j]->coordmtl : nullptr;
     ligand->find_mutual_max_bind_potential(cs_res[j]);
     if (mtl) ligand->stay_close_other = mtl;
-    // cout << *cs_res[j] << endl << endl;
-
-    // Point residue toward where ligand will be, unless using pi stacking.
-    if (cs_bt[j] != pi && cs_bt[j] != mcoord)
-    {
-        MovabilityType mt = cs_res[j]->movability;
-        cs_res[j]->movability = MOV_FLEXONLY;
-        cs_res[j]->conform_atom_to_location(cs_res[j]->get_reach_atom()->name, loneliest);
-        cs_res[j]->movability = mt;
-    }
 
     ligand->movability = MOV_ALL;
     float f = frand(0,1);
     if (f < 0.333)
     {
         ligand->crumple(frand(0, square));
-        // cout << "\\/\\/ ";
     }
     else if (f < 0.666)
     {
         ligand->minimize_internal_clashes();
-        // cout << "---- ";
     }
 
     // Place the ligand so that the atom group is centered in the binding pocket.
+    ligand->movability = MOV_ALL;
     Point agp = cs_lag[j]->get_center();
-    SCoord mov = loneliest.subtract(agp);
+    Point resna = cs_res[j]->get_reach_atom_location();
+    // cout << resna;
+    SCoord mov = resna.subtract(agp);
     ligand->move(mov);
+    // cout << cs_lag[j]->get_center() << endl << endl;
 
     Rotation rot;
     LocatedVector lv;
     Point agcen;
-    Point resna;
     ligand->enforce_stays();
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.

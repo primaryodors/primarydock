@@ -22,6 +22,7 @@ struct CPartial
     bool pi = false;
     // int resno = 0;
     std::string resnos_as_string(Protein* p);
+    int from_cvty_line(char* lndata);               // Returns the cavity number from the first column.
 };
 
 class Cavity
@@ -38,6 +39,7 @@ class Cavity
     CPartial* point_inside_pocket(Point pt);
     float containment_violations(Molecule* m, float stop_if_more_than = Avogadro);
     float find_best_containment(Molecule* m);
+    std::string resnos_as_string(Protein* p);
 
     protected:
     void compute_vdW_surface(float d);

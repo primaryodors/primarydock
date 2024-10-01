@@ -360,7 +360,7 @@ float Cavity::containment_violations(Molecule* m, float simt)
     Atom** va = m->get_vdW_vertex_atoms();
 
     int i;
-    float viol = m->total_eclipses()*33;
+    float viol = 0;
     for (i=0; ligand_vertices[i].x || ligand_vertices[i].y || ligand_vertices[i].z; i++)
     {
         CPartial* cp = point_inside_pocket(ligand_vertices[i]);
@@ -369,7 +369,7 @@ float Cavity::containment_violations(Molecule* m, float simt)
         {
             viol += (Z > 1) ? 1 : 0.5;
 
-            if (viol > simt) return viol+simt;
+            if (viol > simt) return viol;
         }
         else
         {
@@ -390,7 +390,7 @@ float Cavity::find_best_containment(Molecule* m)
     Point cen = get_center();
     m->recenter(cen);
     Pose best(m);
-    float bestviol = containment_violations(m);
+    float bestviol = containment_violations(m) + m->total_eclipses()*33;
 
     Point axes[3];
     axes[0] = Point(1,0,0);
@@ -423,7 +423,7 @@ float Cavity::find_best_containment(Molecule* m)
 
                 if (!atoms_outside_cavity)
                 {
-                    float viol = containment_violations(m, fmax(0, bestviol));
+                    float viol = containment_violations(m, fmax(0, bestviol)) + m->total_eclipses()*33;
                     if (viol < bestviol)
                     {
                         best.copy_state(m);
@@ -447,7 +447,7 @@ float Cavity::find_best_containment(Molecule* m)
             maybe.z += 0.5 * j/9;
 
             m->recenter(maybe);
-            float viol = containment_violations(m);
+            float viol = containment_violations(m) + m->total_eclipses()*33;
             if (viol < bestviol)
             {
                 best.copy_state(m);
@@ -460,6 +460,36 @@ float Cavity::find_best_containment(Molecule* m)
     }
 
     return bestviol;
+}
+
+std::string Cavity::resnos_as_string(Protein* p)
+{
+    if (!partials || !pallocd) return (std::string)"";
+    int i, j, n=p->get_end_resno();
+    bool resincluded[n+4];
+    for (i=0; i<=n; i++) resincluded[i] = false;
+    for (i=0; i<pallocd; i++)
+    {
+        if (!partials[i].s.radius) break;
+        std::string pres = partials[i].resnos_as_string(p);
+        char buffer[1024];
+        strcpy(buffer, pres.c_str());
+        char** words = chop_spaced_words(buffer);
+        if (!words) continue;
+        for (j=0; words[j]; j++) resincluded[atoi(words[j])] = true;
+    }
+
+    std::string result = "";
+    for (i=1; i<=n; i++)
+    {
+        if (resincluded[i])
+        {
+            if (result.length()) result += " ";
+            result += std::to_string(i);
+        }
+    }
+
+    return result;
 }
 
 std::string CPartial::resnos_as_string(Protein* p)
@@ -481,4 +511,31 @@ std::string CPartial::resnos_as_string(Protein* p)
     std::string result;
     for (i=1; i<=n; i++) if (intersect[i]) result += (std::string)(result.length() ? " " : "") + std::to_string(i);
     return result;
+}
+
+int CPartial::from_cvty_line(char* lndata)
+{
+    int cno;
+
+    //           1111111111222222222233333333334444444444
+    // 01234567890123456789012345678901234567890123456789
+    //    2   -4.228   22.449    7.041   2.569  -+HSP  96 99 157 158 161 182
+
+    lndata[4] = 0;
+    cno = atoi(lndata);
+    lndata[13] = 0;
+    s.center.x = atof(lndata+5);
+    lndata[22] = 0;
+    s.center.y = atof(lndata+14);
+    lndata[31] = 0;
+    s.center.z = atof(lndata+23);
+    lndata[39] = 0;
+    s.radius = atof(lndata+32);
+    chargedn = (lndata[41] == '-');
+    chargedp = (lndata[42] == '+');
+    polar    = (lndata[43] == 'H');
+    thio     = (lndata[44] == 'S');
+    pi       = (lndata[45] == 'P');
+
+    return cno;
 }

@@ -13,6 +13,7 @@
 #include "classes/group.h"
 #include "classes/search.h"
 #include "classes/scoring.h"
+#include "classes/cavity.h"
 
 using namespace std;
 
@@ -75,6 +76,7 @@ char tplrfnam[256];
 char ligfname[256];
 char smiles[256];
 char outfname[256];
+char cvtyfname[256];
 Point pocketcen;
 std::ofstream *output = NULL;
 
@@ -83,6 +85,8 @@ int cenbuf_idx = 0;
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
+Cavity cvtys[256];
+int ncvtys = 0;
 std::vector<std::string> dyn_strings;
 std::vector<DynamicMotion> dyn_motions;
 
@@ -1505,6 +1509,11 @@ int interpret_config_line(char** words)
         clash_fleeing = atof(words[1]);
         return 1;
     }
+    else if (!strcmp(words[0], "VCVTY"))
+    {
+        strcpy(cvtyfname, words[1]);
+        return 1;
+    }
 
     return 0;
 }
@@ -1871,7 +1880,7 @@ int main(int argc, char** argv)
     for (i=0; i<65536; i++) buffer[i] = 0;
 
     for (i=0; i<256; i++)
-        configfname[i] = protfname[i] = protafname[i] = ligfname[i] = 0;
+        configfname[i] = protfname[i] = protafname[i] = ligfname[i] = cvtyfname[i] = 0;
 
     time_t began = time(NULL);
 
@@ -1969,6 +1978,34 @@ int main(int argc, char** argv)
 
     if (kcal) kJmol_cutoff /= _kcal_per_kJ;
     drift = 1.0 / (iters/25+1);
+
+    if (strlen(cvtyfname))
+    {
+        if (!file_exists(cvtyfname))
+        {
+            cout << "ERROR file not found: " << cvtyfname << endl;
+            return -7;
+        }
+        FILE* fp = fopen(cvtyfname, "rb");
+        if (!fp)
+        {
+            cout << "FAILED to open " << cvtyfname << " for reading." << endl;
+            return -7;
+        }
+
+        cout << "Reading " << cvtyfname << "..." << endl;
+        char buffer[1024];
+        while (!feof(fp))
+        {
+            fgets(buffer, 1022, fp);
+            CPartial cp;
+            int cno = cp.from_cvty_line(buffer);
+            cvtys[cno].add_partial(cp);
+            if (cno+1 > ncvtys) ncvtys = cno+1;
+        }
+        fclose(fp);
+        cout << "Read " << ncvtys << " cavities." << endl;
+    }
 
     char protid[255];
     char* slash = strrchr(protfname, '/');
@@ -3184,6 +3221,26 @@ _try_again:
         {
             protein = &pose_proteins[j];
             ligand = &pose_ligands[j+1];
+
+            if (ncvtys)
+            {
+                float viols;
+                Cavity* fitsin = nullptr;
+                int cno;
+                for (cno = 0; cno < ncvtys; cno++)
+                {
+                    if (!cvtys[cno].count_partials()) continue;
+                    float viol = cvtys[cno].containment_violations(ligand);
+                    if (!cno || viol < viols)
+                    {
+                        fitsin = &cvtys[cno];
+                        viols = viol;
+                    }
+                }
+
+                viols /= ligand->get_atom_count();
+                if (!fitsin || viols > 0.18) continue;
+            }
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {

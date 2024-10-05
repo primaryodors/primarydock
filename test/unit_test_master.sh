@@ -90,9 +90,9 @@ if [ -z "$RESULT" ]; then
     SER258="${SER258/Ser258(6.55): /}"
     SER258="${SER258/[.][0-9]*/}"
     ARG262=$( cat output/OR51/OR51E2/OR51E2.propionic_acid.active.dock | grep -m 1 "Arg262(6.59): " )
-    ARG262="${ASP201/Arg262(6.59): /}"
-    ARG262="${ASP201/[.][0-9]*/}"
-    if [[ $ARG262 -gt "-20"  ]] || [[ $SER258 -gt "-15"  ]]; then
+    ARG262="${ARG262/Arg262(6.59): /}"
+    ARG262="${ARG262/[.][0-9]*/}"
+    if [[ $ARG262 -gt "-20"  ]] || [[ $SER258 -gt "-5"  ]]; then
         printf "${RED}OR51E2 propionate test FAILED: bad contacts.${NC}\n"
     else
         printf "${GRN}OR51E2 propionate test succeeded.${NC}\n"

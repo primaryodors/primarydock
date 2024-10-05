@@ -847,6 +847,9 @@ heredoc;
                 if ($resno) $cenresno[] = $resno;
             }
 
+            $cvtyfname = str_replace('.pdb', '.cvty', $pdbfname);
+            $vcvty = file_exists($cvtyfname) ? "VCVTY $cvtyfname" : "";
+
             $cenresno = implode(" ", $cenresno);
             $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
             echo "$cmd\n";
@@ -901,6 +904,7 @@ heredoc;
 PROT $pdbfname
 LIG sdf/$ligname.sdf
 $iso
+$vcvty
 
 $cenres
 SIZE $size

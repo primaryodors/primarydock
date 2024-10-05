@@ -356,6 +356,7 @@ CPartial* Cavity::point_inside_pocket(Point pt)
 const Point* ligand_vertices;
 float Cavity::containment_violations(Molecule* m, float simt)
 {
+    ligand_vertices = m->obtain_vdW_surface(10);
     if (!ligand_vertices) return 0;
     Atom** va = m->get_vdW_vertex_atoms();
 

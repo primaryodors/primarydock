@@ -490,6 +490,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     int i, j=0, l, n;
 
     bool ligand_can_hbond = ligand->has_hbond_donors() || ligand->has_hbond_acceptors() || fabs(ligand->get_charge()) > 0.999999999;
+    bool require_ionic = false;
 
     n = cs_res_qty;
     any_resnos_priority = false;
@@ -517,9 +518,14 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         // If the ligand can form a polar bond, it must form a polar bond.
         if (!cs_res[j]->priority && (ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
 
+        // If the ligand can form an ionic bond, it must.
+        if (require_ionic && cs_bt[j] != ionic) continue;
+
         // If the ligand and residue have opposite charges, the bond is ionic (or mcoord) no matter what.
         float rchg = cs_res[j]->get_charge(), lchg = cs_lag[j]->get_ionic();
         if (fabs(lchg) >= 1 && fabs(rchg) >= 1 && cs_bt[j] != mcoord && sgn(lchg) == -sgn(rchg)) cs_bt[j] = ionic;
+
+        if (cs_bt[j] == ionic) require_ionic = true;
 
         int li, ln;
         float b, lmcb, bmcb = 0;
@@ -555,10 +561,11 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         float GC = ligand->get_barycenter().get_3d_distance(cs_lag[j]->get_center());
         float r = fmax(0, fabs(alphaC - GC - 3) - cs_res[j]->get_reach());
 
-        float w = pow(b/500, cs_bondweight_exponent) / pow(r, 2) * 100000;
+        float w = pow(b/500, cs_bondweight_exponent) / pow(r, 2) * 10000;
         if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 10;
         if (frand(0,1) < w) goto chose_residue;
     }
+    
     chose_residue:
     cs_idx = j;
 
@@ -636,8 +643,14 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     for (; theta < M_PI*2; theta += cs_360_step)
     {
         AminoAcid* cc[SPHREACH_MAX+4];
-        protein->get_residues_can_clash_ligand(cc, ligand, ligand->get_barycenter(), size, nullptr);
+        int sphres = protein->get_residues_can_clash_ligand(cc, ligand, ligand->get_barycenter(), size, nullptr);
         float f = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(cc));
+        for (l=0; l<sphres; l++)
+        {
+            if (!cc[l] || !cc[l]->priority) continue;
+            float lf = ligand->get_intermol_binding(cc[l], false).attractive;
+            if (lf > 0) f -= lf;
+        }
         if (!theta || f < least_clash)
         {
             least_clash = f;

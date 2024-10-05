@@ -65,6 +65,8 @@ class DockResult
     bool out_pro_clash = false;
     bool out_mc = false;
     bool out_vdw_repuls = false;
+
+    bool disqualified = false;
 };
 
 extern float init_total_binding_by_type[_INTER_TYPES_LIMIT];

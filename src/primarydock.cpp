@@ -306,7 +306,11 @@ int interpret_resno(const char* field)
 
     if (offset == buffer)
     {
-        if (bang) aa->priority = true;
+        if (bang)
+        {
+            aa->priority = true;
+            priority_resnos.push_back(aa->get_residue_no());
+        }
         return retval;
     }
 
@@ -315,7 +319,11 @@ int interpret_resno(const char* field)
     {
         if (buffer[i] == aa->get_letter())
         {
-            if (bang) aa->priority = true;
+            if (bang)
+            {
+                aa->priority = true;
+                priority_resnos.push_back(aa->get_residue_no());
+            }
             return retval;
         }
     }
@@ -956,6 +964,8 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
 {
     int i=1;
     Point local_pocketcen;
+    center_resnos.clear();
+    priority_resnos.clear();
     if (!strcmp(words[i], "RES"))
     {
         i++;
@@ -1669,9 +1679,19 @@ void choose_cen_buf()
         if (aa) aa->priority = false;
     }
 
+    priority_resnos.clear();
+
     n = CEN_buf.size();
     if (pose <= n) cenbuf_idx = pose-1;
-    else cenbuf_idx = rand() % n;
+    else
+    {
+        for (i=0; i<10; i++)
+        {
+            cenbuf_idx = rand() % n;
+            if (strchr(CEN_buf[cenbuf_idx].c_str(), '!')) return;
+            else if (frand(0,1) < 0.1) return;
+        }
+    }
 }
 
 void apply_protein_specific_settings(Protein* p)
@@ -1685,6 +1705,12 @@ void apply_protein_specific_settings(Protein* p)
     pocketcen = pocketcen_from_config_words(words, nullptr);
     loneliest = protein->find_loneliest_point(pocketcen, size);
     delete[] words;
+
+    if (n = priority_resnos.size()) for (i=0; i<n; i++)
+    {
+        AminoAcid* aa = protein->get_residue(priority_resnos[i]);
+        if (aa) aa->priority = true;
+    }
 
     if (!p->get_metals_count() && metald_prot) p->copy_mcoords(metald_prot);
 
@@ -2342,6 +2368,7 @@ int main(int argc, char** argv)
                     {
                         aa->coordmtl = mtlcoords[i].mtl;
                         aa->priority = true;
+                        priority_resnos.push_back(aa->get_residue_no());
                     }
                 }
             }
@@ -2656,6 +2683,23 @@ _try_again:
             #endif
             #endif
 
+            #if _dbg_groupsel
+            cout << "Priority resnos: ";
+            #endif
+
+            if (n = priority_resnos.size()) for (i=0; i<n; i++)
+            {
+                AminoAcid* aa = protein->get_residue(priority_resnos[i]);
+                if (aa) aa->priority = true;
+                #if _dbg_groupsel
+                cout << *aa << " ";
+                #endif
+            }
+
+            #if _dbg_groupsel
+            cout << endl << endl;
+            #endif
+
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, nodecen, size, addl_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
 
@@ -2775,7 +2819,12 @@ _try_again:
 
             #if _dbg_groupsel
             cout << "Candidate binding residues: ";
-            for (i=0; i<sphres; i++) cout << *reaches_spheroid[nodeno][i] << " ";
+            for (i=0; i<sphres; i++)
+            {
+                cout << *reaches_spheroid[nodeno][i];
+                if (reaches_spheroid[nodeno][i]->priority) cout << "!";
+                cout << " ";
+            }
             cout << endl;
             #endif
 
@@ -3222,6 +3271,8 @@ _try_again:
             protein = &pose_proteins[j];
             ligand = &pose_ligands[j+1];
 
+            if (dr[j][0].disqualified) continue;
+
             if (ncvtys)
             {
                 float viols;
@@ -3239,7 +3290,15 @@ _try_again:
                 }
 
                 viols /= ligand->get_atom_count();
-                if (!fitsin || viols > 0.18) continue;
+                #if _dbg_cvty_pose_filter
+                cout << "Pose with energy " << (-dr[j][0].kJmol*energy_mult) << " has " << viols << " violations with "
+                    << fitsin->resnos_as_string(protein) << "." << endl;
+                #endif
+                if (!fitsin || viols >= 5)
+                {
+                    dr[j][0].disqualified = true;
+                    continue;
+                }
             }
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())

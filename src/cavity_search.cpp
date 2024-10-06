@@ -26,6 +26,7 @@ int interpret_resno(const char* field)
 
     int retval = 0;
     char* dot = strchr(buffer, '.');
+    char* bang = strchr(buffer, '!');
     if (dot)
     {
         *(dot++) = 0;
@@ -42,17 +43,32 @@ int interpret_resno(const char* field)
     }
     else retval = atoi(offset);
 
-    if (offset == buffer) return retval;
-
     AminoAcid* aa = protein->get_residue(retval);
     if (!aa) return 0;
+
+    if (offset == buffer)
+    {
+        if (bang)
+        {
+            aa->priority = true;
+        }
+        return retval;
+    }
 
     int i;
     for (i=0; buffer[i] >= 'A' && buffer[i] <= 'Z'; i++)
     {
-        if (buffer[i] == aa->get_letter()) aa->priority = true;
+        if (buffer[i] == aa->get_letter())
+        {
+            if (bang)
+            {
+                aa->priority = true;
+            }
+            return retval;
+        }
     }
-    return retval;
+
+    return bang ? retval : 0;
 }
 
 int main(int argc, char** argv)

@@ -56,7 +56,11 @@
         "N109K":
         {
             "(S)-(-)-citronellol": "lf",
-            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+            "ref": 
+            [
+                "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013",
+                "https:\/\/doi.org\/10.1021\/acs.orglett.2c01635"
+            ]
         },
         "G108A/N109K":
         {
@@ -78,7 +82,11 @@
         "S112A":
         {
             "(S)-(-)-citronellal": "-",
-            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013",
+                "https:\/\/doi.org\/10.1021\/acs.orglett.2c01635"
+            ]
         },
         "I114T":
         {
@@ -105,7 +113,11 @@
         {
             "(R)-carvone": "-",
             "(S)-carvone": "lf",
-            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1007\/s00018-017-2576-z",
+                "https:\/\/doi.org\/10.1021\/acs.orglett.2c01635"
+            ]
         },
         "I205V":
         {
@@ -158,7 +170,11 @@
             "musk xylene": "lf",
             "musk tibetene": "lf",
             "musk ambrette": "lf",
-            "ref": "https:\/\/doi.org\/10.1073\/pnas.1713026115"
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1073\/pnas.1713026115",
+                "https:\/\/doi.org\/10.1021\/acs.orglett.2c01635"
+            ]
         },
         "Y276F":
         {

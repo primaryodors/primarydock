@@ -3308,6 +3308,25 @@ function show_cavity(cavno, cmode=1)
 			else if (cavities[cavno][i]["thio"]) { red = 0.75; green = 0.75; blue = 0.3; }
 			else if (cavities[cavno][i]["pi"]) { red = 0.55; green = 0.44; blue = 0.55; }
 			else { red = 0.6; green = 0.6; blue = 0.6; }
+
+			var lum = 0.29*red + 0.57*green + 0.14*blue;
+			var rg = red - lum;
+			var yb = lum - blue;
+
+			if (cavities[cavno][i]["priority"])
+			{
+				rg *= 3;
+				yb *= 2;
+			}
+			else
+			{
+				rg *= 0.5;
+				yb *= 0.6;
+			}
+
+			red = rg + lum;
+			blue = lum - yb;
+			green = (lum - 0.29*red - 0.14*blue)/0.57;
 			break;
 
 			case 2:
@@ -3322,6 +3341,10 @@ function show_cavity(cavno, cmode=1)
 			green = 0.00392 * (c & 0xff00) / 256;
 			blue = 0.00392 * (c & 0xff);
 		}
+
+		red = Math.max(0, Math.min(1, red));
+		green = Math.max(0, Math.min(1, green));
+		blue = Math.max(0, Math.min(1, blue));
 
 		color.push(red);
 		color.push(green);

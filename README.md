@@ -90,10 +90,10 @@ A few utility apps are also provided in the bin/ dir.
 Scans a protein's 3 dimensional structure looking for places where a ligand may be able to dock. An output file can be specified to receive
 the coordinates of collections of spheres that form the shapes of the cavities.
 
-If the output file is in the same directory as a PDB model, and its name is identical except for having a .cav extension instead of .pdb,
+If the output file is in the same directory as a PDB model, and its name is identical except for having a .cvty extension instead of .pdb,
 then certain 3D views of the web app will recognize the file and allow the user to see the found pockets in the protein's 3D structure.
 
-The prediction feature automatically generates .cav files for the active and inactive models used in the prediction, if no .cav file already
+The prediction feature automatically generates .cvty files for the active and inactive models used in the prediction, if no .cvty file already
 exists when the prediction begins.
 
 

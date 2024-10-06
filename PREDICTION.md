@@ -119,10 +119,13 @@ An example of the command line for running a prediction might be:
 php -f predict/method_directmdl.php prot=OR1A1 lig=cis-3-hexen-1-ol
 ```
 
-If the name of the ligand contains spaces, then the spaces should be replaced with underscores, e.g. `lig=isoamyl_acetate`.
-If the ligand name contains parentheses, it's a good idea to put the entire lig= parameter in quotes, e.g.:
+If the name of the ligand contains characters other than alphanumeric, dash, or underscore, then it must be enclosed in quotes.
+Spaces can be replaced with underscores. For example:
 
 ```
+php -f predict/method_directmdl.php prot=OR5A1 lig=beta-ionone
+php -f predict/method_directmdl.php prot=OR52D1 lig=isoamyl_acetate
+php -f predict/method_directmdl.php prot=OR52D1 "lig=isoamyl acetate"
 php -f predict/method_directmdl.php prot=OR1A1 "lig=(S)-(+)-carvone"
 ```
 

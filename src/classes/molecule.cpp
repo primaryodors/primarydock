@@ -636,6 +636,18 @@ Point Molecule::get_atom_location(char const * aname)
     return a->get_location();
 }
 
+Point Molecule::get_atom_location(int i)
+{
+    if (noAtoms(atoms))
+    {
+        Point pt;
+        return pt;
+    }
+    Atom* a = get_atom(i);
+    if (!a) return get_barycenter();
+    return a->get_location();
+}
+
 Atom* Molecule::get_nearest_atom(Point loc) const
 {
     if (noAtoms(atoms)) return 0;
@@ -764,6 +776,24 @@ float Molecule::total_eclipses()
     if (base_eclipses > result) base_eclipses = result;
     return result - base_eclipses;
     #endif
+}
+
+int Molecule::atoms_inside_sphere(Sphere s, bool* bi, float rm)
+{
+    if (!atoms) return 0;
+    int numfound = 0;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        float r = s.center.get_3d_distance(atoms[i]->get_location());
+        if (r <= s.radius*rm + atoms[i]->get_vdW_radius())
+        {
+            numfound++;
+            if (bi) bi[i] = true;
+        }
+    }
+
+    return numfound;
 }
 
 float Molecule::bindability_by_type(intera_type t, bool ib)
@@ -2839,6 +2869,54 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     return retval;
 }
 
+void Molecule::find_mutual_max_bind_potential(Molecule* other)
+{
+    int i, j, m = get_atom_count(), n = other->get_atom_count();
+    if (!m || !n) return;
+
+    float best_potential = 0;
+    for (i=0; i<m; i++)
+    {
+        for (j=0; j<n; j++)
+        {
+            float b = InteratomicForce::potential_binding(atoms[i], other->atoms[j]);
+            float r = atoms[i]->distance_to(other->atoms[j]);
+            b += 2.0/r;
+            if (b > best_potential)
+            {
+                best_potential = b;
+                stay_close_mine = atoms[i];
+                stay_close_other = other->atoms[j];
+                stay_close_limit  = InteratomicForce::optimal_distance(atoms[i], other->atoms[j]);
+            }
+        }
+    }
+}
+
+void Molecule::enforce_stays(float amt)
+{
+    if (!stay_close_mine || !stay_close_other) return;
+
+    Rotation rot = align_points_3d(stay_close_mine->get_location(), stay_close_other->get_location(), get_barycenter());
+    LocatedVector lv = rot.v;
+    lv.origin = get_barycenter();
+    rotate(lv, rot.a*amt);
+
+    SCoord movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
+    // cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl;
+    float optimal = InteratomicForce::optimal_distance(stay_close_mine, stay_close_other);
+    // cout << "Should be " << optimal << endl;
+    movamt.r -= optimal;
+    movamt.r *= amt;
+    // cout << movamt << endl;
+    MovabilityType wasmov = movability;
+    movability = MOV_ALL;
+    move(movamt);
+    movability = wasmov;movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
+    // cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl << endl;
+
+}
+
 Interaction Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 {
     Molecule* ligands[4];
@@ -3380,7 +3458,8 @@ Interaction Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
             result += f;
         }
     }
-    return result;
+
+   return result;
 }
 
 void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**),
@@ -3591,6 +3670,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         a->move(motion);
                         // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
                         tryenerg = cfmol_multibind(a, nearby);
+                        
 
                         if (tryenerg.improved(benerg))
                         {
@@ -3630,6 +3710,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     a->move(motion);
 
                     tryenerg = cfmol_multibind(a, nearby);
+                    
 
                     #if _dbg_fitness_plummet
                     if (!i) cout << "(linear motion try " << -tryenerg << ") ";
@@ -3662,6 +3743,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         a->move(motion);
 
                         tryenerg = cfmol_multibind(a, nearby);
+                        
 
                         if (tryenerg.improved(benerg))
                         {
@@ -3710,6 +3792,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
 
                     tryenerg = cfmol_multibind(a, nearby);
+                    
 
                     if (tryenerg.improved(benerg))
                     {
@@ -3752,6 +3835,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                     a->rotate(&axis, theta);
                     tryenerg = cfmol_multibind(a, nearby);
+                    
 
                     if (tryenerg.improved(benerg))
                     {
@@ -3824,6 +3908,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 }
                                 tryenerg = cfmol_multibind(a, nearby);
                                 tryenerg.repulsive += a->total_eclipses();
+                                
 
                                 #if _dbg_mol_flexion
                                 if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;

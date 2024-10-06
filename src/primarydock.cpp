@@ -13,6 +13,7 @@
 #include "classes/group.h"
 #include "classes/search.h"
 #include "classes/scoring.h"
+#include "classes/cavity.h"
 
 using namespace std;
 
@@ -75,6 +76,7 @@ char tplrfnam[256];
 char ligfname[256];
 char smiles[256];
 char outfname[256];
+char cvtyfname[256];
 Point pocketcen;
 std::ofstream *output = NULL;
 
@@ -83,6 +85,8 @@ int cenbuf_idx = 0;
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
+Cavity cvtys[256];
+int ncvtys = 0;
 std::vector<std::string> dyn_strings;
 std::vector<DynamicMotion> dyn_motions;
 
@@ -302,7 +306,11 @@ int interpret_resno(const char* field)
 
     if (offset == buffer)
     {
-        if (bang) aa->priority = true;
+        if (bang)
+        {
+            aa->priority = true;
+            priority_resnos.push_back(aa->get_residue_no());
+        }
         return retval;
     }
 
@@ -311,7 +319,11 @@ int interpret_resno(const char* field)
     {
         if (buffer[i] == aa->get_letter())
         {
-            if (bang) aa->priority = true;
+            if (bang)
+            {
+                aa->priority = true;
+                priority_resnos.push_back(aa->get_residue_no());
+            }
             return retval;
         }
     }
@@ -952,6 +964,8 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
 {
     int i=1;
     Point local_pocketcen;
+    center_resnos.clear();
+    priority_resnos.clear();
     if (!strcmp(words[i], "RES"))
     {
         i++;
@@ -1505,6 +1519,11 @@ int interpret_config_line(char** words)
         clash_fleeing = atof(words[1]);
         return 1;
     }
+    else if (!strcmp(words[0], "VCVTY"))
+    {
+        strcpy(cvtyfname, words[1]);
+        return 1;
+    }
 
     return 0;
 }
@@ -1660,9 +1679,19 @@ void choose_cen_buf()
         if (aa) aa->priority = false;
     }
 
+    priority_resnos.clear();
+
     n = CEN_buf.size();
     if (pose <= n) cenbuf_idx = pose-1;
-    else cenbuf_idx = rand() % n;
+    else
+    {
+        for (i=0; i<10; i++)
+        {
+            cenbuf_idx = rand() % n;
+            if (strchr(CEN_buf[cenbuf_idx].c_str(), '!')) return;
+            else if (frand(0,1) < 0.1) return;
+        }
+    }
 }
 
 void apply_protein_specific_settings(Protein* p)
@@ -1676,6 +1705,12 @@ void apply_protein_specific_settings(Protein* p)
     pocketcen = pocketcen_from_config_words(words, nullptr);
     loneliest = protein->find_loneliest_point(pocketcen, size);
     delete[] words;
+
+    if (n = priority_resnos.size()) for (i=0; i<n; i++)
+    {
+        AminoAcid* aa = protein->get_residue(priority_resnos[i]);
+        if (aa) aa->priority = true;
+    }
 
     if (!p->get_metals_count() && metald_prot) p->copy_mcoords(metald_prot);
 
@@ -1871,7 +1906,7 @@ int main(int argc, char** argv)
     for (i=0; i<65536; i++) buffer[i] = 0;
 
     for (i=0; i<256; i++)
-        configfname[i] = protfname[i] = protafname[i] = ligfname[i] = 0;
+        configfname[i] = protfname[i] = protafname[i] = ligfname[i] = cvtyfname[i] = 0;
 
     time_t began = time(NULL);
 
@@ -1969,6 +2004,34 @@ int main(int argc, char** argv)
 
     if (kcal) kJmol_cutoff /= _kcal_per_kJ;
     drift = 1.0 / (iters/25+1);
+
+    if (strlen(cvtyfname))
+    {
+        if (!file_exists(cvtyfname))
+        {
+            cout << "ERROR file not found: " << cvtyfname << endl;
+            return -7;
+        }
+        FILE* fp = fopen(cvtyfname, "rb");
+        if (!fp)
+        {
+            cout << "FAILED to open " << cvtyfname << " for reading." << endl;
+            return -7;
+        }
+
+        cout << "Reading " << cvtyfname << "..." << endl;
+        char buffer[1024];
+        while (!feof(fp))
+        {
+            fgets(buffer, 1022, fp);
+            CPartial cp;
+            int cno = cp.from_cvty_line(buffer);
+            cvtys[cno].add_partial(cp);
+            if (cno+1 > ncvtys) ncvtys = cno+1;
+        }
+        fclose(fp);
+        cout << "Read " << ncvtys << " cavities." << endl;
+    }
 
     char protid[255];
     char* slash = strrchr(protfname, '/');
@@ -2305,6 +2368,7 @@ int main(int argc, char** argv)
                     {
                         aa->coordmtl = mtlcoords[i].mtl;
                         aa->priority = true;
+                        priority_resnos.push_back(aa->get_residue_no());
                     }
                 }
             }
@@ -2619,6 +2683,23 @@ _try_again:
             #endif
             #endif
 
+            #if _dbg_groupsel
+            cout << "Priority resnos: ";
+            #endif
+
+            if (n = priority_resnos.size()) for (i=0; i<n; i++)
+            {
+                AminoAcid* aa = protein->get_residue(priority_resnos[i]);
+                if (aa) aa->priority = true;
+                #if _dbg_groupsel
+                cout << *aa << " ";
+                #endif
+            }
+
+            #if _dbg_groupsel
+            cout << endl << endl;
+            #endif
+
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, nodecen, size, addl_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
 
@@ -2738,7 +2819,12 @@ _try_again:
 
             #if _dbg_groupsel
             cout << "Candidate binding residues: ";
-            for (i=0; i<sphres; i++) cout << *reaches_spheroid[nodeno][i] << " ";
+            for (i=0; i<sphres; i++)
+            {
+                cout << *reaches_spheroid[nodeno][i];
+                if (reaches_spheroid[nodeno][i]->priority) cout << "!";
+                cout << " ";
+            }
             cout << endl;
             #endif
 
@@ -3184,6 +3270,23 @@ _try_again:
         {
             protein = &pose_proteins[j];
             ligand = &pose_ligands[j+1];
+
+            if (dr[j][0].disqualified) continue;
+
+            if (ncvtys)
+            {
+                dr[j][0].disqualified = true;
+                int cno;
+                for (cno = 0; cno < ncvtys; cno++)
+                {
+                    if (!cvtys[cno].count_partials()) continue;
+                    if (cvtys[cno].point_inside_pocket(ligand->get_barycenter()))
+                    {
+                        dr[j][0].disqualified = false;
+                        break;
+                    }
+                }
+            }
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {

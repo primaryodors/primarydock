@@ -20,7 +20,9 @@ struct CPartial
     bool polar = false;
     bool thio = false;
     bool pi = false;
-    int resno = 0;
+    // int resno = 0;
+    std::string resnos_as_string(Protein* p);
+    int from_cvty_line(char* lndata);               // Returns the cavity number from the first column.
 };
 
 class Cavity
@@ -35,8 +37,10 @@ class Cavity
     CPartial* get_partial_by_idx(int idx) { return &partials[idx]; }
     Point get_center();
     CPartial* point_inside_pocket(Point pt);
-    float containment_violations(Molecule* m, float stop_if_more_than = Avogadro);
+    CPartial* sphere_inside_pocket(Sphere s);
+    float containment_violations(Molecule* m, float stop_if_more_than = -1);
     float find_best_containment(Molecule* m);
+    std::string resnos_as_string(Protein* p);
 
     protected:
     void compute_vdW_surface(float d);
@@ -49,4 +53,8 @@ class Cavity
     int vdw_vertex_count = 0;
 };
 
+extern float cav_xmax, cav_xmin, cav_ymax, cav_ymin, cav_zmax, cav_zmin, cav_xyrlim, cav_xzrlim, cav_yzrlim;
+extern int cav_resmin, cav_resmax;
+
 #endif
+

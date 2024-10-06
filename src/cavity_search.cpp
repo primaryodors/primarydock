@@ -73,7 +73,7 @@ int main(int argc, char** argv)
     buffer[0] = 0;
     for (i=1; i<argc; i++)
     {
-        if (buffer[0] != '-' || !buffer[1]) strcpy(buffer, argv[i]);
+        if (buffer[0] != '-' || !buffer[1] || buffer[1] == '-') strcpy(buffer, argv[i]);
         if ((buffer[0] == '-' && buffer[1] == 'p') || !strcmp(buffer, "--prot") || !strcmp(buffer, "--protein"))
         {
             i++;
@@ -214,6 +214,17 @@ int main(int argc, char** argv)
                 p.coordinate_metal(mtlcoords);
             }
         }
+        else if (!strcmp(buffer, "--xmax")) cav_xmax = atof(argv[++i]);
+        else if (!strcmp(buffer, "--ymax")) cav_ymax = atof(argv[++i]);
+        else if (!strcmp(buffer, "--zmax")) cav_zmax = atof(argv[++i]);
+        else if (!strcmp(buffer, "--xmin")) cav_xmin = atof(argv[++i]);
+        else if (!strcmp(buffer, "--ymin")) cav_ymin = atof(argv[++i]);
+        else if (!strcmp(buffer, "--zmin")) cav_zmin = atof(argv[++i]);
+        else if (!strcmp(buffer, "--xyrlim")) cav_xyrlim = atof(argv[++i]);
+        else if (!strcmp(buffer, "--xzrlim")) cav_xzrlim = atof(argv[++i]);
+        else if (!strcmp(buffer, "--yzrlim")) cav_yzrlim = atof(argv[++i]);
+        else if (!strcmp(buffer, "--sr")) cav_resmin = atoi(argv[++i]);
+        else if (!strcmp(buffer, "--er")) cav_resmax = atoi(argv[++i]);
         else if ((buffer[0] == '-' && buffer[1] == 'h') || !strcmp(buffer, "--help"))
         {
             cout << "Usage:" << endl << endl;
@@ -248,7 +259,7 @@ int main(int argc, char** argv)
             cout << "\t\tamino acid letters are optional." << endl << endl;
 
             cout << "-o, --output\tSpecifies a destination filename for the output data. " << endl;
-            cout << "\t\tTypically, this file would end in a .cav extension." << endl << endl;
+            cout << "\t\tTypically, this file would end in a .cvty extension." << endl << endl;
 
             cout << "-p, --protein\tSpecifies a file in PDB format for the protein to be searched." << endl << endl;
 
@@ -308,7 +319,7 @@ int main(int argc, char** argv)
         for (j=0; j<n; j++)
         {
             CPartial* part = cavities[i].get_partial_by_idx(j);
-            if (fp) fprintf(fp, "%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %4d\n", i, 
+            if (fp) fprintf(fp, "%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %s\n", i, 
                 part->s.center.x,
                 part->s.center.y,
                 part->s.center.z,
@@ -320,9 +331,9 @@ int main(int argc, char** argv)
                 part->thio     ? 'S' : ' ',
                 part->pi       ? 'P' : ' ',
                 part->priority ? '!' : ' ',
-                part->resno
+                part->resnos_as_string(protein).c_str()
                 );
-            else printf("%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %4d\n", i, 
+            else printf("%4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %s\n", i, 
                 part->s.center.x,
                 part->s.center.y,
                 part->s.center.z,
@@ -334,7 +345,7 @@ int main(int argc, char** argv)
                 part->thio     ? 'S' : ' ',
                 part->pi       ? 'P' : ' ',
                 part->priority ? '!' : ' ',
-                part->resno
+                part->resnos_as_string(protein).c_str()
                 );
         }
     }

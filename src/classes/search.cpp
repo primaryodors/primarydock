@@ -490,10 +490,16 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     int i, j=0, l, n;
 
     bool ligand_can_hbond = ligand->has_hbond_donors() || ligand->has_hbond_acceptors() || fabs(ligand->get_charge()) > 0.999999999;
+    bool require_ionic = false;
 
     n = cs_res_qty;
     any_resnos_priority = false;
-    for (l=0; l<n; l++) if (cs_res[l]->priority) any_resnos_priority = true;
+    for (l=0; l<n; l++)
+    {
+        cs_res[l] = protein->get_residue(cs_res[l]->get_residue_no());
+        if (cs_res[l]->priority) any_resnos_priority = true;
+        cs_lag[l]->update_atom_pointers(ligand);
+    }
 
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     n = cs_res_qty;
@@ -512,9 +518,14 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         // If the ligand can form a polar bond, it must form a polar bond.
         if (!cs_res[j]->priority && (ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
 
+        // If the ligand can form an ionic bond, it must.
+        if (require_ionic && cs_bt[j] != ionic) continue;
+
         // If the ligand and residue have opposite charges, the bond is ionic (or mcoord) no matter what.
         float rchg = cs_res[j]->get_charge(), lchg = cs_lag[j]->get_ionic();
         if (fabs(lchg) >= 1 && fabs(rchg) >= 1 && cs_bt[j] != mcoord && sgn(lchg) == -sgn(rchg)) cs_bt[j] = ionic;
+
+        if (cs_bt[j] == ionic) require_ionic = true;
 
         int li, ln;
         float b, lmcb, bmcb = 0;
@@ -550,10 +561,11 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
         float GC = ligand->get_barycenter().get_3d_distance(cs_lag[j]->get_center());
         float r = fmax(0, fabs(alphaC - GC - 3) - cs_res[j]->get_reach());
 
-        float w = pow(b/500, cs_bondweight_exponent) / pow(r, 2) * 100000;
+        float w = pow(b/500, cs_bondweight_exponent) / pow(r, 2) * 10000;
         if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 10;
         if (frand(0,1) < w) goto chose_residue;
     }
+    
     chose_residue:
     cs_idx = j;
 
@@ -585,48 +597,33 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     }
 
     Atom* mtl = (cs_bt[j] == mcoord) ? cs_res[j]->coordmtl : nullptr;
-
-    // Point residue toward where ligand will be, unless using pi stacking.
-    if (cs_bt[j] != pi && cs_bt[j] != mcoord)
-    {
-        MovabilityType mt = cs_res[j]->movability;
-        cs_res[j]->movability = MOV_FLEXONLY;
-        cs_res[j]->conform_atom_to_location(cs_res[j]->get_reach_atom()->name, loneliest);
-        cs_res[j]->movability = mt;
-    }
+    ligand->find_mutual_max_bind_potential(cs_res[j]);
+    if (mtl) ligand->stay_close_other = mtl;
 
     ligand->movability = MOV_ALL;
     float f = frand(0,1);
     if (f < 0.333)
     {
         ligand->crumple(frand(0, square));
-        // cout << "\\/\\/ ";
     }
     else if (f < 0.666)
     {
         ligand->minimize_internal_clashes();
-        // cout << "---- ";
     }
 
     // Place the ligand so that the atom group is centered in the binding pocket.
+    ligand->movability = MOV_ALL;
     Point agp = cs_lag[j]->get_center();
-    SCoord mov = loneliest.subtract(agp);
+    Point resna = cs_res[j]->get_reach_atom_location();
+    // cout << resna;
+    SCoord mov = resna.subtract(agp);
     ligand->move(mov);
+    // cout << cs_lag[j]->get_center() << endl << endl;
 
-    // Rotate the ligand so the atom group faces the chosen residue.
-    Point resca = mtl ? mtl->get_location() : cs_res[j]->get_CA_location();
-    Point agcen = cs_lag[j]->get_center();
-    Rotation rot = align_points_3d(agcen, resca, ligand->get_barycenter());
-    LocatedVector lv = rot.v;
-    lv.origin = ligand->get_barycenter();
-    ligand->rotate(lv, rot.a);
-
-    // Move the ligand so that the atom group is at the optimal distance to the residue.
-    Point resna = mtl ? mtl->get_location() : cs_res[j]->get_nearest_atom(loneliest)->get_location();
-    agcen = cs_lag[j]->get_center();
-    mov = resna.subtract(agcen);
-    mov.r -= mtl ? 2.5 : 1;
-    if (mov.r > 0) ligand->move(mov);
+    Rotation rot;
+    LocatedVector lv;
+    Point agcen;
+    ligand->enforce_stays();
 
     // Rotate the ligand about the residue so that its barycenter aligns with the "loneliest" point.
     agcen = cs_lag[j]->get_center();
@@ -646,8 +643,14 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
     for (; theta < M_PI*2; theta += cs_360_step)
     {
         AminoAcid* cc[SPHREACH_MAX+4];
-        protein->get_residues_can_clash_ligand(cc, ligand, ligand->get_barycenter(), size, nullptr);
+        int sphres = protein->get_residues_can_clash_ligand(cc, ligand, ligand->get_barycenter(), size, nullptr);
         float f = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(cc));
+        for (l=0; l<sphres; l++)
+        {
+            if (!cc[l] || !cc[l]->priority) continue;
+            float lf = ligand->get_intermol_binding(cc[l], false).attractive;
+            if (lf > 0) f -= lf;
+        }
         if (!theta || f < least_clash)
         {
             least_clash = f;

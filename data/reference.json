@@ -129,6 +129,11 @@
         "short_name": "Burton et al (2022)",
         "citation": "Shawn D. Burton, Audrey Brown, Thomas P. Eiting, Isaac A. Youngstrom, Thomas C. Rust, Michael Schmuker, Matt Wachowiak\r\nMapping odorant sensitivities reveals a sparse but structured representation of olfactory chemical space by sensory input to the mouse olfactory bulb.\r\nbioRxiv 2022.05.11.491539; doi: https:\/\/doi.org\/10.1101\/2022.05.11.491539"
     },
+    "https:\/\/doi.org\/10.1007\/s00018-018-2996-4":
+    {
+        "short_name": "Bushdid et al (2019)",
+        "citation": "Bushdid C., de March C. A., Topin J., Do M., Matsunami H., Golebiowski J. Mammalian class I odorant receptors exhibit a conserved vestibular binding pocket. Cell Mol Life Sci. 2019 March ; 76(5): 995–1004."
+    },
     "https:\/\/doi.org\/10.1038\/jid.2014.273":
     {
         "short_name": "Busse et al (2014)",
@@ -228,6 +233,11 @@
     {
         "short_name": "Duroux et al (2020)",
         "citation": "Duroux R, Mandeau A, Guiraudie-Capraz G, Quesnel Y, Loing E. A Rose Extract Protects the Skin against Stress Mediators: A Potential Role of Olfactory Receptors. Molecules. 2020 Oct 16;25(20):4743. doi: 10.3390\/molecules25204743. PMID: 33081083; PMCID: PMC7587601."
+    },
+    "https:\/\/doi.org\/10.1093\/chemse\/bjae015":
+    {
+        "short_name": "Emter et al (2024)",
+        "citation": "Roger Emter, Christel Merillat, Sandro Dossenbach, Andreas Natsch, The trilogy of human musk receptors: linking receptor activation, genotype, and sensory perception. Chemical Senses, 2024, 49, bjae015"
     },
     "https:\/\/doi.org\/10.1186\/2044-7248-1-22":
     {
@@ -335,6 +345,11 @@
         "short_name": "Gu et al (2014)",
         "citation": "Gu, X., Karp, P. H., Brody, S. L., Pierce, R. A., Welsh, M. J., Holtzman, M. J., & Ben-Shahar, Y. (2014). Chemosensory functions for pulmonary neuroendocrine cells. American journal of respiratory cell and molecular biology, 50(3), 637-646."
     },
+    "https:\/\/doi.org\/10.1038\/s41586-023-06106-4":
+    {
+        "short_name": "Guo et al (2023)",
+        "citation": "Guo L, Cheng J, Lian S, Liu Q, Lu Y, Zheng Y, Zhu K, Zhang M, Kong Y, Zhang C, Rong N, Zhuang Y, Fang G, Jiang J, Zhang T, Han X, Liu Z, Xia M, Liu S, Zhang L, Liberles SD, Yu X, Xu Y, Yang F, Li Q, Sun JP. Structural basis of amine odorant perception by a mammal olfactory receptor. Nature. 2023 Jun;618(7963):193-200. doi: 10.1038/s41586-023-06106-4. Epub 2023 May 24. PMID: 37225986."
+    },
     "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680":
     {
         "short_name": "Haag, Di Pizio, Krautwurst (2022)",
@@ -409,6 +424,11 @@
     {
         "short_name": "Jaeger et al (2013)",
         "citation": "S.R. Jaeger, J.F. McRae, C.M. Bava, M.K. Beresford, D. Hunter, Y. Jia, S.L. Chheang, D. Jin, M.\r\nPeng, J.C. Gamble et al, A Mendelian Trait for Olfactory Sensitivity Affects Odor Experience and Food\r\nSelection, Curr. Biol. 23 (2013) 1601-1605."
+    },
+    "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268":
+    {
+        "short_name": "Jia et al (2021)",
+        "citation": "Liang Jia, Shengju Li, Wenxuan Dai, Lingna Guo, Zhengrong Xu, Anne M. Scott, Zhe Zhang, Jianfeng Ren, Qinghua Zhang, Thomas S. Dexheimer, Yu-Wen Chung-Davidson, Richard R. Neubig, Qian Li, and Weiming Li. Convergent olfactory trace amine-associated receptors detect biogenic polyamines with distinct motifs via a conserved binding site. J. Biol. Chem. (2021) 297(5) 101268"
     },
     "https:\/\/doi.org\/10.3390\/genes10110910":
     {
@@ -899,6 +919,11 @@
     {
         "short_name": "Trimmer et al (2019)",
         "citation": "C. Trimmer, A. Keller, N. R. Murphy, L. L. Snyder, J. R. Willer, M. H. Nagai, N. Katsanis, L. B. Vosshall,\r\nH. Matsunami, and J. D. Mainland\r\nGenetic variation across the human olfactory receptor\r\nrepertoire alters odor perception\r\nPNAS | May 7, 2019 | vol. 116 | no. 19 | 9475\u20139480"
+    },
+    "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016":
+    {
+        "short_name": "Trimmer et al (2023)",
+        "citation": "Casey Trimmer, Randy Arroyave, Christine Vuilleumier, ..., Christian Margot, Matthew E. Rogers, Patrick Pfister, Allosteric modulation of a human odorant receptor. Current Biology 33, 1-12"
     },
     "https:\/\/onlinelibrary.wiley.com\/doi\/10.1111\/exd.13132":
     {

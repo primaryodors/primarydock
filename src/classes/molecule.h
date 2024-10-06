@@ -134,6 +134,7 @@ public:
     std::vector<Atom*> longest_dimension();
     float get_atom_bond_length_anomaly(Atom* atom, Atom* ignore = nullptr);
     float evolve_structure(int generations = _evolution_default_generations, float mutation_rate = _default_mutation_rate, int pop_size = _default_population_size);
+    int atoms_inside_sphere(Sphere container, bool* byindex, float radius_multiplier = 1);     // If byindex is not null, sets byindex[n] to true for atoms inside the sphere, but does not set to false.
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -147,6 +148,7 @@ public:
     }
     int count_atoms_by_element(const char* esym);
     Point get_atom_location(const char* aname);
+    Point get_atom_location(int idx);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
     void delete_all_atoms();
@@ -222,6 +224,8 @@ public:
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
+    void find_mutual_max_bind_potential(Molecule* other);
+    void enforce_stays(float amount=1);
 
     float get_springy_bond_satisfaction();
 
@@ -264,6 +268,8 @@ public:
     Atom *best_intera = nullptr, *best_other_intera = nullptr;
     Molecule* best_interactor = nullptr;
     int eclipse_hash = 0;
+    Atom *stay_close_mine = nullptr, *stay_close_other = nullptr;
+    float stay_close_limit = Avogadro;
 
 protected:
 

@@ -1,0 +1,1612 @@
+{
+    "OR1A1":
+    {
+        "T99M":
+        {
+            "(S)-(-)-citronellol": "nc",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "A106G":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "-",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "G108A":
+        {
+            "(R)-carvone": "+",
+            "(S)-carvone": "-",
+            "(S)-(-)-citronellol": "lf",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1007\/s00018-017-2576-z",
+                "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+            ]
+        },
+        "G108A/G152A":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "G108A/I205V":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "-",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "G152A/I205V":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "-",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "G108A/G152A/I205V":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "N109D":
+        {
+            "(R)-carvone": "lf",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "N109K":
+        {
+            "(S)-(-)-citronellol": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "G108A/N109K":
+        {
+            "(S)-(-)-citronellol": "lf",
+            "(S)-(-)-citronellal": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "T110A":
+        {
+            "(S)-(-)-citronellol": "+",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "D111A":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "S112A":
+        {
+            "(S)-(-)-citronellal": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "I114T":
+        {
+            "(S)-(-)-citronellol": "+",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "R128H":
+        {
+            "caproic acid": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "G152A":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "-",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "A154T/N155S":
+        {
+            "(S)-(-)-citronellol": "nc",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "N155S":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "I205V":
+        {
+            "(R)-carvone": "+",
+            "(S)-carvone": "-",
+            "(S)-(-)-citronellol": "nc",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1007\/s00018-017-2576-z",
+                "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+            ]
+        },
+        "V233M":
+        {
+            "caproic acid": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "Y250F":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "Y251F":
+        {
+            "musk xylene": "lf",
+            "musk tibetene": "lf",
+            "musk ambrette": "-",
+            "(R)-carvone": "-",
+            "(S)-carvone": "lf",
+            "ref": 
+            [
+                "https:\/\/doi.org\/10.1007\/s00018-017-2576-z",
+                "https:\/\/doi.org\/10.1073\/pnas.1713026115"
+            ]
+        },
+        "Y251M":
+        {
+            "(R)-carvone": "lf",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "V254T":
+        {
+            "(S)-(-)-citronellol": "nc",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "Y258F":
+        {
+            "musk xylene": "lf",
+            "musk tibetene": "lf",
+            "musk ambrette": "lf",
+            "ref": "https:\/\/doi.org\/10.1073\/pnas.1713026115"
+        },
+        "Y276F":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "+",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "Y276L":
+        {
+            "(R)-carvone": "lf",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "T277M":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "T277V":
+        {
+            "(S)-(-)-citronellol": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "P285S":
+        {
+            "caproic acid": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR1A2":
+    {
+        "A108G":
+        {
+            "(S)-(-)-citronellol": "+",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "K109N":
+        {
+            "(S)-(-)-citronellol": "+",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "A108G/K109N":
+        {
+            "(S)-(-)-citronellol": "+",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "T154A/S155N":
+        {
+            "(S)-(-)-citronellol": "nc",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "S155A":
+        {
+            "(S)-(-)-citronellal": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "V205I":
+        {
+            "(S)-(-)-citronellol": "nc",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "T254V":
+        {
+            "(S)-(-)-citronellol": "nc",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
+        "V277T":
+        {
+            "(S)-(-)-citronellol": "nc",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        }
+    },
+    "OR1C1":
+    {
+        "A67V":
+        {
+            "linalool": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR1N2":
+    {
+        "W23R/V230G/T287M":
+        {
+            "(E)-ambrettolide": "+",
+            "(Z)-ambrettolide": "+",
+            "dihydroambrettolide": "+",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjae015"
+        }
+    },
+    "OR2A25":
+    {
+        "S75N":
+        {
+            "linalool": "nc",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "S75N/A209P":
+        {
+            "linalool": "nc",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "S75N/V82A/A209P":
+        {
+            "linalool": "nc",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "A209P":
+        {
+            "linalool": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR2J3":
+    {
+        "L66P":
+        {
+            "cis-3-hexen-1-ol": "lf",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjs049"
+        },
+        "T113A":
+        {
+            "cis-3-hexen-1-ol": "-",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1371\/journal.pgen.1009564",
+                "https:\/\/doi.org\/10.1093\/chemse\/bjs049"
+            ]
+        },
+        "T113A/R226Q":
+        {
+            "cis-3-hexen-1-ol": "lf",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjs049"
+        },
+        "T113A/M139I/R226Q":
+        {
+            "cis-3-hexen-1-ol": "lf",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjs049"
+        },
+        "T113A/I261M":
+        {
+            "cis-3-hexen-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjs049"
+        },
+        "R226Q":
+        {
+            "cis-3-hexen-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjs049"
+        },
+        "I261M":
+        {
+            "cis-3-hexen-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjs049"
+        },
+        "V228I/I261M":
+        {
+            "cis-3-hexen-1-ol": "nc",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjs049"
+        }
+    },
+    "OR2M3":
+    {
+        "D11N":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "I13L":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "+",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "A33G":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "nc",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "L63F":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "V78I":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "T105H":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "T105I":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "T105A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "G109C":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "G109R":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C112S":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C112A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "M144T":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "I198V":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "+",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "C202S":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C202A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C203S":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C203A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C203Y":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "A216T":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "C241A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "H244A":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "Y259H":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "R266H":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "I289N":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "R293S":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "M302T":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "I13L/A33G":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "I13L/M144T":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "A33G/M144T":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "I13L/A33G/M144T":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "lf",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        },
+        "I13L/A33G/R266H":
+        {
+            "3-mercapto-2-methylpentan-1-ol": "nc",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjw118"
+        }
+    },
+    "OR2T11":
+    {
+        "S5A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "A30G":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "M56A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "M66A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "V92A":
+        {
+            "tert-butanethiol": "nc",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "M115A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "M133A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "R135A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "C138A":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "S190A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "T213A":
+        {
+            "tert-butanethiol": "nc",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "T221A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "C238S":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "H241R":
+        {
+            "tert-butanethiol": "lf",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "P265A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "V270A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        },
+        "G296A":
+        {
+            "tert-butanethiol": "-",
+            "ref": "http:\/\/pubs.acs.org\/doi\/abs\/10.1021\/jacs.6b06983"
+        }
+    },
+    "OR2W1":
+    {
+        "M81V":
+        {
+            "methyl benzoate": "lf",
+            "ethyl cyclohexane-carboxylate": "lf",
+            "ethyl 2-methyl-propanoate": "lf",
+            "delta-octalactone": "lf",
+            "dipropyl disulfide": "lf",
+            "dipropyl trisulfide": "lf",
+            "3-ethylphenol": "lf",
+            "2-methoxy-5-methylphenol": "lf",
+            "4-methoxy-2-methyl-2-butanethiol": "lf",
+            "(E)-2-heptenal": "lf",
+            "(Z)-2-octenal": "lf",
+            "(Z)-4-decenal": "lf",
+            "2-nonanone": "-",
+            "2-acetylpyrazine": "lf",
+            "geraniol": "lf",
+            "(S)-limonene": "lf",
+            "alpha-phellandrene": "lf",
+            "alpha-terpineol": "lf",
+            "(+)-sabinene": "lf",
+            "1-p-menthene-8-thiol": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680"
+        },
+        "M105H":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "S109C":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "S109A":
+        {
+            "2-phenylethanethiol": "-",
+            "3-mercaptohexyl acetate": "-",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "C112A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202S":
+        {
+            "2-phenylethanethiol": "-",
+            "3-mercaptohexyl acetate": "nc",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202C":
+        {
+            "2-phenylethanethiol": "-",
+            "3-mercaptohexyl acetate": "+",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202C/G203C":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202C/G203C/C241A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "L202C/G203C/H244A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "Y252A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "lf",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "Y259A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "-",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "Y252A/Y259A":
+        {
+            "2-phenylethanethiol": "lf",
+            "3-mercaptohexyl acetate": "lf",
+            "allyl phenylacetate": "-",
+            "ref": "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/"
+        },
+        "D296N":
+        {
+            "4-vinylphenol": "-",
+            "ethyl hexanoate": "-",
+            "1,8-cineole": "-",
+            "3-ethylphenol": "-",
+            "2-methoxy-5-methylphenol": "-",
+            "4-methoxy-2-methyl-2-butanethiol": "-",
+            "2-acetylpyrazine": "-",
+            "caproic acid": "-",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1016\/j.foodchem.2021.131680",
+                "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+            ]
+        }
+    },
+    "OR2AG1":
+    {
+        "A104I":
+        {
+            "amyl butyrate": "lf",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "A104G":
+        {
+            "amyl butyrate": "nc",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "F206V":
+        {
+            "amyl butyrate": "nc",
+            "isoamyl benzoate": "+",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "V260W":
+        {
+            "amyl butyrate": "-",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "S263C":
+        {
+            "amyl butyrate": "-",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "S264C":
+        {
+            "amyl butyrate": "-",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "S264V":
+        {
+            "amyl butyrate": "-",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "T279V":
+        {
+            "amyl butyrate": "-",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "V239W":
+        {
+            "amyl butyrate": "nc",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        },
+        "S242C":
+        {
+            "amyl butyrate": "nc",
+            "ref": "https:\/\/doi.org\/10.1002\/anie.201103980"
+        }
+    },
+    "OR4D6":
+    {
+        "S151T":
+        {
+            "galaxolide": "-",
+            "ref": "https:\/\/doi.org\/10.1371\/journal.pgen.1009564"
+        },
+        "M263T":
+        {
+            "galaxolide": "-",
+            "ref": "https:\/\/doi.org\/10.1371\/journal.pgen.1009564"
+        }
+    },
+    "OR5A1":
+    {
+        "D183N":
+        {
+            "beta-ionone": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2013.07.030"
+        }
+    },
+    "OR5A2":
+    {
+        "P172L":
+        {
+            "(S)-galaxolide": "-",
+            "(E)-ambrettolide": "-",
+            "dihydroambrettolide": "-",
+            "thibetolide": "-",
+            "muscone": "-",
+            "serenolide": "-",
+            "ethylene brassylate": "-",
+            "nirvanolide": "-",
+            "velvione": "-",
+            "musk R1": "-",
+            "habanolide": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjae015"
+        }
+    },
+    "OR5K1":
+    {
+        "F62L":
+        {
+            "trimethylpyrazine": "nc",
+            "ref": "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R"
+        }
+    },
+    "OR5AN1":
+    {
+        "G3A":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "M60L":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "G162A":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "T247K":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "Y260F":
+        {
+            "muscone": "lf",
+            "cyclopentadecanone": "lf",
+            "thiacyclopentadecane 1-oxide": "lf",
+            "isomuscone": "lf",
+            "dihydrocivetone": "lf",
+            "civetone": "lf",
+            "musk ketone": "lf",
+            "musk xylene": "lf",
+            "musk tibetene": "lf",
+            "ref": 
+            [
+                "https:\/\/doi.org\/10.1073\/pnas.1713026115"
+            ]
+        },
+        "Y279A":
+        {
+            "cyclopentadecanone": "lf",
+            "ref": "https:\/\/doi.org\/10.1073\/pnas.1713026115"
+        },
+        "T280L":
+        {
+            "muscenone": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016"
+        },
+        "L289F":
+        {
+            "muscenone": "+",
+            "musk ketone": "+",
+            "musk xylol": "+",
+            "civettone": "+",
+            "globanone": "+",
+            "cyclopentadecanone": "+",
+            "muscone": "+",
+            "cyclopentadecanol": "+",
+            "ambretone": "+",
+            "ethylene brassylate": "+",
+            "exaltolide": "+",
+            "galaxolide": "+",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1016\/j.cub.2023.03.016",
+                "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1",
+                "https:\/\/doi.org\/10.1093\/chemse\/bjae015",
+                "https:\/\/doi.org\/10.1093\/chemse\/bjac037"
+            ]
+        },
+        "G3R/L289F":
+        {
+            "muscone": "nc",
+            "cyclopentadecanol": "nc",
+            "ambretone": "+",
+            "ethylene brassylate": "+",
+            "exaltolide": "+",
+            "musk ketone": "nc",
+            "galaxolide": "+",
+            "ref": "https:\/\/doi.org\/10.1093\/chemse\/bjac037"
+        }
+    },
+    "OR6Y1":
+    {
+        "H11R/R16H/F32L/I35V/I122V/M176T/A197S/M202L/M259T":
+        {
+            "diacetyl": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR7D4":
+    {
+        "D52G":
+        {
+            "androstenone": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "S75C":
+        {
+            "androstenone": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "P79L":
+        {
+            "androstenone": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "S84N":
+        {
+            "androstenone": "+",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "R88W":
+        {
+            "androstenone": "-",
+            "androstadienone": "-",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "H131Q":
+        {
+            "androstenone": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "T133M":
+        {
+            "androstenone": "-",
+            "androstadienone": "-",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "R88W/T133M":
+        {
+            "androstenone": "lf",
+            "androstadienone": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "M136I":
+        {
+            "androstenone": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "C139R":
+        {
+            "androstenone": "+",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "C139Y":
+        {
+            "androstenone": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "L162P":
+        {
+            "androstenone": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "A279D":
+        {
+            "androstenone": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        },
+        "L292M":
+        {
+            "androstenone": "-",
+            "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        }
+    },
+    "OR10G4":
+    {
+        "A9V/M134V/V195E/R235G/K295Q":
+        {
+            "isoeugenol": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "L24P/V195E":
+        {
+            "isoeugenol": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "T62I/Y101C/M134V/G146S/P181S/V195E/R235G/K295Q":
+        {
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR10G7":
+    {
+        "T5S":
+        {
+            "guaiacol": "+",
+            "isoeugenol": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "T13M":
+        {
+            "guaiacol": "-",
+            "isoeugenol": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "T5S/I28V":
+        {
+            "guaiacol": "+",
+            "isoeugenol": "nc",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "T5S/A18V/P19Q/G20A":
+        {
+            "guaiacol": "+",
+            "isoeugenol": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR10G9":
+    {
+        "A90T/M134V":
+        {
+            "guaiacol": "-",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "A90V/Q172R/H228R":
+        {
+            "guaiacol": "+",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "A9V/T62I/Q172R/Y176C/V200L/L204V/H228R":
+        {
+            "guaiacol": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR10J5":
+    {
+        "R233W":
+        {
+            "bourgeonal": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR11A1":
+    {
+        "M80T":
+        {
+            "2-ethylfenchol": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        },
+        "A165T":
+        {
+            "2-ethylfenchol": "lf",
+            "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
+        }
+    },
+    "OR51B2":
+    {
+        "V36I/M147T":
+        {
+            "(E)-3-methyl-2-hexenoic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1371\/journal.pgen.1009564"
+        },
+        "C120R/L134F/C209S":
+        {
+            "(E)-3-methyl-2-hexenoic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1371\/journal.pgen.1009564"
+        }
+    },
+    "OR51E1":
+    {
+        "F265A":
+        {
+            "butyric acid": "-",
+            "pelargonic acid": "-",
+            "cyclobutanecarboxylic acid": "-",
+            "isovaleric acid": "-",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
+        },
+        "R264A":
+        {
+            "butyric acid": "lf",
+            "pelargonic acid": "lf",
+            "cyclobutanecarboxylic acid": "lf",
+            "isovaleric acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
+        },
+        "H263A":
+        {
+            "butyric acid": "-",
+            "pelargonic acid": "nc",
+            "cyclobutanecarboxylic acid": "-",
+            "isovaleric acid": "-",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
+        },
+        "L202A":
+        {
+            "butyric acid": "-",
+            "pelargonic acid": "-",
+            "cyclobutanecarboxylic acid": "-",
+            "isovaleric acid": "-",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
+        },
+        "Y200A":
+        {
+            "butyric acid": "lf",
+            "pelargonic acid": "lf",
+            "cyclobutanecarboxylic acid": "lf",
+            "isovaleric acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
+        },
+        "V254G":
+        {
+            "butyric acid": "+",
+            "pelargonic acid": "+",
+            "cyclobutanecarboxylic acid": "+",
+            "isovaleric acid": "+",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-018-2996-4"
+        }
+    },
+    "OR51E2":
+    {
+        "S258":
+        {
+            "propionic acid": "kb!",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "R262":
+        {
+            "propionic acid": "kb!",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "H104":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F155":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "H180":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Q181":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "G198":
+        {
+            "propionic acid": "kb",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F155A":
+        {
+            "acetic acid": "-",
+            "propionic acid": "-",
+            "butyric acid": "nc",
+            "valeric acid": "+",
+            "caproic acid": "+",
+            "oenanthic acid": "+",
+            "caprylic acid": "+",
+            "pelargonic acid": "+",
+            "capric acid": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "L158A":
+        {
+            "acetic acid": "-",
+            "propionic acid": "-",
+            "butyric acid": "+",
+            "valeric acid": "+",
+            "caproic acid": "+",
+            "oenanthic acid": "+",
+            "caprylic acid": "+",
+            "pelargonic acid": "nc",
+            "capric acid": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "S242A":
+        {
+            "propionic acid": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y291A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "H243A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "R121A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y217A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "V252A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "P253A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "R150A":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F250A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "S111A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "D209A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y251A":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F250Y":
+        {
+            "propionic acid": "mx",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "F250H":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y251F":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Y251H":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Q181E":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Q181D":
+        {
+            "propionic acid": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        },
+        "Q181N":
+        {
+            "propionic acid": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
+        }
+    },
+    "TAAR1":
+    {
+        "C5S":
+        {
+            "beta-phenethylamine": "nc",
+            "tyramine": "nc",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C13S":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C88S":
+        {
+            "beta-phenethylamine": "nc",
+            "tyramine": "nc",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C96S":
+        {
+            "beta-phenethylamine": "lf",
+            "tyramine": "lf",
+            "3-iodothyronamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C178S":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "nc",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "C88S/C178S":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "H63L":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "-",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "R83H":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "D103N":
+        {
+            "beta-phenethylamine": "lf",
+            "tyramine": "lf",
+            "3-iodothyronamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "W264F":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "S107C":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "V184P":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "T194A":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "nc",
+            "3-iodothyronamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "I290N":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "nc",
+            "3-iodothyronamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "I290Y":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "F195T":
+        {
+            "beta-phenethylamine": "-",
+            "tyramine": "-",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "T271A":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        },
+        "T271N":
+        {
+            "beta-phenethylamine": "+",
+            "tyramine": "+",
+            "3-iodothyronamine": "+",
+            "ref": "https:\/\/doi.org\/10.1101\/2023.09.06.556555"
+        }
+    },
+    "mTAAR5":
+    {
+        "C17S":
+        {
+            "trimethylamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C24S":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C99S":
+        {
+            "trimethylamine": "+",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "D114A":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C118A":
+        {
+            "trimethylamine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C188S":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "W265A":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "Y295A":
+        {
+            "trimethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        }
+    },
+    "mTAAR9":
+    {
+        "C14S":
+        {
+            "spermidine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C22S":
+        {
+            "spermidine": "mx",
+            "beta-phenethylamine": "mx",
+            "N,N-dimethylcyclohexylamine": "lf",
+            "cadaverine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C97S":
+        {
+            "spermidine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "D112A":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "lf",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1038\/s41586-023-06106-4",
+                "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+            ]
+        },
+        "D112E":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "D112N":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "C116A":
+        {
+            "spermidine": "nc",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "C186S":
+        {
+            "spermidine": "mx",
+            "beta-phenethylamine": "mx",
+            "N,N-dimethylcyclohexylamine": "lf",
+            "cadaverine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "W271A":
+        {
+            "spermidine": "lf",
+            "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        },
+        "Y274A":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "Y274F":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "Y274W":
+        {
+            "spermidine": "-",
+            "cadaverine": "lf",
+            "triethylamine": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "E294A":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "E294D":
+        {
+            "spermidine": "-",
+            "cadaverine": "-",
+            "triethylamine": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "E294Q":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "W298A":
+        {
+            "spermidine": "-",
+            "cadaverine": "-",
+            "triethylamine": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "W298F":
+        {
+            "spermidine": "-",
+            "cadaverine": "+",
+            "triethylamine": "+",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "W298Y":
+        {
+            "spermidine": "-",
+            "cadaverine": "+",
+            "triethylamine": "+",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "V300T":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "lf",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "Y301A":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "-",
+            "ref":
+            [
+                "https:\/\/doi.org\/10.1038\/s41586-023-06106-4",
+                "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+            ]
+        },
+        "Y301F":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "Y301Q":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        },
+        "Y301S":
+        {
+            "spermidine": "lf",
+            "cadaverine": "lf",
+            "triethylamine": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jbc.2021.101268"
+        }
+    }
+}

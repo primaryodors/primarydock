@@ -36589,9 +36589,8 @@
             {
                 "OR6Y1":
                 {
-                    "type": "sa",
-                    "ec50": "-4.6",
-                    "adjusted_curve_top": "7.4999998211861"
+                    "type": "na",
+                    "adjusted_curve_top": "0"
                 }
             },
             "https:\/\/doi.org\/10.1038\/nature06162":

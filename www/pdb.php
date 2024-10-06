@@ -36,7 +36,7 @@ if (!file_exists($pdbfn))
 
 $result = file_get_contents($pdbfn);
 
-$cavfn = str_replace(".pdb", ".cav", $pdbfn);
+$cavfn = str_replace(".pdb", ".cvty", $pdbfn);
 if (file_exists($cavfn))
 {
     $lines = explode("\n", $result);

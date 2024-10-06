@@ -1271,6 +1271,14 @@
             "ref": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"
         }
     },
+    "OR52*":
+    {
+        "R6.59":
+        {
+            "propionic acid": "kb!",
+            "ref": "https:\/\/doi.org\/10.1038\/s41467-023-43983-9"
+        }
+    },
     "TAAR1":
     {
         "C5S":
@@ -1441,6 +1449,19 @@
         {
             "trimethylamine": "lf",
             "ref": "https:\/\/doi.org\/10.1038\/s41586-023-06106-4"
+        }
+    },
+    "TAAR8":
+    {
+        "D111":
+        {
+            "cadaverine": "kb!",
+            "ref": "https:\/\/doi.org\/10.3390\/cimb46080510"
+        },
+        "D201":
+        {
+            "cadaverine": "kb!",
+            "ref": "https:\/\/doi.org\/10.3390\/cimb46080510"
         }
     },
     "mTAAR9":

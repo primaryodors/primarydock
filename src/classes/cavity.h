@@ -8,7 +8,7 @@
 #define cav_360_step fiftyseventh*4
 #define cav_xyz_step 1.6
 #define cav_min_partials 4
-#define cav_linking_threshold 2.2
+#define cav_linking_threshold 2.8
 
 struct CPartial
 {

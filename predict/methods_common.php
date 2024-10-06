@@ -26,7 +26,7 @@ echo "Method is $method.\n";
 $result = $output = false;
 chdir(__DIR__);
 chdir("..");
-exec("make primarydock", $output, $result);
+exec("make primarydock bin/cavity_search", $output, $result);
 if ($result) die("Build fail.\n".print_r($output, true));
 
 // Configurable variables
@@ -404,18 +404,18 @@ function prepare_outputs()
     $cavfname = "pdbs/$fam/$protid.upright.cvty";
     if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
     {
-        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 10 --sr $cavsr --er $caver";
         echo "$cmd\n";
         passthru($cmd);
     }
     $cavfname = "pdbs/$fam/$protid.active.cvty";
     if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
     {
-        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 10 --sr $cavsr --er $caver";
         echo "$cmd\n";
         passthru($cmd);
     }
-    
+
     if ($mbp && isset($mbp["cvty"]) && @$mbp["cvty"])
     {
         $mutants = json_decode(file_get_contents("data/mutants.json"), true);
@@ -542,19 +542,45 @@ function prepare_outputs()
         usort($cavities_a, "mutcavsort");
         // print_r($cavities_a);
 
-        // Select the top 3 cavities and use them as your multipocket. Add exclamation points to any cavity residues identified as priority.
+        // Select the top 3 cavities and use them as your multipocket.
+        // Add exclamation points to any cavity residues identified as priority.
+        // If any cavities are priority, only include priority cavities.
         $cenres_inactive = "";
+        $any_priority = false;
         for ($i=0; $i<3; $i++)
         {
-            if (!isset($cavities_i[$i])) $break;
-            foreach ($cavities_i[$i] as $k => $v) if (@substr($mresnos[$v],-1) == '!') $cavities_i[$i][$k] .= '!';
+            if (!isset($cavities_i[$i])) break;
+            if (!is_array($cavities_i[$i])) break;
+            $this_priority = false;
+            foreach ($cavities_i[$i] as $k => $v)
+            {
+                if (@substr($mresnos[$v],-1) == '!')
+                {
+                    $cavities_i[$i][$k] .= '!';
+                    $this_priority = true;
+                }
+            }
+            if ($this_priority) $any_priority = true;
+            else if (!$this_priority && $any_priority) continue;
             $cenres_inactive .= "CEN RES ".implode(' ',$cavities_i[$i])."\n";
         }
         $cenres_active = "";
+        $any_priority = false;
         for ($i=0; $i<3; $i++)
         {
-            if (!isset($cavities_a[$i])) $break;
-            foreach ($cavities_a[$i] as $k => $v) if (@substr($mresnos[$v],-1) == '!') $cavities_a[$i][$k] .= '!';
+            if (!isset($cavities_a[$i])) break;
+            if (!is_array($cavities_a[$i])) break;
+            $this_priority = false;
+            foreach ($cavities_a[$i] as $k => $v)
+            {
+                if (@substr($mresnos[$v],-1) == '!')
+                {
+                    $cavities_a[$i][$k] .= '!';
+                    $this_priority = true;
+                }
+            }
+            if ($this_priority) $any_priority = true;
+            else if (!$this_priority && $any_priority) continue;
             $cenres_active .= "CEN RES ".implode(' ',$cavities_a[$i])."\n";
         }
         // echo "$cenres_active\n";

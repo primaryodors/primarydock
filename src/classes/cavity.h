@@ -37,7 +37,8 @@ class Cavity
     CPartial* get_partial_by_idx(int idx) { return &partials[idx]; }
     Point get_center();
     CPartial* point_inside_pocket(Point pt);
-    float containment_violations(Molecule* m, float stop_if_more_than = Avogadro);
+    CPartial* sphere_inside_pocket(Sphere s);
+    float containment_violations(Molecule* m, float stop_if_more_than = -1);
     float find_best_containment(Molecule* m);
     std::string resnos_as_string(Protein* p);
 

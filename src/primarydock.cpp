@@ -3289,12 +3289,12 @@ _try_again:
                     }
                 }
 
-                viols /= ligand->get_atom_count();
+                viols /= (0.5*(ligand->get_atom_count() + ligand->get_heavy_atom_count()));
                 #if _dbg_cvty_pose_filter
                 cout << "Pose with energy " << (-dr[j][0].kJmol*energy_mult) << " has " << viols << " violations with "
                     << fitsin->resnos_as_string(protein) << "." << endl;
                 #endif
-                if (!fitsin || viols >= 5)
+                if (!fitsin || viols >= 0.25)
                 {
                     dr[j][0].disqualified = true;
                     continue;

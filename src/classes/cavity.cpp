@@ -353,32 +353,35 @@ CPartial* Cavity::point_inside_pocket(Point pt)
     return nullptr;
 }
 
+CPartial* Cavity::sphere_inside_pocket(Sphere s)
+{
+    if (!pallocd) return nullptr;
+    int i;
+    for (i=0; i<pallocd; i++)
+    {
+        if (partials[i].s.radius < min_partial_radius) break;
+        float r = partials[i].s.center.get_3d_distance(s.center);
+        if (r < (partials[i].s.radius - s.radius)) return &partials[i];
+    }
+
+    return nullptr;
+}
+
 const Point* ligand_vertices;
 float Cavity::containment_violations(Molecule* m, float simt)
 {
-    ligand_vertices = m->obtain_vdW_surface(10);
-    if (!ligand_vertices) return 0;
-    Atom** va = m->get_vdW_vertex_atoms();
-
-    int i;
+    int i, n = m->get_atom_count();
     float viol = 0;
-    for (i=0; ligand_vertices[i].x || ligand_vertices[i].y || ligand_vertices[i].z; i++)
+    for (i=0; i<n; i++)
     {
-        CPartial* cp = point_inside_pocket(ligand_vertices[i]);
-        int Z = va[i]->get_Z();
+        Atom* a = m->get_atom(i);
+        CPartial* cp = point_inside_pocket(a->get_location());
+        int Z = a->get_Z();
         if (!cp)
         {
             viol += (Z > 1) ? 1 : 0.5;
 
-            if (viol > simt) return viol;
-        }
-        else
-        {
-            float coefficient = cp->priority ? 0.05 : 0.001;
-            if (cp->metallic && Z==16) viol -= 1.00*coefficient;
-            if (cp->chargedn && va[i]->get_charge() >  hydrophilicity_cutoff) viol -= .50*coefficient;
-            if (cp->chargedp && va[i]->get_charge() < -hydrophilicity_cutoff) viol -= .50*coefficient;
-            if (cp->polar && fabs(va[i]->is_polar()) > hydrophilicity_cutoff) viol -= .25*coefficient;
+            if ((simt >= 0) && (viol > simt)) return viol;
         }
     }
 

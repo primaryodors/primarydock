@@ -32,8 +32,8 @@ function make_prediction($data)
 
         $aenergy = floatval(@$data['a_Pose1']);
         $ienergy = floatval(@$data['i_Pose1']);
-        $afound = floatval(@$data['a_POSES']); // / intval($pose);
-        $ifound = floatval(@$data['i_POSES']); // / intval($pose);
+        $afound = floatval(@$data['a_POSES']) / intval($pose);
+        $ifound = floatval(@$data['i_POSES']) / intval($pose);
 
         $aeq = equilibrium(0, $aenergy);                    // how much of the active-state population will be ligand-bound
         $ieq = equilibrium(0, $ienergy);                    // how much of the inactive-state population will be ligand-bound

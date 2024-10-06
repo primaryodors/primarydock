@@ -636,6 +636,18 @@ Point Molecule::get_atom_location(char const * aname)
     return a->get_location();
 }
 
+Point Molecule::get_atom_location(int i)
+{
+    if (noAtoms(atoms))
+    {
+        Point pt;
+        return pt;
+    }
+    Atom* a = get_atom(i);
+    if (!a) return get_barycenter();
+    return a->get_location();
+}
+
 Atom* Molecule::get_nearest_atom(Point loc) const
 {
     if (noAtoms(atoms)) return 0;

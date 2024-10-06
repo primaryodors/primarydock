@@ -456,6 +456,14 @@ Point Atom::get_location()
     return pt;
 }
 
+Sphere Atom::get_sphere()
+{
+    Sphere s;
+    s.center = location;
+    s.radius = get_vdW_radius();
+    return s;
+}
+
 void Bond::fetch_moves_with_atom2(Atom** result)
 {
     int i;

@@ -162,6 +162,7 @@ public:
         return geometry;
     }
     Point get_location();
+    Sphere get_sphere();
     float get_vdW_radius()
     {
         return vdW_rad;

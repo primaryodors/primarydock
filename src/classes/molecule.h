@@ -148,6 +148,7 @@ public:
     }
     int count_atoms_by_element(const char* esym);
     Point get_atom_location(const char* aname);
+    Point get_atom_location(int idx);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
     void delete_all_atoms();

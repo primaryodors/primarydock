@@ -3275,29 +3275,16 @@ _try_again:
 
             if (ncvtys)
             {
-                float viols;
-                Cavity* fitsin = nullptr;
+                dr[j][0].disqualified = true;
                 int cno;
                 for (cno = 0; cno < ncvtys; cno++)
                 {
                     if (!cvtys[cno].count_partials()) continue;
-                    float viol = cvtys[cno].containment_violations(ligand);
-                    if (!cno || viol < viols)
+                    if (cvtys[cno].point_inside_pocket(ligand->get_barycenter()))
                     {
-                        fitsin = &cvtys[cno];
-                        viols = viol;
+                        dr[j][0].disqualified = false;
+                        break;
                     }
-                }
-
-                viols /= (0.5*(ligand->get_atom_count() + ligand->get_heavy_atom_count()));
-                #if _dbg_cvty_pose_filter
-                cout << "Pose with energy " << (-dr[j][0].kJmol*energy_mult) << " has " << viols << " violations with "
-                    << fitsin->resnos_as_string(protein) << "." << endl;
-                #endif
-                if (!fitsin || viols >= 0.25)
-                {
-                    dr[j][0].disqualified = true;
-                    continue;
                 }
             }
 

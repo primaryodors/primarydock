@@ -397,28 +397,70 @@ function prepare_outputs()
         }
     }
 
+    // Get the list of residues from the mutants file, converted to BW numbers.
+    $mresnos = [];
+    $mpresnos = [];
+    $mutantid = false;
+    $mutants = json_decode(file_get_contents("data/mutants.json"), true);
+    if (isset($mutants[$protid])) $mutantid = $protid;
+    if ($mutantid)
+    {
+        foreach ($mutants[$mutantid] as $resnos => $effects)
+        {
+            $resnos = explode("/", $resnos);
+            $temp = [];
+
+            $priority = false;
+            $effect = false;
+
+            foreach ($effects as $odor => $eff)
+            {
+                if ($odor == 'ref') continue;
+                if ($eff != 'nc') $effect = true;
+                if ($eff == "lf" || $eff == "kb!") $priority = true;
+            }
+
+            if (!$effect) continue;
+
+            foreach ($resnos as $snp)
+            {
+                $fromaa = substr($snp, 0, 1);
+                $rno = intval(substr($snp, 1));
+                $actualaa = @substr($prots[$mutantid]['sequence'], $rno-1, 1);
+                if ($actualaa != $fromaa) die("ERROR: mutants.json says $mutantid:$rno should be $fromaa but it's $actualaa in the data.\n");
+
+                $lbw = bw_from_resno($mutantid, $rno);
+                $lbwp = $priority ? ($lbw . '!') : $lbw;
+                $mresnos["$lbw"] = $lbwp;
+                if ($priority) $mpresnos["$lbw"] = $lbw;
+            }
+        }
+        // print_r($mresnos);
+    }
+
     $cavsr = resno_from_bw($protid, "1.28");
     $caver = resno_from_bw($protid, "7.56");
 
     $fam = family_from_protid($protid);
     $cavfname = "pdbs/$fam/$protid.upright.cvty";
+    $bsr = implode(' ', $mpresnos);
+    $bsr = $bsr ? "--bsr $bsr" : "";
     if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
     {
-        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 10 --sr $cavsr --er $caver";
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 10 --sr $cavsr --er $caver $bsr";
         echo "$cmd\n";
         passthru($cmd);
     }
     $cavfname = "pdbs/$fam/$protid.active.cvty";
     if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
     {
-        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 10 --sr $cavsr --er $caver";
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 10 --sr $cavsr --er $caver $bsr";
         echo "$cmd\n";
         passthru($cmd);
     }
 
     if ($mbp && isset($mbp["cvty"]) && @$mbp["cvty"])
     {
-        $mutants = json_decode(file_get_contents("data/mutants.json"), true);
         $c = explode("\n", file_get_contents("pdbs/$fam/$protid.upright.cvty"));
         $cavities_i = [];
         foreach ($c as $ln)
@@ -477,44 +519,6 @@ function prepare_outputs()
                 if (intval($lbw)) $temp[] = $lbw;
             }
             $cavities_a[$cavno] = $temp;
-        }
-
-        // Get the list of residues from the mutants file, converted to BW numbers.
-        $mresnos = [];
-        $mutantid = false;
-        if (isset($mutants[$protid])) $mutantid = $protid;
-        if ($mutantid)
-        {
-            foreach ($mutants[$mutantid] as $resnos => $effects)
-            {
-                $resnos = explode("/", $resnos);
-                $temp = [];
-
-                $priority = false;
-                $effect = false;
-
-                foreach ($effects as $odor => $eff)
-                {
-                    if ($odor == 'ref') continue;
-                    if ($eff != 'nc') $effect = true;
-                    if ($eff == "lf" || $eff == "kb!") $priority = true;
-                }
-
-                if (!$effect) continue;
-
-                foreach ($resnos as $snp)
-                {
-                    $fromaa = substr($snp, 0, 1);
-                    $rno = intval(substr($snp, 1));
-                    $actualaa = @substr($prots[$mutantid]['sequence'], $rno-1, 1);
-                    if ($actualaa != $fromaa) die("ERROR: mutants.json says $mutantid:$rno should be $fromaa but it's $actualaa in the data.\n");
-
-                    $lbw = bw_from_resno($mutantid, $rno);
-                    $lbwp = $priority ? ($lbw . '!') : $lbw;
-                    $mresnos["$lbw"] = $lbwp;
-                }
-            }
-            // print_r($mresnos);
         }
 
         // Now prioritize cavities that contain mutant residues.
@@ -945,6 +949,7 @@ $excl
 ATOMTO 3.39 EXTENT 7.53
 BRIDGE 3.39 7.49
 STCR 3.39 7.49
+BRIDGE Y6.55 DE45.51
 
 SEARCH $search
 POSE $pose

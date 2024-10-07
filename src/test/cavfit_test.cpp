@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 
     bool save_tmp_pdbs = false;
 
-    int i;
+    int i, j, n;
     for (i=0; i<256; i++) priorities[i] = false;
 
     FILE* fp;
@@ -106,13 +106,41 @@ int main(int argc, char** argv)
     }
 
     bestp.restore_state(&m);
-    fp = fopen("cavfit_test.pdb", "w");
+
+    for (i=0; i<ncvtys; i++)
+    {
+        n = cvtys[i].count_partials();
+        for (j=0; j<n; j++)
+        {
+            CPartial* part = cvtys[i].get_partial_by_idx(j);
+            sprintf(buffer, "REMARK 821 %4d %8.3f %8.3f %8.3f %7.3f %c%c%c%c%c%c%c %s\n", i, 
+                part->s.center.x,
+                part->s.center.y,
+                part->s.center.z,
+                part->s.radius,
+                part->metallic ? 'M' : ' ',
+                part->chargedn ? '-' : ' ',
+                part->chargedp ? '+' : ' ',
+                part->polar    ? 'H' : ' ',
+                part->thio     ? 'S' : ' ',
+                part->pi       ? 'P' : ' ',
+                part->priority ? '!' : ' ',
+                part->resnos_as_string(&p).c_str()
+                );
+            p.add_remark(buffer);
+        }
+    }
+
+    std::string outf = "cavfit_test.pdb";
+    fp = fopen(outf.c_str(), "w");
     if (!fp)
     {
         cout << "FAILED to open output file for writing." << endl;
         return -3;
     }
     p.save_pdb(fp, &m);
+    fclose(fp);
+    cout << "Saved " << outf << endl;
 
     return 0;
 }

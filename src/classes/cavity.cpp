@@ -353,18 +353,34 @@ CPartial* Cavity::point_inside_pocket(Point pt)
     return nullptr;
 }
 
-CPartial* Cavity::sphere_inside_pocket(Sphere s)
+float Cavity::sphere_inside_pocket(Sphere s, CPartial** p)
 {
-    if (!pallocd) return nullptr;
+    if (p) *p = nullptr;
+    if (!pallocd) return 0;
+
     int i;
+    float result = 0;
     for (i=0; i<pallocd; i++)
     {
         if (partials[i].s.radius < min_partial_radius) break;
         float r = partials[i].s.center.get_3d_distance(s.center);
-        if (r < (partials[i].s.radius - s.radius)) return &partials[i];
+        if (r < (partials[i].s.radius - s.radius))
+        {
+            if (p) *p = &partials[i];
+            return 1;
+        }
+        else if (r < partials[i].s.radius)
+        {
+            float f = sphere_intersection(partials[i].s.radius, s.radius, r) / sphere_intersection(partials[i].s.radius, s.radius, 0);
+            if (f > result)
+            {
+                result = f;
+                if (p) *p = &partials[i];   
+            }
+        }
     }
 
-    return nullptr;
+    return result;
 }
 
 const Point* ligand_vertices;
@@ -375,14 +391,11 @@ float Cavity::containment_violations(Molecule* m, float simt)
     for (i=0; i<n; i++)
     {
         Atom* a = m->get_atom(i);
-        CPartial* cp = point_inside_pocket(a->get_location());
+        float f = sphere_inside_pocket(a->get_sphere());
         int Z = a->get_Z();
-        if (!cp)
-        {
-            viol += (Z > 1) ? 1 : 0.5;
 
-            if ((simt >= 0) && (viol > simt)) return viol;
-        }
+        viol += ((Z > 1) ? 1 : 0.5) * (1.0 - f);
+        if ((simt >= 0) && (viol > simt)) return viol;
     }
 
     return viol;
@@ -394,7 +407,7 @@ float Cavity::find_best_containment(Molecule* m)
     Point cen = get_center();
     m->recenter(cen);
     Pose best(m);
-    float bestviol = containment_violations(m) + m->total_eclipses()*33;
+    float bestviol = Avogadro;
 
     Point axes[3];
     axes[0] = Point(1,0,0);
@@ -427,7 +440,7 @@ float Cavity::find_best_containment(Molecule* m)
 
                 if (!atoms_outside_cavity)
                 {
-                    float viol = containment_violations(m, fmax(0, bestviol)) + m->total_eclipses()*33;
+                    float viol = containment_violations(m) + m->total_eclipses()*33;
                     if (viol < bestviol)
                     {
                         best.copy_state(m);

@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     bestp.copy_state(&m);
     for (i=0; i<ncvtys; i++)
     {
-        float ctainmt = cvtys[i].find_best_containment(&m);
+        float ctainmt = cvtys[i].find_best_containment(&m, true);
         if (!i || ctainmt > bestc)
         {
             bestp.copy_state(&m);

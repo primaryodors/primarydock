@@ -454,32 +454,29 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
                     if (a->get_Z() < 2) continue;
                     Point aloc = a->get_location();
 
-                    CPartial** inside;
-                    float f = sphere_inside_pocket(a->get_sphere(), inside);
-                    if (mbt && inside && (f >= 0.85))
+                    CPartial* inside;
+                    float f = sphere_inside_pocket(a->get_sphere(), &inside);
+                    if (mbt && inside)
                     {
                         float e = 0;
-                        if ((*inside)->chargedp && a->get_charge() < -hydrophilicity_cutoff) e = 0.6;
-                        else if ((*inside)->chargedn && a->get_charge() > hydrophilicity_cutoff) e = 0.6;
-                        else if ((*inside)->metallic && (a->get_family() == CHALCOGEN || a->get_family() == PNICTOGEN) && a->get_Z() != 8) e = 0.8;
-                        else if ((*inside)->polar && fabs(a->is_polar()) > hydrophilicity_cutoff) e = 0.3;
-                        else if ((*inside)->thio && a->get_family() == CHALCOGEN && a->get_Z() != 8) e = 0.15;
-                        else if ((*inside)->pi && a->is_pi()) e = 0.12;
-                        if ((*inside)->priority) e *= 2;
+                        if (inside->chargedp && a->is_conjugated_to_charge() < -hydrophilicity_cutoff) e = 0.6;
+                        else if (inside->chargedn && a->is_conjugated_to_charge() > hydrophilicity_cutoff) e = 0.6;
+                        else if (inside->metallic && (a->get_family() == CHALCOGEN || a->get_family() == PNICTOGEN) && a->get_Z() != 8) e = 0.8;
+                        else if (inside->polar && fabs(a->is_polar()) > hydrophilicity_cutoff) e = 0.3;
+                        else if (inside->thio && a->get_family() == CHALCOGEN && a->get_Z() != 8) e = 0.15;
+                        else if (inside->pi && a->is_pi()) e = 0.12;
+                        if (inside->priority) e *= 2;
                         f += e;
                     }
                     atoms_outside_cavity += (1.0-f);
                 }
 
-                //cout << atoms_outside_cavity << "/" << bestviol;
                 if (atoms_outside_cavity < bestviol)
                 {
                     best.copy_state(m);
                     bestviol = atoms_outside_cavity;
                     besttheta = theta;
-                    //cout << " *";
                 }
-                //cout << endl;
 
                 m->rotate(lv, cav_360_step);
             }

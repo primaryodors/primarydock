@@ -3349,7 +3349,7 @@ _try_again:
 
                     auths += (std::string)" " + std::to_string(dr[j][0].auth);
 
-                    if (i==1) best_acc_energy = -dr[j][0].kJmol;
+                    if (!best_acc_energy) best_acc_energy = -dr[j][0].kJmol;
 
                     for (k=0; k<=pathnodes; k++)
                     {

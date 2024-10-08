@@ -446,7 +446,7 @@ function prepare_outputs()
     $bsr = $bsr ? "--bsr $bsr" : "";
     if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
     {
-        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 10 --sr $cavsr --er $caver $bsr";
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 10 --sr $cavsr --er $caver";
         echo "$cmd\n";
         passthru($cmd);
     }

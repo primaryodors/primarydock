@@ -38,6 +38,7 @@ Interaction Interaction::operator+(Interaction const& obj)
     Interaction result;
     result.attractive = attractive + obj.attractive;
     result.repulsive = repulsive + obj.repulsive;
+    result.stays_met = stays_met && obj.stays_met;
     return result;
 }
     
@@ -45,6 +46,7 @@ Interaction Interaction::operator+=(Interaction const& obj)
 {
     attractive += obj.attractive;
     repulsive += obj.repulsive;
+    stays_met = stays_met && obj.stays_met;
     return obj;
 }
 
@@ -1441,6 +1443,7 @@ float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
 bool Interaction::improved(Interaction rel)
 {
     if (summed() < -clash_limit_per_aa*10) return rel.repulsive > repulsive;
+    if (!stays_met) return false;
     return attractive > rel.attractive || repulsive < rel.repulsive;
 }
 

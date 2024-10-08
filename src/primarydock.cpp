@@ -960,6 +960,11 @@ void update_progressbar(float percentage)
     hueoffset += 0.3;
 }
 
+void erase_progressbar()
+{
+    cout << "\033[A\033[K";
+}
+
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
 {
     int i=1;
@@ -2353,7 +2358,7 @@ int main(int argc, char** argv)
     float l_atom_clash_limit = clash_limit_per_atom; // - kJmol_cutoff;
 
     std::vector<std::shared_ptr<AtomGroup>> lagc;
-    if (pdpst == pst_constrained)
+    if (pdpst == pst_constrained || pdpst == pst_cavity_fit)
     {
         ligand = &pose_ligands[1];
         lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
@@ -2922,6 +2927,7 @@ _try_again:
                 else if (pdpst == pst_cavity_fit)
                 {
                     float bestc = 0;
+                    int bestl = 0;
                     Pose bestp(ligand);
                     bestp.copy_state(ligand);
                     for (l=0; l<ncvtys; l++)
@@ -2931,9 +2937,23 @@ _try_again:
                         {
                             bestp.copy_state(ligand);
                             bestc = ctainmt;
+                            bestl = l;
                         }
                     }
                     bestp.restore_state(ligand);
+                    // erase_progressbar(); cout << "Using cavity " << cvtys[bestl].resnos_as_string(protein) << endl << endl;
+
+                    int csidx = Search::choose_cs_pair(protein, ligand);
+
+                    Atom* mtl = (cs_bt[csidx] == mcoord) ? cs_res[csidx]->coordmtl : nullptr;
+                    ligand->find_mutual_max_bind_potential(cs_res[csidx]);
+                    if (mtl) ligand->stay_close_other = mtl;
+
+                    ligand->movability = MOV_ALL;
+                    Point agp = cs_lag[csidx]->get_center();
+                    Point resna = cs_res[csidx]->get_reach_atom_location();
+                    SCoord mov = resna.subtract(agp);
+                    ligand->move(mov);
                 }
                 else if (pdpst == pst_copyfrom)
                 {
@@ -2984,6 +3004,15 @@ _try_again:
                     waters[j]->movability = MOV_ALL;
                     waters[j]->reset_conformer_momenta();
                     cfmols[i++] = waters[j];
+                }
+            }
+
+            if (n = priority_resnos.size())
+            {
+                for (j=0; j<n; j++)
+                {
+                    AminoAcid* aa = protein->get_residue(priority_resnos[j]);
+                    if (aa) cfmols[i++] = (Molecule*)aa;
                 }
             }
 
@@ -3275,7 +3304,7 @@ _try_again:
 
     if (progressbar)
     {
-        cout << "\033[A\033[K";
+        erase_progressbar();
     }
 
     // Output the dr[][] array in order of increasing pose number.

@@ -485,7 +485,7 @@ void Search::prepare_constrained_search(Protein* protein, Molecule* ligand, Poin
     }
 }
 
-void Search::do_constrained_search(Protein* protein, Molecule* ligand)
+int Search::choose_cs_pair(Protein* protein, Molecule* ligand)
 {
     int i, j=0, l, n;
 
@@ -503,7 +503,7 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
     n = cs_res_qty;
-    if (!n) return;
+    if (!n) return 0;
     for (l=0; l<1e5; l++)
     {
         j = rand() % n;
@@ -555,7 +555,6 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
             case vdW: default: b = 4;
         }
 
-        // float r = fmax(2.8, cs_res[j]->get_CA_location().get_3d_distance(loneliest) - cs_res[j]->get_reach()/2);
         Point caloc = cs_res[j]->get_CA_location();
         float alphaC = cs_lag[j]->get_center().get_3d_distance(caloc);
         float GC = ligand->get_barycenter().get_3d_distance(cs_lag[j]->get_center());
@@ -563,11 +562,19 @@ void Search::do_constrained_search(Protein* protein, Molecule* ligand)
 
         float w = pow(b/500, cs_bondweight_exponent) / pow(r, 2) * 10000;
         if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 10;
-        if (frand(0,1) < w) goto chose_residue;
+        if (frand(0,1) < w) return j;
     }
-    
-    chose_residue:
-    cs_idx = j;
+
+    return j;
+}
+
+void Search::do_constrained_search(Protein* protein, Molecule* ligand)
+{
+    int i, j=0, l, n;
+    n = cs_res_qty;
+    if (!n) return;
+
+    cs_idx = j = choose_cs_pair(protein, ligand);
 
     if ((cs_bt[j] == hbond || cs_bt[j] == mcoord || cs_bt[j] == ionic) && cs_lag[j]->heavy_atom_count() > 4 // && cs_lag[j]->get_pi()
         && (cs_lag[j]->contains_element("N") || cs_lag[j]->contains_element("O") || cs_lag[j]->contains_element("S"))

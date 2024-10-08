@@ -361,7 +361,6 @@ function prepare_outputs()
         }
     
         if (isset($mbp["size"])) $size = $mbp["size"];
-        if (isset($mbp["search"])) $search = $mbp["search"];
         if (isset($mbp["mcoord"]))
         {
             if (!is_array($mbp['mcoord'])) $mbp['mcoord'] = [$mbp['mcoord']];
@@ -461,6 +460,7 @@ function prepare_outputs()
 
     if ($mbp && isset($mbp["cvty"]) && @$mbp["cvty"])
     {
+        $search = "CF";
         $c = explode("\n", file_get_contents("pdbs/$fam/$protid.upright.cvty"));
         $cavities_i = [];
         foreach ($c as $ln)
@@ -637,6 +637,8 @@ function prepare_outputs()
         }
         else die("Unsupported receptor family.\n");
     }
+
+    if (isset($mbp["search"])) $search = $mbp["search"];
 
     $atomto = implode("\n", $atomto);
 }
@@ -906,9 +908,9 @@ heredoc;
                 {
                     $ln = substr($ln, 4);
                     $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
-                    $sx = floatval($psiz[0])+2;
-                    $sy = floatval($psiz[1])+2;
-                    $sz = floatval($psiz[2])+2;
+                    $sx = floatval($psiz[0]);
+                    $sy = floatval($psiz[1]);
+                    $sz = floatval($psiz[2]);
                     $size = "$sx $sy $sz";
                 }
             }

@@ -14,11 +14,21 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     float x, y, z, step, yoff = 0, zoff = 0;
     Point pcen = p->get_region_center(sr, er), pbox = p->get_region_bounds(sr, er);
 
+    int priorities[1024], pqty;
+    priorities[0] = pqty = 0;
+    l = p->get_end_resno();
+    for (i=1; i<=l; i++)
+    {
+        AminoAcid* a = p->get_residue(i);
+        if (a && a->priority) priorities[pqty++] = i;
+    }
+    priorities[pqty] = 0;
+
     step = cav_xyz_step;
     AminoAcid* can_clash[SPHREACH_MAX+4];
     Molecule dummy("DUMMY");
     dummy.add_atom("H", "H1", nullptr, 0);
-    Point size(_INTERA_R_CUTOFF/1.5, _INTERA_R_CUTOFF/1.5, _INTERA_R_CUTOFF/1.5);
+    Point size(_INTERA_R_CUTOFF, _INTERA_R_CUTOFF, _INTERA_R_CUTOFF);
     CPartial parts[65536];
     j=0;
     bool any_priority = false;
@@ -35,8 +45,8 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
             {
                 Point pt(x,y,z);
                 dummy.recenter(pt);
-                int sphres = p->get_residues_can_clash_ligand(can_clash, &dummy, pt, size, nullptr, true);
-                if (sphres < 8) continue;          // Too isolated.
+                int sphres = p->get_residues_can_clash_ligand(can_clash, &dummy, pt, size, priorities, true);
+                if (sphres < 8+pqty) continue;          // Too isolated.
                 float rmin;
                 CPartial working;
                 for (i=0; i<sphres; i++)
@@ -48,14 +58,24 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                         rmin = r;
                     }
                     if (r < min_partial_radius) break;
+                }
+
+                for (i=0; i<sphres; i++)
+                {
+                    Atom* a = can_clash[i]->get_nearest_atom(pt);
+                    float r = a->get_location().get_3d_distance(pt);
+                    if (r > rmin+1.5 && !can_clash[i]->priority) continue;
+                    if (r > rmin+6) continue;
 
                     Atom* CB = can_clash[i]->get_atom("CB");
-                    if (CB && a->get_location().get_3d_distance(CB->get_location()) 
-                        < a->get_location().get_3d_distance(can_clash[i]->get_CA_location()))
+                    if (CB
+                        && a->get_location().get_3d_distance(CB->get_location()) < a->get_location().get_3d_distance(can_clash[i]->get_CA_location())
+                        && (!pqty || can_clash[i]->priority)
+                        )
                     {
                         if (can_clash[i]->priority)
                         {
-                            // cout << can_clash[i]->get_name() << " has priority." << endl;
+                            // cout << pt << can_clash[i]->get_name() << " distance " << r << " has priority." << endl;
                             any_priority = working.priority = true;
                         }
                         if (can_clash[i]->coordmtl) working.metallic = true;
@@ -363,6 +383,7 @@ float Cavity::sphere_inside_pocket(Sphere s, CPartial** p)
     for (i=0; i<pallocd; i++)
     {
         if (partials[i].s.radius < min_partial_radius) break;
+        if (partials[i].s.radius < s.radius) break;
         float r = partials[i].s.center.get_3d_distance(s.center);
         if (r < (partials[i].s.radius - s.radius))
         {
@@ -371,7 +392,8 @@ float Cavity::sphere_inside_pocket(Sphere s, CPartial** p)
         }
         else if (r < partials[i].s.radius)
         {
-            float f = sphere_intersection(partials[i].s.radius, s.radius, r) / sphere_intersection(partials[i].s.radius, s.radius, 0);
+            // float f = sphere_intersection(partials[i].s.radius, s.radius, r) / sphere_intersection(partials[i].s.radius, s.radius, 0);
+            float f = 1.0 - (r - (partials[i].s.radius - s.radius)) / s.radius;
             if (f > result)
             {
                 result = f;
@@ -401,7 +423,7 @@ float Cavity::containment_violations(Molecule* m, float simt)
     return viol;
 }
 
-float Cavity::find_best_containment(Molecule* m)
+float Cavity::find_best_containment(Molecule* m, bool mbt)
 {
     ligand_vertices = m->obtain_vdW_surface(10);
     Point cen = get_center();
@@ -415,7 +437,7 @@ float Cavity::find_best_containment(Molecule* m)
     axes[2] = Point(0,0,1);
     int i, j, k, l, n = m->get_atom_count();
     float theta, besttheta;
-    for (l=0; l<5; l++)
+    for (l=0; l<15; l++)
     {
         for (j=0; j<3; j++)
         {
@@ -424,30 +446,40 @@ float Cavity::find_best_containment(Molecule* m)
             besttheta=0;
             for (theta=0; theta < M_PI*2; theta += cav_360_step)
             {
-                int atoms_outside_cavity = 0;
+                float atoms_outside_cavity = 0;
                 std::string ldbg = "";
                 for (i=0; i<n; i++)
                 {
                     Atom* a = m->get_atom(i);
                     if (a->get_Z() < 2) continue;
                     Point aloc = a->get_location();
-                    CPartial* inside = point_inside_pocket(aloc);
-                    if (!inside) atoms_outside_cavity++;
-                    else ldbg += (std::string)"Atom " + (std::string)a->name + (std::string)" is inside partial centered at "
-                        + std::to_string(inside->s.center.x) + std::to_string(inside->s.center.y) + std::to_string(inside->s.center.z)
-                        + (std::string)" radius " + std::to_string(inside->s.radius) + (std::string)"\n";
+
+                    CPartial** inside;
+                    float f = sphere_inside_pocket(a->get_sphere(), inside);
+                    if (mbt && inside && (f >= 0.85))
+                    {
+                        float e = 0;
+                        if ((*inside)->chargedp && a->get_charge() < -hydrophilicity_cutoff) e = 0.6;
+                        else if ((*inside)->chargedn && a->get_charge() > hydrophilicity_cutoff) e = 0.6;
+                        else if ((*inside)->metallic && (a->get_family() == CHALCOGEN || a->get_family() == PNICTOGEN) && a->get_Z() != 8) e = 0.8;
+                        else if ((*inside)->polar && fabs(a->is_polar()) > hydrophilicity_cutoff) e = 0.3;
+                        else if ((*inside)->thio && a->get_family() == CHALCOGEN && a->get_Z() != 8) e = 0.15;
+                        else if ((*inside)->pi && a->is_pi()) e = 0.12;
+                        if ((*inside)->priority) e *= 2;
+                        f += e;
+                    }
+                    atoms_outside_cavity += (1.0-f);
                 }
 
-                if (!atoms_outside_cavity)
+                //cout << atoms_outside_cavity << "/" << bestviol;
+                if (atoms_outside_cavity < bestviol)
                 {
-                    float viol = containment_violations(m) + m->total_eclipses()*33;
-                    if (viol < bestviol)
-                    {
-                        best.copy_state(m);
-                        bestviol = viol;
-                        besttheta = theta;
-                    }
+                    best.copy_state(m);
+                    bestviol = atoms_outside_cavity;
+                    besttheta = theta;
+                    //cout << " *";
                 }
+                //cout << endl;
 
                 m->rotate(lv, cav_360_step);
             }
@@ -536,7 +568,7 @@ int CPartial::from_cvty_line(char* lndata)
 
     //           1111111111222222222233333333334444444444
     // 01234567890123456789012345678901234567890123456789
-    //    2   -4.228   22.449    7.041   2.569  -+HSP  96 99 157 158 161 182
+    //    2   -4.228   22.449    7.041   2.569  -+HSP! 96 99 157 158 161 182
 
     lndata[4] = 0;
     cno = atoi(lndata);
@@ -553,6 +585,7 @@ int CPartial::from_cvty_line(char* lndata)
     polar    = (lndata[43] == 'H');
     thio     = (lndata[44] == 'S');
     pi       = (lndata[45] == 'P');
+    priority = (lndata[46] == '!');
 
     return cno;
 }

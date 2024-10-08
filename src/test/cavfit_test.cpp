@@ -118,13 +118,13 @@ int main(int argc, char** argv)
                 part->s.center.y,
                 part->s.center.z,
                 part->s.radius,
-                part->metallic ? 'M' : ' ',
-                part->chargedn ? '-' : ' ',
-                part->chargedp ? '+' : ' ',
-                part->polar    ? 'H' : ' ',
-                part->thio     ? 'S' : ' ',
-                part->pi       ? 'P' : ' ',
-                part->priority ? '!' : ' ',
+                part->metallic ? 'M' : '_',
+                part->chargedn ? '-' : '_',
+                part->chargedp ? '+' : '_',
+                part->polar    ? 'H' : '_',
+                part->thio     ? 'S' : '_',
+                part->pi       ? 'P' : '_',
+                part->priority ? '!' : '_',
                 part->resnos_as_string(&p).c_str()
                 );
             p.add_remark(buffer);

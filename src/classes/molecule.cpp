@@ -2892,9 +2892,9 @@ void Molecule::find_mutual_max_bind_potential(Molecule* other)
         }
     }
 
-    if (stay_close_mine && stay_close_other)
+    /*if (stay_close_mine && stay_close_other)
         cout << name << ":" << stay_close_mine->name << " and " << other->name << ":" << stay_close_other->name
-            << " must remain within " << stay_close_limit << "A." << endl << endl;
+            << " must remain within " << stay_close_limit << "A." << endl << endl;*/
 }
 
 bool Molecule::check_stays()
@@ -3681,9 +3681,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         #endif
 
                         a->move(motion);
-                        // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
-                        tryenerg = cfmol_multibind(a, nearby);
-                        
+                        a->enforce_stays(0.333);
+                        tryenerg = cfmol_multibind(a, nearby);                        
 
                         if (tryenerg.improved(benerg))
                         {

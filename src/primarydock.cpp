@@ -2950,10 +2950,7 @@ _try_again:
                     if (mtl) ligand->stay_close_other = mtl;
 
                     ligand->movability = MOV_ALL;
-                    Point agp = cs_lag[csidx]->get_center();
-                    Point resna = cs_res[csidx]->get_reach_atom_location();
-                    SCoord mov = resna.subtract(agp);
-                    ligand->move(mov);
+                    ligand->enforce_stays();
                 }
                 else if (pdpst == pst_copyfrom)
                 {

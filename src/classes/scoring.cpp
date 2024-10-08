@@ -40,6 +40,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     char* lmca2n[end1];
     float lmc[end1];
 
+    ligpos.copy_state(ligand);
+
     for (i=0; i<end1; i++)
     {
         #if compute_vdw_repulsion

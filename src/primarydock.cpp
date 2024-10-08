@@ -1410,6 +1410,11 @@ int interpret_config_line(char** words)
             pdpst = pst_constrained;
             return 1;
         }
+        else if (!strcmp(words[1], "CF"))
+        {
+            pdpst = pst_cavity_fit;
+            return 1;
+        }
         else if (!strcmp(words[1], "CP"))
         {
             int lf = 1;
@@ -2914,6 +2919,22 @@ _try_again:
                         << " ~ " << *cs_lag[ultimate_csidx] << endl << endl << flush;
                     #endif
                 }
+                else if (pdpst == pst_cavity_fit)
+                {
+                    float bestc = 0;
+                    Pose bestp(ligand);
+                    bestp.copy_state(ligand);
+                    for (l=0; l<ncvtys; l++)
+                    {
+                        float ctainmt = cvtys[l].find_best_containment(ligand, true);
+                        if (!l || ctainmt > bestc)
+                        {
+                            bestp.copy_state(ligand);
+                            bestc = ctainmt;
+                        }
+                    }
+                    bestp.restore_state(ligand);
+                }
                 else if (pdpst == pst_copyfrom)
                 {
                     Search::copy_ligand_position_from_file(protein, ligand, copyfrom_filename.c_str(), copyfrom_ligname, copyfrom_resno);
@@ -3272,6 +3293,7 @@ _try_again:
             ligand = &pose_ligands[j+1];
 
             if (dr[j][0].disqualified) continue;
+            dr[j][0].ligpos.restore_state(ligand);
 
             if (ncvtys)
             {
@@ -3280,13 +3302,17 @@ _try_again:
                 for (cno = 0; cno < ncvtys; cno++)
                 {
                     if (!cvtys[cno].count_partials()) continue;
-                    if (cvtys[cno].point_inside_pocket(ligand->get_barycenter()))
+                    CPartial* cp;
+                    if (cp = cvtys[cno].point_inside_pocket(ligand->get_barycenter()))
                     {
+                        /*cout << -dr[j][0].kJmol << " " << ligand->get_barycenter() << " is inside " << cp->s.center
+                            << " of " << cvtys[cno].resnos_as_string(protein) << endl;*/
                         dr[j][0].disqualified = false;
                         break;
                     }
                 }
             }
+            if (dr[j][0].disqualified) continue;
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {

@@ -15,11 +15,12 @@ enum PoseSearchType
     pst_best_binding,
     pst_tumble_spheres,
     pst_constrained,
+    pst_cavity_fit,
     pst_copyfrom
 };
 
 // Default search algorithm if not specified by config file or command line args.
-#define default_search_algorithm pst_constrained
+#define default_search_algorithm pst_cavity_fit
 
 struct SCoord;
 struct Point;

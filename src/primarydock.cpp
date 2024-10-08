@@ -2408,7 +2408,7 @@ _try_again:
         metal_initlocs[i] = mtlcoords[i].mtl->get_location();
     }
 
-    float best_energy = 0, best_worst_clash = 0;
+    float best_energy = 0, best_acc_energy = 0, best_worst_clash = 0;
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -3349,6 +3349,8 @@ _try_again:
 
                     auths += (std::string)" " + std::to_string(dr[j][0].auth);
 
+                    if (i==1) best_acc_energy = -dr[j][0].kJmol;
+
                     for (k=0; k<=pathnodes; k++)
                     {
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
@@ -3498,9 +3500,13 @@ _exitposes:
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
 
-    cout << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
-    if (output) *output << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
-    if (debug) *debug << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    cout << "Best candidate pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (output) *output << "Best candidate pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (debug) *debug << "Best candidate pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+
+    cout << "Best accepted pose energy: " << (kcal ? best_acc_energy/_kcal_per_kJ : best_acc_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (output) *output << "Best accepted pose energy: " << (kcal ? best_acc_energy/_kcal_per_kJ : best_acc_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (debug) *debug << "Best accepted pose energy: " << (kcal ? best_acc_energy/_kcal_per_kJ : best_acc_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
 
     cout << "Best worst clash: " << (kcal ? best_worst_clash/_kcal_per_kJ : best_worst_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
     if (output) *output << "Best worst clash: " << (kcal ? best_worst_clash/_kcal_per_kJ : best_worst_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;

@@ -3027,6 +3027,28 @@ _try_again:
             int cfmolqty = i;
             for (; i<=SPHREACH_MAX; i++) cfmols[i] = NULL;
 
+            if (pdpst == pst_cavity_fit && ligand->stay_close_mine && ligand->stay_close_other)
+            {
+                LocatedVector axis = (SCoord)ligand->stay_close_other->get_location().subtract(ligand->stay_close_mine->get_location());
+                axis.origin = ligand->stay_close_mine->get_location();
+                float theta, step = fiftyseventh*2;
+                Pose bestp(ligand);
+                Interaction bestb = Molecule::total_intermol_binding(cfmols);
+
+                for (theta=0; theta<M_PI*2; theta += step)
+                {
+                    ligand->rotate(axis, step);
+                    Interaction linter = Molecule::total_intermol_binding(cfmols);
+                    if (linter.attractive > bestb.attractive)
+                    {
+                        bestb = linter;
+                        bestp.copy_state(ligand);
+                    }
+                }
+
+                bestp.restore_state(ligand);
+            }
+
             ligand->reset_conformer_momenta();
             
             if (rcn)

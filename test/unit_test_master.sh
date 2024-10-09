@@ -79,9 +79,9 @@ if [ -z "$RESULT" ]; then
     ARG264="${ARG264/Arg264(6.59): /}"
     ARG264="${ARG264/[.][0-9]*/}"
     if [[ $ARG264 -gt "-5"  ]]; then
-        printf "${GRN}OR51E1 caprylate prediction test succeeded.${NC}\n"
-    else
         printf "${RED}OR51E1 caprylate prediction test FAILED: bad contacts.${NC}\n"
+    else
+        printf "${GRN}OR51E1 caprylate prediction test succeeded.${NC}\n"
     fi
 else
     printf "${RED}OR51E1 caprylate prediction test FAILED.${NC}\n"

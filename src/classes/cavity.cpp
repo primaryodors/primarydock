@@ -145,7 +145,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
         if (r > cav_yzrlim) continue;
 
         if (tmpcav[i].count_partials() >= cav_min_partials
-            // && (!any_priority || tmpcav[i].priority)
+            && (!any_priority || tmpcav[i].priority)
             ) cavs[j++] = tmpcav[i];
         if (j >= cmax-1) break;
     }

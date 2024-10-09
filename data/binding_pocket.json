@@ -32,6 +32,11 @@
         },
         "cvty": true
     },
+    "OR5[12][A-Z]+[0-9]{1,2}":
+    {
+        "stcr": "6.59",
+        "cvty": true
+    },
     "*":
     {
         "cvty": true

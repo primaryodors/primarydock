@@ -13,6 +13,7 @@ class Interaction
 
     float attractive = 0;
     float repulsive = 0;
+    bool stays_met = true;
 
     float summed() { return attractive-repulsive; }
     

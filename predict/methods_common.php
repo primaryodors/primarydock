@@ -26,7 +26,7 @@ echo "Method is $method.\n";
 $result = $output = false;
 chdir(__DIR__);
 chdir("..");
-exec("make primarydock", $output, $result);
+exec("make primarydock bin/cavity_search", $output, $result);
 if ($result) die("Build fail.\n".print_r($output, true));
 
 // Configurable variables
@@ -361,7 +361,6 @@ function prepare_outputs()
         }
     
         if (isset($mbp["size"])) $size = $mbp["size"];
-        if (isset($mbp["search"])) $search = $mbp["search"];
         if (isset($mbp["mcoord"]))
         {
             if (!is_array($mbp['mcoord'])) $mbp['mcoord'] = [$mbp['mcoord']];
@@ -397,28 +396,71 @@ function prepare_outputs()
         }
     }
 
+    // Get the list of residues from the mutants file, converted to BW numbers.
+    $mresnos = [];
+    $mpresnos = [];
+    $mutantid = false;
+    $mutants = json_decode(file_get_contents("data/mutants.json"), true);
+    if (isset($mutants[$protid])) $mutantid = $protid;
+    if ($mutantid)
+    {
+        foreach ($mutants[$mutantid] as $resnos => $effects)
+        {
+            $resnos = explode("/", $resnos);
+            $temp = [];
+
+            $priority = false;
+            $effect = false;
+
+            foreach ($effects as $odor => $eff)
+            {
+                if ($odor == 'ref') continue;
+                if ($eff != 'nc') $effect = true;
+                if ($eff == "lf" || $eff == "kb!") $priority = true;
+            }
+
+            if (!$effect) continue;
+
+            foreach ($resnos as $snp)
+            {
+                $fromaa = substr($snp, 0, 1);
+                $rno = intval(substr($snp, 1));
+                $actualaa = @substr($prots[$mutantid]['sequence'], $rno-1, 1);
+                if ($actualaa != $fromaa) die("ERROR: mutants.json says $mutantid:$rno should be $fromaa but it's $actualaa in the data.\n");
+
+                $lbw = bw_from_resno($mutantid, $rno);
+                $lbwp = $priority ? ($lbw . '!') : $lbw;
+                $mresnos["$lbw"] = $lbwp;
+                if ($priority) $mpresnos["$lbw"] = $lbw;
+            }
+        }
+        // print_r($mresnos);
+    }
+
     $cavsr = resno_from_bw($protid, "1.28");
     $caver = resno_from_bw($protid, "7.56");
 
     $fam = family_from_protid($protid);
     $cavfname = "pdbs/$fam/$protid.upright.cvty";
+    $bsr = implode(' ', $mpresnos);
+    $bsr = $bsr ? "--bsr $bsr" : "";
     if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
     {
-        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.upright.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 13 --sr $cavsr --er $caver";
         echo "$cmd\n";
         passthru($cmd);
     }
     $cavfname = "pdbs/$fam/$protid.active.cvty";
     if (!file_exists($cavfname) || filemtime($cavfname) < filemtime("bin/cavity_search"))
     {
-        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 23 --xzrlim 15 --sr $cavsr --er $caver";
+        $cmd = "bin/cavity_search -p pdbs/$fam/$protid.active.pdb -o $cavfname --ymin 5 --ymax 18 --xzrlim 13 --sr $cavsr --er $caver $bsr";
         echo "$cmd\n";
         passthru($cmd);
     }
-    
+
     if ($mbp && isset($mbp["cvty"]) && @$mbp["cvty"])
     {
-        $mutants = json_decode(file_get_contents("data/mutants.json"), true);
+        $search = "CF";
         $c = explode("\n", file_get_contents("pdbs/$fam/$protid.upright.cvty"));
         $cavities_i = [];
         foreach ($c as $ln)
@@ -479,44 +521,6 @@ function prepare_outputs()
             $cavities_a[$cavno] = $temp;
         }
 
-        // Get the list of residues from the mutants file, converted to BW numbers.
-        $mresnos = [];
-        $mutantid = false;
-        if (isset($mutants[$protid])) $mutantid = $protid;
-        if ($mutantid)
-        {
-            foreach ($mutants[$mutantid] as $resnos => $effects)
-            {
-                $resnos = explode("/", $resnos);
-                $temp = [];
-
-                $priority = false;
-                $effect = false;
-
-                foreach ($effects as $odor => $eff)
-                {
-                    if ($odor == 'ref') continue;
-                    if ($eff != 'nc') $effect = true;
-                    if ($eff == "lf" || $eff == "kb!") $priority = true;
-                }
-
-                if (!$effect) continue;
-
-                foreach ($resnos as $snp)
-                {
-                    $fromaa = substr($snp, 0, 1);
-                    $rno = intval(substr($snp, 1));
-                    $actualaa = @substr($prots[$mutantid]['sequence'], $rno-1, 1);
-                    if ($actualaa != $fromaa) die("ERROR: mutants.json says $mutantid:$rno should be $fromaa but it's $actualaa in the data.\n");
-
-                    $lbw = bw_from_resno($mutantid, $rno);
-                    $lbwp = $priority ? ($lbw . '!') : $lbw;
-                    $mresnos["$lbw"] = $lbwp;
-                }
-            }
-            // print_r($mresnos);
-        }
-
         // Now prioritize cavities that contain mutant residues.
         function how_many_mres($lcavity)
         {
@@ -542,19 +546,45 @@ function prepare_outputs()
         usort($cavities_a, "mutcavsort");
         // print_r($cavities_a);
 
-        // Select the top 3 cavities and use them as your multipocket. Add exclamation points to any cavity residues identified as priority.
+        // Select the top 3 cavities and use them as your multipocket.
+        // Add exclamation points to any cavity residues identified as priority.
+        // If any cavities are priority, only include priority cavities.
         $cenres_inactive = "";
+        $any_priority = false;
         for ($i=0; $i<3; $i++)
         {
-            if (!isset($cavities_i[$i])) $break;
-            foreach ($cavities_i[$i] as $k => $v) if (@substr($mresnos[$v],-1) == '!') $cavities_i[$i][$k] .= '!';
+            if (!isset($cavities_i[$i])) break;
+            if (!is_array($cavities_i[$i])) break;
+            $this_priority = false;
+            foreach ($cavities_i[$i] as $k => $v)
+            {
+                if (@substr($mresnos[$v],-1) == '!')
+                {
+                    $cavities_i[$i][$k] .= '!';
+                    $this_priority = true;
+                }
+            }
+            if ($this_priority) $any_priority = true;
+            else if (!$this_priority && $any_priority) continue;
             $cenres_inactive .= "CEN RES ".implode(' ',$cavities_i[$i])."\n";
         }
         $cenres_active = "";
+        $any_priority = false;
         for ($i=0; $i<3; $i++)
         {
-            if (!isset($cavities_a[$i])) $break;
-            foreach ($cavities_a[$i] as $k => $v) if (@substr($mresnos[$v],-1) == '!') $cavities_a[$i][$k] .= '!';
+            if (!isset($cavities_a[$i])) break;
+            if (!is_array($cavities_a[$i])) break;
+            $this_priority = false;
+            foreach ($cavities_a[$i] as $k => $v)
+            {
+                if (@substr($mresnos[$v],-1) == '!')
+                {
+                    $cavities_a[$i][$k] .= '!';
+                    $this_priority = true;
+                }
+            }
+            if ($this_priority) $any_priority = true;
+            else if (!$this_priority && $any_priority) continue;
             $cenres_active .= "CEN RES ".implode(' ',$cavities_a[$i])."\n";
         }
         // echo "$cenres_active\n";
@@ -607,6 +637,8 @@ function prepare_outputs()
         }
         else die("Unsupported receptor family.\n");
     }
+
+    if (isset($mbp["search"])) $search = $mbp["search"];
 
     $atomto = implode("\n", $atomto);
 }
@@ -876,9 +908,9 @@ heredoc;
                 {
                     $ln = substr($ln, 4);
                     $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
-                    $sx = floatval($psiz[0])+2;
-                    $sy = floatval($psiz[1])+2;
-                    $sz = floatval($psiz[2])+2;
+                    $sx = floatval($psiz[0]);
+                    $sy = floatval($psiz[1]);
+                    $sz = floatval($psiz[2]);
                     $size = "$sx $sy $sz";
                 }
             }
@@ -919,6 +951,8 @@ $excl
 ATOMTO 3.39 EXTENT 7.53
 BRIDGE 3.39 7.49
 STCR 3.39 7.49
+BRIDGE Y6.55 DE45.51
+STCR Y6.55 DE45.51
 
 SEARCH $search
 POSE $pose

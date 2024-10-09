@@ -960,6 +960,11 @@ void update_progressbar(float percentage)
     hueoffset += 0.3;
 }
 
+void erase_progressbar()
+{
+    cout << "\033[A\033[K";
+}
+
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
 {
     int i=1;
@@ -1408,6 +1413,11 @@ int interpret_config_line(char** words)
         else if (!strcmp(words[1], "CS"))
         {
             pdpst = pst_constrained;
+            return 1;
+        }
+        else if (!strcmp(words[1], "CF"))
+        {
+            pdpst = pst_cavity_fit;
             return 1;
         }
         else if (!strcmp(words[1], "CP"))
@@ -2348,7 +2358,7 @@ int main(int argc, char** argv)
     float l_atom_clash_limit = clash_limit_per_atom; // - kJmol_cutoff;
 
     std::vector<std::shared_ptr<AtomGroup>> lagc;
-    if (pdpst == pst_constrained)
+    if (pdpst == pst_constrained || pdpst == pst_cavity_fit)
     {
         ligand = &pose_ligands[1];
         lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
@@ -2398,7 +2408,7 @@ _try_again:
         metal_initlocs[i] = mtlcoords[i].mtl->get_location();
     }
 
-    float best_energy = 0, best_worst_clash = 0;
+    float best_energy = 0, best_acc_energy = 0, best_worst_clash = 0;
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -2914,6 +2924,34 @@ _try_again:
                         << " ~ " << *cs_lag[ultimate_csidx] << endl << endl << flush;
                     #endif
                 }
+                else if (pdpst == pst_cavity_fit)
+                {
+                    float bestc = 0;
+                    int bestl = 0;
+                    Pose bestp(ligand);
+                    bestp.copy_state(ligand);
+                    for (l=0; l<ncvtys; l++)
+                    {
+                        float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);
+                        if (!l || ctainmt > bestc)
+                        {
+                            bestp.copy_state(ligand);
+                            bestc = ctainmt;
+                            bestl = l;
+                        }
+                    }
+                    bestp.restore_state(ligand);
+                    // erase_progressbar(); cout << "Using cavity " << cvtys[bestl].resnos_as_string(protein) << endl << endl;
+
+                    int csidx = Search::choose_cs_pair(protein, ligand);
+
+                    Atom* mtl = (cs_bt[csidx] == mcoord) ? cs_res[csidx]->coordmtl : nullptr;
+                    ligand->find_mutual_max_bind_potential(cs_res[csidx]);
+                    if (mtl) ligand->stay_close_other = mtl;
+
+                    ligand->movability = MOV_ALL;
+                    ligand->enforce_stays();
+                }
                 else if (pdpst == pst_copyfrom)
                 {
                     Search::copy_ligand_position_from_file(protein, ligand, copyfrom_filename.c_str(), copyfrom_ligname, copyfrom_resno);
@@ -2966,6 +3004,15 @@ _try_again:
                 }
             }
 
+            if (n = priority_resnos.size())
+            {
+                for (j=0; j<n; j++)
+                {
+                    AminoAcid* aa = protein->get_residue(priority_resnos[j]);
+                    if (aa) cfmols[i++] = (Molecule*)aa;
+                }
+            }
+
 
             for (j=0; j<sphres; j++)
             {
@@ -2979,6 +3026,28 @@ _try_again:
 
             int cfmolqty = i;
             for (; i<=SPHREACH_MAX; i++) cfmols[i] = NULL;
+
+            if (pdpst == pst_cavity_fit && ligand->stay_close_mine && ligand->stay_close_other)
+            {
+                LocatedVector axis = (SCoord)ligand->stay_close_other->get_location().subtract(ligand->stay_close_mine->get_location());
+                axis.origin = ligand->stay_close_mine->get_location();
+                float theta, step = fiftyseventh*2;
+                Pose bestp(ligand);
+                Interaction bestb = Molecule::total_intermol_binding(cfmols);
+
+                for (theta=0; theta<M_PI*2; theta += step)
+                {
+                    ligand->rotate(axis, step);
+                    Interaction linter = Molecule::total_intermol_binding(cfmols);
+                    if (linter.attractive > bestb.attractive)
+                    {
+                        bestb = linter;
+                        bestp.copy_state(ligand);
+                    }
+                }
+
+                bestp.restore_state(ligand);
+            }
 
             ligand->reset_conformer_momenta();
             
@@ -3254,7 +3323,7 @@ _try_again:
 
     if (progressbar)
     {
-        cout << "\033[A\033[K";
+        erase_progressbar();
     }
 
     // Output the dr[][] array in order of increasing pose number.
@@ -3272,6 +3341,7 @@ _try_again:
             ligand = &pose_ligands[j+1];
 
             if (dr[j][0].disqualified) continue;
+            dr[j][0].ligpos.restore_state(ligand);
 
             if (ncvtys)
             {
@@ -3280,13 +3350,17 @@ _try_again:
                 for (cno = 0; cno < ncvtys; cno++)
                 {
                     if (!cvtys[cno].count_partials()) continue;
-                    if (cvtys[cno].point_inside_pocket(ligand->get_barycenter()))
+                    CPartial* cp;
+                    if (cp = cvtys[cno].point_inside_pocket(ligand->get_barycenter()))
                     {
+                        /*cout << -dr[j][0].kJmol << " " << ligand->get_barycenter() << " is inside " << cp->s.center
+                            << " of " << cvtys[cno].resnos_as_string(protein) << endl;*/
                         dr[j][0].disqualified = false;
                         break;
                     }
                 }
             }
+            if (dr[j][0].disqualified) continue;
 
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
@@ -3296,6 +3370,8 @@ _try_again:
                     if (dr[j][0].worst_nrg_aa > clash_limit_per_aa) continue;
 
                     auths += (std::string)" " + std::to_string(dr[j][0].auth);
+
+                    if (!best_acc_energy) best_acc_energy = -dr[j][0].kJmol;
 
                     for (k=0; k<=pathnodes; k++)
                     {
@@ -3446,9 +3522,13 @@ _exitposes:
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
 
-    cout << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
-    if (output) *output << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
-    if (debug) *debug << "Best pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    cout << "Best candidate pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (output) *output << "Best candidate pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (debug) *debug << "Best candidate pose energy: " << (kcal ? best_energy/_kcal_per_kJ : best_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+
+    cout << "Best accepted pose energy: " << (kcal ? best_acc_energy/_kcal_per_kJ : best_acc_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (output) *output << "Best accepted pose energy: " << (kcal ? best_acc_energy/_kcal_per_kJ : best_acc_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
+    if (debug) *debug << "Best accepted pose energy: " << (kcal ? best_acc_energy/_kcal_per_kJ : best_acc_energy) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
 
     cout << "Best worst clash: " << (kcal ? best_worst_clash/_kcal_per_kJ : best_worst_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;
     if (output) *output << "Best worst clash: " << (kcal ? best_worst_clash/_kcal_per_kJ : best_worst_clash) << (kcal ? " kcal/mol." : " kJ/mol.") << endl;

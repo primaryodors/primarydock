@@ -5,10 +5,10 @@
 
 #define min_partial_radius 0.7
 #define min_dist_bounding_box 11
-#define cav_360_step fiftyseventh*4
+#define cav_360_step fiftyseventh*1
 #define cav_xyz_step 1.6
 #define cav_min_partials 4
-#define cav_linking_threshold 2.2
+#define cav_linking_threshold 2.8
 
 struct CPartial
 {
@@ -37,9 +37,9 @@ class Cavity
     CPartial* get_partial_by_idx(int idx) { return &partials[idx]; }
     Point get_center();
     CPartial* point_inside_pocket(Point pt);
-    CPartial* sphere_inside_pocket(Sphere s);
+    float sphere_inside_pocket(Sphere s, CPartial** partial = nullptr);
     float containment_violations(Molecule* m, float stop_if_more_than = -1);
-    float find_best_containment(Molecule* m);
+    float find_best_containment(Molecule* m, bool match_binding_types = false);
     std::string resnos_as_string(Protein* p);
 
     protected:

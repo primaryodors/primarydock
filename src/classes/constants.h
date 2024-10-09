@@ -181,12 +181,12 @@
 #define flexion_probability_multiplier 0.3
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
+#define compute_missed_connections 1
 
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
 
 // Obsolete stuff.
-#define compute_missed_connections 0
 #define compute_vdw_repulsion 0
 #define compute_clashdirs 0
 

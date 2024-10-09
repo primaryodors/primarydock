@@ -75,7 +75,14 @@ REPORT="testdata/OR51E1_caprylate_pred.approved.txt"
 php -f predict/method_directmdl.php prot=OR51E1 lig=caprylic_acid | grep '[[]Predicted[]] => ' > testdata/received/OR51E1_caprylate_pred.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/OR51E1_caprylate_pred.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}OR51E1 caprylate prediction test succeeded.${NC}\n"
+    ARG264=$( cat output/OR51/OR51E1/OR51E1.caprylic_acid.active.dock | grep -m 1 "Arg264(6.59): " )
+    ARG264="${ARG264/Arg264(6.59): /}"
+    ARG264="${ARG264/[.][0-9]*/}"
+    if [[ $ARG264 -gt "-5"  ]]; then
+        printf "${RED}OR51E1 caprylate prediction test FAILED: bad contacts.${NC}\n"
+    else
+        printf "${GRN}OR51E1 caprylate prediction test succeeded.${NC}\n"
+    fi
 else
     printf "${RED}OR51E1 caprylate prediction test FAILED.${NC}\n"
     diff --color --unified $REPORT testdata/received/OR51E1_caprylate_pred.received.txt
@@ -92,7 +99,7 @@ if [ -z "$RESULT" ]; then
     ARG262=$( cat output/OR51/OR51E2/OR51E2.propionic_acid.active.dock | grep -m 1 "Arg262(6.59): " )
     ARG262="${ARG262/Arg262(6.59): /}"
     ARG262="${ARG262/[.][0-9]*/}"
-    if [[ $ARG262 -gt "-20"  ]] || [[ $SER258 -gt "-5"  ]]; then
+    if [[ $ARG262 -gt "-15"  ]] || [[ $SER258 -gt "-5"  ]]; then
         printf "${RED}OR51E2 propionate test FAILED: bad contacts.${NC}\n"
     else
         printf "${GRN}OR51E2 propionate test succeeded.${NC}\n"

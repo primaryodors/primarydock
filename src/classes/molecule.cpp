@@ -2887,10 +2887,21 @@ void Molecule::find_mutual_max_bind_potential(Molecule* other)
                 best_potential = b;
                 stay_close_mine = atoms[i];
                 stay_close_other = other->atoms[j];
-                stay_close_limit  = InteratomicForce::optimal_distance(atoms[i], other->atoms[j]);
+                stay_close_limit  = InteratomicForce::optimal_distance(atoms[i], other->atoms[j])*1.5;
             }
         }
     }
+
+    /*if (stay_close_mine && stay_close_other)
+        cout << name << ":" << stay_close_mine->name << " and " << other->name << ":" << stay_close_other->name
+            << " must remain within " << stay_close_limit << "A." << endl << endl;*/
+}
+
+bool Molecule::check_stays()
+{
+    if (!stay_close_mine || !stay_close_other) return true;
+    float r = stay_close_other->distance_to(stay_close_mine);
+    return (r <= stay_close_limit);
 }
 
 void Molecule::enforce_stays(float amt)
@@ -2912,7 +2923,8 @@ void Molecule::enforce_stays(float amt)
     MovabilityType wasmov = movability;
     movability = MOV_ALL;
     move(movamt);
-    movability = wasmov;movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
+    movability = wasmov;
+    movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
     // cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl << endl;
 
 }
@@ -2988,6 +3000,7 @@ Interaction Molecule::get_intermol_binding(Molecule** ligands, bool subtract_cla
     Interaction kJmol;
     if (!atoms) return 0;
     if (subtract_clashes) kJmol.repulsive += get_internal_clashes();
+    if (!check_stays()) kJmol.stays_met = false;
 
     lastshielded = 0;
     clash1 = clash2 = nullptr;
@@ -3102,7 +3115,7 @@ Interaction Molecule::get_intermol_binding(Molecule** ligands, bool subtract_cla
                         {
                             Point mc = missed_connection;
                             // cout << mc << endl;
-                            if (ligands[l]->priority) mc_bpotential *= 3.333;
+                            if (ligands[l]->priority) mc_bpotential *= 10;
                             float lc = ligands[l]->atoms[j]->get_charge();
                             if (lc && sgn(lc) == -sgn(atoms[i]->get_charge())) mc_bpotential *= 3.333;
                             float mcrr = missed_connection.r * missed_connection.r;
@@ -3668,9 +3681,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         #endif
 
                         a->move(motion);
-                        // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
-                        tryenerg = cfmol_multibind(a, nearby);
-                        
+                        a->enforce_stays(0.333);
+                        tryenerg = cfmol_multibind(a, nearby);                        
 
                         if (tryenerg.improved(benerg))
                         {

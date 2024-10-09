@@ -3456,6 +3456,7 @@ Interaction AminoAcid::get_intermol_binding(AminoAcid** neighbs, bool backbone_a
                     if (!neighbs[i]->atoms[k]->is_backbone) continue;
                     float r = neighbs[i]->atoms[k]->get_location().get_3d_distance(&aloc);
                     Interaction abind = InteratomicForce::total_binding(atoms[j], neighbs[i]->atoms[k]);
+                    if (!check_stays()) retval.stays_met = false;
                     if (abind.summed() && !isnan(abind.summed()) && !isinf(abind.summed()))
                     {
                         retval += abind;

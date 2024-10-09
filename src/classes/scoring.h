@@ -55,6 +55,7 @@ class DockResult
     bool display_binding_atoms = false;
     bool display_clash_atoms = false;
     float energy_mult = 1;
+    Pose ligpos;
 
     bool out_per_res_e = true;
     bool out_per_btyp_e = true;

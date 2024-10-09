@@ -233,8 +233,8 @@ function load_viewer(obj)
                 if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
                 {
                     echo "filediv.innerHTML = \"$rcpid";
-                    echo " &#xb7; <small><a href=\\\"#\\\" onclick=\\\"load_remote_pdb('pdb.php?prot=$rcpid'); window.parent.setTimeout( window.parent.show_bsr_chains, 1234);\\\">inactive</a></small>";
-                    echo " &#xb7; <small><a href=\\\"#\\\" onclick=\\\"load_remote_pdb('pdb.php?prot=$rcpid&mod=a'); window.parent.setTimeout( window.parent.show_bsr_chains, 1234);\\\">active</a></small>";
+                    echo " &#xb7; <small><a id=\\\"mdl3di\\\" class=\\\"mdlsel\\\" href=\\\"#\\\" onclick=\\\"load_remote_pdb('pdb.php?prot=$rcpid'); $('#mdl3da').removeClass('mdlsel'); this.className = 'mdlsel'; window.parent.setTimeout( window.parent.show_bsr_chains, 1234);\\\">inactive</a></small>";
+                    echo " &#xb7; <small><a id=\\\"mdl3da\\\" href=\\\"#\\\" onclick=\\\"load_remote_pdb('pdb.php?prot=$rcpid&mod=a'); $('#mdl3di').removeClass('mdlsel'); this.className = 'mdlsel'; window.parent.setTimeout( window.parent.show_bsr_chains, 1234);\\\">active</a></small>";
                     echo "\";";
                 }
                 else

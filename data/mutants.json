@@ -256,6 +256,23 @@
             "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
         }
     },
+    "OR1G1":
+    {
+        "A112S":
+        {
+            "1-nonanol": "-",
+            "nonanal": "-",
+            "gamma-decalactone": "-",
+            "tridecanal": "-",
+            "9-decen-1-ol": "-",
+            "ref": "https:\/\/doi.org\/10.1093\/protein\/gzs037"
+        },
+        "A112V":
+        {
+            "octanal": "+",
+            "ref": "https:\/\/doi.org\/10.1093\/protein\/gzs037"
+        }
+    },
     "OR1N2":
     {
         "W23R/V230G/T287M":
@@ -812,7 +829,17 @@
         "F62L":
         {
             "trimethylpyrazine": "nc",
-            "ref": "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R"
+            "ref": "https:\/\/doi.org\/10.1096\/fj.202100224R"
+        },
+        "L104A":
+        {
+            "hazelnut pyrazine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.06.01.494157"
+        },
+        "L255A":
+        {
+            "hazelnut pyrazine": "-",
+            "ref": "https:\/\/doi.org\/10.1101\/2022.06.01.494157"
         }
     },
     "OR5AN1":
@@ -979,6 +1006,14 @@
         {
             "androstenone": "-",
             "ref": "https:\/\/doi.org\/10.1038\/nature06162"
+        }
+    },
+    "OR8D1":
+    {
+        "N206A":
+        {
+            "sotolone": "lf",
+            "ref": "https:\/\/doi.org\/10.1021\/acs.jafc.3c09142"
         }
     },
     "OR10G4":

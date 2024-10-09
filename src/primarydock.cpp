@@ -2932,7 +2932,7 @@ _try_again:
                     bestp.copy_state(ligand);
                     for (l=0; l<ncvtys; l++)
                     {
-                        float ctainmt = cvtys[l].find_best_containment(ligand, true);
+                        float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);
                         if (!l || ctainmt > bestc)
                         {
                             bestp.copy_state(ligand);

@@ -465,7 +465,7 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
                         else if (inside->polar && fabs(a->is_polar()) > hydrophilicity_cutoff) e = 0.3;
                         else if (inside->thio && a->get_family() == CHALCOGEN && a->get_Z() != 8) e = 0.15;
                         else if (inside->pi && a->is_pi()) e = 0.12;
-                        if (inside->priority) e *= 2;
+                        if (inside->priority) e *= 5;
                         f += e;
                     }
                     atoms_outside_cavity += (1.0-f);

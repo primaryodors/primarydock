@@ -5,14 +5,16 @@
 int main(int argc, char** argv)
 {
     Protein p("Test Receptor");
+    Protein* protein = &p;
     Molecule m("Test Ligand");
+    Molecule* ligand = &m;
     Cavity cvtys[256];
     int ncvtys = 0;
     bool priorities[256];
 
     bool save_tmp_pdbs = false;
 
-    int i, j, n;
+    int i, j, l, n;
     for (i=0; i<256; i++) priorities[i] = false;
 
     FILE* fp;
@@ -71,6 +73,17 @@ int main(int argc, char** argv)
             fclose(fp);
             cout << "Read " << ncvtys << " cavities." << endl;
         }
+        else if (!strcmp(argv[i], "--bsr"))
+        {
+            for (i++; argv[i] && argv[i][0] >= '0' && argv[i][0] <= '9'; i++)
+            {
+                dot = strrchr(argv[i], '.');
+                AminoAcid* aa;
+                if (dot) aa = p.get_residue_bw(argv[i]);
+                else aa = p.get_residue(atoi(argv[i]));
+                if (aa) aa->priority = true;
+            }
+        }
         else cout << "Warning: unknown command argument " << argv[i] << endl;
     }
 
@@ -92,20 +105,57 @@ int main(int argc, char** argv)
         return -2;
     }
 
-    float bestc = 0;
-    Pose bestp(&m);
-    bestp.copy_state(&m);
-    for (i=0; i<ncvtys; i++)
+
+    std::vector<std::shared_ptr<AtomGroup>> lagc;
+    lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+    agqty = lagc.size();
+    if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
+    for (i=0; i<agqty; i++)
+        agc[i] = lagc.at(i).get();
+
+    if (mtlcoords.size())
     {
-        float ctainmt = cvtys[i].find_best_containment(&m, true);
-        if (!i || ctainmt > bestc)
+        for (i=0; i<mtlcoords.size(); i++)
         {
-            bestp.copy_state(&m);
-            bestc = ctainmt;
+            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            {
+                AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                if (aa)
+                {
+                    aa->coordmtl = mtlcoords[i].mtl;
+                    aa->priority = true;
+                }
+            }
         }
     }
 
-    bestp.restore_state(&m);
+    size = Point(999,999,999);
+    Search::prepare_constrained_search(protein, ligand, Point(0,0,0));
+
+    float bestc = 0;
+    int bestl = 0;
+    Pose bestp(ligand);
+    bestp.copy_state(ligand);
+    for (l=0; l<ncvtys; l++)
+    {
+        float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);
+        if (!l || ctainmt > bestc)
+        {
+            bestp.copy_state(ligand);
+            bestc = ctainmt;
+            bestl = l;
+        }
+    }
+    bestp.restore_state(ligand);
+
+    int csidx = Search::choose_cs_pair(protein, ligand);
+
+    Atom* mtl = (cs_bt[csidx] == mcoord) ? cs_res[csidx]->coordmtl : nullptr;
+    ligand->find_mutual_max_bind_potential(cs_res[csidx]);
+    if (mtl) ligand->stay_close_other = mtl;
+
+    ligand->movability = MOV_ALL;
+    ligand->enforce_stays();
 
     for (i=0; i<ncvtys; i++)
     {

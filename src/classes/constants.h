@@ -397,6 +397,7 @@
 #define _dbg_residue_poses 0
 #define _dbg_rock_pic 0
 #define _dbg_soft 0
+#define _dbg_stays_enforce 1
 #define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0

@@ -84,6 +84,7 @@ int main(int argc, char** argv)
                 else aa = p.get_residue(atoi(argv[i]));
                 if (aa) aa->priority = true;
             }
+            if (argv[i]) i--;
         }
         else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--out"))
         {

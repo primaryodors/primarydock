@@ -928,7 +928,7 @@ heredoc;
                     $pbsr = $cenresno;
                 }
                 $pbsr = count($pbsr) ? ("--bsr ".implode(' ', $pbsr)) : "";
-                $cavfitfn = "tmp/".md5(time()).".pdb";
+                $cavfitfn = "tmp/".md5(microtime()).".pdb";
                 $cmd = "bin/cavity_fit $pdbfname $cvtyfname sdf/$ligname.sdf $pbsr -o $cavfitfn";
                 echo "$cmd\n";
                 passthru("make bin/cavity_fit && $cmd");

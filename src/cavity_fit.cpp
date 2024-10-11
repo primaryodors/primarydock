@@ -195,7 +195,7 @@ int main(int argc, char** argv)
     }
     p.save_pdb(fp, &m);
     fclose(fp);
-    cout << "Saved " << outf << endl;
+    cout << "Saved " << outfname << endl;
 
     return 0;
 }

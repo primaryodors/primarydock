@@ -919,9 +919,16 @@ heredoc;
             if ($extcavfit)
             {
                 $pbsr = [];
-                foreach ($cenresarr as $bw) if (substr($bw, -1) == '!') $pbsr[] = str_replace('!', '', $bw);
+                if (false!==strpos($cenres, "!"))
+                {
+                    foreach ($cenresarr as $bw) if (substr($bw, -1) == '!') $pbsr[] = str_replace('!', '', $bw);
+                }
+                else
+                {
+                    $pbsr = $cenresno;
+                }
                 $pbsr = count($pbsr) ? ("--bsr ".implode(' ', $pbsr)) : "";
-                $cavfitfn = "tmp/".md5(time).".pdb";
+                $cavfitfn = "tmp/".md5(time()).".pdb";
                 $cmd = "bin/cavity_fit $pdbfname $cvtyfname sdf/$ligname.sdf $pbsr -o $cavfitfn";
                 echo "$cmd\n";
                 passthru("make bin/cavity_fit && $cmd");

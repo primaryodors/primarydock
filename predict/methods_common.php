@@ -32,7 +32,7 @@ if ($result) die("Build fail.\n".print_r($output, true));
 // Configurable variables
 $elim = 0;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
-if (!isset($do_scwhere)) $do_scwhere = false;
+$extcavfit = true;
 $metrics_to_process =
 [
   "BENERG" => "BindingEnergy",
@@ -647,7 +647,7 @@ $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
     global $ligname, $isomers, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
-    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST, $nodel;
+    global $extcavfit, $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST, $nodel;
     global $cenres, $size, $docker, $mcoord, $atomto, $excl, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
@@ -872,7 +872,8 @@ heredoc;
         case "pd":
         if ($cenres)
         {
-            foreach (explode(" ", explode("\n", $cenres)[0]) as $bw)
+            $cenresarr = explode(" ", explode("\n", $cenres)[0]);
+            foreach ($cenresarr as $bw)
             {
                 if (!preg_match("/[A-Z]*[0-9]+([.][0-9]+)?!?/", $bw)) continue;
                 $resno = resno_from_bw($protid, $bw);
@@ -881,12 +882,6 @@ heredoc;
 
             $cvtyfname = str_replace('.pdb', '.cvty', $pdbfname);
             $vcvty = file_exists($cvtyfname) ? "VCVTY $cvtyfname" : "";
-
-            $cenresno = implode(" ", $cenresno);
-            $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
-            echo "$cmd\n";
-            $censz = [];
-            exec($cmd, $censz);
 
             switch (family_from_protid($protid))
             {
@@ -902,6 +897,12 @@ heredoc;
                 $softness = "1.0";
             }
 
+            $lcenresno = implode(" ", $cenresno);
+            $cmd = "bin/pepteditor predict/center.pepd $pdbfname $lcenresno";
+            echo "$cmd\n";
+            $censz = [];
+            exec($cmd, $censz);
+
             foreach ($censz as $ln)
             {
                 if (substr($ln, 0, 4) == "SZ: ")
@@ -913,6 +914,19 @@ heredoc;
                     $sz = floatval($psiz[2]);
                     $size = "$sx $sy $sz";
                 }
+            }
+
+            if ($extcavfit)
+            {
+                $pbsr = [];
+                foreach ($cenresarr as $bw) if (substr($bw, -1) == '!') $pbsr[] = str_replace('!', '', $bw);
+                $pbsr = count($pbsr) ? ("--bsr ".implode(' ', $pbsr)) : "";
+                $cavfitfn = "tmp/".md5(time).".pdb";
+                $cmd = "bin/cavity_fit $pdbfname $cvtyfname sdf/$ligname.sdf $pbsr -o $cavfitfn";
+                echo "$cmd\n";
+                passthru("make bin/cavity_fit && $cmd");
+
+                $search = "CP $cavfitfn";
             }
         }
 
@@ -927,6 +941,8 @@ heredoc;
             if ($pose < 4*count($isomers)) $pose = 4*count($isomers);
         }
         else $iso = "";
+
+        $movie = file_exists("tmp/predmovie") ? "MOVIE" : "";
 
         $excl1 = resno_from_bw($protid, "2.37");
         $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 1 2 3 4 45 5 6 7" : "";
@@ -962,7 +978,7 @@ ITERS $iter
 PROGRESS
 # OUTMC 1
 # OUTVDWR 1
-# MOVIE
+$movie
 
 FLEX 1
 $soft
@@ -1009,6 +1025,7 @@ heredoc;
             $outlines = explode("\n", file_get_contents($outfname));
         }
 
+
         if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
         $num_poses = 0;
         foreach ($outlines as $ln)
@@ -1019,8 +1036,12 @@ heredoc;
             }
         }
 
-        if (!$retvar && $num_poses && !file_exists("tmp/nodelete")) unlink($cnfname);
-        else echo "WARNING: Not deleting a temporary config file in tmp/.\n"
+        if (!file_exists("tmp/nodelete"))
+        {
+            if ($extcavfit) unlink($cavfitfn);
+            unlink($cnfname);
+        }
+        else echo "WARNING: Not deleting one or more temporary files used for docking because you have selected the debug \"nodelete\" option.\n"
             ."Recommend periodically checking the tmp/ folder and manually deleting old files that are no longer necessary.\n";
 
         break;

@@ -1,6 +1,6 @@
 
-#include "../classes/search.h"
-#include "../classes/cavity.h"
+#include "classes/search.h"
+#include "classes/cavity.h"
 
 int main(int argc, char** argv)
 {
@@ -11,6 +11,7 @@ int main(int argc, char** argv)
     Cavity cvtys[256];
     int ncvtys = 0;
     bool priorities[256];
+    std::string outfname = "cavfit.pdb";
 
     bool save_tmp_pdbs = false;
 
@@ -83,6 +84,11 @@ int main(int argc, char** argv)
                 else aa = p.get_residue(atoi(argv[i]));
                 if (aa) aa->priority = true;
             }
+        }
+        else if (!strcmp(argv[i], "-o") || !strcmp(argv[i], "--out"))
+        {
+            i++;
+            outfname = argv[i];
         }
         else cout << "Warning: unknown command argument " << argv[i] << endl;
     }
@@ -181,11 +187,10 @@ int main(int argc, char** argv)
         }
     }
 
-    std::string outf = "cavfit_test.pdb";
-    fp = fopen(outf.c_str(), "w");
+    fp = fopen(outfname.c_str(), "w");
     if (!fp)
     {
-        cout << "FAILED to open output file for writing." << endl;
+        cout << "FAILED to open " << outfname << " for writing." << endl;
         return -3;
     }
     p.save_pdb(fp, &m);

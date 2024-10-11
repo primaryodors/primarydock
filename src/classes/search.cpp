@@ -13,7 +13,7 @@ AminoAcid* cs_res[MAX_CS_RES];
 intera_type cs_bt[MAX_CS_RES];
 AtomGroup* cs_lag[MAX_CS_RES];
 int cs_res_qty = 0;
-int cs_idx = 0;
+int cs_idx = -1;
 bool Search::any_resnos_priority = false;
 
 void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocket_cen)
@@ -499,6 +499,7 @@ int Search::choose_cs_pair(Protein* protein, Molecule* ligand)
         cs_res[l] = protein->get_residue(cs_res[l]->get_residue_no());
         if (cs_res[l]->priority) any_resnos_priority = true;
         cs_lag[l]->update_atom_pointers(ligand);
+        if (cs_bt[l] == ionic) require_ionic = true;
     }
 
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.

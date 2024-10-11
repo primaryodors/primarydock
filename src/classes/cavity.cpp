@@ -132,6 +132,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
     j=0;
     for (i=0; i<l; i++)
     {
+        tmpcav[i].prot = p;
         Point cen = tmpcav[i].get_center();
         if (cen.x < cav_xmin || cen.x > cav_xmax) continue;
         if (cen.y < cav_ymin || cen.y > cav_ymax) continue;
@@ -385,15 +386,11 @@ float Cavity::sphere_inside_pocket(Sphere s, CPartial** p)
         if (partials[i].s.radius < min_partial_radius) break;
         if (partials[i].s.radius < s.radius) break;
         float r = partials[i].s.center.get_3d_distance(s.center);
-        if (r < (partials[i].s.radius - s.radius))
-        {
-            if (p) *p = &partials[i];
-            return 1;
-        }
-        else if (r < partials[i].s.radius)
+        if (r < partials[i].s.radius)
         {
             // float f = sphere_intersection(partials[i].s.radius, s.radius, r) / sphere_intersection(partials[i].s.radius, s.radius, 0);
-            float f = 1.0 - (r - (partials[i].s.radius - s.radius)) / s.radius;
+            float f = (r < (partials[i].s.radius - s.radius)) ? 1 : (1.0 - (r - (partials[i].s.radius - s.radius)) / s.radius);
+            if (partials[i].priority) f += 2;
             if (f > result)
             {
                 result = f;
@@ -430,21 +427,19 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
     m->recenter(cen);
     Pose best(m);
     float bestviol = Avogadro;
+    LocatedVector lv;
 
-    Point axes[3];
-    axes[0] = Point(1,0,0);
-    axes[1] = Point(0,1,0);
-    axes[2] = Point(0,0,1);
+    SCoord axisx = Point(1,0,0);
+    SCoord axisy = Point(0,1,0);
+    SCoord axisz = Point(0,0,1);
     int i, j, k, l, n = m->get_atom_count();
-    float theta, besttheta;
-    for (l=0; l<15; l++)
+    float thx, thy, thz;
+
+    for (thx=0; thx < M_PI*2; thx += cav_360_step)
     {
-        for (j=0; j<3; j++)
+        for (thy=0; thy < M_PI*2; thy += cav_360_step)
         {
-            LocatedVector lv = (SCoord)axes[j];
-            lv.origin = cen;
-            besttheta=0;
-            for (theta=0; theta < M_PI*2; theta += cav_360_step)
+            for (thz=0; thz < M_PI*2; thz += cav_360_step)
             {
                 float atoms_outside_cavity = 0;
                 std::string ldbg = "";
@@ -456,54 +451,75 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
 
                     CPartial* inside;
                     float f = sphere_inside_pocket(a->get_sphere(), &inside);
+                    if (inside && a->get_charge() && a->distance_to(prot->get_residue(264)->get_atom("HH2")) < 10)
+                        cout << a->distance_to(prot->get_residue(264)->get_atom("HH2")) << endl << flush;
                     if (mbt && inside)
                     {
                         float e = 0;
-                        if (inside->chargedp && a->is_conjugated_to_charge() < -hydrophilicity_cutoff) e = 0.6;
-                        else if (inside->chargedn && a->is_conjugated_to_charge() > hydrophilicity_cutoff) e = 0.6;
+                        float achg = a->get_charge();
+                        if (!achg) achg = a->is_conjugated_to_charge();
+                        if (inside->chargedp && achg < -hydrophilicity_cutoff) e = 0.6;
+                        else if (inside->chargedn && achg > hydrophilicity_cutoff) e = 0.6;
                         else if (inside->metallic && (a->get_family() == CHALCOGEN || a->get_family() == PNICTOGEN) && a->get_Z() != 8) e = 0.8;
                         else if (inside->polar && fabs(a->is_polar()) > hydrophilicity_cutoff) e = 0.3;
                         else if (inside->thio && a->get_family() == CHALCOGEN && a->get_Z() != 8) e = 0.15;
                         else if (inside->pi && a->is_pi()) e = 0.12;
-                        if (inside->priority) e *= 5;
+                        if (e && inside->priority)
+                        {
+                            if (inside->chargedp) cout << inside->s.center << " "
+                                << inside->resnos_as_string(prot) << (inside->chargedn ? "-" : "") << (inside->chargedp ? "+" : "")
+                                << " " << a->name << " " << achg << " " << e << endl;
+                            f = e;
+                        }
                         f += e;
                     }
                     atoms_outside_cavity += (1.0-f);
-                }
+                }   // for i
 
                 if (atoms_outside_cavity < bestviol)
                 {
                     best.copy_state(m);
                     bestviol = atoms_outside_cavity;
-                    besttheta = theta;
                 }
 
+                lv = axisz;
+                lv.origin = cen;
                 m->rotate(lv, cav_360_step);
-            }
-            best.restore_state(m);
-        }
+            }   // for thz
 
-        for (j=0; j<=26; j++)
+            lv = axisy;
+            lv.origin = cen;
+            m->rotate(lv, cav_360_step);
+        }   // for thy
+
+        lv = axisy;
+        lv.origin = cen;
+        m->rotate(lv, cav_360_step);
+        cout << "." << flush;
+    }   // for thx
+
+    best.restore_state(m);
+
+    for (j=0; j<=26; j++)
+    {
+        Point maybe = cen;
+        k=0;
+        _retry_linear_motion:
+        maybe.x += 0.5 * (j%3-1);
+        maybe.y += 0.5 * ((j/3)%3-1);
+        maybe.z += 0.5 * j/9;
+
+        m->recenter(maybe);
+        float viol = containment_violations(m) + m->total_eclipses()*33;
+        if (viol < bestviol)
         {
-            Point maybe = cen;
-            k=0;
-            _retry_linear_motion:
-            maybe.x += 0.5 * (j%3-1);
-            maybe.y += 0.5 * ((j/3)%3-1);
-            maybe.z += 0.5 * j/9;
-
-            m->recenter(maybe);
-            float viol = containment_violations(m) + m->total_eclipses()*33;
-            if (viol < bestviol)
-            {
-                best.copy_state(m);
-                bestviol = viol;
-                k++;
-                if (k < 5) goto _retry_linear_motion;
-            }
+            best.copy_state(m);
+            bestviol = viol;
+            k++;
+            if (k < 5) goto _retry_linear_motion;
         }
-        best.restore_state(m);
     }
+    best.restore_state(m);
 
     return bestviol;
 }
@@ -566,23 +582,25 @@ int CPartial::from_cvty_line(char* lndata)
     //           1111111111222222222233333333334444444444
     // 01234567890123456789012345678901234567890123456789
     //    2   -4.228   22.449    7.041   2.569  -+HSP! 96 99 157 158 161 182
+    //   0    2.212   14.679    9.921   2.180 __+H_P! 161 200 201 204 264
 
-    lndata[4] = 0;
-    cno = atoi(lndata);
-    lndata[13] = 0;
-    s.center.x = atof(lndata+5);
-    lndata[22] = 0;
-    s.center.y = atof(lndata+14);
-    lndata[31] = 0;
-    s.center.z = atof(lndata+23);
-    lndata[39] = 0;
-    s.radius = atof(lndata+32);
-    chargedn = (lndata[41] == '-');
-    chargedp = (lndata[42] == '+');
-    polar    = (lndata[43] == 'H');
-    thio     = (lndata[44] == 'S');
-    pi       = (lndata[45] == 'P');
-    priority = (lndata[46] == '!');
+    char** words = chop_spaced_words(lndata);
+
+    if (!words[0] || !words[1] || !words[2] || !words[3] || !words[4] || !words[5]) return -1;
+
+    cno = atoi(words[0]);
+    s.center.x = atof(words[1]);
+    s.center.y = atof(words[2]);
+    s.center.z = atof(words[3]);
+    s.radius = atof(words[4]);
+    chargedn = strchr(words[5], '-');
+    chargedp = strchr(words[5], '+');
+    polar    = strchr(words[5], 'H');
+    thio     = strchr(words[5], 'S');
+    pi       = strchr(words[5], 'P');
+    priority = strchr(words[5], '!');
+
+    delete words;
 
     return cno;
 }

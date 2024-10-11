@@ -380,12 +380,18 @@ float Cavity::sphere_inside_pocket(Sphere s, CPartial** p)
     if (!pallocd) return 0;
 
     int i;
-    float result = 0;
+    float result = 0, br = Avogadro;
     for (i=0; i<pallocd; i++)
     {
         if (partials[i].s.radius < min_partial_radius) break;
-        if (partials[i].s.radius < s.radius) break;
         float r = partials[i].s.center.get_3d_distance(s.center);
+        if (p && (!*p || r < br))
+        {
+            *p = &partials[i];
+            br = r;
+        }
+
+        if (partials[i].s.radius < s.radius) break;
         if (r < partials[i].s.radius)
         {
             // float f = sphere_intersection(partials[i].s.radius, s.radius, r) / sphere_intersection(partials[i].s.radius, s.radius, 0);
@@ -447,12 +453,11 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
                 {
                     Atom* a = m->get_atom(i);
                     if (a->get_Z() < 2) continue;
-                    Point aloc = a->get_location();
 
                     CPartial* inside;
                     float f = sphere_inside_pocket(a->get_sphere(), &inside);
-                    if (inside && a->get_charge() && a->distance_to(prot->get_residue(264)->get_atom("HH2")) < 10)
-                        cout << a->distance_to(prot->get_residue(264)->get_atom("HH2")) << endl << flush;
+                    /* if (inside && a->get_charge() && a->distance_to(prot->get_residue(264)->get_atom("HH2")) < 5)
+                        cout << a->distance_to(prot->get_residue(264)->get_atom("HH2")) << endl << flush; */
                     if (mbt && inside)
                     {
                         float e = 0;
@@ -466,9 +471,9 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
                         else if (inside->pi && a->is_pi()) e = 0.12;
                         if (e && inside->priority)
                         {
-                            if (inside->chargedp) cout << inside->s.center << " "
+                            /* if (inside->chargedp) cout << inside->s.center << " "
                                 << inside->resnos_as_string(prot) << (inside->chargedn ? "-" : "") << (inside->chargedp ? "+" : "")
-                                << " " << a->name << " " << achg << " " << e << endl;
+                                << " " << a->name << " " << achg << " " << e << endl; */
                             f = e;
                         }
                         f += e;
@@ -492,10 +497,9 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
             m->rotate(lv, cav_360_step);
         }   // for thy
 
-        lv = axisy;
+        lv = axisx;
         lv.origin = cen;
         m->rotate(lv, cav_360_step);
-        cout << "." << flush;
     }   // for thx
 
     best.restore_state(m);
@@ -579,11 +583,7 @@ int CPartial::from_cvty_line(char* lndata)
 {
     int cno;
 
-    //           1111111111222222222233333333334444444444
-    // 01234567890123456789012345678901234567890123456789
-    //    2   -4.228   22.449    7.041   2.569  -+HSP! 96 99 157 158 161 182
-    //   0    2.212   14.679    9.921   2.180 __+H_P! 161 200 201 204 264
-
+    //   0    2.212   14.679    9.921   2.180 M-+HSP! 161 200 201 204 264
     char** words = chop_spaced_words(lndata);
 
     if (!words[0] || !words[1] || !words[2] || !words[3] || !words[4] || !words[5]) return -1;

@@ -584,7 +584,9 @@ int CPartial::from_cvty_line(char* lndata)
     int cno;
 
     //   0    2.212   14.679    9.921   2.180 M-+HSP! 161 200 201 204 264
-    char** words = chop_spaced_words(lndata);
+    char buffer[65536];
+    strcpy(buffer, lndata);
+    char** words = chop_spaced_words(buffer);
 
     if (!words[0] || !words[1] || !words[2] || !words[3] || !words[4] || !words[5]) return -1;
 

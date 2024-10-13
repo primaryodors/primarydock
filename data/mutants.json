@@ -23,7 +23,19 @@
                 "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
             ]
         },
+        "G108A/N109K":
+        {
+            "(S)-(-)-citronellol": "lf",
+            "(S)-(-)-citronellal": "-",
+            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
+        },
         "G108A/G152A":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "lf",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "G108A/G152A/I205V":
         {
             "(R)-carvone": "-",
             "(S)-carvone": "lf",
@@ -33,18 +45,6 @@
         {
             "(R)-carvone": "-",
             "(S)-carvone": "-",
-            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
-        },
-        "G152A/I205V":
-        {
-            "(R)-carvone": "-",
-            "(S)-carvone": "-",
-            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
-        },
-        "G108A/G152A/I205V":
-        {
-            "(R)-carvone": "-",
-            "(S)-carvone": "lf",
             "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
         },
         "N109D":
@@ -61,12 +61,6 @@
                 "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013",
                 "https:\/\/doi.org\/10.1021\/acs.orglett.2c01635"
             ]
-        },
-        "G108A/N109K":
-        {
-            "(S)-(-)-citronellol": "lf",
-            "(S)-(-)-citronellal": "-",
-            "ref": "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013"
         },
         "T110A":
         {
@@ -99,6 +93,12 @@
             "ref": "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115"
         },
         "G152A":
+        {
+            "(R)-carvone": "-",
+            "(S)-carvone": "-",
+            "ref": "https:\/\/doi.org\/10.1007\/s00018-017-2576-z"
+        },
+        "G152A/I205V":
         {
             "(R)-carvone": "-",
             "(S)-carvone": "-",

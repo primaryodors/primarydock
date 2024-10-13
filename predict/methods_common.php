@@ -918,7 +918,7 @@ heredoc;
 
             if ($extcavfit)
             {
-                print_r($mresnos);
+                // print_r($mresnos);
                 $pbsr = [];
                 if (count($mresnos))
                 {

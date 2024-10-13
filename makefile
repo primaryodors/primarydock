@@ -11,9 +11,9 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
 	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test test/cs_test test/mcoord_test test/vdw_vertex_test \
-	  test/ageo_test test/cavfit_test
+	  test/ageo_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic \
-	 $(BINDIR)/score_pdb $(BINDIR)/ramachandran $(BINDIR)/ringflip $(BINDIR)/cavity_search
+	 $(BINDIR)/score_pdb $(BINDIR)/ramachandran $(BINDIR)/ringflip $(BINDIR)/cavity_search $(BINDIR)/cavity_fit
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -155,9 +155,6 @@ test/histidine_test: src/test/histidine_test.cpp $(OBJS)
 test/cs_test: src/test/cs_test.cpp $(OBJS)
 	$(CC) src/test/cs_test.cpp $(OBJS) -o test/cs_test $(CFLAGS)
 
-test/cavfit_test: src/test/cavfit_test.cpp $(OBJS)
-	$(CC) src/test/cavfit_test.cpp $(OBJS) -o test/cavfit_test $(CFLAGS)
-
 test/mcoord_test: src/test/mcoord_test.cpp $(OBJS)
 	$(CC) src/test/mcoord_test.cpp $(OBJS) -o test/mcoord_test $(CFLAGS)
 
@@ -175,6 +172,9 @@ $(BINDIR)/pepteditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR
 
 $(BINDIR)/cavity_search: src/cavity_search.cpp $(OBJS) $(OBJDIR)/cavity.o
 	$(CC) src/cavity_search.cpp $(OBJS) -o $(BINDIR)/cavity_search $(CFLAGS)
+
+$(BINDIR)/cavity_fit: src/cavity_fit.cpp $(OBJS)
+	$(CC) src/cavity_fit.cpp $(OBJS) -o $(BINDIR)/cavity_fit $(CFLAGS)
 
 $(BINDIR)/ic: src/ic.cpp $(OBJS) $(OBJDIR)/protein.o
 	$(CC) src/ic.cpp $(OBJS) -o $(BINDIR)/ic $(CFLAGS)

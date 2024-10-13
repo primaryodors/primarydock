@@ -178,7 +178,7 @@
 #define bb_scooch_threshold_distance 1.5
 #define flexion_selection 1
 #define no_zero_flexions 1
-#define flexion_probability_multiplier 0.3
+#define flexion_probability_multiplier 1.0
 #define ignore_invalid_partial 1
 #define use_best_binding_iteration 0
 #define compute_missed_connections 1
@@ -397,6 +397,7 @@
 #define _dbg_residue_poses 0
 #define _dbg_rock_pic 0
 #define _dbg_soft 0
+#define _dbg_stays_enforce 0
 #define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0

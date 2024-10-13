@@ -2911,7 +2911,7 @@ void Molecule::enforce_stays(float amt)
     Rotation rot = align_points_3d(stay_close_mine->get_location(), stay_close_other->get_location(), get_barycenter());
     LocatedVector lv = rot.v;
     lv.origin = get_barycenter();
-    rotate(lv, rot.a*amt);
+    rotate(lv, fmin(fabs(rot.a), hexagonal)*sgn(rot.a)*amt);
 
     SCoord movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
     // cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl;
@@ -2924,9 +2924,11 @@ void Molecule::enforce_stays(float amt)
     movability = MOV_ALL;
     move(movamt);
     movability = wasmov;
-    movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
-    // cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl << endl;
 
+    #if _dbg_stays_enforce
+    movamt = stay_close_other->get_location().subtract(stay_close_mine->get_location());
+    cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl << endl;
+    #endif
 }
 
 Interaction Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)

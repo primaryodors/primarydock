@@ -545,7 +545,7 @@ void iteration_callback(int iter, Molecule** mols)
     int i, j, l, n;
     float f = 0;
 
-    if (pdpst == pst_constrained)
+    if (cs_idx >= 0)
     {
         Point resca = cs_res[cs_idx]->get_CA_location();
         Point agcen = cs_lag[cs_idx]->get_center();
@@ -595,7 +595,7 @@ void iteration_callback(int iter, Molecule** mols)
 
         if (flex
             // && iter < 5
-            && (lf < -10 || lf < 0.1 * ptnl || (lc > 0 && lf < 5))
+            && (lc > 10 || lf < 0.3 * ptnl || (lc > 0 && lf < 5))
             && mols[l]->movability == MOV_FLXDESEL
             && lres
             && frand(0,1) < flexion_probability_multiplier * prob
@@ -2932,7 +2932,7 @@ _try_again:
                     bestp.copy_state(ligand);
                     for (l=0; l<ncvtys; l++)
                     {
-                        float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);
+                        float ctainmt = cvtys[l].find_best_containment(ligand, true); // * frand(0.5, 1);
                         if (!l || ctainmt > bestc)
                         {
                             bestp.copy_state(ligand);

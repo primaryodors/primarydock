@@ -648,7 +648,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 {
     global $ligname, $isomers, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $extcavfit, $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST, $nodel;
-    global $cenres, $size, $docker, $mcoord, $atomto, $excl, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
+    global $cenres, $mresnos, $size, $docker, $mcoord, $atomto, $excl, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 
@@ -918,10 +918,11 @@ heredoc;
 
             if ($extcavfit)
             {
+                print_r($mresnos);
                 $pbsr = [];
-                if (false!==strpos($cenres, "!"))
+                if (count($mresnos))
                 {
-                    foreach ($cenresarr as $bw) if (substr($bw, -1) == '!') $pbsr[] = str_replace('!', '', $bw);
+                    foreach ($mresnos as $bw) if (substr($bw, -1) == '!') $pbsr[] = str_replace('!', '', $bw);
                 }
                 else
                 {

@@ -59,7 +59,7 @@ struct Point
 struct Sphere
 {
     Point center;
-    float radius;
+    float radius = 0;
     float volume() { return M_PI*radius*radius; }
 };
 

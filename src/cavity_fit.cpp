@@ -145,6 +145,7 @@ int main(int argc, char** argv)
     bestp.copy_state(ligand);
     for (l=0; l<ncvtys; l++)
     {
+        cvtys[l].prot = protein;
         float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);
         if (!l || ctainmt > bestc)
         {
@@ -162,7 +163,7 @@ int main(int argc, char** argv)
     if (mtl) ligand->stay_close_other = mtl;
 
     ligand->movability = MOV_ALL;
-    ligand->enforce_stays();
+    // ligand->enforce_stays();
 
     for (i=0; i<ncvtys; i++)
     {

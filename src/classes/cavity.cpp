@@ -563,26 +563,24 @@ int CPartial::from_cvty_line(char* lndata)
 {
     int cno;
 
-    //           1111111111222222222233333333334444444444
-    // 01234567890123456789012345678901234567890123456789
-    //    2   -4.228   22.449    7.041   2.569  -+HSP! 96 99 157 158 161 182
+    //   0    2.212   14.679    9.921   2.180 M-+HSP! 161 200 201 204 264
+    char** words = chop_spaced_words(lndata);
 
-    lndata[4] = 0;
-    cno = atoi(lndata);
-    lndata[13] = 0;
-    s.center.x = atof(lndata+5);
-    lndata[22] = 0;
-    s.center.y = atof(lndata+14);
-    lndata[31] = 0;
-    s.center.z = atof(lndata+23);
-    lndata[39] = 0;
-    s.radius = atof(lndata+32);
-    chargedn = (lndata[41] == '-');
-    chargedp = (lndata[42] == '+');
-    polar    = (lndata[43] == 'H');
-    thio     = (lndata[44] == 'S');
-    pi       = (lndata[45] == 'P');
-    priority = (lndata[46] == '!');
+    if (!words[0] || !words[1] || !words[2] || !words[3] || !words[4] || !words[5]) return -1;
+
+    cno = atoi(words[0]);
+    s.center.x = atof(words[1]);
+    s.center.y = atof(words[2]);
+    s.center.z = atof(words[3]);
+    s.radius = atof(words[4]);
+    chargedn = strchr(words[5], '-');
+    chargedp = strchr(words[5], '+');
+    polar    = strchr(words[5], 'H');
+    thio     = strchr(words[5], 'S');
+    pi       = strchr(words[5], 'P');
+    priority = strchr(words[5], '!');
+
+    delete words;
 
     return cno;
 }

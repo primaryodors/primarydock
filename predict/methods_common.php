@@ -32,7 +32,7 @@ if ($result) die("Build fail.\n".print_r($output, true));
 // Configurable variables
 $elim = 0;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
-$extcavfit = true;
+$extcavfit = false;
 $metrics_to_process =
 [
   "BENERG" => "BindingEnergy",
@@ -270,7 +270,7 @@ function prepare_ligand($lig_name)
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $prots, $protid, $fam, $outfname, $pdbfname, $docker, $mresnos;
-    global $binding_pockets, $mutants, $cavities_a, $cavities_i, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
+    global $binding_pockets, $mutants, $cavities_a, $cavities_i, $cenres_active, $cenres_inactive, $size, $search, $extcavfit, $num_std_devs;
     global $atomto, $excl, $nodel, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
@@ -291,7 +291,7 @@ function prepare_outputs()
     $odor = find_odorant($ligname);
 
     $size = "7.5 7.5 7.5";
-    $search = "CS";
+    $search = $extcavfit ? "CF" : "CS";
     $atomto = [];
     $excl = "";
     $nodel = "";
@@ -460,7 +460,6 @@ function prepare_outputs()
 
     if ($mbp && isset($mbp["cvty"]) && @$mbp["cvty"])
     {
-        $search = "CF";
         $c = explode("\n", file_get_contents("pdbs/$fam/$protid.upright.cvty"));
         $cavities_i = [];
         foreach ($c as $ln)
@@ -881,7 +880,7 @@ heredoc;
             }
 
             $cvtyfname = str_replace('.pdb', '.cvty', $pdbfname);
-            $vcvty = file_exists($cvtyfname) ? "VCVTY $cvtyfname" : "";
+            $vcvty = /*file_exists($cvtyfname) ? "VCVTY $cvtyfname" :*/ "";
 
             switch (family_from_protid($protid))
             {

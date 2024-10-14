@@ -645,7 +645,7 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
-    global $ligname, $isomers, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
+    global $ligname, $isomers, $prots, $protid, $configf, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $extcavfit, $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $_REQUEST, $nodel;
     global $cenres, $mresnos, $size, $docker, $mcoord, $atomto, $excl, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
@@ -940,6 +940,16 @@ heredoc;
         if ($fam == "TAAR") $nodel .= "\nNODEL 45.60 5.38";
         else $nodel .= "\nNODEL 45.51 45.59";
 
+        $resno = resno_from_bw($protid, "5.42");
+        $l5_42 = substr($prots[$protid]['sequence'], $resno-1, 1);
+        switch ($l5_42)
+        {
+            case 'S': $atomto .= "\nATOMTO 5.42 OG 3.33"; break;
+            case 'T': $atomto .= "\nATOMTO 5.42 OG2 3.33"; break;
+            case 'N': $atomto .= "\nATOMTO 5.42 OD1 3.33"; break;
+            default: ;
+        }
+
         if ($isomers)
         {
             $iso = [];
@@ -974,7 +984,6 @@ $excl
 ATOMTO 3.39 EXTENT 7.53
 BRIDGE 3.39 7.49
 STCR 3.39 7.49
-# ATOMTO T7.42 OG2 3.33
 BRIDGE CSTYNQED3.40 YCSTNQH6.48
 BRIDGE Y6.55 DE45.51
 STCR CSTYNQED3.40 YCSTNQH6.48 Y6.55 DE45.51

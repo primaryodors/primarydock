@@ -3182,12 +3182,12 @@ _try_again:
                 dr[drcount][nodeno].miscdata += (std::string)cs_res[cs_idx]->get_name() + (std::string)" ~ ";
                 std:stringstream stst;
                 stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl;
-                dr[drcount][nodeno].miscdata += stst.str();
+                dr[drcount][nodeno].miscdata += stst.str() + (std::string)"\n";
             }
 
             if (ndynwinds)
             {
-                dr[drcount][nodeno].miscdata += (std::string)"Dynamic Windings:\n";
+                dr[drcount][nodeno].miscdata += (std::string)"Dynamic windings:\n";
                 for (i=0; i<ndynwinds; i++)
                 {
                     int sr = protein->get_residue(dynwinds[i].start_resno)->get_residue_no();

@@ -46,7 +46,9 @@ class DynamicMotion
     float bias = 0;
     float minimum = 0;
 
+    DynamicMotion() { prot = nullptr; }
     DynamicMotion(Protein* ppro);
+    void set_protein(Protein* newprot);
     bool add_constraint(DynamicConstraint* new_cons);           // Returns false if unable to add.
     void read_config_line(const char* line, DynamicMotion** all_motions);
     float apply_incremental(float additional_amount);           // Returns total applied.

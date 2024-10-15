@@ -80,15 +80,13 @@ char cvtyfname[256];
 Point pocketcen;
 std::ofstream *output = NULL;
 
-std::vector<std::string> CEN_buf;
+std::string CEN_buf[256];
+int ncenbuf = 0;
 int cenbuf_idx = 0;
-std::vector<std::string> pathstrs;
-std::vector<std::string> states;
+std::string pathstrs[256];
 
 Cavity cvtys[256];
 int ncvtys = 0;
-std::vector<std::string> dyn_strings;
-std::vector<DynamicMotion> dyn_motions;
 
 bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
@@ -114,7 +112,13 @@ int addl_resno[256];
 const Region* regions;
 SCoord region_clashes[85][3];
 Molecule* ligand;
-std::vector<std::string> isomers;
+
+std::string isomers[256];
+int nisomers = 0;
+
+DynamicMotion dynwinds[256];
+int ndynwinds = 0;
+
 Molecule** waters = nullptr;
 Molecule** owaters = nullptr;
 Point ligcen_target;
@@ -611,6 +615,24 @@ void iteration_callback(int iter, Molecule** mols)
         iter_best_bind = f;
     }
 
+    for (i=0; i<ndynwinds; i++)
+    {
+        int sr = protein->get_residue(dynwinds[i].start_resno)->get_residue_no();
+        int er = protein->get_residue(dynwinds[i].end_resno)->get_residue_no();
+        if (sr > er)
+        {
+            l = er;
+            er = sr;
+            sr = l;
+        }
+
+        Interaction before = ligand->get_intermol_binding(mols);
+        dynwinds[i].apply_incremental(frand(-0.1,0.1));
+        Interaction after = ligand->get_intermol_binding(mols);
+        float ic = protein->get_internal_clashes(sr, er);
+        if (before.improved(after) || ic > (clash_limit_per_aa*0.333*(er-sr))) dynwinds[i].apply_incremental(-0.1);
+    }
+
     // Attempt to connect hydrogen bonds to ligand.
     if (flex)
     {
@@ -1060,7 +1082,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "CEN"))
     {
-        CEN_buf.push_back(origbuff);
+        CEN_buf[ncenbuf++] = origbuff;
         optsecho = (std::string)"Center " + (std::string)origbuff;
         return 0;
     }
@@ -1092,6 +1114,15 @@ int interpret_config_line(char** words)
         debug = new std::ofstream(words[1], std::ofstream::out);
         optsecho = "Debug file: " + (std::string)words[1];
         return 1;
+    }
+    else if (!strcmp(words[0], "DYNW") || !strcmp(words[0], "DYNU"))
+    {
+        dynwinds[ndynwinds].start_resno.from_string(words[1]);
+        dynwinds[ndynwinds].end_resno.from_string(words[2]);
+        dynwinds[ndynwinds].bias = (words[0][3] == 'U') ? -7 : 7;
+        dynwinds[ndynwinds].type = dyn_wind;
+        ndynwinds++;
+        return 2;
     }
     else if (!strcmp(words[0], "ECHO"))
     {
@@ -1197,7 +1228,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "ISO"))
     {
-        isomers.push_back(words[1]);
+        isomers[nisomers++] = words[1];
         return 1;
     }
     else if (!strcmp(words[0], "SMILES"))
@@ -1275,8 +1306,6 @@ int interpret_config_line(char** words)
         if (nodeno)
         {
             if ((nodeno) > pathnodes) pathnodes = nodeno;
-
-            pathstrs.resize(nodeno+1);
             pathstrs[nodeno] = origbuff;
         }
         optsecho = "Path node set #" + to_string(nodeno);
@@ -1499,12 +1528,6 @@ int interpret_config_line(char** words)
         soft_nodelete_end.push_back(rper);
         return 2;
     }
-    else if (!strcmp(words[0], "STATE"))
-    {
-        states.push_back(origbuff);
-        optsecho = "Added state " + (std::string)origbuff;
-        return 0;
-    }
     else if (!strcmp(words[0], "TEMPLATE"))
     {
         tplset = (strcmp(words[1], "off") != 0) && (strcmp(words[1], "OFF") != 0);
@@ -1691,13 +1714,12 @@ void choose_cen_buf()
 
     priority_resnos.clear();
 
-    n = CEN_buf.size();
-    if (pose <= n) cenbuf_idx = pose-1;
+    if (pose <= ncenbuf) cenbuf_idx = pose-1;
     else
     {
         for (i=0; i<10; i++)
         {
-            cenbuf_idx = rand() % n;
+            cenbuf_idx = rand() % ncenbuf;
             if (strchr(CEN_buf[cenbuf_idx].c_str(), '!')) return;
             else if (frand(0,1) < 0.1) return;
         }
@@ -1769,26 +1791,9 @@ void apply_protein_specific_settings(Protein* p)
         delete[] words;
     }
 
-    dyn_motions.clear();
-    n = dyn_strings.size();
-    for (i=0; i<n; i++)
+    for (i=0; i<ndynwinds; i++)
     {
-        DynamicMotion dyn(protein);
-        char buffer[1024];
-        strcpy(buffer, dyn_strings[i].c_str());
-        char** words = chop_spaced_words(buffer);
-        AminoAcid* aa1 = protein->get_residue_bw(words[1]);
-        AminoAcid* aa2 = protein->get_residue_bw(words[2]);
-        int resno1 = aa1->get_residue_no();
-        int resno2 = aa2->get_residue_no();
-        dyn.name = (std::string)words[1] + (std::string)"-" + (std::string)words[2];
-        dyn.type = dyn_bend;
-        dyn.start_resno.from_string(resno1<resno2 ? words[1] : words[2]);
-        dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
-        dyn.fulcrum_resno.from_string(words[1]);
-        dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
-        dyn.bias = 30*fiftyseventh;
-        dyn_motions.push_back(dyn);
+        dynwinds[i].set_protein(p);
     }
 
     if (softdock)
@@ -2167,7 +2172,7 @@ int main(int argc, char** argv)
         required_contacts[i].resolve_resno(protein);
     }
 
-    if (!CEN_buf.size())
+    if (!ncenbuf)
     {
         cout << "Error: no binding pocket centers defined." << endl;
         return 0xbadb19d;
@@ -2220,9 +2225,9 @@ int main(int argc, char** argv)
         case 's':
         case 'S':
             // SDF
-            if (isomers.size())
+            if (nisomers)
             {
-                i = rand() % isomers.size();
+                i = rand() % nisomers;
                 ligname = get_fttl_no_path_or_ext(isomers[i].c_str());
                 ligand->set_name(ligname.c_str());
                 lligfname = isomers[i].c_str();
@@ -2240,9 +2245,9 @@ int main(int argc, char** argv)
 
         case 'p':
         case 'P':
-            if (isomers.size())
+            if (nisomers)
             {
-                i = rand() % isomers.size();
+                i = rand() % nisomers;
                 ligname = get_fttl_no_path_or_ext(isomers[i].c_str());
                 ligand->set_name(ligname.c_str());
                 lligfname = isomers[i].c_str();
@@ -2424,8 +2429,6 @@ _try_again:
         float lig_min_int_clsh = ligand->get_internal_clashes();
         // if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
 
-        for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
-
         int rcn = required_contacts.size();
         if (rcn)
         {
@@ -2521,7 +2524,6 @@ _try_again:
                 maxh2o = omaxh2o;
             }
 
-            // if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
             if (echo_progress) cout << (time(NULL) - began) << " seconds: starting pose " << pose << " node " << nodeno << "..." << endl;
@@ -2610,38 +2612,6 @@ _try_again:
             #endif
             if (nodeno)
             {
-                for (i=0; i<states.size(); i++)
-                {
-                    strcpy(buffer, states[i].c_str());
-                    char** words = chop_spaced_words(buffer);
-                    if (atoi(words[1]) == nodeno)
-                    {
-                        int sr = atoi(words[2]), er = atoi(words[3]);
-                        float theta = atof(words[4]) * fiftyseventh;
-
-                        Point sloc = protein->get_atom_location(sr, "CA"),
-                              eloc = protein->get_atom_location(er, "CA");
-
-                        LocatedVector lv = (SCoord)(sloc.subtract(eloc));
-                        lv.origin = sloc;
-
-                        int resno;
-                        for (resno = sr; resno <= er; resno++)
-                        {
-                            AminoAcid* aa = protein->get_residue(resno);
-                            if (aa)
-                            {
-                                MovabilityType mt = aa->movability;
-                                aa->movability = MOV_ALL;
-
-                                aa->rotate(lv, theta);
-
-                                aa->movability = mt;
-                            }
-                        }
-                    }
-                }
-
                 // nodecen = nodecen.add(&path[nodeno]);
                 strcpy(buffer, pathstrs[nodeno].c_str());
                 if (!strlen(buffer))
@@ -3154,7 +3124,7 @@ _try_again:
             dr[drcount][nodeno].out_vdw_repuls = out_vdw_repuls;
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
-            if (isomers.size()) dr[drcount][nodeno].isomer = ligand->get_name();
+            if (nisomers) dr[drcount][nodeno].isomer = ligand->get_name();
 
             if ((pose==1 && !nodeno) || best_energy > -btot) best_energy = -btot;
             if ((pose==1 && !nodeno) || best_worst_clash > dr[drcount][nodeno].worst_energy) best_worst_clash = dr[drcount][nodeno].worst_energy;
@@ -3214,17 +3184,17 @@ _try_again:
                 dr[drcount][nodeno].miscdata += stst.str();
             }
 
-            if (dyn_motions.size())
+            if (ndynwinds)
             {
-                dr[drcount][nodeno].miscdata += (std::string)"Dynamic Motions:\n";
-                for (i=0; i<dyn_motions.size(); i++)
+                dr[drcount][nodeno].miscdata += (std::string)"Dynamic Windings:\n";
+                for (i=0; i<ndynwinds; i++)
                 {
-                    dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i].name
-                        + (std::string)" "
-                        + std::to_string(dyn_motions[i].get_total_applied())
+                    int sr = protein->get_residue(dynwinds[i].start_resno)->get_residue_no();
+                    int er = protein->get_residue(dynwinds[i].end_resno)->get_residue_no();
+                    dr[drcount][nodeno].miscdata += std::to_string(sr) + (std::string)"-" + std::to_string(er)
+                        + (std::string)" " + std::to_string(dynwinds[i].get_total_applied()*dynwinds[i].bias)
                         + (std::string)"\n";
                 }
-                dr[drcount][nodeno].miscdata += (std::string)"\n";
             }
 
             #if _DBG_STEPBYSTEP
@@ -3404,7 +3374,6 @@ _try_again:
                         dr[j][k].do_output_colors = false;
                         dr[j][k].include_pdb_data = true;
                         if (output) *output << dr[j][k];
-
 
                         if (!k && outpdb.length() && pose <= outpdb_poses)
                         {

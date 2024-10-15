@@ -651,6 +651,8 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 
+    $is_active = !($metrics_prefix == "i" || $metrics_prefix == "i_");
+
     if (!file_exists("tmp")) mkdir("tmp");
     $modelfname = preg_replace("/.dock$/", ".model%o.pdb", $outfname);
     $retvar = 0;
@@ -946,6 +948,12 @@ heredoc;
             }
         }
 
+        if ($search == "CP")
+        {
+            if (!$is_active) $search = "CS";
+            else $search .= " " . str_replace(".active.", ".inactive.", str_replace("%o", "1", $modelfname));
+        }
+
         if ($fam == "TAAR") $nodel .= "\nNODEL 45.60 5.38";
         else $nodel .= "\nNODEL 45.51 45.59";
 
@@ -971,8 +979,8 @@ heredoc;
         $movie = file_exists("tmp/predmovie") ? "MOVIE" : "";
 
         $excl1 = resno_from_bw($protid, "2.37");
-        $soft = (($metrics_prefix != "i" && $metrics_prefix != "i_") && $softness) ? "SOFT $softness 1 2 3 4 45 5 6 7" : "";
-        if ($metrics_prefix == "i" || $metrics_prefix == "i_") $dynu = "";
+        $soft = ($is_active && $softness) ? "SOFT $softness 1 2 3 4 45 5 6 7" : "";
+        if (!$is_active) $dynu = "";
 
         $configf = <<<heredoc
 
@@ -996,6 +1004,8 @@ ATOMTO 3.39 EXTENT 7.53
 BRIDGE 3.39 7.49
 STCR 3.39 7.49
 BRIDGE CSTYNQED3.40 YCSTNQH6.48
+ATOMTO DE45.51 EXTENT 3.32
+ATOMTO Y6.55 OH 3.32
 BRIDGE Y6.55 DE45.51
 STCR CSTYNQED3.40 YCSTNQH6.48 Y6.55 DE45.51
 

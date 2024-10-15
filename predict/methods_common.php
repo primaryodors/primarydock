@@ -884,16 +884,25 @@ heredoc;
 
             switch (family_from_protid($protid))
             {
-                case "OR":
+                case "OR1": case "OR2": case "OR3": case "OR4": case "OR5": case "OR6": case "OR7": case "OR8": case "OR9":
+                case "OR10": case "OR11": case "OR12": case "OR13": case "OR14": case "OR15":        // Humans don't have OR15s, but some mammals do.
                 $softness = "1.0";
+                $dynu = "DYNU 5.58 5.32";
+                break;
+
+                case "OR51": case "OR52": case "OR56":
+                $softness = "0.666";
+                $dynu = "";
                 break;
 
                 case "TAAR":
                 $softness = "0.0";
+                $dynu = "";
                 break;
 
                 default:
-                $softness = "1.0";
+                $softness = "0";
+                $dynu = "";
             }
 
             $lcenresno = implode(" ", $cenresno);
@@ -967,6 +976,7 @@ heredoc;
         $configf = <<<heredoc
 
 PROT $pdbfname
+$dynu
 LIG sdf/$ligname.sdf
 $iso
 $vcvty

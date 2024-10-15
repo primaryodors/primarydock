@@ -627,10 +627,11 @@ void iteration_callback(int iter, Molecule** mols)
         }
 
         Interaction before = ligand->get_intermol_binding(mols);
-        dynwinds[i].apply_incremental(frand(-0.1,0.1));
+        float iamt = frand(-0.1,0.1);
+        dynwinds[i].apply_incremental(iamt);
         Interaction after = ligand->get_intermol_binding(mols);
         float ic = protein->get_internal_clashes(sr, er);
-        if (before.improved(after) || ic > (clash_limit_per_aa*0.333*(er-sr))) dynwinds[i].apply_incremental(-0.1);
+        if (before.improved(after) || ic > (clash_limit_per_aa*0.25*(er-sr))) dynwinds[i].apply_incremental(-iamt);
     }
 
     // Attempt to connect hydrogen bonds to ligand.

@@ -17,21 +17,6 @@ DynamicMotion::DynamicMotion(Protein* ppro)
     for (i=0; i<MAX_DYN_NEARBY; i++) nearby_contacts[i] = nullptr;
 }
 
-void DynamicMotion::set_protein(Protein* ppro)
-{
-    if (!ppro)
-    {
-        cout << "Null protein given to DynamicMotion." << endl;
-        throw -1;
-    }
-
-    prot = ppro;
-    applied = last_change = 0;
-    int i;
-    for (i=0; i<=MAX_DYN_CONSTRAINTS; i++) constraints[i] = nullptr;
-    for (i=0; i<MAX_DYN_NEARBY; i++) nearby_contacts[i] = nullptr;
-}
-
 bool DynamicMotion::add_constraint(DynamicConstraint* c)
 {
     if (!c->depends_on)

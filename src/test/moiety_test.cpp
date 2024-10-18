@@ -25,7 +25,7 @@ int main(int argc, char** argv)
             rewind(fp);
 
             char contents[size+4];
-            fread(contents, size, 1, fp);
+            int fyrw = fread(contents, size, 1, fp);
             fclose(fp);
             m.from_sdf(contents);
         }

@@ -686,7 +686,7 @@ void Search::copy_ligand_position_from_file(Protein* protein, Molecule* ligand, 
     bool copying = false;
     while (!feof(fp))
     {
-        fgets(buffer, 4090, fp);
+        char* fyrw = fgets(buffer, 4090, fp);
         char** words = chop_spaced_words(buffer);
         if (!words[0] || strcmp(words[0], "HETATM"))
         {

@@ -692,7 +692,7 @@ int main(int argc, char** argv)
         {
             char buffer[1024];
             buffer[0] = '\0';
-            fgets(buffer, 1023, pf);
+            char* fyrw = fgets(buffer, 1023, pf);
             if (buffer[0]) // && buffer[0] != '#')
             {
                 while (strlen(buffer) && buffer[strlen(buffer)-1] <= ' ') buffer[strlen(buffer)-1] = '\0';
@@ -1493,7 +1493,7 @@ int main(int argc, char** argv)
                     if (!fp) raise_error("Please ensure data/dlsrc.dat file exists.");
                     while (!feof(fp))
                     {
-                        fgets(buffer1, 1022, fp);
+                        char* fyrw = fgets(buffer1, 1022, fp);
                         if (buffer1[0] == '#') continue;
                         char** dls = chop_spaced_words(buffer1);
 
@@ -1524,7 +1524,7 @@ int main(int argc, char** argv)
                         url = "";
                         while (!feof(fp))
                         {
-                            fgets(buffer1, 1022, fp);
+                            char* fyrw = fgets(buffer1, 1022, fp);
                             char* psz = strstr(buffer1, key.c_str());
                             if (psz)
                             {

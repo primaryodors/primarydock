@@ -106,7 +106,7 @@ int main(int argc, char** argv)
         while (!feof(pf))
         {
             char buffer[16384];
-            fgets(buffer, 16361, pf);
+            char* fyrw = fgets(buffer, 16361, pf);
             if (buffer[0] >= ' ')
             {
                 char** words = chop_spaced_words(buffer, '|');

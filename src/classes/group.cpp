@@ -462,7 +462,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         char buffer[1024];
         while (!feof(fp))
         {
-            fgets(buffer, 1022, fp);
+            char* fyrw = fgets(buffer, 1022, fp);
             if (buffer[0])
             {
                 Moiety m;

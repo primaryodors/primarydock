@@ -2014,7 +2014,7 @@ int main(int argc, char** argv)
         char buffer[1024];
         while (!feof(fp))
         {
-            fgets(buffer, 1022, fp);
+            char* fyrw = fgets(buffer, 1022, fp);
             CPartial cp;
             int cno = cp.from_cvty_line(buffer);
             cvtys[cno].add_partial(cp);

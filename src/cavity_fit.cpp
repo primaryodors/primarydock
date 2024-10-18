@@ -20,6 +20,7 @@ int main(int argc, char** argv)
 
     FILE* fp;
     char buffer[49152];
+    int fyrw;
     for (i=1; i<argc; i++)
     {
         char* dot;
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
                 cout << "Failed to open " << argv[i] << " for reading." << endl;
                 return -1;
             }
-            fread(buffer, 1, 49150, fp);
+            fyrw = fread(buffer, 1, 49150, fp);
             fclose(fp);
             m.from_sdf(buffer);
         }
@@ -65,7 +66,7 @@ int main(int argc, char** argv)
             char buffer[1024];
             while (!feof(fp))
             {
-                fgets(buffer, 1022, fp);
+                char* fyrw = fgets(buffer, 1022, fp);
                 CPartial cp;
                 int cno = cp.from_cvty_line(buffer);
                 cvtys[cno].add_partial(cp);

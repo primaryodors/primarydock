@@ -427,8 +427,8 @@ void reconnect_bridges()
         if (aa2) aa2->movability = MOV_PINNED; 
 
         #if _dbg_bridges
-        if (!aa1) cout << resno1 << " not found." << endl;
-        if (!aa2) cout << resno2 << " not found." << endl;
+        if (!aa1) cout << endl << resno1 << " not found." << endl;
+        if (!aa2) cout << endl << resno2 << " not found." << endl;
         if (aa1 && aa2)
         {
             float tb = -aa1->get_intermol_binding(aa2).summed();
@@ -1741,12 +1741,14 @@ void apply_protein_specific_settings(Protein* p)
 
         if (!aa)
         {
+            if (progressbar) erase_progressbar();
             cout << "Warning: residue " << words[1] << " not found." << endl;
             continue;
         }
 
         if (!target)
         {
+            if (progressbar) erase_progressbar();
             cout << "Warning: residue " << words[3] << " not found." << endl;
             continue;
         }
@@ -1755,6 +1757,7 @@ void apply_protein_specific_settings(Protein* p)
         if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
         if (!a)
         {
+            if (progressbar) erase_progressbar();
             cout << "Warning: atom not found " << *aa << ":" << aname << endl;
             continue;
         }

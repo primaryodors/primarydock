@@ -28,7 +28,7 @@ function make_prediction($data)
     if (isset($data["a_Pose1"]) || isset($data["a_BindingEnergy"]))
     {
         $baseline = 0.05;                       // this is a guess.
-        $baseDeltaG = DeltaG($baseline);
+        $baseDeltaG = DeltaG($baseline);        // difference between base active energy and base inactive energy.
 
         $aenergy = floatval(@$data['a_Pose1']);
         $ienergy = floatval(@$data['i_Pose1']);
@@ -37,7 +37,7 @@ function make_prediction($data)
 
         $aeq = equilibrium(0, $aenergy);                    // how much of the active-state population will be ligand-bound
         $ieq = equilibrium(0, $ienergy);                    // how much of the inactive-state population will be ligand-bound
-        $bound_acv = equilibrium($ienergy, $aenergy-$baseDeltaG);       // how much of the ligand-bound population will be active
+        $bound_acv = equilibrium($ienergy, $aenergy+$baseDeltaG);       // how much of the ligand-bound population will be active
         $activation = $aeq*$bound_acv + (1.0-$baseline)*(1.0-$aeq) - $baseline;
 
         $aa100 = floatval(@$data['a_A100']);

@@ -96,17 +96,17 @@ switch ($fam)
     if ($rcpid == "OR51F2") $mdlcls = "AutoModel";
     break;
 
-    /*case 'OR1':
+    case 'OR1':
     $knowns = "$CLASSI, $CLASSII";
     break;
 
     case 'OR2':
     if (substr($rcpid, 0, 4) == "OR2M" || substr($rcpid, 0, 4) == "OR2T" || substr($rcpid, 0, 4) == "OR2V") $knowns = $CLASSII_tight;
     else $knowns = $CLASSII;
-    break;*/
+    break;
 
     default:        // Class II ORs
-    $knowns = "$CLASSI"; //, $CLASSII, $mTAAR, $TAAR1";      // , $LPAR1
+    $knowns = "$CLASSI, $CLASSII, $mTAAR, $TAAR1";      // , $LPAR1
 }
 
 

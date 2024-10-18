@@ -3063,8 +3063,9 @@ _try_again:
             ligand->movability = MOV_ALL;
             if (!flex) for (j=0; j<sphres; j++)
             {
-                reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
+                if (reaches_spheroid[nodeno][j]->movability != MOV_PINNED) reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
             }
+            freeze_bridged_residues();
             ligand->agroups = global_pairs;
             if (output_each_iter) output_iter(0, cfmols);
             if (pdpst == pst_best_binding) ligand->movability = (MovabilityType)(MOV_CAN_AXIAL | MOV_CAN_RECEN | MOV_CAN_FLEX);

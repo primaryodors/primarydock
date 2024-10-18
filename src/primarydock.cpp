@@ -87,8 +87,6 @@ std::vector<std::string> states;
 
 Cavity cvtys[256];
 int ncvtys = 0;
-std::vector<std::string> dyn_strings;
-std::vector<DynamicMotion> dyn_motions;
 
 bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
@@ -954,9 +952,9 @@ void update_progressbar(float percentage)
         }
         else cout << "\u2591";
     }
-    cout << ("|/-\\")[spinchr] << " " << (int)percentage << "%.               " << endl;
+    cout << ("|/-\\")[spinchr/4] << " " << (int)percentage << "%.               " << endl;
     spinchr++;
-    if (spinchr >= 4) spinchr = 0;
+    if (spinchr >= 16) spinchr = 0;
     hueoffset += 0.3;
 }
 
@@ -1769,27 +1767,7 @@ void apply_protein_specific_settings(Protein* p)
         delete[] words;
     }
 
-    dyn_motions.clear();
-    n = dyn_strings.size();
-    for (i=0; i<n; i++)
-    {
-        DynamicMotion dyn(protein);
-        char buffer[1024];
-        strcpy(buffer, dyn_strings[i].c_str());
-        char** words = chop_spaced_words(buffer);
-        AminoAcid* aa1 = protein->get_residue_bw(words[1]);
-        AminoAcid* aa2 = protein->get_residue_bw(words[2]);
-        int resno1 = aa1->get_residue_no();
-        int resno2 = aa2->get_residue_no();
-        dyn.name = (std::string)words[1] + (std::string)"-" + (std::string)words[2];
-        dyn.type = dyn_bend;
-        dyn.start_resno.from_string(resno1<resno2 ? words[1] : words[2]);
-        dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
-        dyn.fulcrum_resno.from_string(words[1]);
-        dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
-        dyn.bias = 30*fiftyseventh;
-        dyn_motions.push_back(dyn);
-    }
+    reconnect_bridges();
 
     if (softdock)
     {
@@ -2423,8 +2401,6 @@ _try_again:
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
         // if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
-
-        for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 
         int rcn = required_contacts.size();
         if (rcn)
@@ -3212,19 +3188,6 @@ _try_again:
                 std:stringstream stst;
                 stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl;
                 dr[drcount][nodeno].miscdata += stst.str();
-            }
-
-            if (dyn_motions.size())
-            {
-                dr[drcount][nodeno].miscdata += (std::string)"Dynamic Motions:\n";
-                for (i=0; i<dyn_motions.size(); i++)
-                {
-                    dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i].name
-                        + (std::string)" "
-                        + std::to_string(dyn_motions[i].get_total_applied())
-                        + (std::string)"\n";
-                }
-                dr[drcount][nodeno].miscdata += (std::string)"\n";
             }
 
             #if _DBG_STEPBYSTEP

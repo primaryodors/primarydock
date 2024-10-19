@@ -603,6 +603,8 @@ void iteration_callback(int iter, Molecule** mols)
         }
     }
 
+    freeze_bridged_residues();
+
     if (f > iter_best_bind)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
@@ -2998,7 +3000,7 @@ _try_again:
                 #if ! flexion_selection
                 if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
                 #endif
-                if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
+                if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_PINNED;
                 cfmols[i++] = reaches_spheroid[nodeno][j];
                 protein->get_residues_can_clash(reaches_spheroid[nodeno][j]->get_residue_no());
             }

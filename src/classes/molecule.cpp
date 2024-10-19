@@ -3448,6 +3448,14 @@ Interaction Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
             }
         }
     }
+    else
+    {
+        float apol = fabs(this->hydrophilicity()) + fabs(this->get_charge());
+        float bpol = fabs(om->hydrophilicity()) + fabs(om->get_charge());
+
+        float factor = 1.0 / fmax(1.0, fabs(apol-bpol));
+        lbind.attractive *= factor;
+    }
 
     return lbind;
 }

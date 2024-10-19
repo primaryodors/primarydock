@@ -38,6 +38,7 @@ function make_prediction($data)
         $aeq = equilibrium(0, $aenergy);                    // how much of the active-state population will be ligand-bound
         $ieq = equilibrium(0, $ienergy);                    // how much of the inactive-state population will be ligand-bound
         $bound_acv = equilibrium($ienergy, $aenergy+$baseDeltaG);       // how much of the ligand-bound population will be active
+        $data['est_base_delta_G'] = $baseDeltaG;
         $activation = $aeq*$bound_acv + (1.0-$baseline)*(1.0-$aeq) - $baseline;
 
         $aa100 = floatval(@$data['a_A100']);

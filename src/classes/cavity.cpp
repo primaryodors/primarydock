@@ -528,6 +528,97 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
     return bestviol;
 }
 
+float CPartial::atom_match_score(Atom* a)
+{
+    float result = 0;
+    if (!a) return result;
+    if (chargedp || chargedn)
+    {
+        float achg = a->get_charge();
+        if (achg > 0 && chargedn) result += 0.3;
+        else if (achg < 0 && chargedp) result += 0.3;
+    }
+
+    if (metallic)
+    {
+        int fam = a->get_family();
+        int Z = a->get_Z();
+
+        if (fam == PNICTOGEN) result += 1.5 / sqrt(Z/8);
+        else if (fam == CHALCOGEN)
+        {
+            if (Z < 10) result += 0.5;
+            else result += 2.5 / sqrt(Z/16);
+        }
+    }
+
+    if (polar)
+    {
+        float apol = a->is_polar();
+        if (fabs(apol) >= hydrophilicity_cutoff) result += 0.2 * fabs(apol);
+    }
+
+    if (thio && a->is_thio()) result += 0.05;
+
+    if (this->pi && a->is_pi()) result += 0.12;
+
+    return result;
+}
+
+bool Cavity::match_ligand(Molecule* ligand)
+{
+    CPartial* mpart[10];
+    Atom*     matom[10];
+    float     score[10];
+    int matches = 0;
+
+    int i, j, l, m, n;
+    float f;
+
+    for (i=0; i<10; i++) score[i] = 0;
+
+    n = ligand->get_atom_count();
+    for (i=0; i<n; i++)
+    {
+        Atom* a = ligand->get_atom(i);
+        for (j=0; j<pallocd; j++)
+        {
+            CPartial* p = partials[j];
+            if (p->s.radius < min_partial_radius) break;
+
+            f = p->atom_match_score(a);
+
+            for (l=0; l<matches; l++)
+            {
+                if (f > score[l])
+                {
+                    for (m=9; m>l; m--)
+                    {
+                        mpart[m] = mpart[m-1];
+                        matom[m] = matom[m-1];
+                        score[m] = score[m-1];
+                    }
+                    mpart[l] = p;
+                    matom[l] = a;
+                    score[l] = f;
+                    matches = max(matches, l+1);
+                    break;
+                }
+            }
+        }
+    }
+
+    // Each match, try centering the atom inside the partial.
+
+    // Do 3-axis rotations to maximize containment.
+
+    // Do xyz wiggle to improve containment.
+
+    // If no satisfactory containment, go on to next match.
+
+    // Return true if good match found.
+}
+
 std::string Cavity::resnos_as_string(Protein* p)
 {
     if (!partials || !pallocd) return (std::string)"";

@@ -23,6 +23,7 @@ struct CPartial
     // int resno = 0;
     std::string resnos_as_string(Protein* p);
     int from_cvty_line(char* lndata);               // Returns the cavity number from the first column.
+    float atom_match_score(Atom* a);
 };
 
 class Cavity
@@ -40,6 +41,7 @@ class Cavity
     float sphere_inside_pocket(Sphere s, CPartial** partial = nullptr);
     float containment_violations(Molecule* m, float stop_if_more_than = -1);
     float find_best_containment(Molecule* m, bool match_binding_types = false);
+    bool match_ligand(Molecule* ligand);
     std::string resnos_as_string(Protein* p);
     Protein* prot = nullptr;
 

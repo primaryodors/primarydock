@@ -156,12 +156,6 @@ void Pose::copy_state(Molecule* m)
 
         saved_atom_locs = new Point[sz+4];
         saved_atom_Z = new int[sz+4];
-        /*for (i=0; i<=sz; i++)
-        {
-            Point pt;
-            saved_atom_locs[nsaved_atom] = pt;
-            saved_atom_Z[nsaved_atom++] = 0;
-        }*/
     }
 
     for (i=0; m->atoms[i] && i<sz; i++)

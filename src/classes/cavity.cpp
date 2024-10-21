@@ -63,9 +63,8 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                 for (i=0; i<sphres; i++)
                 {
                     Atom* a = can_clash[i]->get_nearest_atom(pt);
-                    float r = a->get_location().get_3d_distance(pt);
-                    if (r > rmin+1.5 && !can_clash[i]->priority) continue;
-                    if (r > rmin+1.5) continue;
+                    float r = a->get_location().get_3d_distance(pt)-a->get_vdW_radius();
+                    if (r > rmin /* && !can_clash[i]->priority */) continue;
 
                     Atom* CB = can_clash[i]->get_atom("CB");
                     if (CB
@@ -76,7 +75,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                         if (can_clash[i]->priority)
                         {
                             // cout << pt << can_clash[i]->get_name() << " distance " << r << " has priority." << endl;
-                            any_priority = working.priority = true;
+                            any_priority = /*working.priority =*/ true;
                         }
                         if (can_clash[i]->coordmtl) working.metallic = true;
                         if (can_clash[i]->get_charge() < -hydrophilicity_cutoff) working.chargedn = true;
@@ -144,6 +143,21 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
         if (r > cav_xzrlim) continue;
         r = sqrt(pow(cen.y - pcen.y, 2) + pow(cen.z - pcen.z, 2));
         if (r > cav_yzrlim) continue;
+
+        int x;
+        for (x=0; x<pqty; x++)
+        {
+            AminoAcid* aa = p->get_residue(priorities[x]);
+            if (!aa) continue;
+            Atom* a = aa->get_nearest_atom(tmpcav[i].get_center());
+            if (!a) continue;
+            CPartial* part = tmpcav[i].get_nearest_partial(a->get_location());
+            if (!part) continue;
+            r = part->s.center.get_3d_distance(a->get_location());
+            if (r > _INTERA_R_CUTOFF+part->s.radius+a->get_vdW_radius()) continue;
+            tmpcav[i].priority = part->priority = true;
+            break;
+        }
 
         if (tmpcav[i].count_partials() >= cav_min_partials
             && (!any_priority || tmpcav[i].priority)
@@ -635,7 +649,7 @@ float Cavity::match_ligand(Molecule* ligand)
                     f = 0;
                     for (i=0; i<n; i++)
                     {
-                        f += sphere_inside_pocket(matom[i]->get_sphere());
+                        f += sphere_inside_pocket(ligand->get_atom(i)->get_sphere());
                     }
 
                     if (f > bestc)
@@ -674,7 +688,7 @@ float Cavity::match_ligand(Molecule* ligand)
             f = 0;
             for (i=0; i<n; i++)
             {
-                f += sphere_inside_pocket(matom[m]->get_sphere());
+                f += sphere_inside_pocket(ligand->get_atom(i)->get_sphere());
             }
             if (f > bestc)
             {

@@ -567,7 +567,7 @@ float CPartial::atom_match_score(Atom* a)
     return result;
 }
 
-bool Cavity::match_ligand(Molecule* ligand)
+float Cavity::match_ligand(Molecule* ligand)
 {
     CPartial* mpart[10];
     Atom*     matom[10];
@@ -575,7 +575,7 @@ bool Cavity::match_ligand(Molecule* ligand)
     int matches = 0;
 
     int i, j, l, m, n;
-    float f;
+    float f, f0;
 
     for (i=0; i<10; i++) score[i] = 0;
 
@@ -590,7 +590,7 @@ bool Cavity::match_ligand(Molecule* ligand)
 
             f = p->atom_match_score(a);
 
-            for (l=0; l<matches; l++)
+            for (l=0; l<10 && l<=matches; l++)
             {
                 if (f > score[l])
                 {
@@ -635,7 +635,7 @@ bool Cavity::match_ligand(Molecule* ligand)
                     f = 0;
                     for (i=0; i<n; i++)
                     {
-                        f += sphere_inside_pocket(matom[m]->get_sphere());
+                        f += sphere_inside_pocket(matom[i]->get_sphere());
                     }
 
                     if (f > bestc)
@@ -689,11 +689,12 @@ bool Cavity::match_ligand(Molecule* ligand)
 
         // If no satisfactory containment, go on to next match.
         // Return true if good match found.
-        if (f >= min_cavmatch_ctainmt) return true;
+        if (f >= min_cavmatch_ctainmt) return f;
+        if (!m) f0 = f;
     }
 
     bestest.restore_state(ligand);
-    return false;
+    return f0;
 }
 
 std::string Cavity::resnos_as_string(Protein* p)

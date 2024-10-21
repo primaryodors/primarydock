@@ -113,7 +113,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
             char buffer[fsz + 4];
             for (i=0; i<(fsz+4); i++) buffer[i] = 0;
 
-            fread(buffer, 1, fsz, pf);
+            int fyrw = fread(buffer, 1, fsz, pf);
             fclose(pf);
 
             from_sdf(buffer);
@@ -1042,7 +1042,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
     while (!feof(is))
     {
         lasttell = ftell(is);
-        fgets(buffer, 1003, is);
+        char* fyrw = fgets(buffer, 1003, is);
         if (buffer[0] == 'A' &&
             buffer[1] == 'T' &&
             buffer[2] == 'O' &&
@@ -1479,7 +1479,7 @@ void AminoAcid::load_aa_defs()
 
         while (!feof(pf))
         {
-            fgets(buffer, 1011, pf);
+            char* fyrw = fgets(buffer, 1011, pf);
             if (buffer[0] != '#' && buffer[0] != '\n')
             {
                 char** words = chop_spaced_words(buffer);

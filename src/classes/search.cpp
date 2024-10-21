@@ -493,53 +493,84 @@ int Search::choose_cs_pair(Protein* protein, Molecule* ligand)
     bool require_ionic = false;
 
     n = cs_res_qty;
+    if (!n) return 0;
     any_resnos_priority = false;
     for (l=0; l<n; l++)
     {
         cs_res[l] = protein->get_residue(cs_res[l]->get_residue_no());
         if (cs_res[l]->priority) any_resnos_priority = true;
         cs_lag[l]->update_atom_pointers(ligand);
-        if (cs_bt[l] == ionic) require_ionic = true;
+    }
+
+    AminoAcid** lcs_res = cs_res;
+    intera_type* lcs_bt = cs_bt;
+    AtomGroup** lcs_lag = cs_lag;
+    int* lindex = nullptr;
+    bool delete_lcs = false;
+
+    if (any_resnos_priority)
+    {
+        lcs_res = new AminoAcid*[MAX_CS_RES];
+        lcs_bt = new intera_type[MAX_CS_RES];
+        lcs_lag = new AtomGroup*[MAX_CS_RES];
+        lindex = new int[MAX_CS_RES];
+        delete_lcs = true;
+
+        n = 0;
+        for (l=0; l<cs_res_qty; l++)
+        {
+            if (cs_res[l]->priority)
+            {
+                lcs_res[n] = cs_res[l];
+                lcs_bt[n] = cs_bt[l];
+                lcs_lag[n] = cs_lag[l];
+                lindex[n] = l;
+                n++;
+            }
+        }
+    }
+
+    for (l=0; l<n; l++)
+    {
+        if (lcs_bt[l] == ionic) require_ionic = true;
     }
 
     // Choose a residue-type-group combination, randomly but weighted by binding energy of binding type.
-    n = cs_res_qty;
-    if (!n) return 0;
     for (l=0; l<1e5; l++)
     {
         j = rand() % n;
 
         #if _dbg_groupsel
-        cout << cs_res[j]->get_name() << (cs_res[j]->priority ? "!" : "") << " ";
+        cout << lcs_res[j]->get_name() << (lcs_res[j]->priority ? "!" : "") << " ";
         #endif
 
         // If any residue is priority, then only a priority residue can be chosen.
-        if (any_resnos_priority && !cs_res[j]->priority) continue;
+        if (any_resnos_priority && !lcs_res[j]->priority) continue;
 
         // If the ligand can form a polar bond, it must form a polar bond.
-        if (!cs_res[j]->priority && (ligand_can_hbond) && (cs_bt[j] == pi || cs_bt[j] == vdW)) continue;
+        if (!lcs_res[j]->priority && (ligand_can_hbond) && (lcs_bt[j] == pi || lcs_bt[j] == vdW)) continue;
 
         // If the ligand can form an ionic bond, it must.
-        if (require_ionic && cs_bt[j] != ionic) continue;
+        if (require_ionic && lcs_bt[j] != ionic) continue;
 
         // If the ligand and residue have opposite charges, the bond is ionic (or mcoord) no matter what.
-        float rchg = cs_res[j]->get_charge(), lchg = cs_lag[j]->get_ionic();
-        if (fabs(lchg) >= 1 && fabs(rchg) >= 1 && cs_bt[j] != mcoord && sgn(lchg) == -sgn(rchg)) cs_bt[j] = ionic;
+        float rchg = lcs_res[j]->get_charge(), lchg = lcs_lag[j]->get_ionic();
+        if (fabs(lchg) >= 1 && fabs(rchg) >= 1 && lcs_bt[j] != mcoord && sgn(lchg) == -sgn(rchg)) lcs_bt[j] = ionic;
 
-        if (cs_bt[j] == ionic) require_ionic = true;
+        if (lcs_bt[j] == ionic) require_ionic = true;
 
         int li, ln;
         float b, lmcb, bmcb = 0;
         Atom *ligmc, *rmet;
-        switch (cs_bt[j])
+        switch (lcs_bt[j])
         {
             case mcoord:
             b = 200;
-            rmet = cs_res[j]->coordmtl;
-            ln = cs_lag[j]->atct;
+            rmet = lcs_res[j]->coordmtl;
+            ln = lcs_lag[j]->atct;
             for (li=0; li<ln; li++)
             {
-                Atom* mca = cs_lag[j]->atoms[li];
+                Atom* mca = lcs_lag[j]->atoms[li];
                 if (mca->get_family() != PNICTOGEN && mca->get_family() != CHALCOGEN && !mca->is_pi()) continue;
                 lmcb = InteratomicForce::metal_compatibility(mca, rmet);
                 if (lmcb > bmcb) bmcb = lmcb;
@@ -550,20 +581,29 @@ int Search::choose_cs_pair(Protein* protein, Molecule* ligand)
             case ionic: b = 60; break;
             case hbond:
             b = 25;
-            if (cs_res[j]->has_pi_atoms() && cs_lag[j]->get_pi()) b *= 2;
+            if (lcs_res[j]->has_pi_atoms() && lcs_lag[j]->get_pi()) b *= 2;
             break;
             case pi: b = 12; break;
             case vdW: default: b = 4;
         }
 
-        Point caloc = cs_res[j]->get_CA_location();
-        float alphaC = cs_lag[j]->get_center().get_3d_distance(caloc);
-        float GC = ligand->get_barycenter().get_3d_distance(cs_lag[j]->get_center());
-        float r = fmax(0, fabs(alphaC - GC - 3) - cs_res[j]->get_reach());
+        Point caloc = lcs_res[j]->get_CA_location();
+        float alphaC = lcs_lag[j]->get_center().get_3d_distance(caloc);
+        float GC = ligand->get_barycenter().get_3d_distance(lcs_lag[j]->get_center());
+        float r = fmax(0, fabs(alphaC - GC - 3) - lcs_res[j]->get_reach());
 
         float w = pow(b/500, cs_bondweight_exponent) / pow(r, 2) * 10000;
-        if (cs_bt[j] == mcoord || cs_bt[j] == ionic) w *= 10;
-        if (frand(0,1) < w) return j;
+        if (lcs_bt[j] == mcoord || lcs_bt[j] == ionic) w *= 10;
+        if (frand(0,1) < w) break;
+    }
+
+    if (delete_lcs)
+    {
+        j = lindex[j];
+        delete lcs_res;
+        delete lcs_bt;
+        delete lcs_lag;
+        delete lindex;
     }
 
     return j;
@@ -686,7 +726,7 @@ void Search::copy_ligand_position_from_file(Protein* protein, Molecule* ligand, 
     bool copying = false;
     while (!feof(fp))
     {
-        fgets(buffer, 4090, fp);
+        char* fyrw = fgets(buffer, 4090, fp);
         char** words = chop_spaced_words(buffer);
         if (!words[0] || strcmp(words[0], "HETATM"))
         {

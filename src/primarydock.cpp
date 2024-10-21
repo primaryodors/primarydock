@@ -87,8 +87,6 @@ std::vector<std::string> states;
 
 Cavity cvtys[256];
 int ncvtys = 0;
-std::vector<std::string> dyn_strings;
-std::vector<DynamicMotion> dyn_motions;
 
 bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
@@ -429,8 +427,8 @@ void reconnect_bridges()
         if (aa2) aa2->movability = MOV_PINNED; 
 
         #if _dbg_bridges
-        if (!aa1) cout << resno1 << " not found." << endl;
-        if (!aa2) cout << resno2 << " not found." << endl;
+        if (!aa1) cout << endl << resno1 << " not found." << endl;
+        if (!aa2) cout << endl << resno2 << " not found." << endl;
         if (aa1 && aa2)
         {
             float tb = -aa1->get_intermol_binding(aa2).summed();
@@ -604,6 +602,8 @@ void iteration_callback(int iter, Molecule** mols)
             mols[l]->movability = MOV_FORCEFLEX;
         }
     }
+
+    freeze_bridged_residues();
 
     if (f > iter_best_bind)
     {
@@ -954,9 +954,9 @@ void update_progressbar(float percentage)
         }
         else cout << "\u2591";
     }
-    cout << ("|/-\\")[spinchr] << " " << (int)percentage << "%.               " << endl;
+    cout << ("|/-\\")[spinchr/4] << " " << (int)percentage << "%.               " << endl;
     spinchr++;
-    if (spinchr >= 4) spinchr = 0;
+    if (spinchr >= 16) spinchr = 0;
     hueoffset += 0.3;
 }
 
@@ -1743,12 +1743,14 @@ void apply_protein_specific_settings(Protein* p)
 
         if (!aa)
         {
+            if (progressbar) erase_progressbar();
             cout << "Warning: residue " << words[1] << " not found." << endl;
             continue;
         }
 
         if (!target)
         {
+            if (progressbar) erase_progressbar();
             cout << "Warning: residue " << words[3] << " not found." << endl;
             continue;
         }
@@ -1757,6 +1759,7 @@ void apply_protein_specific_settings(Protein* p)
         if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
         if (!a)
         {
+            if (progressbar) erase_progressbar();
             cout << "Warning: atom not found " << *aa << ":" << aname << endl;
             continue;
         }
@@ -1769,27 +1772,7 @@ void apply_protein_specific_settings(Protein* p)
         delete[] words;
     }
 
-    dyn_motions.clear();
-    n = dyn_strings.size();
-    for (i=0; i<n; i++)
-    {
-        DynamicMotion dyn(protein);
-        char buffer[1024];
-        strcpy(buffer, dyn_strings[i].c_str());
-        char** words = chop_spaced_words(buffer);
-        AminoAcid* aa1 = protein->get_residue_bw(words[1]);
-        AminoAcid* aa2 = protein->get_residue_bw(words[2]);
-        int resno1 = aa1->get_residue_no();
-        int resno2 = aa2->get_residue_no();
-        dyn.name = (std::string)words[1] + (std::string)"-" + (std::string)words[2];
-        dyn.type = dyn_bend;
-        dyn.start_resno.from_string(resno1<resno2 ? words[1] : words[2]);
-        dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
-        dyn.fulcrum_resno.from_string(words[1]);
-        dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
-        dyn.bias = 30*fiftyseventh;
-        dyn_motions.push_back(dyn);
-    }
+    reconnect_bridges();
 
     if (softdock)
     {
@@ -2033,7 +2016,7 @@ int main(int argc, char** argv)
         char buffer[1024];
         while (!feof(fp))
         {
-            fgets(buffer, 1022, fp);
+            char* fyrw = fgets(buffer, 1022, fp);
             CPartial cp;
             int cno = cp.from_cvty_line(buffer);
             cvtys[cno].add_partial(cp);
@@ -2423,8 +2406,6 @@ _try_again:
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
         // if (frand(0,1) < 0.666) ligand->crumple(frand(0, hexagonal));
-
-        for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 
         int rcn = required_contacts.size();
         if (rcn)
@@ -3019,7 +3000,7 @@ _try_again:
                 #if ! flexion_selection
                 if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
                 #endif
-                if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
+                if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_PINNED;
                 cfmols[i++] = reaches_spheroid[nodeno][j];
                 protein->get_residues_can_clash(reaches_spheroid[nodeno][j]->get_residue_no());
             }
@@ -3087,8 +3068,9 @@ _try_again:
             ligand->movability = MOV_ALL;
             if (!flex) for (j=0; j<sphres; j++)
             {
-                reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
+                if (reaches_spheroid[nodeno][j]->movability != MOV_PINNED) reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
             }
+            freeze_bridged_residues();
             ligand->agroups = global_pairs;
             if (output_each_iter) output_iter(0, cfmols);
             if (pdpst == pst_best_binding) ligand->movability = (MovabilityType)(MOV_CAN_AXIAL | MOV_CAN_RECEN | MOV_CAN_FLEX);
@@ -3212,19 +3194,6 @@ _try_again:
                 std:stringstream stst;
                 stst << cs_bt[cs_idx] << " ~ " << *cs_lag[cs_idx] << endl;
                 dr[drcount][nodeno].miscdata += stst.str();
-            }
-
-            if (dyn_motions.size())
-            {
-                dr[drcount][nodeno].miscdata += (std::string)"Dynamic Motions:\n";
-                for (i=0; i<dyn_motions.size(); i++)
-                {
-                    dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i].name
-                        + (std::string)" "
-                        + std::to_string(dyn_motions[i].get_total_applied())
-                        + (std::string)"\n";
-                }
-                dr[drcount][nodeno].miscdata += (std::string)"\n";
             }
 
             #if _DBG_STEPBYSTEP

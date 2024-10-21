@@ -1081,7 +1081,7 @@ int Molecule::from_pdb(FILE* is, bool het_only)
 
     while (!feof(is))
     {
-        fgets(buffer, 1003, is);
+        char* fyrw = fgets(buffer, 1003, is);
         int charge = 0, offset = (buffer[21] != ' ' && buffer[22] == ' ') ? 1 : 0;
         char** words = chop_spaced_words(buffer);
 
@@ -3449,6 +3449,17 @@ Interaction Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
         }
     }
 
+    #if limit_interactions_by_hydrophilicity
+    else
+    {
+        float apol = fabs(this->hydrophilicity()) + fabs(this->get_charge());
+        float bpol = fabs(om->hydrophilicity()) + fabs(om->get_charge());
+
+        float factor = 1.0 / fmax(1.0, fabs(apol-bpol));
+        lbind.attractive *= factor;
+    }
+    #endif
+
     return lbind;
 }
 
@@ -4199,7 +4210,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
         if (pf)
         {
             char buffer[1024];
-            fgets(buffer, 1022, pf);
+            char* fyrw = fgets(buffer, 1022, pf);
             if (strlen(buffer))			// TODO: Change this to employ a regex.
             {
                 fclose(pf);
@@ -4213,7 +4224,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
                 int lno = 0;
                 while (buffer[0] != '$' && !feof(pf))
                 {
-                    fgets(buffer, 1022, pf);
+                    char* fyrw = fgets(buffer, 1022, pf);
                     lno++;
                     sdfdat += (std::string)buffer;
 

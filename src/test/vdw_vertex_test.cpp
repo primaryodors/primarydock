@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        fread(buffer, 1, 65535, pf);
+        int fyrw = fread(buffer, 1, 65535, pf);
         fclose(pf);
         cout << "Read data.\n";
         nloaded = m.from_sdf(buffer);

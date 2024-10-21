@@ -147,12 +147,19 @@ int main(int argc, char** argv)
     for (l=0; l<ncvtys; l++)
     {
         cvtys[l].prot = protein;
-        float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);
+        /*float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);
         if (!l || ctainmt > bestc)
         {
             bestp.copy_state(ligand);
             bestc = ctainmt;
             bestl = l;
+        }*/
+
+        bool contained = cvtys[l].match_ligand(ligand);
+        if (contained)
+        {
+            bestp.copy_state(ligand);
+            if (frand(0,1) < 0.5) break;
         }
     }
     bestp.restore_state(ligand);

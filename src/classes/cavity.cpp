@@ -562,6 +562,8 @@ float CPartial::atom_match_score(Atom* a)
 
     if (this->pi && a->is_pi()) result += 0.12;
 
+    if (priority) result *= 5;
+
     return result;
 }
 
@@ -583,7 +585,7 @@ bool Cavity::match_ligand(Molecule* ligand)
         Atom* a = ligand->get_atom(i);
         for (j=0; j<pallocd; j++)
         {
-            CPartial* p = partials[j];
+            CPartial* p = &partials[j];
             if (p->s.radius < min_partial_radius) break;
 
             f = p->atom_match_score(a);
@@ -608,15 +610,90 @@ bool Cavity::match_ligand(Molecule* ligand)
         }
     }
 
-    // Each match, try centering the atom inside the partial.
+    Pose bestest(ligand);
+    for (m=0; m<matches; m++)
+    {
+        // Each match, try centering the atom inside the partial.
+        SCoord mov = mpart[m]->s.center.subtract(matom[m]->get_location());
+        ligand->move(mov);
 
-    // Do 3-axis rotations to maximize containment.
+        // Do 3-axis rotations to maximize containment.
+        SCoord axisx = Point(1,0,0);
+        SCoord axisy = Point(0,1,0);
+        SCoord axisz = Point(0,0,1);
+        Pose best(ligand);
+        float bestc = 0;
+        LocatedVector lv;
+        float thx, thy, thz;
 
-    // Do xyz wiggle to improve containment.
+        for (thx=0; thx < M_PI*2; thx += cav_360_step)
+        {
+            for (thy=0; thy < M_PI*2; thy += cav_360_step)
+            {
+                for (thz=0; thz < M_PI*2; thz += cav_360_step)
+                {
+                    f = 0;
+                    for (i=0; i<n; i++)
+                    {
+                        f += sphere_inside_pocket(matom[m]->get_sphere());
+                    }
 
-    // If no satisfactory containment, go on to next match.
+                    if (f > bestc)
+                    {
+                        bestc = f;
+                        best.copy_state(ligand);
+                    }
 
-    // Return true if good match found.
+                    lv = axisz;
+                    lv.origin = matom[m]->get_location();
+                    ligand->rotate(lv, cav_360_step);
+                }   // for thz
+
+                lv = axisy;
+                lv.origin = matom[m]->get_location();
+                ligand->rotate(lv, cav_360_step);
+            }   // for thy
+
+            lv = axisx;
+            lv.origin = matom[m]->get_location();
+            ligand->rotate(lv, cav_360_step);
+        }   // for thx
+        best.restore_state(ligand);
+
+        // Do xyz wiggle to improve containment.
+        for (j=0; j<=26; j++)
+        {
+            Point maybe = ligand->get_barycenter();
+            l=0;
+            _retry__linear_motion:
+            maybe.x += 0.5 * (j%3-1);
+            maybe.y += 0.5 * ((j/3)%3-1);
+            maybe.z += 0.5 * j/9;
+
+            ligand->recenter(maybe);
+            f = 0;
+            for (i=0; i<n; i++)
+            {
+                f += sphere_inside_pocket(matom[m]->get_sphere());
+            }
+            if (f > bestc)
+            {
+                best.copy_state(ligand);
+                bestc = f;
+                l++;
+                if (l < 5) goto _retry__linear_motion;
+            }
+        }
+        best.restore_state(ligand);
+        if (!m) bestest.copy_state(ligand);
+
+        // If no satisfactory containment, go on to next match.
+        // Return true if good match found.
+        if (f >= min_cavmatch_ctainmt) return true;
+    }
+
+    bestest.restore_state(ligand);
+    return false;
 }
 
 std::string Cavity::resnos_as_string(Protein* p)

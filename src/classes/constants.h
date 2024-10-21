@@ -14,6 +14,7 @@
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
 #define default_cavity_stuffing 0.03
+#define min_cavmatch_ctainmt 0.6
 #define _DEFAULT_INTERA_R_CUTOFF 6
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d

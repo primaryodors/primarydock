@@ -372,9 +372,9 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
         residues[i]->save_pdb(os, offset);
         offset += residues[i]->get_atom_count();
     }
-    if (m_mcoords.size())
+    if (nm_mcoords)
     {
-        for (i=0; i<m_mcoords.size(); i++)
+        for (i=0; i<nm_mcoords; i++)
         {
             if (!m_mcoords[i].mtl) continue;
             cout << "Saving " << m_mcoords[i].mtl->name << endl;
@@ -1570,11 +1570,11 @@ void Protein::copy_mcoords(Protein* cf)
 {
     int i, j, n;
 
-    if (n = cf->m_mcoords.size()) for (i=0; i<n; i++)
+    if (n = cf->nm_mcoords) for (i=0; i<n; i++)
     {
         MCoord mc = cf->m_mcoords[i];
         if (mc.mtl) mc.mtl->move(mc.mtl_original_location);
-        this->m_mcoords.push_back(mc);
+        this->m_mcoords[nm_mcoords++] = mc;
     }
 
     for (i=0; i<32; i++) mcoord_resnos[i] = cf->mcoord_resnos[i];
@@ -2419,16 +2419,16 @@ Point Protein::get_region_bounds(int startres, int endres)
     return retval;
 }
 
-std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
+MCoord* Protein::coordinate_metal(MCoord* mtlcoords, int count)
 {
     int i, j, k, l, m, n, q, miter, i2, j1;
 
-    n = mtlcoords.size();
+    n = count;
 
     k=m=0;
     for (i=0; i<n; i++)
     {
-        int ncr = mtlcoords[i].coordres.size();
+        int ncr = mtlcoords[i].ncoordres;
 
         // Obtain the alpha center.
         Point pt4avg[ncr+2];
@@ -2446,7 +2446,7 @@ std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         // Obtain the alpha normal.
         SCoord alpnorm = compute_normal(pt4avg[0], pt4avg[1], pt4avg[2]);
 
-        m_mcoords.push_back(mtlcoords[i]);
+        m_mcoords[nm_mcoords++] = mtlcoords[i];
         Point lpt;
         Molecule** lmc = new Molecule*[ncr+4];
         lmc[0] = new Molecule("lcm");

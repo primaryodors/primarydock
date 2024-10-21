@@ -207,7 +207,8 @@ int main(int argc, char** argv)
             {
                 Point mcen = average_of_points(mcraloc, mcrq);
                 cout << "Performing metal coordination (3 residues)..." << endl << flush;
-                std::vector<MCoord> mtlcoords;
+                MCoord mtlcoords[16];
+                int nmtlcoords = 0;
                 MCoord mc;
                 mc.Z = Atom::Z_from_esym(esym);
                 mc.charge = charge;
@@ -219,15 +220,15 @@ int main(int argc, char** argv)
                 {
                     ResiduePlaceholder rp;
                     rp.resno = mcr[l];
-                    mc.coordres.push_back(rp);
+                    mc.coordres[mc.ncoordres++] = rp;
                     AminoAcid* aa = p.get_residue(rp.resno);
                     Atom* a = aa->get_one_most_bindable(mcoord);
                     aa->conform_atom_to_location(a->name, mcen);
                 }
 
-                mtlcoords.push_back(mc);
+                mtlcoords[nmtlcoords++] = mc;
 
-                p.coordinate_metal(mtlcoords);
+                p.coordinate_metal(mtlcoords, nmtlcoords);
             }
         }
         else if (!strcmp(buffer, "--xmax")) cav_xmax = atof(argv[++i]);

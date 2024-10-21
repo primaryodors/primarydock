@@ -257,12 +257,12 @@ float teleport_water(Molecule* mol)
 MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
 {
     int m, n;
-    if (!(n = mtlcoords.size())) return nullptr;
+    if (!(n = nmtlcoords)) return nullptr;
 
     int i, j;
     for (i=0; i<n; i++)
     {
-        m = mtlcoords[i].coordres.size();
+        m = mtlcoords[i].ncoordres;
         for (j=0; j<m; j++)
         {
             if (mtlcoords[i].coordres[j].resno == aa->is_residue()) return &mtlcoords[i];
@@ -1225,10 +1225,10 @@ int interpret_config_line(char** words)
             if (words[i][0] == '#') break;
             ResiduePlaceholder rp;
             rp.set(words[i]);
-            mcr.coordres.push_back(rp);
+            mcr.coordres[mcr.ncoordres++] = rp;
         }
 
-        mtlcoords.push_back(mcr);
+        mtlcoords[nmtlcoords++] = mcr;
         return i-1;
     }
     else if (!strcmp(words[0], "MOVIE"))
@@ -2057,7 +2057,7 @@ int main(int argc, char** argv)
     Pose tmp_pdb_residue[poses+1][protein->get_end_resno()+1];
     Pose tmp_pdb_waters[poses+1][omaxh2o+1];
     Pose tmp_pdb_ligand[poses+1];
-    Point tmp_pdb_metal_locs[poses+1][mtlcoords.size()+1];
+    Point tmp_pdb_metal_locs[poses+1][nmtlcoords+1];
 
     if (tplset)
     {
@@ -2117,10 +2117,10 @@ int main(int argc, char** argv)
 
     int l, j1, i2, miter;
 
-    if (mtlcoords.size())
+    if (nmtlcoords)
     {
         protein->pocketcen = pocketcen;
-        mtlcoords = protein->coordinate_metal(mtlcoords);
+        protein->coordinate_metal(mtlcoords, nmtlcoords);
         metald_prot = protein;
 
         if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
@@ -2344,17 +2344,17 @@ int main(int argc, char** argv)
     if (pdpst == pst_constrained || pdpst == pst_cavity_fit)
     {
         ligand = &pose_ligands[1];
-        lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+        lagc = AtomGroup::get_potential_ligand_groups(ligand, nmtlcoords > 0);
         agqty = lagc.size();
         if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
         for (i=0; i<agqty; i++)
             agc[i] = lagc.at(i).get();
 
-        if (mtlcoords.size())
+        if (nmtlcoords)
         {
-            for (i=0; i<mtlcoords.size(); i++)
+            for (i=0; i<nmtlcoords; i++)
             {
-                for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                for (j=0; j<mtlcoords[i].ncoordres; j++)
                 {
                     AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
                     if (aa)
@@ -2384,7 +2384,7 @@ _try_again:
         region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
     }
 
-    n = mtlcoords.size();
+    n = nmtlcoords;
     Point metal_initlocs[n+4];
     for (i=0; i<n; i++)
     {
@@ -2434,11 +2434,11 @@ _try_again:
             fclose(pf);
             apply_protein_specific_settings(protein);
 
-            if (mtlcoords.size())
+            if (nmtlcoords)
             {
-                for (i=0; i<mtlcoords.size(); i++)
+                for (i=0; i<nmtlcoords; i++)
                 {
-                    for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                    for (j=0; j<mtlcoords[i].ncoordres; j++)
                     {
                         AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
                         if (aa)
@@ -2457,7 +2457,7 @@ _try_again:
             apply_protein_specific_settings(protein);
         }
 
-        n = mtlcoords.size();
+        n = nmtlcoords;
         for (i=0; i<n; i++)
         {
             mtlcoords[i].mtl->move(metal_initlocs[i]);
@@ -3046,13 +3046,13 @@ _try_again:
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
 
-            n = mtlcoords.size();
+            n = nmtlcoords;
             if (n)
             {
                 int j1;
                 for (j=0; j<n; j++)
                 {
-                    int n1 = mtlcoords[j].coordres.size();
+                    int n1 = mtlcoords[j].ncoordres;
                     for (j1=0; j1<n1; j1++)
                     {
                         AminoAcid* aa = protein->get_residue(mtlcoords[j].coordres[j1].resno);
@@ -3099,7 +3099,7 @@ _try_again:
                         tmp_pdb_waters[pose][j].copy_state(waters[j]);
                     }
                 }
-                n = mtlcoords.size();
+                n = nmtlcoords;
                 for (j=0; j < n; j++)
                 {
                     tmp_pdb_metal_locs[pose][j] = mtlcoords[j].mtl->get_location();
@@ -3436,7 +3436,7 @@ _try_again:
                                 }
                             }
 
-                            n1 = mtlcoords.size();
+                            n1 = nmtlcoords;
                             for (j1=0; j1 < n1; j1++)
                             {
                                 mtlcoords[j1].mtl->move(tmp_pdb_metal_locs[pose][j1]);

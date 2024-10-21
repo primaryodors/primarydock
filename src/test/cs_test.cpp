@@ -122,7 +122,7 @@ int main(int argc, char** argv)
     loneliest = p.find_loneliest_point(pocketcen, size);
     cout << "Loneliest point = " << loneliest << endl;
 
-    std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(&m, mtlcoords.size() > 0);
+    std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(&m, nmtlcoords > 0);
     agqty = lagc.size();
     if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
     for (i=0; i<agqty; i++)

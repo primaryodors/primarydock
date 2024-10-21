@@ -91,7 +91,8 @@ class GroupPair
 std::ostream& operator<<(std::ostream& os, const AtomGroup& ag);
 std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg);
 
-extern std::vector<MCoord> mtlcoords;
+extern MCoord mtlcoords[16];
+extern int nmtlcoords;
 extern std::vector<std::shared_ptr<GroupPair>> global_pairs;
 extern std::vector<Moiety> predef_grp;
 

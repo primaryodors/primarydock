@@ -1,7 +1,8 @@
 
 #include "group.h"
 
-std::vector<MCoord> mtlcoords;
+MCoord mtlcoords[16];
+int nmtlcoords = 0;
 std::vector<std::shared_ptr<GroupPair>> global_pairs;
 std::vector<Moiety> predef_grp;
 std::vector<AminoAcid*> ResidueGroup::disqualified_residues;
@@ -104,7 +105,7 @@ Atom* AtomGroup::get_mcoord_atom()
 float AtomGroup::get_sum()
 {
     float retval = fabs(get_ionic()*60) + get_polarity()*25 + get_pi()*2;
-    if (mtlcoords.size()) retval += get_mcoord()*60 - get_polarity()*40;
+    if (nmtlcoords) retval += get_mcoord()*60 - get_polarity()*40;
     return retval;
 }
 

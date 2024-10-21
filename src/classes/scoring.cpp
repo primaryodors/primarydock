@@ -261,7 +261,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     // cout << btot << endl;
 
     int mcn;
-    if (mcn = mtlcoords.size())         // Assignment, not comparison.
+    if (mcn = nmtlcoords)         // Assignment, not comparison.
     {
         strcpy(metrics[metcount], "Metals");
         float lmb = 0;
@@ -406,9 +406,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
     }
 
-    if (mtlcoords.size())
+    if (nmtlcoords)
     {
-        for (l=0; l<mtlcoords.size(); l++)
+        for (l=0; l<nmtlcoords; l++)
         {
             mtlcoords[l].mtl->stream_pdb_line(
                 lpdbdat,

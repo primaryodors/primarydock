@@ -65,7 +65,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                     Atom* a = can_clash[i]->get_nearest_atom(pt);
                     float r = a->get_location().get_3d_distance(pt);
                     if (r > rmin+1.5 && !can_clash[i]->priority) continue;
-                    if (r > rmin+6) continue;
+                    if (r > rmin+1.5) continue;
 
                     Atom* CB = can_clash[i]->get_atom("CB");
                     if (CB
@@ -610,7 +610,7 @@ float Cavity::match_ligand(Molecule* ligand)
         }
     }
 
-    Pose bestest(ligand);
+    Pose best_of_all(ligand);
     for (m=0; m<matches; m++)
     {
         // Each match, try centering the atom inside the partial.
@@ -685,7 +685,7 @@ float Cavity::match_ligand(Molecule* ligand)
             }
         }
         best.restore_state(ligand);
-        if (!m) bestest.copy_state(ligand);
+        if (!m) best_of_all.copy_state(ligand);
 
         // If no satisfactory containment, go on to next match.
         // Return true if good match found.
@@ -693,7 +693,7 @@ float Cavity::match_ligand(Molecule* ligand)
         if (!m) f0 = f;
     }
 
-    bestest.restore_state(ligand);
+    best_of_all.restore_state(ligand);
     return f0;
 }
 

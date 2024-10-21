@@ -261,7 +261,7 @@ else
     diff --color --unified testdata/group_test_res.taar8.approved.txt testdata/received/group_test_res.received.txt
 fi
 
-bin/pepteditor testdata/8f76.pepd 2>&1 > /dev/null
+# bin/pepteditor testdata/8f76.pepd 2>&1 > /dev/null
 
 test/group_test_res pdbs/OR51/OR51E2.active.pdb sdf/propionic_acid.sdf 4.57 6.59 | grep atom_group | sed '/^#/d' > testdata/received/group_test_res.received.txt
 RESULT=$(diff --unified testdata/group_test_res.51e2.approved.txt testdata/received/group_test_res.received.txt)

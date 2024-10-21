@@ -113,7 +113,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc, Protein
             char buffer[fsz + 4];
             for (i=0; i<(fsz+4); i++) buffer[i] = 0;
 
-            fread(buffer, 1, fsz, pf);
+            int fyrw = fread(buffer, 1, fsz, pf);
             fclose(pf);
 
             from_sdf(buffer);

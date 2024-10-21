@@ -268,6 +268,7 @@
 // with hydrophilicity of the side chains.
 #define hydrophilicity_boost 5
 #define best_binding_stochastic 0.3
+#define limit_interactions_by_hydrophilicity 0
 
 #define default_pre_ligand_multimol_radius 15
 #define default_pre_ligand_flex_radius 10

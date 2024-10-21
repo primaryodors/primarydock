@@ -3448,6 +3448,8 @@ Interaction Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
             }
         }
     }
+
+    #if limit_interactions_by_hydrophilicity
     else
     {
         float apol = fabs(this->hydrophilicity()) + fabs(this->get_charge());
@@ -3456,6 +3458,7 @@ Interaction Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
         float factor = 1.0 / fmax(1.0, fabs(apol-bpol));
         lbind.attractive *= factor;
     }
+    #endif
 
     return lbind;
 }

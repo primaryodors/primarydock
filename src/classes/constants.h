@@ -356,6 +356,7 @@
 #define _dbg_bb_pullaway 0
 #define _dbg_bb_realign 0
 #define _dbg_bb_rots 0
+#define _dbg_bconstr 0
 #define _dbg_bridges 0
 #define _dbg_can_rotate 0
 #define _dbg_cond_basic 0

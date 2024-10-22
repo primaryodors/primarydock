@@ -66,6 +66,7 @@ char* get_file_ext(char* filename)
 
 bool output_each_iter = false;
 bool progressbar = false;
+std::string itersfname;
 int movie_offset = 0;
 char configfname[256];
 char protfname[256];
@@ -496,7 +497,7 @@ void do_pivotal_hbond_rot_and_scoot()
 
 void output_iter(int iter, Molecule** mols)
 {
-    std::string itersfname = (std::string)"tmp/" + (std::string)"_iters.dock";
+    itersfname = (std::string)"tmp/" + (std::string)"_iters.dock";
     int i, liter = iter + movie_offset;
     FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
     if (fp)
@@ -2480,7 +2481,8 @@ _try_again:
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl << endl << flush;
 
-        if (pdpst == pst_tumble_spheres)
+        if (pdpst == pst_constrained) Search::prepare_constrained_search(protein, ligand, pocketcen);
+        else if (pdpst == pst_tumble_spheres)
         {
             Search::do_tumble_spheres(protein, ligand, pocketcen);
             attempt_priority_hbond();
@@ -2911,10 +2913,23 @@ _try_again:
                     best_cslig.restore_state(ligand);
                     cs_idx = ultimate_csidx;
 
-                    #if _dbg_groupsel
+                    Atom* mtl = (cs_bt[cs_idx] == mcoord) ? cs_res[cs_idx]->coordmtl : nullptr;
+                    ligand->find_mutual_max_bind_potential(cs_res[cs_idx]);
+                    if (mtl) ligand->stay_close_other = mtl;
+
+                    ligand->movability = MOV_ALL;
+                    ligand->enforce_stays();
+
+                    #if _dbg_groupsel || _dbg_bconstr
                     cout << "Binding constraint:\n" << cs_res[ultimate_csidx]->get_name()
                         << " ~ " << cs_bt[ultimate_csidx]
-                        << " ~ " << *cs_lag[ultimate_csidx] << endl << endl << flush;
+                        << " ~ " << *cs_lag[ultimate_csidx]
+                        << endl << endl
+                        << "Stay-close atoms:\n"
+                        << ligand->stay_close_mine->name << " ~ "
+                        << ligand->stay_close_other->aaletter << ligand->stay_close_other->residue << ":" << ligand->stay_close_other->name
+                        << " " << ligand->stay_close_limit << "Å"
+                        << endl << endl << flush;
                     #endif
                 }
                 else if (pdpst == pst_cavity_fit)
@@ -3014,7 +3029,7 @@ _try_again:
                 #endif
                 if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_PINNED;
                 cfmols[i++] = reaches_spheroid[nodeno][j];
-                protein->get_residues_can_clash(reaches_spheroid[nodeno][j]->get_residue_no());
+                protein->get_residues_can_clash(reaches_spheroid[nodeno][j]->get_residue_no());      // This sets clashables internally to the protein.
             }
 
             int cfmolqty = i;
@@ -3596,6 +3611,26 @@ _exitposes:
             cout << "PDB appended to output file." << endl;
         }
         else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;
+    }
+    if (output_each_iter)
+    {
+        pf = fopen(temp_pdb_file.length() ? temp_pdb_file.c_str() : protfname, "r");
+        if (!pf)
+        {
+            cout << "Error trying to read " << protfname << endl;
+            return 0xbadf12e;
+        }
+        protein->load_pdb(pf);
+        fclose(pf);
+        apply_protein_specific_settings(protein);
+
+        pf = fopen(itersfname.c_str(), "ab");
+        if (pf)
+        {
+            fprintf(pf, "\nOriginal PDB:\n");
+            protein->save_pdb(pf);
+            fclose(pf);
+        }
     }
 
     if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());

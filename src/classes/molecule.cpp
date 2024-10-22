@@ -2870,11 +2870,13 @@ void Molecule::find_mutual_max_bind_potential(Molecule* other)
     float best_potential = 0;
     for (i=0; i<m; i++)
     {
+        if (atoms[i]->is_backbone) continue;
         for (j=0; j<n; j++)
         {
+            if (other->atoms[j]->is_backbone) continue;
             float b = InteratomicForce::potential_binding(atoms[i], other->atoms[j]);
             float r = atoms[i]->distance_to(other->atoms[j]);
-            b += 2.0/r;
+            b /= sqrt(r);
             if (b > best_potential)
             {
                 best_potential = b;

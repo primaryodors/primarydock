@@ -173,6 +173,7 @@ std::vector<AcvBndRot> active_bond_rots;
 std::vector<ResiduePlaceholder> required_contacts;
 std::vector<std::string> bridges;
 std::vector<std::string> atomto;
+std::string nfwarned = "";
 std::string outpdb;
 int outpdb_poses = 0;
 
@@ -1743,15 +1744,21 @@ void apply_protein_specific_settings(Protein* p)
 
         if (!aa)
         {
-            if (progressbar) erase_progressbar();
-            cout << "Warning: residue " << words[1] << " not found." << endl;
+            if (!strstr(nfwarned.c_str(), words[1]))
+            {
+                cout << "Warning: residue " << words[1] << " not found." << endl;
+                nfwarned += (std::string)" " + (std::string)words[1];
+            }
             continue;
         }
 
         if (!target)
         {
-            if (progressbar) erase_progressbar();
-            cout << "Warning: residue " << words[3] << " not found." << endl;
+            if (!strstr(nfwarned.c_str(), words[3]))
+            {
+                cout << "Warning: residue " << words[3] << " not found." << endl;
+                nfwarned += (std::string)" " + (std::string)words[3];
+            }
             continue;
         }
 
@@ -1759,8 +1766,13 @@ void apply_protein_specific_settings(Protein* p)
         if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
         if (!a)
         {
+            if (!strstr(nfwarned.c_str(), aname))
+            {
+                cout << "Warning: atom not found " << *aa << ":" << aname << endl;
+                nfwarned += (std::string)" " + (std::string)aname;
+            }
             if (progressbar) erase_progressbar();
-            cout << "Warning: atom not found " << *aa << ":" << aname << endl;
+            
             continue;
         }
 

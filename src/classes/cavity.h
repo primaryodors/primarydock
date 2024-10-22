@@ -41,7 +41,7 @@ class Cavity
     float sphere_inside_pocket(Sphere s, CPartial** partial = nullptr);
     float containment_violations(Molecule* m, float stop_if_more_than = -1);
     float find_best_containment(Molecule* m, bool match_binding_types = false);
-    float match_ligand(Molecule* ligand);
+    float match_ligand(Molecule* ligand, Atom** match_atom = nullptr, CPartial** match_partial = nullptr);
     std::string resnos_as_string(Protein* p);
     Protein* prot = nullptr;
 

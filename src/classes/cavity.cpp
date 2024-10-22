@@ -581,7 +581,7 @@ float CPartial::atom_match_score(Atom* a)
     return result;
 }
 
-float Cavity::match_ligand(Molecule* ligand)
+float Cavity::match_ligand(Molecule* ligand, Atom** match_atom, CPartial** match_partial)
 {
     CPartial* mpart[10];
     Atom*     matom[10];
@@ -622,6 +622,13 @@ float Cavity::match_ligand(Molecule* ligand)
                 }
             }
         }
+    }
+
+    if (!matches)
+    {
+        if (match_atom) *match_atom = nullptr;
+        if (match_partial) *match_partial = nullptr;
+        return -Avogadro;
     }
 
     Pose best_of_all(ligand);
@@ -690,6 +697,7 @@ float Cavity::match_ligand(Molecule* ligand)
             {
                 f += sphere_inside_pocket(ligand->get_atom(i)->get_sphere());
             }
+
             if (f > bestc)
             {
                 best.copy_state(ligand);
@@ -703,10 +711,17 @@ float Cavity::match_ligand(Molecule* ligand)
 
         // If no satisfactory containment, go on to next match.
         // Return true if good match found.
-        if (f >= min_cavmatch_ctainmt) return f;
-        if (!m) f0 = f;
+        if (bestc >= min_cavmatch_ctainmt)
+        {
+            if (match_atom) *match_atom = matom[m];
+            if (match_partial) *match_partial = mpart[m];
+            return bestc;
+        }
+        if (!m) f0 = bestc;
     }
 
+    if (match_atom) *match_atom = matom[0];
+    if (match_partial) *match_partial = mpart[0];
     best_of_all.restore_state(ligand);
     return f0;
 }

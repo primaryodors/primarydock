@@ -150,7 +150,13 @@ int main(int argc, char** argv)
         cvtys[l].prot = protein;
         /*float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);*/
 
-        float ctainmt = cvtys[l].match_ligand(ligand);
+        Atom* ma = nullptr;
+        CPartial* mcp = nullptr;
+        float ctainmt = cvtys[l].match_ligand(ligand, &ma, &mcp);
+        if (!ma) continue;
+        cout << "Cavity " << l << " best containment " << ctainmt
+            << " " << (ma ? ma->name : "") << " " << (mcp ? mcp->s.center : Point())
+            << endl << flush;
         if (!l || ctainmt > bestc)
         {
             bestp.copy_state(ligand);

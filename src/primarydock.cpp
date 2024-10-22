@@ -607,12 +607,6 @@ void iteration_callback(int iter, Molecule** mols)
 
     freeze_bridged_residues();
 
-    if (f > iter_best_bind)
-    {
-        for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
-        iter_best_bind = f;
-    }
-
     // Attempt to connect hydrogen bonds to ligand.
     if (flex)
     {
@@ -678,7 +672,13 @@ void iteration_callback(int iter, Molecule** mols)
         }
     }
 
-    #if use_best_binding_iteration
+    if (f > iter_best_bind)
+    {
+        for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
+        iter_best_bind = f;
+    }
+
+    #if use_best_energy_iteration
     if (iter == iters && iter_best_bind > 0)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);

@@ -32,7 +32,7 @@ if ($result) die("Build fail.\n".print_r($output, true));
 // Configurable variables
 $elim = 0;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
-$extcavfit = false;
+$extcavfit = true;
 $metrics_to_process =
 [
   "BENERG" => "BindingEnergy",

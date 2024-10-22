@@ -154,8 +154,14 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
             CPartial* part = tmpcav[i].get_nearest_partial(a->get_location());
             if (!part) continue;
             r = part->s.center.get_3d_distance(a->get_location());
-            if (r > _INTERA_R_CUTOFF+part->s.radius+a->get_vdW_radius()) continue;
+            // if (r > _INTERA_R_CUTOFF+part->s.radius+a->get_vdW_radius()) continue;
             tmpcav[i].priority = part->priority = true;
+            if (aa->coordmtl) part->metallic = true;
+            if (aa->get_charge() < -hydrophilicity_cutoff) part->chargedn = true;
+            if (aa->get_charge() >  hydrophilicity_cutoff) part->chargedp = true;
+            if (aa->pi_stackability() >= 0.2) part->pi = true;
+            if (fabs(aa->hydrophilicity()) > hydrophilicity_cutoff) part->polar = true;
+            if (aa->count_atoms_by_element("S")) part->thio = true;
             break;
         }
 

@@ -156,12 +156,19 @@ void Pose::copy_state(Molecule* m)
 
         saved_atom_locs = new Point[sz+4];
         saved_atom_Z = new int[sz+4];
+        saved_atom_name = new char*[sz+4];
+        for (i=0; i<sz; i++)
+        {
+            saved_atom_name[i] = new char[16];
+            saved_atom_name[i][0] = 0;
+        }
     }
 
     for (i=0; m->atoms[i] && i<sz; i++)
     {
         saved_atom_locs[i] = m->atoms[i]->get_location();
         saved_atom_Z[i] = m->atoms[i]->get_Z();
+        strcpy(saved_atom_name[i], m->atoms[i]->name);
     }
     sz = i;
 }
@@ -177,7 +184,7 @@ void Pose::restore_state(Molecule* m)
         {
             if (i == n-1 && !m->atoms[i] && (saved_atom_Z[i] == 1)) break;
             if (!m->atoms[i] && !saved_atom_Z[i]) break;
-            if (/*n != sz ||*/ !m->atoms[i] || (saved_atom_Z[i] != m->atoms[i]->get_Z()))
+            if (/*n != sz ||*/ !m->atoms[i] || (saved_atom_Z[i] != m->atoms[i]->get_Z()) || strcmp(saved_atom_name[i], m->atoms[i]->name) )
             {
                 cout << "Attempt to restore pose to incompatible molecule (from " << saved_from->name << " to " << m->name << ")." << endl;
                 if (m->is_residue())
@@ -2882,21 +2889,17 @@ void Molecule::find_mutual_max_bind_potential(Molecule* other)
                 best_potential = b;
                 stay_close_mine = atoms[i];
                 stay_close_other = other->atoms[j];
-                stay_close_limit  = InteratomicForce::optimal_distance(atoms[i], other->atoms[j])*1.5;
             }
         }
     }
-
-    /*if (stay_close_mine && stay_close_other)
-        cout << name << ":" << stay_close_mine->name << " and " << other->name << ":" << stay_close_other->name
-            << " must remain within " << stay_close_limit << "A." << endl << endl;*/
 }
 
 bool Molecule::check_stays()
 {
     if (!stay_close_mine || !stay_close_other) return true;
     float r = stay_close_other->distance_to(stay_close_mine);
-    return (r <= stay_close_limit);
+    float optimal = InteratomicForce::optimal_distance(stay_close_mine, stay_close_other);
+    return (r <= optimal+stay_close_tolerance);
 }
 
 void Molecule::enforce_stays(float amt)
@@ -2912,7 +2915,8 @@ void Molecule::enforce_stays(float amt)
     // cout << stay_close_mine->name << " - " << stay_close_other->residue << ":" << stay_close_other->name << " = " << movamt << endl;
     float optimal = InteratomicForce::optimal_distance(stay_close_mine, stay_close_other);
     // cout << "Should be " << optimal << endl;
-    movamt.r -= optimal;
+    movamt.r -= (optimal+stay_close_tolerance);
+    if (movamt.r < 0) return;
     movamt.r *= amt;
     // cout << movamt << endl;
     MovabilityType wasmov = movability;

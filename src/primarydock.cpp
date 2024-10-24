@@ -2916,6 +2916,7 @@ _try_again:
                     Atom* mtl = (cs_bt[cs_idx] == mcoord) ? cs_res[cs_idx]->coordmtl : nullptr;
                     ligand->find_mutual_max_bind_potential(cs_res[cs_idx]);
                     if (mtl) ligand->stay_close_other = mtl;
+                    else if (waters && waters[0]) ligand->stay_close_tolerance += 5;
 
                     ligand->movability = MOV_ALL;
                     ligand->enforce_stays();
@@ -2928,7 +2929,6 @@ _try_again:
                         << "Stay-close atoms:\n"
                         << ligand->stay_close_mine->name << " ~ "
                         << ligand->stay_close_other->aaletter << ligand->stay_close_other->residue << ":" << ligand->stay_close_other->name
-                        << " " << ligand->stay_close_limit << "Å"
                         << endl << endl << flush;
                     #endif
                 }
@@ -2956,6 +2956,7 @@ _try_again:
                     Atom* mtl = (cs_bt[csidx] == mcoord) ? cs_res[csidx]->coordmtl : nullptr;
                     ligand->find_mutual_max_bind_potential(cs_res[csidx]);
                     if (mtl) ligand->stay_close_other = mtl;
+                    else if (waters && waters[0]) ligand->stay_close_tolerance += 5;
 
                     ligand->movability = MOV_ALL;
                     ligand->enforce_stays();

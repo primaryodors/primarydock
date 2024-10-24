@@ -973,7 +973,7 @@ $vcvty
 
 $cenres
 SIZE $size
-# H2O 5
+H2O 1
 $mcoord
 $atomto
 $stcr

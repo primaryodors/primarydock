@@ -68,6 +68,7 @@ protected:
     int sz = 0;
     Point* saved_atom_locs = nullptr;
     int* saved_atom_Z = nullptr;
+    char** saved_atom_name = nullptr;
     int nsaved_atom = 0;
     Molecule* saved_from = nullptr;
 };
@@ -271,7 +272,7 @@ public:
     Molecule* best_interactor = nullptr;
     int eclipse_hash = 0;
     Atom *stay_close_mine = nullptr, *stay_close_other = nullptr;
-    float stay_close_limit = Avogadro;
+    float stay_close_tolerance = 0;
 
 protected:
 

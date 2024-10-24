@@ -66,6 +66,7 @@ char* get_file_ext(char* filename)
 
 bool output_each_iter = false;
 bool progressbar = false;
+std::string itersfname;
 int movie_offset = 0;
 char configfname[256];
 char protfname[256];
@@ -173,6 +174,7 @@ std::vector<AcvBndRot> active_bond_rots;
 std::vector<ResiduePlaceholder> required_contacts;
 std::vector<std::string> bridges;
 std::vector<std::string> atomto;
+std::string nfwarned = "";
 std::string outpdb;
 int outpdb_poses = 0;
 
@@ -257,12 +259,12 @@ float teleport_water(Molecule* mol)
 MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
 {
     int m, n;
-    if (!(n = mtlcoords.size())) return nullptr;
+    if (!(n = nmtlcoords)) return nullptr;
 
     int i, j;
     for (i=0; i<n; i++)
     {
-        m = mtlcoords[i].coordres.size();
+        m = mtlcoords[i].ncoordres;
         for (j=0; j<m; j++)
         {
             if (mtlcoords[i].coordres[j].resno == aa->is_residue()) return &mtlcoords[i];
@@ -495,7 +497,7 @@ void do_pivotal_hbond_rot_and_scoot()
 
 void output_iter(int iter, Molecule** mols)
 {
-    std::string itersfname = (std::string)"tmp/" + (std::string)"_iters.dock";
+    itersfname = (std::string)"tmp/" + (std::string)"_iters.dock";
     int i, liter = iter + movie_offset;
     FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
     if (fp)
@@ -605,12 +607,6 @@ void iteration_callback(int iter, Molecule** mols)
 
     freeze_bridged_residues();
 
-    if (f > iter_best_bind)
-    {
-        for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
-        iter_best_bind = f;
-    }
-
     // Attempt to connect hydrogen bonds to ligand.
     if (flex)
     {
@@ -676,7 +672,13 @@ void iteration_callback(int iter, Molecule** mols)
         }
     }
 
-    #if use_best_binding_iteration
+    if (f > iter_best_bind)
+    {
+        for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
+        iter_best_bind = f;
+    }
+
+    #if use_best_energy_iteration
     if (iter == iters && iter_best_bind > 0)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
@@ -1225,10 +1227,10 @@ int interpret_config_line(char** words)
             if (words[i][0] == '#') break;
             ResiduePlaceholder rp;
             rp.set(words[i]);
-            mcr.coordres.push_back(rp);
+            mcr.coordres[mcr.ncoordres++] = rp;
         }
 
-        mtlcoords.push_back(mcr);
+        mtlcoords[nmtlcoords++] = mcr;
         return i-1;
     }
     else if (!strcmp(words[0], "MOVIE"))
@@ -1743,15 +1745,21 @@ void apply_protein_specific_settings(Protein* p)
 
         if (!aa)
         {
-            if (progressbar) erase_progressbar();
-            cout << "Warning: residue " << words[1] << " not found." << endl;
+            if (!strstr(nfwarned.c_str(), words[1]))
+            {
+                cout << "Warning: residue " << words[1] << " not found." << endl;
+                nfwarned += (std::string)" " + (std::string)words[1];
+            }
             continue;
         }
 
         if (!target)
         {
-            if (progressbar) erase_progressbar();
-            cout << "Warning: residue " << words[3] << " not found." << endl;
+            if (!strstr(nfwarned.c_str(), words[3]))
+            {
+                cout << "Warning: residue " << words[3] << " not found." << endl;
+                nfwarned += (std::string)" " + (std::string)words[3];
+            }
             continue;
         }
 
@@ -1759,8 +1767,13 @@ void apply_protein_specific_settings(Protein* p)
         if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
         if (!a)
         {
+            if (!strstr(nfwarned.c_str(), aname))
+            {
+                cout << "Warning: atom not found " << *aa << ":" << aname << endl;
+                nfwarned += (std::string)" " + (std::string)aname;
+            }
             if (progressbar) erase_progressbar();
-            cout << "Warning: atom not found " << *aa << ":" << aname << endl;
+            
             continue;
         }
 
@@ -2057,7 +2070,7 @@ int main(int argc, char** argv)
     Pose tmp_pdb_residue[poses+1][protein->get_end_resno()+1];
     Pose tmp_pdb_waters[poses+1][omaxh2o+1];
     Pose tmp_pdb_ligand[poses+1];
-    Point tmp_pdb_metal_locs[poses+1][mtlcoords.size()+1];
+    Point tmp_pdb_metal_locs[poses+1][nmtlcoords+1];
 
     if (tplset)
     {
@@ -2117,10 +2130,10 @@ int main(int argc, char** argv)
 
     int l, j1, i2, miter;
 
-    if (mtlcoords.size())
+    if (nmtlcoords)
     {
         protein->pocketcen = pocketcen;
-        mtlcoords = protein->coordinate_metal(mtlcoords);
+        protein->coordinate_metal(mtlcoords, nmtlcoords);
         metald_prot = protein;
 
         if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
@@ -2344,17 +2357,17 @@ int main(int argc, char** argv)
     if (pdpst == pst_constrained || pdpst == pst_cavity_fit)
     {
         ligand = &pose_ligands[1];
-        lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+        lagc = AtomGroup::get_potential_ligand_groups(ligand, nmtlcoords > 0);
         agqty = lagc.size();
         if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
         for (i=0; i<agqty; i++)
             agc[i] = lagc.at(i).get();
 
-        if (mtlcoords.size())
+        if (nmtlcoords)
         {
-            for (i=0; i<mtlcoords.size(); i++)
+            for (i=0; i<nmtlcoords; i++)
             {
-                for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                for (j=0; j<mtlcoords[i].ncoordres; j++)
                 {
                     AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
                     if (aa)
@@ -2384,7 +2397,7 @@ _try_again:
         region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
     }
 
-    n = mtlcoords.size();
+    n = nmtlcoords;
     Point metal_initlocs[n+4];
     for (i=0; i<n; i++)
     {
@@ -2434,11 +2447,11 @@ _try_again:
             fclose(pf);
             apply_protein_specific_settings(protein);
 
-            if (mtlcoords.size())
+            if (nmtlcoords)
             {
-                for (i=0; i<mtlcoords.size(); i++)
+                for (i=0; i<nmtlcoords; i++)
                 {
-                    for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                    for (j=0; j<mtlcoords[i].ncoordres; j++)
                     {
                         AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
                         if (aa)
@@ -2457,7 +2470,7 @@ _try_again:
             apply_protein_specific_settings(protein);
         }
 
-        n = mtlcoords.size();
+        n = nmtlcoords;
         for (i=0; i<n; i++)
         {
             mtlcoords[i].mtl->move(metal_initlocs[i]);
@@ -2468,7 +2481,8 @@ _try_again:
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl << endl << flush;
 
-        if (pdpst == pst_tumble_spheres)
+        if (pdpst == pst_constrained) Search::prepare_constrained_search(protein, ligand, pocketcen);
+        else if (pdpst == pst_tumble_spheres)
         {
             Search::do_tumble_spheres(protein, ligand, pocketcen);
             attempt_priority_hbond();
@@ -2899,10 +2913,23 @@ _try_again:
                     best_cslig.restore_state(ligand);
                     cs_idx = ultimate_csidx;
 
-                    #if _dbg_groupsel
+                    Atom* mtl = (cs_bt[cs_idx] == mcoord) ? cs_res[cs_idx]->coordmtl : nullptr;
+                    ligand->find_mutual_max_bind_potential(cs_res[cs_idx]);
+                    if (mtl) ligand->stay_close_other = mtl;
+                    else if (waters && waters[0]) ligand->stay_close_tolerance += 5;
+
+                    ligand->movability = MOV_ALL;
+                    ligand->enforce_stays();
+
+                    #if _dbg_groupsel || _dbg_bconstr
                     cout << "Binding constraint:\n" << cs_res[ultimate_csidx]->get_name()
                         << " ~ " << cs_bt[ultimate_csidx]
-                        << " ~ " << *cs_lag[ultimate_csidx] << endl << endl << flush;
+                        << " ~ " << *cs_lag[ultimate_csidx]
+                        << endl << endl
+                        << "Stay-close atoms:\n"
+                        << ligand->stay_close_mine->name << " ~ "
+                        << ligand->stay_close_other->aaletter << ligand->stay_close_other->residue << ":" << ligand->stay_close_other->name
+                        << endl << endl << flush;
                     #endif
                 }
                 else if (pdpst == pst_cavity_fit)
@@ -2913,7 +2940,7 @@ _try_again:
                     bestp.copy_state(ligand);
                     for (l=0; l<ncvtys; l++)
                     {
-                        float ctainmt = cvtys[l].find_best_containment(ligand, true); // * frand(0.5, 1);
+                        float ctainmt = cvtys[l].match_ligand(ligand);
                         if (!l || ctainmt > bestc)
                         {
                             bestp.copy_state(ligand);
@@ -2929,6 +2956,7 @@ _try_again:
                     Atom* mtl = (cs_bt[csidx] == mcoord) ? cs_res[csidx]->coordmtl : nullptr;
                     ligand->find_mutual_max_bind_potential(cs_res[csidx]);
                     if (mtl) ligand->stay_close_other = mtl;
+                    else if (waters && waters[0]) ligand->stay_close_tolerance += 5;
 
                     ligand->movability = MOV_ALL;
                     ligand->enforce_stays();
@@ -3002,7 +3030,7 @@ _try_again:
                 #endif
                 if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_PINNED;
                 cfmols[i++] = reaches_spheroid[nodeno][j];
-                protein->get_residues_can_clash(reaches_spheroid[nodeno][j]->get_residue_no());
+                protein->get_residues_can_clash(reaches_spheroid[nodeno][j]->get_residue_no());      // This sets clashables internally to the protein.
             }
 
             int cfmolqty = i;
@@ -3046,13 +3074,13 @@ _try_again:
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
 
-            n = mtlcoords.size();
+            n = nmtlcoords;
             if (n)
             {
                 int j1;
                 for (j=0; j<n; j++)
                 {
-                    int n1 = mtlcoords[j].coordres.size();
+                    int n1 = mtlcoords[j].ncoordres;
                     for (j1=0; j1<n1; j1++)
                     {
                         AminoAcid* aa = protein->get_residue(mtlcoords[j].coordres[j1].resno);
@@ -3099,7 +3127,7 @@ _try_again:
                         tmp_pdb_waters[pose][j].copy_state(waters[j]);
                     }
                 }
-                n = mtlcoords.size();
+                n = nmtlcoords;
                 for (j=0; j < n; j++)
                 {
                     tmp_pdb_metal_locs[pose][j] = mtlcoords[j].mtl->get_location();
@@ -3436,7 +3464,7 @@ _try_again:
                                 }
                             }
 
-                            n1 = mtlcoords.size();
+                            n1 = nmtlcoords;
                             for (j1=0; j1 < n1; j1++)
                             {
                                 mtlcoords[j1].mtl->move(tmp_pdb_metal_locs[pose][j1]);
@@ -3584,6 +3612,26 @@ _exitposes:
             cout << "PDB appended to output file." << endl;
         }
         else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;
+    }
+    if (output_each_iter)
+    {
+        pf = fopen(temp_pdb_file.length() ? temp_pdb_file.c_str() : protfname, "r");
+        if (!pf)
+        {
+            cout << "Error trying to read " << protfname << endl;
+            return 0xbadf12e;
+        }
+        protein->load_pdb(pf);
+        fclose(pf);
+        apply_protein_specific_settings(protein);
+
+        pf = fopen(itersfname.c_str(), "ab");
+        if (pf)
+        {
+            fprintf(pf, "\nOriginal PDB:\n");
+            protein->save_pdb(pf);
+            fclose(pf);
+        }
     }
 
     if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());

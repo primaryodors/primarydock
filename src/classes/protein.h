@@ -50,7 +50,8 @@ struct MCoord
     int charge = 2;
     Atom* mtl = nullptr;
     Point mtl_original_location;
-    std::vector<ResiduePlaceholder> coordres;
+    ResiduePlaceholder coordres[16];
+    int ncoordres = 0;
 };
 
 struct AARenumber
@@ -77,7 +78,7 @@ public:
     void delete_sidechain(int resno);
     void delete_residues(int startres, int endres);
     void delete_sidechains(int startres, int endres);
-    std::vector<MCoord> coordinate_metal(std::vector<MCoord> mtlcoords);
+    MCoord* coordinate_metal(MCoord* mtlcoords, int count);
     void set_region(std::string name, int start, int end);
     void set_bw50(int helixno, int resno);
     void renumber_residues(int startres, int endres, int new_startres);
@@ -224,7 +225,8 @@ protected:
     region_source regions_from = rgn_none;
     char** remarks = nullptr;
     int remarksz = 0;
-    std::vector<MCoord> m_mcoords;
+    MCoord m_mcoords[16];
+    int nm_mcoords = 0;
     int Ballesteros_Weinstein[79];
     std::vector<AABridge> aabridges;
     std::vector<Bond*> connections;

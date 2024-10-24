@@ -2653,7 +2653,8 @@ int main(int argc, char** argv)
                 if (ncr < 2) raise_error("MCOORD requires at least 2 coordinating atoms.");
                 if (uses_fancy_options) raise_error("MCOORD no longer supports YO, YAr, Th8, or per-atom coordinations.");
 
-                std::vector<MCoord> mtlcoords;
+                MCoord mtlcoords[16];
+                int nmtlcoords = 0;
                 MCoord mc;
                 mc.Z = ma->get_Z();
                 mc.charge = elem_charge;
@@ -2663,12 +2664,12 @@ int main(int argc, char** argv)
                 {
                     ResiduePlaceholder rp;
                     rp.resno = resnos[l];
-                    mc.coordres.push_back(rp);
+                    mc.coordres[mc.ncoordres++] = rp;
                 }
 
-                mtlcoords.push_back(mc);
+                mtlcoords[nmtlcoords++] = mc;
 
-                working->coordinate_metal(mtlcoords);
+                working->coordinate_metal(mtlcoords, nmtlcoords);
                 
             } // MCOORD
 

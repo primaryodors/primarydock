@@ -14,6 +14,7 @@
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
 #define default_cavity_stuffing 0.03
+#define min_cavmatch_ctainmt 0.6
 #define _DEFAULT_INTERA_R_CUTOFF 6
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -180,7 +181,7 @@
 #define no_zero_flexions 1
 #define flexion_probability_multiplier 1.0
 #define ignore_invalid_partial 1
-#define use_best_binding_iteration 0
+#define use_best_energy_iteration 1
 #define compute_missed_connections 1
 
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
@@ -355,6 +356,7 @@
 #define _dbg_bb_pullaway 0
 #define _dbg_bb_realign 0
 #define _dbg_bb_rots 0
+#define _dbg_bconstr 0
 #define _dbg_bridges 0
 #define _dbg_can_rotate 0
 #define _dbg_cond_basic 0

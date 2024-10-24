@@ -35,6 +35,7 @@ int main(int argc, char** argv)
             }
             p.load_pdb(fp);
             fclose(fp);
+            cout << "Loaded " << argv[i] << endl;
         }
         else if (dot && !strcasecmp(dot, ".sdf"))
         {
@@ -115,17 +116,17 @@ int main(int argc, char** argv)
 
 
     std::vector<std::shared_ptr<AtomGroup>> lagc;
-    lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+    lagc = AtomGroup::get_potential_ligand_groups(ligand, nmtlcoords > 0);
     agqty = lagc.size();
     if (agqty > MAX_CS_RES-2) agqty = MAX_CS_RES-2;
     for (i=0; i<agqty; i++)
         agc[i] = lagc.at(i).get();
 
-    if (mtlcoords.size())
+    if (nmtlcoords)
     {
-        for (i=0; i<mtlcoords.size(); i++)
+        for (i=0; i<nmtlcoords; i++)
         {
-            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            for (j=0; j<mtlcoords[i].ncoordres; j++)
             {
                 AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
                 if (aa)
@@ -147,7 +148,15 @@ int main(int argc, char** argv)
     for (l=0; l<ncvtys; l++)
     {
         cvtys[l].prot = protein;
-        float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);
+        /*float ctainmt = cvtys[l].find_best_containment(ligand, true) * frand(0.5, 1);*/
+
+        Atom* ma = nullptr;
+        CPartial* mcp = nullptr;
+        float ctainmt = cvtys[l].match_ligand(ligand, &ma, &mcp);
+        if (!ma) continue;
+        cout << "Cavity " << l << " best containment " << ctainmt
+            << " " << (ma ? ma->name : "") << " " << (mcp ? mcp->s.center : Point())
+            << endl << flush;
         if (!l || ctainmt > bestc)
         {
             bestp.copy_state(ligand);

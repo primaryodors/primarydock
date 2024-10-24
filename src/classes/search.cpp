@@ -340,7 +340,7 @@ void Search::do_tumble_spheres(Protein* protein, Molecule* ligand, Point l_pocke
 
 void Search::do_best_binding(Protein* protein, Molecule* ligand, Point l_pocket_cen, AminoAcid** reaches_spheroid)
 {
-    std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
+    std::vector<std::shared_ptr<AtomGroup>> lagc = AtomGroup::get_potential_ligand_groups(ligand, nmtlcoords > 0);
     std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid, l_pocket_cen);
     global_pairs = GroupPair::pair_groups(lagc, scg, l_pocket_cen);
 

@@ -63,9 +63,8 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                 for (i=0; i<sphres; i++)
                 {
                     Atom* a = can_clash[i]->get_nearest_atom(pt);
-                    float r = a->get_location().get_3d_distance(pt);
-                    if (r > rmin+1.5 && !can_clash[i]->priority) continue;
-                    if (r > rmin+6) continue;
+                    float r = a->get_location().get_3d_distance(pt)-a->get_vdW_radius();
+                    if (r > rmin /* && !can_clash[i]->priority */) continue;
 
                     Atom* CB = can_clash[i]->get_atom("CB");
                     if (CB
@@ -76,7 +75,7 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
                         if (can_clash[i]->priority)
                         {
                             // cout << pt << can_clash[i]->get_name() << " distance " << r << " has priority." << endl;
-                            any_priority = working.priority = true;
+                            any_priority = /*working.priority =*/ true;
                         }
                         if (can_clash[i]->coordmtl) working.metallic = true;
                         if (can_clash[i]->get_charge() < -hydrophilicity_cutoff) working.chargedn = true;
@@ -144,6 +143,27 @@ int Cavity::scan_in_protein(Protein* p, Cavity* cavs, int cmax)
         if (r > cav_xzrlim) continue;
         r = sqrt(pow(cen.y - pcen.y, 2) + pow(cen.z - pcen.z, 2));
         if (r > cav_yzrlim) continue;
+
+        int x;
+        for (x=0; x<pqty; x++)
+        {
+            AminoAcid* aa = p->get_residue(priorities[x]);
+            if (!aa) continue;
+            Atom* a = aa->get_nearest_atom(tmpcav[i].get_center());
+            if (!a) continue;
+            CPartial* part = tmpcav[i].get_nearest_partial(a->get_location());
+            if (!part) continue;
+            r = part->s.center.get_3d_distance(a->get_location());
+            // if (r > _INTERA_R_CUTOFF+part->s.radius+a->get_vdW_radius()) continue;
+            tmpcav[i].priority = part->priority = true;
+            if (aa->coordmtl) part->metallic = true;
+            if (aa->get_charge() < -hydrophilicity_cutoff) part->chargedn = true;
+            if (aa->get_charge() >  hydrophilicity_cutoff) part->chargedp = true;
+            if (aa->pi_stackability() >= 0.2) part->pi = true;
+            if (fabs(aa->hydrophilicity()) > hydrophilicity_cutoff) part->polar = true;
+            if (aa->count_atoms_by_element("S")) part->thio = true;
+            break;
+        }
 
         if (tmpcav[i].count_partials() >= cav_min_partials
             && (!any_priority || tmpcav[i].priority)
@@ -526,6 +546,190 @@ float Cavity::find_best_containment(Molecule* m, bool mbt)
     best.restore_state(m);
 
     return bestviol;
+}
+
+float CPartial::atom_match_score(Atom* a)
+{
+    float result = 0;
+    if (!a) return result;
+    if (chargedp || chargedn)
+    {
+        float achg = a->get_charge();
+        if (achg > 0 && chargedn) result += 0.3;
+        else if (achg < 0 && chargedp) result += 0.3;
+    }
+
+    if (metallic)
+    {
+        int fam = a->get_family();
+        int Z = a->get_Z();
+
+        if (fam == PNICTOGEN) result += 1.5 / sqrt(Z/8);
+        else if (fam == CHALCOGEN)
+        {
+            if (Z < 10) result += 0.5;
+            else result += 2.5 / sqrt(Z/16);
+        }
+    }
+
+    if (polar)
+    {
+        float apol = a->is_polar();
+        if (fabs(apol) >= hydrophilicity_cutoff) result += 0.2 * fabs(apol);
+    }
+
+    if (thio && a->is_thio()) result += 0.05;
+
+    if (this->pi && a->is_pi()) result += 0.12;
+
+    if (priority) result *= 5;
+
+    return result;
+}
+
+float Cavity::match_ligand(Molecule* ligand, Atom** match_atom, CPartial** match_partial)
+{
+    CPartial* mpart[10];
+    Atom*     matom[10];
+    float     score[10];
+    int matches = 0;
+
+    int i, j, l, m, n;
+    float f, f0;
+
+    for (i=0; i<10; i++) score[i] = 0;
+
+    n = ligand->get_atom_count();
+    for (i=0; i<n; i++)
+    {
+        Atom* a = ligand->get_atom(i);
+        for (j=0; j<pallocd; j++)
+        {
+            CPartial* p = &partials[j];
+            if (p->s.radius < min_partial_radius) break;
+
+            f = p->atom_match_score(a);
+
+            for (l=0; l<10 && l<=matches; l++)
+            {
+                if (f > score[l])
+                {
+                    for (m=9; m>l; m--)
+                    {
+                        mpart[m] = mpart[m-1];
+                        matom[m] = matom[m-1];
+                        score[m] = score[m-1];
+                    }
+                    mpart[l] = p;
+                    matom[l] = a;
+                    score[l] = f;
+                    matches = max(matches, l+1);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!matches)
+    {
+        if (match_atom) *match_atom = nullptr;
+        if (match_partial) *match_partial = nullptr;
+        return -Avogadro;
+    }
+
+    Pose best_of_all(ligand);
+    for (m=0; m<matches; m++)
+    {
+        // Each match, try centering the atom inside the partial.
+        SCoord mov = mpart[m]->s.center.subtract(matom[m]->get_location());
+        ligand->move(mov);
+
+        // Do 3-axis rotations to maximize containment.
+        SCoord axisx = Point(1,0,0);
+        SCoord axisy = Point(0,1,0);
+        SCoord axisz = Point(0,0,1);
+        Pose best(ligand);
+        float bestc = 0;
+        LocatedVector lv;
+        float thx, thy, thz;
+
+        for (thx=0; thx < M_PI*2; thx += cav_360_step)
+        {
+            for (thy=0; thy < M_PI*2; thy += cav_360_step)
+            {
+                for (thz=0; thz < M_PI*2; thz += cav_360_step)
+                {
+                    f = 0;
+                    for (i=0; i<n; i++)
+                    {
+                        f += sphere_inside_pocket(ligand->get_atom(i)->get_sphere());
+                    }
+
+                    if (f > bestc)
+                    {
+                        bestc = f;
+                        best.copy_state(ligand);
+                    }
+
+                    lv = axisz;
+                    lv.origin = matom[m]->get_location();
+                    ligand->rotate(lv, cav_360_step);
+                }   // for thz
+
+                lv = axisy;
+                lv.origin = matom[m]->get_location();
+                ligand->rotate(lv, cav_360_step);
+            }   // for thy
+
+            lv = axisx;
+            lv.origin = matom[m]->get_location();
+            ligand->rotate(lv, cav_360_step);
+        }   // for thx
+        best.restore_state(ligand);
+
+        // Do xyz wiggle to improve containment.
+        for (j=0; j<=26; j++)
+        {
+            Point maybe = ligand->get_barycenter();
+            l=0;
+            _retry__linear_motion:
+            maybe.x += 0.5 * (j%3-1);
+            maybe.y += 0.5 * ((j/3)%3-1);
+            maybe.z += 0.5 * j/9;
+
+            ligand->recenter(maybe);
+            f = 0;
+            for (i=0; i<n; i++)
+            {
+                f += sphere_inside_pocket(ligand->get_atom(i)->get_sphere());
+            }
+
+            if (f > bestc)
+            {
+                best.copy_state(ligand);
+                bestc = f;
+                l++;
+                if (l < 5) goto _retry__linear_motion;
+            }
+        }
+        best.restore_state(ligand);
+        if (!m) best_of_all.copy_state(ligand);
+
+        // If no satisfactory containment, go on to next match.
+        // Return true if good match found.
+        if (bestc >= min_cavmatch_ctainmt)
+        {
+            if (match_atom) *match_atom = matom[m];
+            if (match_partial) *match_partial = mpart[m];
+            return bestc;
+        }
+        if (!m) f0 = bestc;
+    }
+
+    if (match_atom) *match_atom = matom[0];
+    if (match_partial) *match_partial = mpart[0];
+    best_of_all.restore_state(ligand);
+    return f0;
 }
 
 std::string Cavity::resnos_as_string(Protein* p)

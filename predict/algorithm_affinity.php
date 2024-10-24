@@ -47,21 +47,21 @@ function make_prediction($data)
         $ittns = floatval(@$data['i_occlusion'] ?: 1);
 
         $data['DockScore'] = 0;
-        if ($activation >= $baseline) $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns * $afound, 4);
+        if ($activation >= $baseline) $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns, 4);
 
         if ($activation >= $baseline && $data['DockScore'] > 0)
         {
             $data['Predicted'] = 'Agonist';
             $data['Affinity'] = round(-$aenergy, 4);
             $data['A100'] = round($aa100, 4);
-            $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns * $afound, 4);
+            $data['DockScore'] = round(-$aenergy * $activation * min($aa100, 20)/20 * $attns, 4);
         }
         else if ($ienergy > 0)
         {
             $data['Affinity'] = round(-$ienergy, 4);
             $data['A100'] = round($ia100, 4);
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = round(-$ienergy * ($baseline-$activation) * $ia100/20 * $ittns * $ifound, 4);
+            $data['DockScore'] = round(-$ienergy * ($baseline-$activation) * $ia100/20 * $ittns, 4);
         }
         else
         {

@@ -291,7 +291,7 @@ function prepare_outputs()
     $odor = find_odorant($ligname);
 
     $size = "7.5 7.5 7.5";
-    $search = $extcavfit ? "CF" : "CS";
+    $search = $extcavfit ? "CF" : "CF";
     $atomto = [];
     $excl = "";
     $nodel = "";
@@ -973,7 +973,7 @@ $vcvty
 
 $cenres
 SIZE $size
-# H2O 5
+H2O 1
 $mcoord
 $atomto
 $stcr
